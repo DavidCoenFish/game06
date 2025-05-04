@@ -1,0 +1,45 @@
+// HelloWorld
+//------------------------------------------------------------------------------
+
+#include "fbuild\windows\windows.bff"
+Using(.Windows10_SDK_X64)
+#include "fbuild\visualstudio\visualstudio.bff"
+
+//Print(.VisualStudioSettings)
+Print(.CompilerOptions)
+
+//Print(.Windows10_SDK_X64)
+
+// Settings
+//------------------------------------------------------------------------------
+Settings
+{
+    .Environment    = { "TMP=C:\Windows\Temp",
+                        "SystemRoot=C:\Windows" }
+}
+
+
+// HelloWorld
+//------------------------------------------------------------------------------
+ObjectList( 'HelloWorld-Lib' )
+{
+    //.Compiler = 'Compiler-VS2019-x64'
+    .CompilerInputFiles  = {'test.cpp'}
+    .CompilerOutputPath = 'Out\'
+}
+
+//C:\Program Files (x86)\Microsoft Visual Studio\VC98\Lib\MSVCRT.LIB
+//C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\stdio.h
+
+Executable( 'HelloWorld' )
+{
+    .Libraries          = { "HelloWorld-Lib" }
+    .LinkerOutput       = '..\build\test.exe'
+    .LinkerOptions      + ' libcmt.lib'     // Std Lib (Multi-Threaded, Static, Release)
+                        + ' kernel32.lib'   // Kernel functions
+//+ ' MSVCRT.LIB'
+}
+
+// All
+//------------------------------------------------------------------------------
+Alias( 'all' ) { .Targets = { 'HelloWorld' } }

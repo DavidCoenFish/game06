@@ -5,3 +5,9 @@ static lib dag:
 static lib render:
 static lib dag render:
 static lib ui:
+
+executable common: app facet [unit test]
+executable render: app facet [triangle, ...]
+
+tool: automatron [build, test, commit]
+
