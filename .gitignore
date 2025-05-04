@@ -1,0 +1,15 @@
+*.exe
+
+# Git
+.git/
+
+# Python
+dist/
+__pycache__/
+*.spec
+
+# Visual studio
+.vscode/
+.vs/
+build/
+

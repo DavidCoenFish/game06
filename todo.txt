@@ -1,0 +1,6 @@
+- ui (see todo_ui.txt)
+- rts demo (see todo_rts.txt)
+- blob renderer
+- personality decal
+- shadow blob (folds upward to look around, laughs, eyes track mouse pointer...)
+- anatomy study shaders

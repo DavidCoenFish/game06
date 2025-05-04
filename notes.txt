@@ -1,0 +1,7 @@
+boot strap -> runs app facet via cmd line
+
+static lib common: boot strap, log, thread task, math, file system
+static lib dag:
+static lib render:
+static lib dag render:
+static lib ui:
