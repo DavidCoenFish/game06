@@ -6,6 +6,8 @@ Library( "dsc_common" )
 VCXProject( "dsc_common_project" )
 {
 	.ProjectOutput = "$_CURRENT_BFF_DIR_$\dsc_common.vcxproj"
-	.ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\source\"
+
+    .ProjectInputPathsRecurse   = true
+	.ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\"
 	.ProjectFiles = "$_CURRENT_BFF_DIR_$\fbuild.bff"
 }
