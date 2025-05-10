@@ -1,4 +1,7 @@
 //https://github.com/fastbuild/fastbuild/tree/main/External/SDK/Windows
+
+#once
+
 // Windows
 //------------------------------------------------------------------------------
 #if __WINDOWS__
@@ -9,7 +12,7 @@
 // Activate
 //------------------------------------------------------------------------------
 #if USING_WINDOWS10_SDK
-    #include "Windows10SDK.bff"
+    #include "windows10sdk.bff"
     Alias( 'ResourceCompiler' ) { .Targets = 'ResourceCompiler-Windows10' }
 #endif
 

@@ -1,45 +1,195 @@
-// HelloWorld
-//------------------------------------------------------------------------------
+Print("")
+Print("_CURRENT_BFF_DIR_: $_CURRENT_BFF_DIR_$")
+Print("_FASTBUILD_VERSION_STRING_: $_FASTBUILD_VERSION_STRING_$")
+Print("_FASTBUILD_VERSION_: $_FASTBUILD_VERSION_$")
+Print("_FASTBUILD_EXE_PATH_: $_FASTBUILD_EXE_PATH_$")
+Print("_WORKING_DIR_: $_WORKING_DIR_$")
 
-#include "fbuild\windows\windows.bff"
-Using(.Windows10_SDK_X64)
 #include "fbuild\visualstudio\visualstudio.bff"
-
-//Print(.VisualStudioSettings)
-Print(.CompilerOptions)
-
-//Print(.Windows10_SDK_X64)
+#include "fbuild\windows\windows.bff"
 
 // Settings
 //------------------------------------------------------------------------------
 Settings
 {
-    .Environment    = { "TMP=C:\Windows\Temp",
-                        "SystemRoot=C:\Windows" }
+    #if __WINDOWS__
+        #import TMP
+        .Environment    = { "PATH=$VS_PATH$;$WINDOWS_SDK_2019_PATH$",
+                            "TMP=$TMP$",
+                            "SystemRoot=C:\Windows" }
+    #endif
 }
 
-
-// HelloWorld
 //------------------------------------------------------------------------------
-ObjectList( 'HelloWorld-Lib' )
-{
-    //.Compiler = 'Compiler-VS2019-x64'
-    .CompilerInputFiles  = {'test.cpp'}
-    .CompilerOutputPath = 'Out\'
-}
-
-//C:\Program Files (x86)\Microsoft Visual Studio\VC98\Lib\MSVCRT.LIB
-//C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\stdio.h
-
-Executable( 'HelloWorld' )
-{
-    .Libraries          = { "HelloWorld-Lib" }
-    .LinkerOutput       = '..\build\test.exe'
-    .LinkerOptions      + ' libcmt.lib'     // Std Lib (Multi-Threaded, Static, Release)
-                        + ' kernel32.lib'   // Kernel functions
-//+ ' MSVCRT.LIB'
-}
-
-// All
+// Config Defines
 //------------------------------------------------------------------------------
-Alias( 'all' ) { .Targets = { 'HelloWorld' } }
+.Debug_Config =
+[
+    .CompilerOptions                = ' -DDEBUG -DPROFILING_ENABLED'
+    .CompilerOptionsC               = .CompilerOptions
+    .BuildConfigName                = 'debug'
+]
+.Profile_Config =
+[
+    .CompilerOptions                = ' -DRELEASE -DPROFILING_ENABLED'
+    .CompilerOptionsC               = .CompilerOptions
+    .BuildConfigName                = 'profile'
+]
+.Release_Config =
+[
+    .CompilerOptions                = ' -DRELEASE'
+    .CompilerOptionsC               = .CompilerOptions
+    .CompilerOptionsDeoptimized     = .CompilerOptions
+    .BuildConfigName                = 'release'
+]
+
+//------------------------------------------------------------------------------
+// Optimizations (MSVC)
+//------------------------------------------------------------------------------
+#if __WINDOWS__
+    .Debug_Optimizations_MSVC =
+    [
+        .CompilerOptions                = ' /MTd /Od /RTC1 /GS /Oy-'
+        .CompilerOptionsC               = .CompilerOptions
+    ]
+    .Profile_Optimizations_MSVC =
+    [
+        .CompilerOptions                = ' /MT /Ox /Oy /Oi /GS- /GF /Gy /Gw /Zo'
+        .CompilerOptionsC               = .CompilerOptions
+        .LinkerOptions                  = ' /OPT:REF,ICF'
+    ]
+    .Release_Optimizations_MSVC =
+    [
+        Using( .Profile_Optimizations_MSVC )
+        .CompilerOptionsDeoptimized     = .CompilerOptions
+                                        - ' /Ox'
+                                        + ' /Od'
+    ]
+#endif
+
+// X64
+//------------------------------------------------------------------------------
+#if __WINDOWS__
+    .X64BaseConfig              = .ToolChain_VS_Windows_X64
+                                + .Windows10_SDK_X64
+    .X64DebugConfig             = .X64BaseConfig
+                                + .Debug_Config
+                                + .Debug_Optimizations_MSVC
+    .X64ReleaseConfig           = .X64BaseConfig
+                                + .Release_Config
+                                + .Release_Optimizations_MSVC
+    .X64ProfileConfig           = .X64BaseConfig
+                                + .Profile_Config
+                                + .Profile_Optimizations_MSVC
+#endif
+
+//------------------------------------------------------------------------------
+// VisualStudio Project Generation
+//------------------------------------------------------------------------------
+#if __WINDOWS__
+    .ProjectCommon =
+    [
+        .ProjectBuildCommand        = '$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform)'
+        .ProjectRebuildCommand      = '$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform)'
+
+        .OutputDirectory            = "$_WORKING_DIR_$\..\build\^$(SolutionName)\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
+        .IntermediateDirectory 	    = "$_WORKING_DIR_$\..\build\^$(SolutionName)\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
+        .BuildLogFile               = '$_WORKING_DIR_$\..\build\^$(SolutionName)\^$(ProjectName)\^$(Platform)\^$(Configuration)\build.log'
+
+        .Platform                   = 'x64'
+        .PlatformToolset            = '$VS_PlatformToolset$'
+    ]
+
+    .Project_x64_Debug        = [ 
+	Using( .ProjectCommon ) 
+	.SolutionPlatform = '$Platform$'
+        .SolutionConfig = 'debug'   
+	.Config = '$SolutionConfig$' 
+	]
+    .Project_x64_Profile      = [ 
+	Using( .ProjectCommon ) 
+	.SolutionPlatform = '$Platform$'
+	.SolutionConfig = 'profile' 
+	.Config = '$SolutionConfig$' 
+	]
+    .Project_x64_Release      = [ 
+	Using( .ProjectCommon ) 
+	.SolutionPlatform = '$Platform$'
+	.SolutionConfig = 'release' 
+	.Config = '$SolutionConfig$' 
+	]
+#endif
+
+.ProjectConfigs = { .Project_x64_Debug, .Project_x64_Profile, .Project_x64_Release }
+
+
+// Configurations
+//------------------------------------------------------------------------------
+#if __WINDOWS__
+    .BuildConfigs               = { .X64DebugConfig, .X64ProfileConfig, .X64ReleaseConfig }
+#endif
+
+.Targets_x64_Debug = {}
+.Targets_x64_Profile = {}
+.Targets_x64_Release = {}
+
+
+#include "application\fbuild.bff"
+#include "staticlib\fbuild.bff"
+
+
+VSSolution("solution")
+{
+    .SolutionOutput = "solution.sln"
+    .SolutionProjects = {"dsc_common_project"}
+    .SolutionBuildProject = "dsc_common_project"
+    .SolutionConfigs = {}
+    ForEach( .ProjectConfig in .ProjectConfigs )
+    {            
+        .SolutionConfig         = [ Using( .ProjectConfig ) ]
+        ^SolutionConfigs        + .SolutionConfig
+    }
+
+    .FolderStatlicLib = [
+        .Path           = 'staticlib'
+        .Projects       = { "dsc_common_project" }
+    ]
+
+    .FolderFBuild = [
+        .Path           = "fbuild"
+        .Items = { "fast_build.cmd", "fbuild.bff" }
+    ]
+    .FolderFBuildVisualStudio = [
+        .Path = "fbuild/fbuild/visualstudio"
+        .Items = { "fbuild/visualstudio/visualstudio.bff", "fbuild/visualstudio/vs2019.bff", "fbuild/visualstudio/vs2022.bff"}
+    ]
+    .FolderFBuildWindows = [
+        .Path = "fbuild/fbuild/windows"
+        .Items = { "fbuild/windows/windows.bff", "fbuild/windows/windows10sdk.bff"}
+    ]
+    .FolderFBuildStaticlib = [
+        .Path = "fbuild/staticlib"
+        .Items = { "staticlib/fbuild.bff"}
+    ]
+    .FolderFBuildStaticlibDscCommon = [
+        .Path = "fbuild/staticlib/dsc_common"
+        .Items = { "staticlib/dsc_common/fbuild.bff"}
+    ]
+
+    .SolutionFolders = {
+        .FolderStatlicLib, 
+        .FolderFBuild, 
+        .FolderFBuildVisualStudio, 
+        .FolderFBuildWindows, 
+        .FolderFBuildStaticlib, 
+        .FolderFBuildStaticlibDscCommon
+        }
+}
+
+Alias("all")
+{
+	.Targets = {"solution"}
+}
+
+Print("end of fbuild.bff")
+Print("")

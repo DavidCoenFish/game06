@@ -1,4 +1,7 @@
 //https://github.com/fastbuild/fastbuild/tree/main/External/SDK/Windows
+
+#once
+
 // Windows 10 SDK
 //------------------------------------------------------------------------------
 //

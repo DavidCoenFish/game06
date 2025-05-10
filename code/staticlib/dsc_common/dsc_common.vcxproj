@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|x64">
+      <Configuration>profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="fbuild.bff" />
+    <CustomBuild Include="source\angle.cpp" />
+    <CustomBuild Include="source\angle.h" />
+    <CustomBuild Include="source\math.cpp" />
+    <CustomBuild Include="source\math.h" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{84f84fc5-6c94-4f93-bc2a-7f5284b7d434}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
+    <IntDir>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
+    <OutDir>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
+    <IntDir>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
+    <OutDir>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
+    <IntDir>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
+    <OutDir>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <BuildLog>
+    <Path>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\build.log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <BuildLog>
+    <Path>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\build.log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <BuildLog>
+    <Path>C:\development\game06\code\..\build\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\build.log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
+  <Import Condition="'$(ConfigurationType)' == 'Makefile' and '$(AndroidAPILevel)' != '' and Exists('$(VCTargetsPath)\Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Android.Common.targets')" Project="$(VCTargetsPath)\Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Android.Common.targets" />
+</Project>

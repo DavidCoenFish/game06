@@ -1,0 +1,65 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_common", "staticlib\dsc_common\dsc_common.vcxproj", "{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fbuild", "fbuild", "{14ED4822-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		fast_build.cmd = fast_build.cmd
+		fbuild.bff = fbuild.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fbuild", "fbuild", "{6820D62E-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "visualstudio", "visualstudio", "{CEEBC01B-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		fbuild\visualstudio\visualstudio.bff = fbuild\visualstudio\visualstudio.bff
+		fbuild\visualstudio\vs2019.bff = fbuild\visualstudio\vs2019.bff
+		fbuild\visualstudio\vs2022.bff = fbuild\visualstudio\vs2022.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{93211CA4-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		fbuild\windows\windows.bff = fbuild\windows\windows.bff
+		fbuild\windows\windows10sdk.bff = fbuild\windows\windows10sdk.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "staticlib", "staticlib", "{52BD33DC-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		staticlib\fbuild.bff = staticlib\fbuild.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_common", "dsc_common", "{FF7FDAD7-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		staticlib\dsc_common\fbuild.bff = staticlib\dsc_common\fbuild.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "staticlib", "staticlib", "{51B0D35D-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|x64 = debug|x64
+		profile|x64 = profile|x64
+		release|x64 = release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.Build.0 = debug|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.profile|x64.ActiveCfg = profile|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.profile|x64.Build.0 = profile|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.release|x64.Build.0 = release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
+		{6820D62E-6C94-4F93-BC2A-7F5284B7D434} = {14ED4822-6C94-4F93-BC2A-7F5284B7D434}
+		{CEEBC01B-6C94-4F93-BC2A-7F5284B7D434} = {6820D62E-6C94-4F93-BC2A-7F5284B7D434}
+		{93211CA4-6C94-4F93-BC2A-7F5284B7D434} = {6820D62E-6C94-4F93-BC2A-7F5284B7D434}
+		{52BD33DC-6C94-4F93-BC2A-7F5284B7D434} = {14ED4822-6C94-4F93-BC2A-7F5284B7D434}
+		{FF7FDAD7-6C94-4F93-BC2A-7F5284B7D434} = {52BD33DC-6C94-4F93-BC2A-7F5284B7D434}
+	EndGlobalSection
+EndGlobal
