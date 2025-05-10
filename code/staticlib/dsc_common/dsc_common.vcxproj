@@ -57,20 +57,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -dbfile C:\development\game06\code\..\build\fastbuild.fdb</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -dbfile C:\development\game06\code\..\build\fastbuild.fdb</NMakeReBuildCommandLine>
     <IntDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
     <OutDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
-    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -dbfile C:\development\game06\code\..\build\fastbuild.fdb</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -dbfile C:\development\game06\code\..\build\fastbuild.fdb</NMakeReBuildCommandLine>
     <IntDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
     <OutDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -dbfile C:\development\game06\code\..\build\fastbuild.fdb</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>C:\development\game06\code\..\bin\fbuild.exe -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -dbfile C:\development\game06\code\..\build\fastbuild.fdb</NMakeReBuildCommandLine>
     <IntDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
     <OutDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
   </PropertyGroup>

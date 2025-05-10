@@ -1,4 +1,5 @@
 #include "angle.h"
+#include "math.h"
 
 const float Angle::DegToRadian(const float in_deg)
 {

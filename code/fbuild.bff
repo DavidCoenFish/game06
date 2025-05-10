@@ -25,22 +25,22 @@ Settings
 //------------------------------------------------------------------------------
 .Debug_Config =
 [
-    .CompilerOptions                = ' -DDEBUG -DPROFILING_ENABLED'
+    .CompilerOptions                = " -DDEBUG -DPROFILING_ENABLED"
     .CompilerOptionsC               = .CompilerOptions
-    .BuildConfigName                = 'debug'
+    .BuildConfigName                = "debug"
 ]
 .Profile_Config =
 [
-    .CompilerOptions                = ' -DRELEASE -DPROFILING_ENABLED'
+    .CompilerOptions                = " -DRELEASE -DPROFILING_ENABLED"
     .CompilerOptionsC               = .CompilerOptions
-    .BuildConfigName                = 'profile'
+    .BuildConfigName                = "profile"
 ]
 .Release_Config =
 [
-    .CompilerOptions                = ' -DRELEASE'
+    .CompilerOptions                = " -DRELEASE"
     .CompilerOptionsC               = .CompilerOptions
     .CompilerOptionsDeoptimized     = .CompilerOptions
-    .BuildConfigName                = 'release'
+    .BuildConfigName                = "release"
 ]
 
 //------------------------------------------------------------------------------
@@ -49,21 +49,21 @@ Settings
 #if __WINDOWS__
     .Debug_Optimizations_MSVC =
     [
-        .CompilerOptions                = ' /MTd /Od /RTC1 /GS /Oy-'
+        .CompilerOptions                = " /MTd /Od /RTC1 /GS /Oy-"
         .CompilerOptionsC               = .CompilerOptions
     ]
     .Profile_Optimizations_MSVC =
     [
-        .CompilerOptions                = ' /MT /Ox /Oy /Oi /GS- /GF /Gy /Gw /Zo'
+        .CompilerOptions                = " /MT /Ox /Oy /Oi /GS- /GF /Gy /Gw /Zo"
         .CompilerOptionsC               = .CompilerOptions
-        .LinkerOptions                  = ' /OPT:REF,ICF'
+        .LinkerOptions                  = " /OPT:REF,ICF"
     ]
     .Release_Optimizations_MSVC =
     [
         Using( .Profile_Optimizations_MSVC )
         .CompilerOptionsDeoptimized     = .CompilerOptions
-                                        - ' /Ox'
-                                        + ' /Od'
+                                        - " /Ox"
+                                        + " /Od"
     ]
 #endif
 
@@ -89,34 +89,34 @@ Settings
 #if __WINDOWS__
     .ProjectCommon =
     [
-        .ProjectBuildCommand        = '$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform)'
-        .ProjectRebuildCommand      = '$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform)'
+        .ProjectBuildCommand        = "$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -dbfile $_WORKING_DIR_$\..\build\fastbuild.fdb"
+        .ProjectRebuildCommand      = "$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -dbfile $_WORKING_DIR_$\..\build\fastbuild.fdb"
 
         .OutputDirectory            = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
         .IntermediateDirectory 	    = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
-        .BuildLogFile               = '$_WORKING_DIR_$\..\build\^$(SolutionName)\^$(ProjectName)\^$(Platform)\^$(Configuration)\build.log'
+        .BuildLogFile               = "$_WORKING_DIR_$\..\build\^$(SolutionName)\^$(ProjectName)\^$(Platform)\^$(Configuration)\build.log"
 
-        .Platform                   = 'x64'
-        .PlatformToolset            = '$VS_PlatformToolset$'
+        .Platform                   = "x64"
+        .PlatformToolset            = "$VS_PlatformToolset$"
     ]
 
     .Project_x64_Debug        = [ 
-	Using( .ProjectCommon ) 
-	.SolutionPlatform = '$Platform$'
-        .SolutionConfig = 'debug'   
-	.Config = '$SolutionConfig$' 
+        Using( .ProjectCommon ) 
+        .SolutionPlatform = "$Platform$"
+        .SolutionConfig = "debug"   
+        .Config = "$SolutionConfig$" 
 	]
     .Project_x64_Profile      = [ 
-	Using( .ProjectCommon ) 
-	.SolutionPlatform = '$Platform$'
-	.SolutionConfig = 'profile' 
-	.Config = '$SolutionConfig$' 
+        Using( .ProjectCommon ) 
+        .SolutionPlatform = "$Platform$"
+        .SolutionConfig = "profile" 
+        .Config = "$SolutionConfig$" 
 	]
     .Project_x64_Release      = [ 
-	Using( .ProjectCommon ) 
-	.SolutionPlatform = '$Platform$'
-	.SolutionConfig = 'release' 
-	.Config = '$SolutionConfig$' 
+        Using( .ProjectCommon ) 
+        .SolutionPlatform = "$Platform$"
+        .SolutionConfig = "release" 
+        .Config = "$SolutionConfig$" 
 	]
 #endif
 
@@ -151,7 +151,7 @@ VSSolution("solution")
     }
 
     .FolderParent = [
-        .Path           = 'parent'
+        .Path           = "parent"
         .Items = { 
             "../.gitignore",
             "../commit.cmd",
@@ -164,7 +164,7 @@ VSSolution("solution")
             }
     ]
     .FolderStatlicLib = [
-        .Path           = 'staticlib'
+        .Path           = "staticlib"
         .Projects       = { "dsc_common_project" }
     ]
 

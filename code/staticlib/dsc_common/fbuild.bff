@@ -1,6 +1,11 @@
-Library( "dsc_common" )
+Print("hello")
+Print("$Librarian$")
+
+Library( "dsc_common_debug_x64" )
 {
-	.LibrarianOutput = "$_WORKING_DIR_$\build\dsc_common.lib"
+	.LibrarianOutput = "$_WORKING_DIR_$\..\build\dsc_common\x64\debug\output\dsc_common.lib"
+	.CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
+	.CompilerOutputPath = "$_WORKING_DIR_$\..\build\dsc_common\x64\debug\intermediate\"
 }
 
 VCXProject( "dsc_common_project" )
@@ -8,6 +13,6 @@ VCXProject( "dsc_common_project" )
 	.ProjectOutput = "$_CURRENT_BFF_DIR_$\dsc_common.vcxproj"
 
     .ProjectInputPathsRecurse   = true
-	.ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\"
+	.ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\source\"
 	.ProjectFiles = "$_CURRENT_BFF_DIR_$\fbuild.bff"
 }

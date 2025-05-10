@@ -5,7 +5,7 @@ PUSHD %~dp0
 cls
 ::..\bin\FBuild.exe -verbose -showcmdoutput -showcmds -showdeps -showtargets -showalltargets -summary 
 
-..\bin\FBuild.exe all -summary -verbose 
+..\bin\FBuild.exe all -summary -verbose -dbfile ..\build\fastbuild.fdb
 
 POPD
 
