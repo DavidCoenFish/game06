@@ -153,6 +153,7 @@ VSSolution("solution")
     .FolderParent = [
         .Path           = 'parent'
         .Items = { 
+            "../.gitignore",
             "../commit.cmd",
             "../launch_visual_studio_code.cmd",
             "../notes.txt",

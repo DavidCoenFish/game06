@@ -37,12 +37,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_common", "dsc_common", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parent", "parent", "{3D8E604F-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
 		..\README.md = ..\README.md
 		..\Reset.cmd = ..\Reset.cmd
 		..\commit.cmd = ..\commit.cmd
 		..\launch_visual_studio_code.cmd = ..\launch_visual_studio_code.cmd
 		..\notes.txt = ..\notes.txt
-		..\script = ..\script
 		..\sync.cmd = ..\sync.cmd
 		..\todo.txt = ..\todo.txt
 	EndProjectSection

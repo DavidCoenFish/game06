@@ -1,5 +1,7 @@
 # *.exe
 
+build/
+
 # Git
 .git/
 
@@ -11,7 +13,10 @@ __pycache__/
 # Visual studio
 .vscode/
 .vs/
-build/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.vcxproj.user
 
 # Fast build
 *.fdb
