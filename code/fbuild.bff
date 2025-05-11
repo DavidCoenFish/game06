@@ -104,7 +104,7 @@ Settings
 
         .OutputDirectory            = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
         .IntermediateDirectory 	    = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
-        .BuildLogFile               = "$_WORKING_DIR_$\..\build\^$(SolutionName)\^$(ProjectName)\^$(Platform)\^$(Configuration)\build.log"
+        .BuildLogFile               = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\build_^$(SolutionName).log"
 
         .Platform                   = "x64"
         .PlatformToolset            = "$VS_PlatformToolset$"

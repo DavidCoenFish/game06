@@ -21,3 +21,4 @@ IF 0 NEQ %ERRORLEVEL% (
   exit /b -1
 )
 
+POPD
