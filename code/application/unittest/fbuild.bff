@@ -29,6 +29,10 @@ ForEach( .BuildConfig in .BuildConfigs )
                        + ' Ws2_32.lib'
                        + ' User32.lib'
                        + .CRTLibs_Static
+                       ///SUBSYSTEM:CONSOLE
+                       Print("")
+                       Print(".LinkerOptions:$LinkerOptions$")
+                       Print("")
 
         .CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
         .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\"
