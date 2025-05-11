@@ -1,33 +1,33 @@
 .ProjectName = "dsc_common"
 
-ForEach( .ProjectConfig in .ProjectConfigs )
+ForEach( .BuildConfig in .BuildConfigs )
 {
-    Using(.ProjectConfig)
-    Print("$ProjectName$_$Config$_$Platform$")
+    Using( .BuildConfig )
+    Print("$ProjectName$_$BuildConfigName$_$Platform$")
 
-    Library( "$ProjectName$_$Config$_$Platform$" )
+    Library( "$ProjectName$_$BuildConfigName$_$Platform$" )
     {
-        .LibrarianOutput = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\output\$ProjectName$.lib"
+        .LibrarianOutput = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output\$ProjectName$.lib"
         .CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
-        .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
+        .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\"
     }
 
-    RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" ) // Name (required)
+    RemoveDir( "clean_$ProjectName$_$BuildConfigName$_$Platform$" ) // Name (required)
     {
         .RemovePaths = { 
-            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\output\", 
-            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\", 
+            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output\", 
+            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\", 
             }
     }
 }
 
-VCXProject( "dsc_common_project" )
+VCXProject( "$ProjectName$_project" )
 {
-	.ProjectOutput = "$_CURRENT_BFF_DIR_$\dsc_common.vcxproj"
+    .ProjectOutput = "$_CURRENT_BFF_DIR_$\$ProjectName$.vcxproj"
 
     .ProjectInputPathsRecurse   = true
-	.ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\source\"
-	.ProjectFiles = "$_CURRENT_BFF_DIR_$\fbuild.bff"
+    .ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\source\"
+    .ProjectFiles = "$_CURRENT_BFF_DIR_$\fbuild.bff"
 }
 
 {

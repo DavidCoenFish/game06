@@ -1,9 +1,9 @@
 Print("")
-Print("_CURRENT_BFF_DIR_: $_CURRENT_BFF_DIR_$")
-Print("_FASTBUILD_VERSION_STRING_: $_FASTBUILD_VERSION_STRING_$")
-Print("_FASTBUILD_VERSION_: $_FASTBUILD_VERSION_$")
-Print("_FASTBUILD_EXE_PATH_: $_FASTBUILD_EXE_PATH_$")
-Print("_WORKING_DIR_: $_WORKING_DIR_$")
+//Print("_CURRENT_BFF_DIR_: $_CURRENT_BFF_DIR_$")
+//Print("_FASTBUILD_VERSION_STRING_: $_FASTBUILD_VERSION_STRING_$")
+//Print("_FASTBUILD_VERSION_: $_FASTBUILD_VERSION_$")
+//Print("_FASTBUILD_EXE_PATH_: $_FASTBUILD_EXE_PATH_$")
+//Print("_WORKING_DIR_: $_WORKING_DIR_$")
 
 .FoldersFBuild = {}
 {
@@ -15,7 +15,16 @@ Print("_WORKING_DIR_: $_WORKING_DIR_$")
 }
 
 #include "fbuild\visualstudio\visualstudio.bff"
+
 #include "fbuild\windows\windows.bff"
+
+//Print("LinkerOptions:$LinkerOptions$")
+//{
+//    Using(.Windows10_SDK_X64)
+//    ^CompilerOptions + .CompilerOptions
+//    ^LinkerOptions + .LinkerOptions
+//}
+//Print("LinkerOptions:$LinkerOptions$")
 
 // Settings
 //------------------------------------------------------------------------------
@@ -149,8 +158,8 @@ Settings
 VSSolution("solution")
 {
     .SolutionOutput = "solution.sln"
-    .SolutionProjects = {"dsc_common_project"}
-    .SolutionBuildProject = "dsc_common_project"
+    .SolutionProjects = {"unittest_project", "dsc_common_project"}
+    .SolutionBuildProject = "unittest_project"
     .SolutionConfigs = {}
     ForEach( .ProjectConfig in .ProjectConfigs )
     {            
@@ -158,12 +167,18 @@ VSSolution("solution")
         ^SolutionConfigs        + .SolutionConfig
     }
 
-
     .SolutionFolders = .FoldersFBuild;
     {
         .temp = [
             .Path           = "staticlib"
             .Projects       = { "dsc_common_project" }
+        ]
+        ^SolutionFolders + .temp;
+    }
+    {
+        .temp = [
+            .Path           = "application"
+            .Projects       = { "unittest_project" }
         ]
         ^SolutionFolders + .temp;
     }

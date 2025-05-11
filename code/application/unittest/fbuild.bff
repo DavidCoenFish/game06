@@ -1,3 +1,58 @@
+.ProjectName = "unittest"
+
+//https://github.com/fastbuild/fastbuild/blob/main/Code/Tools/FBuild/FBuild/FBuild.bff
+
+ForEach( .BuildConfig in .BuildConfigs )
+{
+    Using( .BuildConfig )
+
+    ObjectList( "$ProjectName$_$BuildConfigName$_$Platform$_obj" )
+    {
+        .CompilerInputPath  = "$_CURRENT_BFF_DIR_$\source\"
+        .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\"
+    }
+
+    Executable( "$ProjectName$_$BuildConfigName$_$Platform$" )
+    {
+        .LinkerOutput = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output\$ProjectName$.exe"
+        .Libraries =  { "$ProjectName$_$BuildConfigName$_$Platform$_obj" }
+        //.Libraries =  { "$ProjectName$_$BuildConfigName$_$Platform$_obj", "dsc_common_$BuildConfigName$_$Platform$" }
+        //.LinkerOptions + "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output"
+
+        .LinkerOptions + ' /SUBSYSTEM:CONSOLE'
+                       + ' libcmt.lib'     // Std Lib (Multi-Threaded, Static, Release)
+                       + ' kernel32.lib'   // Kernel functions
+                       + ' Advapi32.lib'
+                       + ' Iphlpapi.lib'
+                       + ' kernel32.lib'
+                       + ' Shell32.lib'
+                       + ' Ws2_32.lib'
+                       + ' User32.lib'
+                       + .CRTLibs_Static
+
+        .CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
+        .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\"
+    }
+
+    RemoveDir( "clean_$ProjectName$_$BuildConfigName$_$Platform$" ) // Name (required)
+    {
+        .RemovePaths = { 
+            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output\", 
+            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\", 
+            }
+    }
+}
+
+
+VCXProject( "$ProjectName$_project" )
+{
+    .ProjectOutput = "$_CURRENT_BFF_DIR_$\$ProjectName$.vcxproj"
+
+    .ProjectInputPathsRecurse   = true
+    .ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\source\"
+    .ProjectFiles = "$_CURRENT_BFF_DIR_$\fbuild.bff"
+}
+
 {
     .temp = [
         .Path = "fbuild/application/unittest"
