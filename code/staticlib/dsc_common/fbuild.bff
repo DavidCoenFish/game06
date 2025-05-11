@@ -1,11 +1,21 @@
-Print("hello")
-Print("$Librarian$")
+.ProjectName = "dsc_common"
 
-Library( "dsc_common_debug_x64" )
+ForEach( .ProjectConfig in .ProjectConfigs )
 {
-	.LibrarianOutput = "$_WORKING_DIR_$\..\build\dsc_common\x64\debug\output\dsc_common.lib"
-	.CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
-	.CompilerOutputPath = "$_WORKING_DIR_$\..\build\dsc_common\x64\debug\intermediate\"
+    Using(.ProjectConfig)
+    Print("$ProjectName$_$Config$_$Platform$")
+
+    Library( "$ProjectName$_$Config$_$Platform$" )
+    {
+        .LibrarianOutput = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\output\$ProjectName$.lib"
+        .CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
+        .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
+    }
+
+    RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" ) // Name (required)
+    {
+        .RemovePaths = { "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\" }
+    }
 }
 
 VCXProject( "dsc_common_project" )
@@ -15,4 +25,12 @@ VCXProject( "dsc_common_project" )
     .ProjectInputPathsRecurse   = true
 	.ProjectInputPaths  = "$_CURRENT_BFF_DIR_$\source\"
 	.ProjectFiles = "$_CURRENT_BFF_DIR_$\fbuild.bff"
+}
+
+{
+    .temp = [
+        .Path = "fbuild/staticlib/dsc_common"
+        .Items = { "staticlib/dsc_common/fbuild.bff"}
+    ]
+    ^FoldersFBuild + .temp
 }

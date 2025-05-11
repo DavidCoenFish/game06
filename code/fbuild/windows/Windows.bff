@@ -18,3 +18,11 @@
 
 //------------------------------------------------------------------------------
 #endif
+
+{
+    .temp = [
+        .Path = "fbuild/fbuild/windows"
+        .Items = { "fbuild/windows/windows.bff", "fbuild/windows/windows10sdk.bff"}
+    ]
+    ^FoldersFBuild + .temp
+}

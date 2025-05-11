@@ -1,0 +1,6 @@
+.temp = [
+    .Path = "fbuild/application"
+    .Items = { "application/fbuild.bff"}
+]
+.FoldersFBuild + .temp
+

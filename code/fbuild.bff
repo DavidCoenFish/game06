@@ -5,6 +5,15 @@ Print("_FASTBUILD_VERSION_: $_FASTBUILD_VERSION_$")
 Print("_FASTBUILD_EXE_PATH_: $_FASTBUILD_EXE_PATH_$")
 Print("_WORKING_DIR_: $_WORKING_DIR_$")
 
+.FoldersFBuild = {}
+{
+    .temp =  [
+        .Path           = "fbuild"
+        .Items = { "fast_build.cmd", "fbuild.bff" }
+    ]
+    ^FoldersFBuild + .temp
+}
+
 #include "fbuild\visualstudio\visualstudio.bff"
 #include "fbuild\windows\windows.bff"
 
@@ -91,6 +100,7 @@ Settings
     [
         .ProjectBuildCommand        = "$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -dbfile $_WORKING_DIR_$\..\build\fastbuild.fdb"
         .ProjectRebuildCommand      = "$_WORKING_DIR_$\..\bin\fbuild.exe -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -dbfile $_WORKING_DIR_$\..\build\fastbuild.fdb"
+        .ProjectCleanCommand        = "$_WORKING_DIR_$\..\bin\fbuild.exe -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -dbfile $_WORKING_DIR_$\..\build\fastbuild.fdb"
 
         .OutputDirectory            = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
         .IntermediateDirectory 	    = "$_WORKING_DIR_$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
@@ -133,10 +143,8 @@ Settings
 .Targets_x64_Profile = {}
 .Targets_x64_Release = {}
 
-
 #include "application\fbuild.bff"
 #include "staticlib\fbuild.bff"
-
 
 VSSolution("solution")
 {
@@ -150,54 +158,31 @@ VSSolution("solution")
         ^SolutionConfigs        + .SolutionConfig
     }
 
-    .FolderParent = [
-        .Path           = "parent"
-        .Items = { 
-            "../.gitignore",
-            "../commit.cmd",
-            "../launch_visual_studio_code.cmd",
-            "../notes.txt",
-            "../README.md",
-            "../Reset.cmd",
-            "../sync.cmd",
-            "../todo.txt"
-            }
-    ]
-    .FolderStatlicLib = [
-        .Path           = "staticlib"
-        .Projects       = { "dsc_common_project" }
-    ]
 
-    .FolderFBuild = [
-        .Path           = "fbuild"
-        .Items = { "fast_build.cmd", "fbuild.bff" }
-    ]
-    .FolderFBuildVisualStudio = [
-        .Path = "fbuild/fbuild/visualstudio"
-        .Items = { "fbuild/visualstudio/visualstudio.bff", "fbuild/visualstudio/vs2019.bff", "fbuild/visualstudio/vs2022.bff"}
-    ]
-    .FolderFBuildWindows = [
-        .Path = "fbuild/fbuild/windows"
-        .Items = { "fbuild/windows/windows.bff", "fbuild/windows/windows10sdk.bff"}
-    ]
-    .FolderFBuildStaticlib = [
-        .Path = "fbuild/staticlib"
-        .Items = { "staticlib/fbuild.bff"}
-    ]
-    .FolderFBuildStaticlibDscCommon = [
-        .Path = "fbuild/staticlib/dsc_common"
-        .Items = { "staticlib/dsc_common/fbuild.bff"}
-    ]
-
-    .SolutionFolders = {
-        .FolderParent,
-        .FolderStatlicLib, 
-        .FolderFBuild, 
-        .FolderFBuildVisualStudio, 
-        .FolderFBuildWindows, 
-        .FolderFBuildStaticlib, 
-        .FolderFBuildStaticlibDscCommon
-        }
+    .SolutionFolders = .FoldersFBuild;
+    {
+        .temp = [
+            .Path           = "staticlib"
+            .Projects       = { "dsc_common_project" }
+        ]
+        ^SolutionFolders + .temp;
+    }
+    {
+        .temp = [
+            .Path           = "parent"
+            .Items = { 
+                "../.gitignore",
+                "../commit.cmd",
+                "../launch_visual_studio_code.cmd",
+                "../notes.txt",
+                "../README.md",
+                "../Reset.cmd",
+                "../sync.cmd",
+                "../todo.txt"
+                }
+        ]
+        ^SolutionFolders + .temp;
+    }
 }
 
 Alias("all")

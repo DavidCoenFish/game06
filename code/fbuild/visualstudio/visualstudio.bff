@@ -27,3 +27,12 @@ Using( .ToolChain_VS_Windows_X64 )
 
 //------------------------------------------------------------------------------
 #endif
+
+{
+    .temp =  [
+        .Path = "fbuild/fbuild/visualstudio"
+        .Items = { "fbuild/visualstudio/visualstudio.bff", "fbuild/visualstudio/vs2019.bff", "fbuild/visualstudio/vs2022.bff"}
+    ]
+    ^FoldersFBuild + .temp
+}
+

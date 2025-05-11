@@ -5,3 +5,10 @@
 //Print("_WORKING_DIR_: $_WORKING_DIR_$")
 
 #include "dsc_common\fbuild.bff"
+
+.temp = [
+    .Path = "fbuild/staticlib"
+    .Items = { "staticlib/fbuild.bff"}
+]
+.FoldersFBuild + .temp
+
