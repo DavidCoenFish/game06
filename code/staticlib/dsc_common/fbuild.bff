@@ -14,7 +14,10 @@ ForEach( .ProjectConfig in .ProjectConfigs )
 
     RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" ) // Name (required)
     {
-        .RemovePaths = { "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\" }
+        .RemovePaths = { 
+            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\output\", 
+            "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\", 
+            }
     }
 }
 
