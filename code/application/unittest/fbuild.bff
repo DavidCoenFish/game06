@@ -14,10 +14,11 @@ ForEach( .BuildConfig in .BuildConfigs )
 
     Executable( "$ProjectName$_$BuildConfigName$_$Platform$" )
     {
+        //.CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
+        //.CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\"
+
         .LinkerOutput = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output\$ProjectName$.exe"
         .Libraries =  { "$ProjectName$_$BuildConfigName$_$Platform$_obj" }
-        //.Libraries =  { "$ProjectName$_$BuildConfigName$_$Platform$_obj", "dsc_common_$BuildConfigName$_$Platform$" }
-        //.LinkerOptions + "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\output"
 
         .LinkerOptions + ' /SUBSYSTEM:CONSOLE'
                        + ' libcmt.lib'     // Std Lib (Multi-Threaded, Static, Release)
@@ -29,13 +30,36 @@ ForEach( .BuildConfig in .BuildConfigs )
                        + ' Ws2_32.lib'
                        + ' User32.lib'
                        + .CRTLibs_Static
-                       ///SUBSYSTEM:CONSOLE
-                       Print("")
-                       Print(".LinkerOptions:$LinkerOptions$")
-                       Print("")
+                       + " /ERRORREPORT:PROMPT"
 
-        .CompilerInputPath = "$_CURRENT_BFF_DIR_$\source\"
-        .CompilerOutputPath = "$_WORKING_DIR_$\..\build\$ProjectName$\$Platform$\$BuildConfigName$\intermediate\"
+        Print("")
+        Print("$ProjectName$_$BuildConfigName$_$Platform$")
+        Print(".LinkerOptions:$LinkerOptions$")
+
+    //value of .LinkerOptions
+    //  /NODEFAULTLIB /WX /NOLOGO /INCREMENTAL:NO /OUT:"%2" "%1" /DEBUG /LIBPATH:"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/lib/x64" 
+    //  /LIBPATH:"C:\Program Files (x86)\Windows Kits\10/Lib/10.0.19041.0/um/x64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\10/Lib/10.0.19041.0/ucrt/x64" /MACHINE:X64 
+    //  /SUBSYSTEM:CONSOLE libcmt.lib kernel32.lib Advapi32.lib Iphlpapi.lib kernel32.lib Shell32.lib Ws2_32.lib User32.lib LIBCMT.LIB libvcruntime.lib libucrt.lib
+
+    //value of linker command line from visual studio default console app
+    //   /OUT:"C:\temp\vsproj\ConsoleApplication1\Debug\ConsoleApplication1.exe" 
+    //   /MANIFEST 
+    //   /NXCOMPAT 
+    //   /PDB:"C:\temp\vsproj\ConsoleApplication1\Debug\ConsoleApplication1.pdb" 
+    //   /DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" 
+    //   /DEBUG 
+    //   /MACHINE:X86 
+    //   /INCREMENTAL 
+    //   /PGD:"C:\temp\vsproj\ConsoleApplication1\Debug\ConsoleApplication1.pgd" 
+    //   /SUBSYSTEM:CONSOLE 
+    //   /MANIFESTUAC:"level='asInvoker' uiAccess='false'" 
+    //   /ManifestFile:"Debug\ConsoleApplication1.exe.intermediate.manifest" 
+    //   /LTCGOUT:"Debug\ConsoleApplication1.iobj" 
+    //   /ERRORREPORT:PROMPT 
+    //   /ILK:"Debug\ConsoleApplication1.ilk" 
+    //   /NOLOGO 
+    //   /TLBID:1 
+
     }
 
     RemoveDir( "clean_$ProjectName$_$BuildConfigName$_$Platform$" ) // Name (required)

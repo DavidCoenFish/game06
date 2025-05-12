@@ -3,7 +3,6 @@
 ForEach( .BuildConfig in .BuildConfigs )
 {
     Using( .BuildConfig )
-    Print("$ProjectName$_$BuildConfigName$_$Platform$")
 
     Library( "$ProjectName$_$BuildConfigName$_$Platform$" )
     {
