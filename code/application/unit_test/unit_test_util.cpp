@@ -3,19 +3,33 @@
 
 namespace
 {
-std::vector<std::function<bool()>> sTestArray;
+	std::vector<std::function<bool()>>& GetTestArray()
+	{
+		static std::vector<std::function<bool()>> sTestArray;
+		return sTestArray;
+	}
 };
 
-void UnitTestUtil::AddTest(std::function<bool()>& in_test)
+const bool UnitTestUtil::AlmostEqual(const bool ok, const float valueLhs, const float valueRhs, const std::string& fileName, const int lineNumber)
 {
-	sTestArray.push_back(in_test);
+	if (std::numeric_limits<float>::epsilon() < std::abs(valueLhs - valueRhs))
+	{
+		std::cerr << "AlmostEqual failed, lhs:" << valueLhs << " rhs:" << valueRhs << " file:" << fileName << " line:" << lineNumber << std::endl;
+		return ok;
+	}
+	return false;
 }
 
-void UnitTestUtil::RunTests()
+void UnitTestUtil::AddTest(const std::function<bool()>& in_test)
+{
+	GetTestArray().push_back(in_test);
+}
+
+const bool UnitTestUtil::RunTests()
 {
 	int32 count_total = 0;
 	int32 count_pass = 0;
-	for(const auto& item : sTestArray)
+	for(const auto& item : GetTestArray())
 	{
 		try
 		{
@@ -33,4 +47,5 @@ void UnitTestUtil::RunTests()
 
 	std::cout << "Pass:" << count_pass << " of tests:" <<  count_total << std::endl;
 
+	return (count_total == count_pass);
 }

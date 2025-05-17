@@ -13,8 +13,10 @@ typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
 //std lib
+#include <cmath>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 

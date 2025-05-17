@@ -139,9 +139,11 @@ Compiler( 'Compiler-VS2019-x64' )
                                     // Warnings
                                     + ' /Wall'              // Enable all warnings (we'll disable those that are not useful)
                                     + ' /WX'                // Warnings as errors
+                                    + ' /wd4365'            // ignore warning, std lib triggering conversion signed/unsigned mismatch
+                                    + ' /wd5045'            // ignore warning, Compiler will insert Spectre mitigation
                                     // Include Paths
                                     + ' /I"./"'
-                                    + ' /wd4365'
+                                    + ' /I"../"'
                                     + .VSIncludePaths
 
     .CompilerOptions                = ' $CommonCompilerOptions$ "%1" /Fo"%2"'
