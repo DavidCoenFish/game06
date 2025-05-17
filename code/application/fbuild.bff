@@ -1,9 +1,0 @@
-#include "unittest\fbuild.bff"
-
-{
-    .temp = [
-        .Path = "fbuild/application"
-        .Items = { "application/fbuild.bff"}
-    ]
-    ^FoldersFBuild + .temp
-}

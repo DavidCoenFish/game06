@@ -1,8 +1,0 @@
-#include "dsc_common\fbuild.bff"
-
-.temp = [
-    .Path = "fbuild/staticlib"
-    .Items = { "staticlib/fbuild.bff"}
-]
-.FoldersFBuild + .temp
-

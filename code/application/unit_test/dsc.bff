@@ -11,4 +11,6 @@
     ^SolutionItemArray + .temp
 }
 
-DscVsprojectStaticLib("dsc_common" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings  .CommonVcproject)
+.LibraryDependencyArray = {"dsc_common"}
+DscVsprojectConsoleExe("unit_test" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
+

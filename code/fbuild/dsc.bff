@@ -22,6 +22,8 @@
     .LibrarianOptions = ""
     .Compiler = ""
     .CompilerOptions = ""
+    .Linker = ""
+    .LinkerOptions = ""
     {
         Using( .VisualStudioSettings )	
         Using( .ToolChain_VS_Windows_X64 )
@@ -29,6 +31,8 @@
         ^LibrarianOptions = .LibrarianOptions
         ^Compiler = .Compiler
         ^CompilerOptions = .CompilerOptions
+        ^Linker = .Linker
+        ^LinkerOptions = .LinkerOptions
     }
 ]
 
@@ -64,29 +68,39 @@
                             + ' /GL'
                             + ' /D "NDEBUG"'
                             + ' /O2'
-
-
          .LibrarianOptions  + ' /LTCG'
+         .LinkerOptions     + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            + ' /LTCG:incremental'
     ]
     ^ConfigurationArray + .Config
 }
 
+.CommonVcproject = [
+        .ProjectInputPathsRecurse   = true
+        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+]
+
 // todo dependencies
-function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings)
+function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject)
 {
     ForEach( .ConfigIter in .ParamConfigurationArray )
     {
         Using( .ConfigIter )
 
         .CompilerOptions    + ' /D "_LIB"'
-                            + ' /FS '
                             + ' /Fd"$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\$ProjectName$.pdb"'
 
+        //Print("Library $ProjectName$_$Config$_$Platform$")
         Library( "$ProjectName$_$Config$_$Platform$" )
         {
             .LibrarianOutput = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\output\$ProjectName$.lib"
-            .CompilerInputPath = "$RelativePath$\source\"
+            .CompilerInputPath = "$RelativePath$\"
             .CompilerOutputPath = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
+            .CompilerOptions = ^CompilerOptions
+            .CompilerOptions + ' /I"$RootPath$\staticlib\$ProjectName$\"'
         }
 
         RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
@@ -102,14 +116,80 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
     {
         .ProjectOutput = "$RelativePath$\$ProjectName$.vcxproj"
         .ProjectConfigs = .ParamConfigurationArray
-        .ProjectInputPathsRecurse   = true
-        .ProjectInputPaths  = "$RelativePath$\source\"
+        .ProjectInputPaths = "$RelativePath$\"
+        .ProjectBasePath = '$RelativePath$\'
         .ProjectFiles = "$RelativePath$\dsc.bff"
 
-        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
-        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
-        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+        Using (.CommonVcproject)
 
+        .Output = "^$(ProjectName).lib"
+        .OutputDirectory            = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
+        .IntermediateDirectory 	    = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
+        .BuildLogFile               = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\build_^$(SolutionName).log"
+
+        .PlatformToolset = ""
+        {
+            Using( .VisualStudioSettings )	
+            ^PlatformToolset = .VS_PlatformToolset
+        }
+    }
+}
+
+function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryBaseNameDependency)
+{
+    ForEach( .ConfigIter in .ParamConfigurationArray )
+    {
+        Using( .ConfigIter )
+
+        .CompilerOptions    + ' /D "_CONSOLE"'
+                            + ' /Fd"$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\$ProjectName$.pdb"'
+
+        ObjectList ("obj_$ProjectName$_$Config$_$Platform$")
+        {
+            .CompilerInputPath = "$RelativePath$\"
+            .CompilerOutputPath = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
+            .CompilerOptions = ^CompilerOptions
+            ForEach( .LibraryName in .LibraryBaseNameDependency )
+            {
+                ^CompilerOptions + ' /I"$RootPath$\staticlib\$LibraryName$\"'
+            }
+        }
+
+        .LinkerOptions + ' /PDB:"$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\$ProjectName$.pdb"'
+        Executable( "$ProjectName$_$Config$_$Platform$" )
+        {
+            .LinkerOutput = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\output\$ProjectName$.exe"
+            .Libraries = {"obj_$ProjectName$_$Config$_$Platform$"}
+            ForEach( .LibraryName in .LibraryBaseNameDependency )
+            {
+                //.Temp = {"$RootPath$\..\build\$LibraryName$\$Platform$\$Config$\output\$LibraryName$.lib"}
+                .Temp = {"$LibraryName$_$Config$_$Platform$"}
+                ^Libraries + .Temp
+
+            }
+            //Print(.Libraries)
+        }
+
+        RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
+        {
+            .RemovePaths = { 
+                "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\output\", 
+                "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\", 
+                }
+        }
+    }
+
+    VCXProject( "$ProjectName$_project" )
+    {
+        .ProjectOutput = "$RelativePath$\$ProjectName$.vcxproj"
+        .ProjectConfigs = .ParamConfigurationArray
+        .ProjectInputPaths  = "$RelativePath$\"
+        .ProjectBasePath = '$RelativePath$\'
+        .ProjectFiles = "$RelativePath$\dsc.bff"
+
+        Using (.CommonVcproject)
+
+        .Output = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output\^$(ProjectName).exe"
         .OutputDirectory            = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
         .IntermediateDirectory 	    = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
         .BuildLogFile               = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\build_^$(SolutionName).log"

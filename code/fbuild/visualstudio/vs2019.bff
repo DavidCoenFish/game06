@@ -132,6 +132,7 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /Zc:forScope'
                                     + ' /Gd'
                                     + ' /FC'
+                                    + ' /FS'
                                     + ' /EHsc'
                                     + ' /nologo'
                                     + ' /diagnostics:column'
@@ -140,6 +141,7 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /WX'                // Warnings as errors
                                     // Include Paths
                                     + ' /I"./"'
+                                    + ' /wd4365'
                                     + .VSIncludePaths
 
     .CompilerOptions                = ' $CommonCompilerOptions$ "%1" /Fo"%2"'
@@ -156,8 +158,21 @@ Compiler( 'Compiler-VS2019-x64' )
 
     // Linker
     .Linker                         = '$VS2019_ToolchainPath$/bin/Hostx64/x64/link.exe'
-    .LinkerOptions                  = '/NODEFAULTLIB /WX /NOLOGO /INCREMENTAL:NO /OUT:"%2" "%1" /DEBUG'
+    .LinkerOptions                  = '/OUT:"%2" "%1"'
+                                    + ' /ERRORREPORT:PROMPT'
+                                    + ' /INCREMENTAL:NO'
+                                    + ' /NOLOGO'
+                                    + ' /MANIFEST'
+                                    + ' /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                                    + ' /manifest:embed'
+                                    + ' /DEBUG'
+                                    + ' /SUBSYSTEM:CONSOLE' 
+                                    + ' /MACHINE:X64'
+                                    + ' /TLBID:1'
+                                    + ' /DYNAMICBASE'
+                                    + ' /NXCOMPAT'
                                     + .VSLibPaths
+
     //CRT
     .CRTLibs_Static                 = ' LIBCMT.LIB'
                                     + ' libvcruntime.lib'
@@ -285,3 +300,8 @@ Compiler( 'Compiler-VS2019-x64' )
 //                                    // Include Paths
 //                                    + ' /I"./"'
 //                                    + .VSIncludePaths
+
+//    .LinkerOptions                  = '/NODEFAULTLIB /WX /NOLOGO /INCREMENTAL:NO /OUT:"%2" "%1" /DEBUG'
+//                                    + .VSLibPaths
+
+

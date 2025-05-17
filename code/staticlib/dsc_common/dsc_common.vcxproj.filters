@@ -3,17 +3,28 @@
   <ItemGroup>
     <CustomBuild Include="dsc.bff">
     </CustomBuild>
-    <CustomBuild Include="source\angle.cpp">
+    <CustomBuild Include="dsc_common\angle.cpp">
+      <Filter>dsc_common</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\angle.h">
+    <CustomBuild Include="dsc_common\angle.h">
+      <Filter>dsc_common</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\common.cpp">
+    <CustomBuild Include="dsc_common\common.cpp">
+      <Filter>dsc_common</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\common.h">
+    <CustomBuild Include="dsc_common\common.h">
+      <Filter>dsc_common</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\math.cpp">
+    <CustomBuild Include="dsc_common\math.cpp">
+      <Filter>dsc_common</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\math.h">
+    <CustomBuild Include="dsc_common\math.h">
+      <Filter>dsc_common</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="dsc_common">
+      <UniqueIdentifier>{efde24f9-6c94-4f93-bc2a-7f5284b7d434}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

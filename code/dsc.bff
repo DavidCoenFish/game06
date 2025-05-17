@@ -28,12 +28,13 @@
 
 #include "fbuild\dsc.bff"
 #include "staticlib\dsc.bff"
+#include "application\dsc.bff"
 
 VSSolution("solution")
 {
     .SolutionOutput = "solution.sln"
-    .SolutionProjects = {"dsc_common_project"}
-    .SolutionBuildProject = "dsc_common_project"
+    .SolutionProjects = {"dsc_common_project", "unit_test_project"}
+    .SolutionBuildProject = "unit_test_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            
@@ -41,7 +42,6 @@ VSSolution("solution")
     }
 
     .SolutionFolders = .SolutionItemArray;
-
     {
         .temp = [
             .Path           = "staticlib"
@@ -49,7 +49,13 @@ VSSolution("solution")
         ]
         ^SolutionFolders + .temp
     }
-
+    {
+        .temp = [
+            .Path           = "application"
+            .Projects       = { "unit_test_project" }
+        ]
+        ^SolutionFolders + .temp
+    }
 }
 
 Alias("all")

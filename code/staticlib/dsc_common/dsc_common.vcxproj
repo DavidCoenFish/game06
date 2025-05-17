@@ -12,12 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="dsc.bff" />
-    <CustomBuild Include="source\angle.cpp" />
-    <CustomBuild Include="source\angle.h" />
-    <CustomBuild Include="source\common.cpp" />
-    <CustomBuild Include="source\common.h" />
-    <CustomBuild Include="source\math.cpp" />
-    <CustomBuild Include="source\math.h" />
+    <CustomBuild Include="dsc_common\angle.cpp" />
+    <CustomBuild Include="dsc_common\angle.h" />
+    <CustomBuild Include="dsc_common\common.cpp" />
+    <CustomBuild Include="dsc_common\common.h" />
+    <CustomBuild Include="dsc_common\math.cpp" />
+    <CustomBuild Include="dsc_common\math.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -50,6 +50,7 @@
     <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform) -summary -verbose</NMakeCleanCommandLine>
+    <NMakeOutput>$(ProjectName).lib</NMakeOutput>
     <IntDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
     <OutDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
   </PropertyGroup>
@@ -57,6 +58,7 @@
     <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform) -summary -verbose</NMakeCleanCommandLine>
+    <NMakeOutput>$(ProjectName).lib</NMakeOutput>
     <IntDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\intermediate</IntDir>
     <OutDir>C:\development\game06\code\..\build\$(ProjectName)\$(Platform)\$(Configuration)\output</OutDir>
   </PropertyGroup>

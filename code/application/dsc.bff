@@ -11,4 +11,5 @@
     ^SolutionItemArray + .temp
 }
 
-DscVsprojectStaticLib("dsc_common" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings  .CommonVcproject)
+//pull in child scripts
+#include "unit_test\dsc.bff"

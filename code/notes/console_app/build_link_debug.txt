@@ -1,1 +1,51 @@
-/OUT:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.exe" /MANIFEST /NXCOMPAT /PDB:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.pdb" /DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" /DEBUG /MACHINE:X64 /INCREMENTAL /PGD:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.pgd" /SUBSYSTEM:CONSOLE /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /ManifestFile:"x64\Debug\ConsoleApplication1.exe.intermediate.manifest" /LTCGOUT:"x64\Debug\ConsoleApplication1.iobj" /ERRORREPORT:PROMPT /ILK:"x64\Debug\ConsoleApplication1.ilk" /NOLOGO /TLBID:1 
+/OUT:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.exe" 
+/MANIFEST 
+/NXCOMPAT 
+/PDB:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.pdb" 
+/DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" 
+/DEBUG 
+/MACHINE:X64 
+/INCREMENTAL 
+/PGD:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.pgd" 
+/SUBSYSTEM:CONSOLE 
+/MANIFESTUAC:"level='asInvoker' uiAccess='false'" 
+/ManifestFile:"x64\Debug\ConsoleApplication1.exe.intermediate.manifest" 
+/LTCGOUT:"x64\Debug\ConsoleApplication1.iobj" 
+/ERRORREPORT:PROMPT 
+/ILK:"x64\Debug\ConsoleApplication1.ilk" 
+/NOLOGO 
+/TLBID:1
+
+
+// from build log, debug x64
+link.exe /ERRORREPORT:PROMPT /OUT:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.exe" /INCREMENTAL /ILK:"x64\Debug\ConsoleApplication1.ilk" /NOLOGO /LIBPATH:"C:\bin\vcpkg\installed\x64-windows\debug\lib" /LIBPATH:"C:\bin\vcpkg\installed\x64-windows\debug\lib\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "C:\bin\vcpkg\installed\x64-windows\debug\lib\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\temp\vsproj\ConsoleApplication1\x64\Debug\ConsoleApplication1.lib" /MACHINE:X64 x64\Debug\ConsoleApplication1.obj
+
+// from build log, release x64
+link.exe 
+/ERRORREPORT:PROMPT 
+/INCREMENTAL:NO 
+/NOLOGO 
+/MANIFEST 
+/MANIFESTUAC:"level='asInvoker' uiAccess='false'" 
+/manifest:embed 
+/DEBUG 
+/SUBSYSTEM:CONSOLE 
+/MACHINE:X64 
+/TLBID:1 
+/DYNAMICBASE 
+/NXCOMPAT 
+
+/OUT:"C:\temp\vsproj\ConsoleApplication1\x64\Release\ConsoleApplication1.exe" 
+
+/OPT:REF 
+/OPT:ICF 
+/LTCG:incremental 
+/LIBPATH:"C:\bin\vcpkg\installed\x64-windows\lib" 
+/LIBPATH:"C:\bin\vcpkg\installed\x64-windows\lib\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "C:\bin\vcpkg\installed\x64-windows\lib\*.lib" 
+/PDB:"C:\temp\vsproj\ConsoleApplication1\x64\Release\ConsoleApplication1.pdb" 
+/LTCGOUT:"x64\Release\ConsoleApplication1.iobj" 
+/IMPLIB:"C:\temp\vsproj\ConsoleApplication1\x64\Release\ConsoleApplication1.lib" x64\Release\ConsoleApplication1.obj
+
+
+// FBuild
+link.exe /NODEFAULTLIB /WX /NOLOGO /INCREMENTAL:NO /OUT:"C:\development\game06\build\unit_test\x64\debug\output\unit_test.exe" "C:\development\game06\build\unit_test\x64\debug\intermediate\main.obj" "C:\development\game06\build\unit_test\x64\debug\intermediate\unittest_util.obj"  /DEBUG /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\lib\x64"

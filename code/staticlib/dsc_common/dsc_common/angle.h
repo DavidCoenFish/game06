@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Angle
 {
 	const float DegToRadian(const float in_deg);
