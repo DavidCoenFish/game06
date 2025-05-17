@@ -21,18 +21,25 @@
     #include "vs2022.bff"
     .VisualStudioSettings = .VisualStudioSettings_VS2022
 #endif
-Using( .VisualStudioSettings )
-Print( 'Using VS$VS_Version_HumanReadable$ (v$VS_Version$) from $VS_ToolchainPath$' )
-Using( .ToolChain_VS_Windows_X64 )
+
+{
+    Using( .VisualStudioSettings )	
+    Print( 'Using VS$VS_Version_HumanReadable$ (v$VS_Version$) from $VS_ToolchainPath$' )
+}
+//Print($.VisualStudioSettings)
+//Using( .VisualStudioSettings )
+//Print( 'Using VS$VS_Version_HumanReadable$ (v$VS_Version$) from $VS_ToolchainPath$' )
+//Using( .ToolChain_VS_Windows_X64 )
 
 //------------------------------------------------------------------------------
 #endif
 
+// append solution items
 {
     .temp =  [
-        .Path = "fbuild/fbuild/visualstudio"
-        .Items = { "fbuild/visualstudio/visualstudio.bff", "fbuild/visualstudio/vs2019.bff", "fbuild/visualstudio/vs2022.bff"}
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\visualstudio.bff", "$_CURRENT_BFF_DIR_$\vs2019.bff", "$_CURRENT_BFF_DIR_$\vs2022.bff"}
     ]
-    ^FoldersFBuild + .temp
+    ^SolutionItemArray + .temp
 }
 

@@ -1,5 +1,4 @@
 //https://github.com/fastbuild/fastbuild/tree/main/External/SDK/Windows
-
 #once
 
 // Windows
@@ -19,10 +18,12 @@
 //------------------------------------------------------------------------------
 #endif
 
+// append solution items
 {
-    .temp = [
-        .Path = "fbuild/fbuild/windows"
-        .Items = { "fbuild/windows/windows.bff", "fbuild/windows/windows10sdk.bff"}
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\windows.bff", "$_CURRENT_BFF_DIR_$\windows10sdk.bff"}
     ]
-    ^FoldersFBuild + .temp
+    ^SolutionItemArray + .temp
 }
+

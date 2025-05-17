@@ -1,0 +1,14 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+DscVsprojectStaticLib("dsc_common" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings)

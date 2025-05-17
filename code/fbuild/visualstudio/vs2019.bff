@@ -117,36 +117,27 @@ Compiler( 'Compiler-VS2019-x64' )
 
     // Compiler
     .Compiler                       = 'Compiler-VS2019-X64'
-    .CommonCompilerOptions          = ' /Z7 /nologo /c'
-                                    + ' /Zc:inline'         // Remove unreferenced COMDATs at compile time (VS2013.2+)
-                                    + ' /Zc:strictStrings'  // Require const only usage of string literals (VS2013+)
-                                    + ' /fp:fast'
-                                    + ' /diagnostics:caret' // Use improved warning/error messages
-                                    + ' /std:c++17'         // Enable c++17 features
-                                    + ' /permissive-'       // Require conformant code
-                                    + ' /GR-'               // No RTTI
-
+    .CommonCompilerOptions          = ' /c'
+                                    + ' /permissive-'
+                                    + ' /GS'
+                                    + ' /W3'
+                                    + ' /Zc:wchar_t'
+                                    + ' /Gm-' 
+                                    + ' /sdl'
+                                    + ' /Zc:inline'
+                                    + ' /fp:precise'
+                                    + ' /D "_UNICODE"' 
+                                    + ' /D "UNICODE"'
+                                    + ' /errorReport:prompt'
+                                    + ' /Zc:forScope'
+                                    + ' /Gd'
+                                    + ' /FC'
+                                    + ' /EHsc'
+                                    + ' /nologo'
+                                    + ' /diagnostics:column'
                                     // Warnings
                                     + ' /Wall'              // Enable all warnings (we'll disable those that are not useful)
                                     + ' /WX'                // Warnings as errors
-
-                                    // These warnings are useful, but fire in system headers (Windows SDK or MSVC CRT)
-                                    + ' /wd4668' // '%s' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
-
-                                    // These warnings are not useful
-                                    + ' /wd4061' // enumerator '%s' in switch of enum '%s' is not explicitly handled by a case label
-                                    + ' /wd4255' // '%s': no function prototype given: converting '()' to '(void)''
-                                    + ' /wd4514' // '%s': unreferenced inline function has been removed
-                                    + ' /wd4571' // Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
-                                    + ' /wd4577' // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
-                                    + ' /wd4625' // '%s' : copy constructor was implicitly defined as deleted
-                                    + ' /wd4710' // '%s': function not inlined
-                                    + ' /wd4711' // function '%s' selected for automatic inline expansion
-                                    + ' /wd4820' // '%s': '%u' bytes padding added after data member '%s'
-                                    + ' /wd5039' // '%s': pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
-                                    + ' /wd5045' // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-                                    + ' /wd5220' // '%s': a non-static data member with a volatile qualified type no longer implies that compiler generated copy/move constructors and copy/move assignment operators are not trivial
-
                                     // Include Paths
                                     + ' /I"./"'
                                     + .VSIncludePaths
@@ -158,7 +149,10 @@ Compiler( 'Compiler-VS2019-x64' )
 
     // Librarian
     .Librarian                      = '$VS2019_ToolchainPath$/bin/Hostx64/x64/lib.exe'
-    .LibrarianOptions               = '/NODEFAULTLIB /WX /NOLOGO /OUT:"%2" "%1"'
+    .LibrarianOptions               = '/OUT:"%2" /MACHINE:X64 /NOLOGO "%1"'
+    // original '/NODEFAULTLIB /WX /NOLOGO /OUT:"%2" "%1"'
+    // /OUT:"C:\temp\vsproj\StaticLib1\x64\Debug\StaticLib1.lib" /MACHINE:X64 /NOLOGO 
+    // /OUT:"C:\temp\vsproj\StaticLib1\x64\Release\StaticLib1.lib" /LTCG /MACHINE:X64 /NOLOGO 
 
     // Linker
     .Linker                         = '$VS2019_ToolchainPath$/bin/Hostx64/x64/link.exe'
@@ -256,3 +250,38 @@ Compiler( 'Compiler-VS2019-x64' )
 ]
 
 //------------------------------------------------------------------------------
+
+//original
+//    .CommonCompilerOptions          = ' /Z7 /nologo /c'
+//                                    + ' /Zc:inline'         // Remove unreferenced COMDATs at compile time (VS2013.2+)
+//                                    + ' /Zc:strictStrings'  // Require const only usage of string literals (VS2013+)
+//                                    + ' /fp:fast'
+//                                    + ' /diagnostics:caret' // Use improved warning/error messages
+//                                    + ' /std:c++17'         // Enable c++17 features
+//                                    + ' /permissive-'       // Require conformant code
+//                                    + ' /GR-'               // No RTTI
+//
+//                                    // Warnings
+//                                    + ' /Wall'              // Enable all warnings (we'll disable those that are not useful)
+//                                    + ' /WX'                // Warnings as errors
+//
+//                                    // These warnings are useful, but fire in system headers (Windows SDK or MSVC CRT)
+//                                    + ' /wd4668' // '%s' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+//
+//                                    // These warnings are not useful
+//                                    + ' /wd4061' // enumerator '%s' in switch of enum '%s' is not explicitly handled by a case label
+//                                    + ' /wd4255' // '%s': no function prototype given: converting '()' to '(void)''
+//                                    + ' /wd4514' // '%s': unreferenced inline function has been removed
+//                                    + ' /wd4571' // Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
+//                                    + ' /wd4577' // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
+//                                    + ' /wd4625' // '%s' : copy constructor was implicitly defined as deleted
+//                                    + ' /wd4710' // '%s': function not inlined
+//                                    + ' /wd4711' // function '%s' selected for automatic inline expansion
+//                                    + ' /wd4820' // '%s': '%u' bytes padding added after data member '%s'
+//                                    + ' /wd5039' // '%s': pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
+//                                    + ' /wd5045' // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+//                                    + ' /wd5220' // '%s': a non-static data member with a volatile qualified type no longer implies that compiler generated copy/move constructors and copy/move assignment operators are not trivial
+//
+//                                    // Include Paths
+//                                    + ' /I"./"'
+//                                    + .VSIncludePaths

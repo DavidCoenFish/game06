@@ -1,0 +1,32 @@
+/permissive- 
+/GS 
+/W3 
+/Zc:wchar_t 
+/Gm- 
+/sdl 
+/Zc:inline 
+/fp:precise 
+/D "_LIB" 
+/D "_UNICODE" 
+/D "UNICODE" 
+/errorReport:prompt 
+/WX- 
+/Zc:forScope 
+/Gd 
+/FC 
+/EHsc 
+/nologo 
+/diagnostics:column 
+
+/Fa"x64\Release\" 
+/Fo"x64\Release\" 
+/Fd"C:\temp\vsproj\StaticLib1\x64\Release\StaticLib1.pdb" 
+/ifcOutput "x64\Release\" 
+/MD 
+/Oi 
+/D "_DEBUG" 
+/Zi 
+/Gy 
+/GL 
+/D "NDEBUG" 
+/O2 

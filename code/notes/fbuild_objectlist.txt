@@ -1,0 +1,47 @@
+https://www.fastbuild.org/docs/functions/objectlist.html
+
+ObjectList( alias )         ; Alias
+{
+  ; options for compilation
+  .Compiler                 ; Compiler to use
+  .CompilerOptions          ; Options for compiler
+  .CompilerOutputPath       ; Path to store intermediate objects
+  .CompilerOutputExtension  ; (optional) Specify the file extension for generated objects (default .obj or .o)
+  .CompilerOutputKeepBaseExtension ; (optional) Append extension instead of replacing it (default: false)
+  .CompilerOutputPrefix     ; (optional) Specify a prefix for generated objects (default none)
+
+  ; Specify inputs for compilation
+  .CompilerInputPath           ; (optional) Path to find files in
+  .CompilerInputPattern        ; (optional) Pattern(s) to use when finding files (default *.cpp)
+  .CompilerInputPathRecurse    ; (optional) Recurse into dirs when finding files (default true)
+  .CompilerInputExcludePath    ; (optional) Path(s) to exclude from compilation
+  .CompilerInputExcludedFiles  ; (optional) File(s) to exclude from compilation (partial, root-relative of full path)
+  .CompilerInputExcludePattern ; (optional) Pattern(s) to exclude from compilation
+  .CompilerInputFiles          ; (optional) Explicit array of files to build
+  .CompilerInputFilesRoot      ; (optional) Root path to use for .obj path generation for explicitly listed files
+  .CompilerInputUnity          ; (optional) Unity to build (or Unities)
+  .CompilerInputAllowNoFiles   ; (optional) Don't fail if no inputs are found
+  .CompilerInputObjectLists    ; (optional) ObjectList(s) whos output should be used as an input
+  
+  ; Cache & Distributed compilation control
+  .AllowCaching             ; (optional) Allow caching of compiled objects if available (default true)
+  .AllowDistribution        ; (optional) Allow distributed compilation if available (default true)
+
+  ; Custom preprocessor support
+  .Preprocessor             ; (optional) Compiler to use for preprocessing
+  .PreprocessorOptions      ; (optional) Args to pass to compiler if using custom preprocessor
+  
+  ; Additional compiler options
+  .CompilerForceUsing       ; (optional) List of objects to be used with /FU
+
+  ; (optional) Properties to control precompiled header use
+  .PCHInputFile             ; (optional) Precompiled header (.cpp) file to compile
+  .PCHOutputFile            ; (optional) Precompiled header compilation output
+  .PCHOptions               ; (optional) Options for compiler for precompiled header
+
+  ; Additional options
+  .PreBuildDependencies     ; (optional) Force targets to be built before this ObjectList (Rarely needed,
+                            ; but useful when a ObjectList relies on generated code).
+  .ConcurrencyGroupName     ; (optional) Concurrency Group for this task
+  .Hidden                   ; (optional) Hide a target from -showtargets (default false)
+}

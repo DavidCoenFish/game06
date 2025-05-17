@@ -1,0 +1,1 @@
+/permissive- /Yu"pch.h" /ifcOutput "x64\Release\" /GS /GL /W3 /Gy /Zc:wchar_t /Zi /Gm- /O2 /sdl /Fd"C:\temp\vsproj\StaticLib1\x64\Release\StaticLib1.pdb" /Zc:inline /fp:precise /D "NDEBUG" /D "_LIB" /D "_UNICODE" /D "UNICODE" /errorReport:prompt /WX- /Zc:forScope /Gd /Oi /MD /FC /Fa"x64\Release\" /EHsc /nologo /Fo"x64\Release\" /Fp"x64\Release\StaticLib1.pch" /diagnostics:column 

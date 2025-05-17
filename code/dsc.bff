@@ -1,0 +1,58 @@
+#once
+//https://www.fastbuild.org/docs/documentation.html
+
+.SolutionItemArray = {}
+{
+    .temp =  [
+        .Path           = "solution_items"
+        .Items = { "dsc.cmd", "dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+{
+    .temp = [
+        .Path           = "parent"
+        .Items = { 
+            "../.gitignore",
+            "../commit.cmd",
+            "../launch_visual_studio_code.cmd",
+            "../notes.txt",
+            "../README.md",
+            "../Reset.cmd",
+            "../sync.cmd",
+            "../todo.txt"
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+
+#include "fbuild\dsc.bff"
+#include "staticlib\dsc.bff"
+
+VSSolution("solution")
+{
+    .SolutionOutput = "solution.sln"
+    .SolutionProjects = {"dsc_common_project"}
+    .SolutionBuildProject = "dsc_common_project"
+    .SolutionConfigs = {}
+    ForEach( .Config in .ConfigurationArray )
+    {            
+        ^SolutionConfigs + .Config
+    }
+
+    .SolutionFolders = .SolutionItemArray;
+
+    {
+        .temp = [
+            .Path           = "staticlib"
+            .Projects       = { "dsc_common_project" }
+        ]
+        ^SolutionFolders + .temp
+    }
+
+}
+
+Alias("all")
+{
+	.Targets = {"solution"}
+}

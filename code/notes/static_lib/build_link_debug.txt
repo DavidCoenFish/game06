@@ -1,0 +1,1 @@
+/OUT:"C:\temp\vsproj\StaticLib1\x64\Debug\StaticLib1.lib" /MACHINE:X64 /NOLOGO 

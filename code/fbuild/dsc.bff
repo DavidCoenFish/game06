@@ -1,0 +1,123 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(.RootPath)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+//pull in child scripts
+#include "visualstudio\visualstudio.bff"
+#include "windows\windows.bff"
+
+.ConfigurationArray = {}
+
+.CommonConfig = [
+    .Librarian = ""
+    .LibrarianOptions = ""
+    .Compiler = ""
+    .CompilerOptions = ""
+    {
+        Using( .VisualStudioSettings )	
+        Using( .ToolChain_VS_Windows_X64 )
+        ^Librarian = .Librarian
+        ^LibrarianOptions = .LibrarianOptions
+        ^Compiler = .Compiler
+        ^CompilerOptions = .CompilerOptions
+    }
+]
+
+// debug x64
+{
+    .Config = [
+        .Platform = "x64"
+        .Config = "debug"
+        Using(.CommonConfig)
+
+        .CompilerOptions    + ' /MDd'
+                            + ' /RTC1'
+                            + ' /D "_DEBUG"'
+                            + ' /ZI'
+                            + ' /Od'
+                            + ' /JMC'
+    ]
+    ^ConfigurationArray + .Config
+}
+
+// release x64
+{
+    .Config = [
+        .Platform = "x64"
+        .Config = "release"
+        Using(.CommonConfig)
+
+        .CompilerOptions    + ' /MD'
+                            + ' /Oi'
+                            + ' /D "_DEBUG"'
+                            + ' /Zi'
+                            + ' /Gy'
+                            + ' /GL'
+                            + ' /D "NDEBUG"'
+                            + ' /O2'
+
+
+         .LibrarianOptions  + ' /LTCG'
+    ]
+    ^ConfigurationArray + .Config
+}
+
+// todo dependencies
+function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings)
+{
+    ForEach( .ConfigIter in .ParamConfigurationArray )
+    {
+        Using( .ConfigIter )
+
+        .CompilerOptions    + ' /D "_LIB"'
+                            + ' /FS '
+                            + ' /Fd"$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\$ProjectName$.pdb"'
+
+        Library( "$ProjectName$_$Config$_$Platform$" )
+        {
+            .LibrarianOutput = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\output\$ProjectName$.lib"
+            .CompilerInputPath = "$RelativePath$\source\"
+            .CompilerOutputPath = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
+        }
+
+        RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
+        {
+            .RemovePaths = { 
+                "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\output\", 
+                "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\", 
+                }
+        }
+    }
+
+    VCXProject( "$ProjectName$_project" )
+    {
+        .ProjectOutput = "$RelativePath$\$ProjectName$.vcxproj"
+        .ProjectConfigs = .ParamConfigurationArray
+        .ProjectInputPathsRecurse   = true
+        .ProjectInputPaths  = "$RelativePath$\source\"
+        .ProjectFiles = "$RelativePath$\dsc.bff"
+
+        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
+
+        .OutputDirectory            = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\output"
+        .IntermediateDirectory 	    = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\intermediate"
+        .BuildLogFile               = "$RootPath$\..\build\^$(ProjectName)\^$(Platform)\^$(Configuration)\build_^$(SolutionName).log"
+
+        .PlatformToolset = ""
+        {
+            Using( .VisualStudioSettings )	
+            ^PlatformToolset = .VS_PlatformToolset
+        }
+    }
+}

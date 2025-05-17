@@ -1,0 +1,21 @@
+https://www.fastbuild.org/docs/functions/vssolution.html
+
+VSSolution( 'alias' )                 // (optional) Alias
+{
+  // Basic options
+  .SolutionOutput                     // Path to Solution file to be generated
+  .SolutionProjects                   // (optional) Project(s) to include in Solution
+  .SolutionConfigs                    // (optional) Solution configurations (see below)
+  
+  // Folders
+  .SolutionFolders                    // (optional) Folders to organize projects (see below)
+
+  // Advanced options
+  .SolutionDependencies               // (optional) Project dependency information (see below)
+  
+  // Version Info  
+  .SolutionVisualStudioVersion        // (optional) Version of Solution (default "14.0.22823.1" VS2015 RC)
+  .SolutionMinimumVisualStudioVersion // (optional) Min version of Solution (default "10.0.40219.1" VS2010 Express)
+
+  // Additional configuration options - see below
+}
