@@ -5,7 +5,7 @@
 {
     .temp =  [
         .Path           = "solution_items"
-        .Items = { "dsc.cmd", "dsc.bff" }
+        .Items = { "dsc.cmd", "dsc.bff", "todo.txt" }
     ]
     ^SolutionItemArray + .temp
 }

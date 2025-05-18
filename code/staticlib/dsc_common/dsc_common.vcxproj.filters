@@ -3,22 +3,64 @@
   <ItemGroup>
     <CustomBuild Include="dsc.bff">
     </CustomBuild>
-    <CustomBuild Include="dsc_common\angle.cpp">
-      <Filter>dsc_common</Filter>
-    </CustomBuild>
-    <CustomBuild Include="dsc_common\angle.h">
-      <Filter>dsc_common</Filter>
-    </CustomBuild>
     <CustomBuild Include="dsc_common\common.cpp">
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\common.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
+    <CustomBuild Include="dsc_common\file_overlay_local.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\file_overlay_local.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\file_system.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\file_system.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\i_file_overlay.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\i_file_overlay.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\i_log_consumer.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\i_log_consumer.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\log_consumer_output_debug_string.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\log_consumer_output_debug_string.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\log_consumer_std_out.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\log_consumer_std_out.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\log_system.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\log_system.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
     <CustomBuild Include="dsc_common\math.cpp">
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\math.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\math_angle.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\math_angle.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
   </ItemGroup>

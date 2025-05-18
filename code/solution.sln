@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution_items", "solution_
 	ProjectSection(SolutionItems) = preProject
 		dsc.bff = dsc.bff
 		dsc.cmd = dsc.cmd
+		todo.txt = todo.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{A9795628-6C94-4F93-BC2A-7F5284B7D434}"

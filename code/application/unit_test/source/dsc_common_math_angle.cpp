@@ -1,14 +1,14 @@
 #include <dsc_common\common.h>
-#include <dsc_common\angle.h>
+#include <dsc_common\math_angle.h>
 #include "unit_test_util.h"
 
 namespace
 {
 bool TestValue(const float value0)
 {
-	const float valueRad0 = DscCommon::Angle::DegToRadian(value0);
-	const float valueDeg0 = DscCommon::Angle::RadianToDeg(valueRad0);
-	const float valueRad1 = DscCommon::Angle::DegToRadian(valueDeg0);
+	const float valueRad0 = DscCommon::MathAngle::DegToRadian(value0);
+	const float valueDeg0 = DscCommon::MathAngle::RadianToDeg(valueRad0);
+	const float valueRad1 = DscCommon::MathAngle::DegToRadian(valueDeg0);
 	
 	bool ok = true;
 	ok = UNIT_TEST_UTIL_ALMOST_EQUAL(ok, valueRad0, valueRad1);
@@ -18,7 +18,7 @@ bool TestValue(const float value0)
 
 };
 
-bool DscCommonAngle()
+bool DscCommonMathAngle()
 {
 	bool ok = true;
 	ok &= TestValue(0.0f);

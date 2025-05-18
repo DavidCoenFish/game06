@@ -1,1 +1,0 @@
-/OUT:"C:\temp\vsproj\StaticLib1\x64\Release\StaticLib1.lib" /LTCG /MACHINE:X64 /NOLOGO 

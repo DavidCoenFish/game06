@@ -1,1 +1,0 @@
-/JMC /permissive- /Yu"pch.h" /ifcOutput "x64\Debug\" /GS /W3 /Zc:wchar_t /ZI /Gm- /Od /sdl /Fd"C:\temp\vsproj\StaticLib1\x64\Debug\StaticLib1.pdb" /Zc:inline /fp:precise /D "_DEBUG" /D "_LIB" /D "_UNICODE" /D "UNICODE" /errorReport:prompt /WX- /Zc:forScope /RTC1 /Gd /MDd /FC /Fa"x64\Debug\" /EHsc /nologo /Fo"x64\Debug\" /Fp"x64\Debug\StaticLib1.pch" /diagnostics:column 

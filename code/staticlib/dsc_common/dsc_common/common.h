@@ -12,79 +12,43 @@ typedef unsigned __int32 uint32;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
+// Windows
+#include <winsdkver.h>
+#define _WIN32_WINNT 0x0A00
+#include <sdkddkver.h>
+#define NOMINMAX // Use the C++ standard templated min/max
+#define NODRAWTEXT
+#define NOGDI // DirectX apps don't need GDI
+#define NOBITMAP
+#define NOMCX // Include <mcx.h> if you need this
+#define NOSERVICE // Include <winsvc.h> if you need this
+#define NOHELP // WinHelp is deprecated
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+#include <cassert>
+
 //std lib
 #include <cmath>
+#include <codecvt>
 #include <functional>
+#include <fstream>
 #include <iostream>
 #include <limits>
+#include <locale>
+#include <string>
 #include <vector>
+#include <map>
 
-
-//#include <winsdkver.h>
-//#define _WIN32_WINNT 0x0A00
-//#include <sdkddkver.h>
-//
-//// Use the C++ standard templated min/max
-//#define NOMINMAX
-//
-//// DirectX apps don't need GDI
-//#define NODRAWTEXT
-//#define NOGDI
-//#define NOBITMAP
-//
-//// Include <mcx.h> if you need this
-//#define NOMCX
-//
-//// Include <winsvc.h> if you need this
-//#define NOSERVICE
-//
-//// WinHelp is deprecated
-//#define NOHELP
-//
-//#define WIN32_LEAN_AND_MEAN
-//#include <Windows.h>
-//
-//#include <wrl/client.h>
-//#include <wrl/event.h>
-//
-//#include <d3d12.h>
-//#include <dxgi1_3.h>
-//#include <dxgi1_6.h>
-//
-//#include <DirectXMath.h>
-//#include <DirectXColors.h>
-//
-//// Std library includes
-//#include <algorithm>
-//#include <array>
-//#include <bitset>
-//#include <chrono>
-////#include <cstdint>
-//#include <exception>
-//#include <filesystem>
-//#include <fstream>
-//#include <functional>
-//#include <future>
-//#include <map>
-//#include <memory>
-//#include <mutex>
-//#include <set>
-////#include <stdexcept>
-//#include <shared_mutex>
-//#include <sstream>
-//#include <string>
-//#include <variant>
-//#include <vector>
-//
-//#ifdef _DEBUG
-//#include <dxgidebug.h>
-//#endif
-//
-//#include <stdio.h>
-//#include <assert.h>
-//
-//
-//// To use graphics and CPU markup events with the latest version of PIX, change this to include <pix3.h>
-//// then add the NuGet package WinPixEventRuntime to the project.
-//#include <pix.h>
-
+//Macro
+#define TOKEN_PAIR(TOKEN) TOKEN,#TOKEN
+#define ENUM_TOKEN_PAIR(ENUM, TOKEN) ENUM::TOKEN,#TOKEN
+#define DSC_CONDITION_THROW(CONDITION, MESSAGE) if (CONDITION) { throw std::exception(MESSAGE); }
+#if defined(_DEBUG)
+   #define DSC_ASSERT(CONDITION, MESSAGE) assert(MESSAGE && (CONDITION))
+   #define DSC_ASSERT_ALWAYS(MESSAGE) assert(MESSAGE && false)
+#else
+   #define DSC_ASSERT(CONDITION, MESSAGE) __noop
+   #define DSC_ASSERT_ALWAYS __noop
+#endif
+#define DSC_TODO(MESSAGE, ...) DSC_ASSERT_ALWAYS(MESSAGE)
