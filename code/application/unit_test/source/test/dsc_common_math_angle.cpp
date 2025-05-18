@@ -1,6 +1,7 @@
 #include <dsc_common\common.h>
 #include <dsc_common\math_angle.h>
-#include "unit_test_util.h"
+#include "dsc_common_math_angle.h"
+#include "test_util.h"
 
 namespace
 {
@@ -11,12 +12,12 @@ bool TestValue(const float value0)
 	const float valueRad1 = DscCommon::MathAngle::DegToRadian(valueDeg0);
 	
 	bool ok = true;
-	ok = UNIT_TEST_UTIL_ALMOST_EQUAL(ok, valueRad0, valueRad1);
+	ok = TEST_UTIL_ALMOST_EQUAL(ok, valueRad0, valueRad1);
 
 	return true;
 }
 
-};
+}//namespace
 
 bool DscCommonMathAngle()
 {

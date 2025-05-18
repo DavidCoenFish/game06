@@ -1,0 +1,29 @@
+#include <dsc_common\common.h>
+#include "std_map.h"
+#include "test_util.h"
+
+namespace
+{
+bool TestFoundValueChange()
+{
+	std::map<int32, int32> map = {};
+
+	map.insert(std::pair<int32, int32>(0,0));
+	auto iter = map.find(0);
+	iter->second = 1;
+
+	bool ok = true;
+	ok = TEST_UTIL_EQUAL(ok, 1, map[0]);
+
+	return true;
+}
+
+}//namespace
+
+bool StdMap()
+{
+	bool ok = true;
+	ok &= TestFoundValueChange();
+
+	return ok;
+}

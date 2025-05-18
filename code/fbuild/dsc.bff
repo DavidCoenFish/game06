@@ -1,7 +1,4 @@
 #once
-//Print(._CURRENT_BFF_DIR_)
-//Print(.RootPath)
-
 // append solution items
 {
     .temp =  [
@@ -81,19 +78,14 @@
         //.ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
         //.ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
         //.ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose"
-        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform)"
-        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform)"
-        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform)"
+        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -verbose -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform)"
+        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -verbose -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform)"
+        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -verbose -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform)"
 ]
 
 // todo dependencies
 function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject)
 {
-    //Print("DscVsprojectStaticLib")
-    //Print(.ProjectName)
-    //Print(.RootPath)
-    //Print(.RelativePath)
-
     ForEach( .ConfigIter in .ParamConfigurationArray )
     {
         Using( .ConfigIter )
@@ -101,15 +93,12 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
         .CompilerOptions    + ' /D "_LIB"'
                             + ' /Fd"$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\$ProjectName$.pdb"'
 
-        //Print("Library $ProjectName$_$Config$_$Platform$")
         Library( "$ProjectName$_$Config$_$Platform$" )
         {
             .LibrarianOutput = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\output\$ProjectName$.lib"
             .CompilerInputPath = "$RelativePath$\"
             .CompilerOutputPath = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
-            .CompilerOptions = ^CompilerOptions
             .CompilerOptions + ' /I"$RootPath$\$RelativePath$\"'
-                           //+ ' /I"../"'
         }
 
         RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
@@ -156,11 +145,11 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
         ObjectList ("obj_$ProjectName$_$Config$_$Platform$")
         {
             .CompilerInputPath = "$RelativePath$\"
-            .CompilerOutputPath = "$RootPath$\..\build\$ProjectName$\$Platform$\$Config$\intermediate\"
-            .CompilerOptions = ^CompilerOptions
+            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
+            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source/"'
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
-                ^CompilerOptions + ' /I"$RootPath$\staticlib\$LibraryName$\"'
+                ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$/"'
             }
         }
 
@@ -171,12 +160,10 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
             .Libraries = {"obj_$ProjectName$_$Config$_$Platform$"}
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
-                //.Temp = {"$RootPath$\..\build\$LibraryName$\$Platform$\$Config$\output\$LibraryName$.lib"}
                 .Temp = {"$LibraryName$_$Config$_$Platform$"}
                 ^Libraries + .Temp
 
             }
-            //Print(.Libraries)
         }
 
         RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )

@@ -1,5 +1,5 @@
 #include <dsc_common\common.h>
-#include "unit_test_util.h"
+#include "test_util.h"
 
 namespace
 {
@@ -10,7 +10,7 @@ namespace
 	}
 };
 
-const bool UnitTestUtil::AlmostEqual(const bool ok, const float valueLhs, const float valueRhs, const std::string& fileName, const int lineNumber)
+const bool TestUtil::AlmostEqual(const bool ok, const float valueLhs, const float valueRhs, const std::string& fileName, const int lineNumber)
 {
 	if (std::numeric_limits<float>::epsilon() < std::abs(valueLhs - valueRhs))
 	{
@@ -20,12 +20,12 @@ const bool UnitTestUtil::AlmostEqual(const bool ok, const float valueLhs, const 
 	return false;
 }
 
-void UnitTestUtil::AddTest(const std::function<bool()>& in_test)
+void TestUtil::AddTest(const std::function<bool()>& in_test)
 {
 	GetTestArray().push_back(in_test);
 }
 
-const bool UnitTestUtil::RunTests()
+const bool TestUtil::RunTests()
 {
 	int32 count_total = 0;
 	int32 count_pass = 0;

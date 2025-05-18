@@ -1,20 +1,25 @@
 #include <dsc_common\common.h>
 #include "main.h"
+#include "test_util.h"
 
-#include "dsc_common_math_angle.h"
-#include "unit_test_util.h"
+#include "test\dsc_common_math_angle.h"
+#include "test\std_map.h"
 
 //int main(int argc, char* argv[], char* envp[])
 int32 main(int32, char*, char*)
 {
-	UnitTestUtil::AddTest(std::function<bool (void)>(DscCommonMathAngle));
+	TestUtil::AddTest(std::function<bool (void)>(DscCommonMathAngle));
+	TestUtil::AddTest(std::function<bool (void)>(StdMap));
 
 	int32 exitCode = 0;
-	if (true != UnitTestUtil::RunTests())
+	if (true != TestUtil::RunTests())
 	{
 		exitCode = -1;
 	}
 
+	std::cout << "<press enter to continue>" << std::endl;
+	std::string output;
+	std::getline(std::cin, output);
 	return exitCode;
 }
 
