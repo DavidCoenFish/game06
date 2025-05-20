@@ -99,8 +99,9 @@ void DscCommon::LogSystem::AddMessage(
 	return;
 }
 
-DscCommon::LogSystem::LogSystem(std::vector<std::unique_ptr<ILogConsumer>>&& in_consumerArray)
-: mConsumerArray(std::move(in_consumerArray))
+DscCommon::LogSystem::LogSystem(const LogLevel in_globalLevel, std::vector<std::unique_ptr<ILogConsumer>>&& in_consumerArray)
+: mGlobalLevel(in_globalLevel)
+, mConsumerArray(std::move(in_consumerArray))
 {
 	DSC_ASSERT(nullptr == sLogSystem, "singelton pattern");
 	sLogSystem = this;
@@ -109,7 +110,8 @@ DscCommon::LogSystem::LogSystem(std::vector<std::unique_ptr<ILogConsumer>>&& in_
 	return;
 }
 
-DscCommon::LogSystem::LogSystem(std::unique_ptr<ILogConsumer>&& in_consumer)
+DscCommon::LogSystem::LogSystem(const LogLevel in_globalLevel, std::unique_ptr<ILogConsumer>&& in_consumer)
+: mGlobalLevel(in_globalLevel)
 {
 	DSC_ASSERT(nullptr == sLogSystem, "singelton pattern");
 	sLogSystem = this;

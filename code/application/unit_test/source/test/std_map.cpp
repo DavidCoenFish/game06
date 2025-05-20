@@ -4,7 +4,7 @@
 
 namespace
 {
-bool TestFoundValueChange()
+const bool TestFoundValueChange()
 {
 	std::map<int32, int32> map = {};
 
@@ -20,7 +20,7 @@ bool TestFoundValueChange()
 
 }//namespace
 
-bool StdMap()
+const bool StdMap()
 {
 	bool ok = true;
 	ok &= TestFoundValueChange();

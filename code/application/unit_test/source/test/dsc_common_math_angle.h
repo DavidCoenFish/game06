@@ -1,3 +1,3 @@
 #pragma once
 
-bool DscCommonMathAngle();
+const bool DscCommonMathAngle();

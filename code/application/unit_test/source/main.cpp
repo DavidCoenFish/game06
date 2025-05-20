@@ -2,12 +2,14 @@
 #include "main.h"
 #include "test_util.h"
 
+#include "test\dsc_common_log_system.h"
 #include "test\dsc_common_math_angle.h"
 #include "test\std_map.h"
 
 //int main(int argc, char* argv[], char* envp[])
 int32 main(int32, char*, char*)
 {
+	TestUtil::AddTest(std::function<bool (void)>(DscCommonLogSystem));
 	TestUtil::AddTest(std::function<bool (void)>(DscCommonMathAngle));
 	TestUtil::AddTest(std::function<bool (void)>(StdMap));
 

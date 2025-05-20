@@ -30,8 +30,8 @@ public:
 
 	//todo, a ctor that takes a std::vector<std::unique_ptr<ILogConsumer>>?
 
-	LogSystem(std::vector<std::unique_ptr<ILogConsumer>>&& in_consumerArray);
-	LogSystem(std::unique_ptr<ILogConsumer>&& in_consumer = FactoryConsumerOutputDebugString());
+	LogSystem(const LogLevel in_globalLevel, std::vector<std::unique_ptr<ILogConsumer>>&& in_consumerArray);
+	LogSystem(const LogLevel in_globalLevel, std::unique_ptr<ILogConsumer>&& in_consumer = FactoryConsumerOutputDebugString());
 	~LogSystem();
 	const int32 AddConsumer(std::unique_ptr<ILogConsumer>&& in_consumer);
 	void SetLevel(const LogLevel in_level);

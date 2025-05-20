@@ -5,7 +5,7 @@
 
 namespace
 {
-bool TestValue(const float value0)
+const bool TestValue(const float value0)
 {
 	const float valueRad0 = DscCommon::MathAngle::DegToRadian(value0);
 	const float valueDeg0 = DscCommon::MathAngle::RadianToDeg(valueRad0);
@@ -19,7 +19,7 @@ bool TestValue(const float value0)
 
 }//namespace
 
-bool DscCommonMathAngle()
+const bool DscCommonMathAngle()
 {
 	bool ok = true;
 	ok &= TestValue(0.0f);
