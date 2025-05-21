@@ -41,12 +41,37 @@ const bool TestDrain()
 	return ok;
 }
 
+const bool TestDrainMany()
+{
+	DscCommon::LogSystem::AddMessage("test", DscCommon::Error, "hello %s", "error");
+	DscCommon::LogSystem::AddMessage("test", DscCommon::Warning, "hello %s", "warning");
+	DscCommon::LogSystem::AddMessage("test", DscCommon::Info, "hello %s", "info");
+	DscCommon::LogSystem::AddMessage("test", DscCommon::Diagnostic, "hello %s", "diagnostic");
+
+	bool ok = true;
+	std::shared_ptr<std::vector<LogConsumerMemory::Data>> dataArray = std::make_shared<std::vector<LogConsumerMemory::Data>>();
+	{
+		DscCommon::LogSystem logSystem(DscCommon::Info, std::make_unique<LogConsumerMemory>(dataArray));
+
+		ok = TEST_UTIL_EQUAL(ok, (int32)3, (int32)dataArray->size());
+
+		DscCommon::LogSystem::AddMessage("test", DscCommon::Diagnostic, "hello %s", "diagnostic2");
+		DscCommon::LogSystem::AddMessage("test", DscCommon::Info, "hello %s", "info2");
+		DscCommon::LogSystem::AddMessage("test", DscCommon::Info, "hello %s", "info3");
+
+		ok = TEST_UTIL_EQUAL(ok, (int32)5, (int32)dataArray->size());
+	}
+
+	return ok;
+}
+
 }//namespace
 
 const bool DscCommonLogSystem()
 {
 	bool ok = true;
 	ok &= TestDrain();
+	ok &= TestDrainMany();
 
 	return ok;
 }
