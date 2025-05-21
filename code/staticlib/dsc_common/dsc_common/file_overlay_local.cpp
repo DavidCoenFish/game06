@@ -34,3 +34,33 @@ const bool DscCommon::FileOverlayLocal::SaveFile(const std::vector<uint8>& in_da
 	stream.close();
 	return true;
 }
+
+const bool DscCommon::FileOverlayLocal::DeleteFile(const std::string& in_filePath)
+{
+	return std::filesystem::remove(in_filePath);
+}
+
+const bool DscCommon::FileOverlayLocal::CreateFolder(const std::string& in_filePath)
+{
+	return std::filesystem::create_directory(in_filePath);
+}
+
+const bool DscCommon::FileOverlayLocal::DeleteFolder(const std::string& in_filePath)
+{
+	return (0 < std::filesystem::remove_all(in_filePath));
+}
+
+const bool DscCommon::FileOverlayLocal::QueryFile(const std::string& in_filePath)
+{
+	return std::filesystem::exists(in_filePath);
+}
+
+const bool DscCommon::FileOverlayLocal::ListFiles(std::vector<std::string>& out_filePathArray, const std::string& in_filePath)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(in_filePath))
+	{
+		out_filePathArray.push_back(entry.path().string());
+	}
+	return (0 < out_filePathArray.size());
+}
+

@@ -31,6 +31,7 @@ typedef unsigned __int64 uint64;
 //std lib
 #include <cmath>
 #include <codecvt>
+#include <filesystem>
 #include <functional>
 #include <fstream>
 #include <iostream>

@@ -16,6 +16,7 @@ public:
 	static const std::string JoinPath(const std::string& in_lhs, const std::string& in_rhs);
 	static std::unique_ptr<IFileOverlay>&& FactoryOverlayLocal();
 
+	FileSystem(std::vector<std::unique_ptr<IFileOverlay>>&& in_consumerArray);
 	FileSystem(std::unique_ptr<IFileOverlay>&& in_overlay = FactoryOverlayLocal());
 
 	const int32 AddOverlay(std::unique_ptr<IFileOverlay>&& in_overlay);
@@ -26,13 +27,23 @@ public:
 	const bool SaveFile(const std::vector<uint8>& in_data, const std::string& in_filePath);
 	const bool SaveFileOverlay(const std::vector<uint8>& in_data, const std::string& in_filePath, const int32 in_overlayId);
 
-	// query, issue is that this need some level of support for each level of the overlay, 
-	// and even the possibly of only query one level of the overlay if it has file, is this modded file?
-	// posibly have [DeleteFile, CreateFolder, DeleteFolder] 
-	// less possible [QueryFile, ListFiles]
+	const bool DeleteFile(const std::string& in_filePath);
+	const bool DeleteFileOverlay(const std::string& in_filePath, const int32 in_overlayId);
+
+	const bool CreateFolder(const std::string& in_filePath);
+	const bool CreateFolderOverlay(const std::string& in_filePath, const int32 in_overlayId);
+
+	const bool DeleteFolder(const std::string& in_filePath);
+	const bool DeleteFolderOverlay(const std::string& in_filePath, const int32 in_overlayId);
+
+	const bool QueryFile(const std::string& in_filePath);
+	const bool QueryFileOverlay(const std::string& in_filePath, const int32 in_overlayId);
+
+	const bool ListFiles(std::vector<std::string>& out_filePathArray, const std::string& in_filePath);
+	const bool ListFilesOverlay(std::vector<std::string>& out_filePathArray, const std::string& in_filePath, const int32 in_overlayId);
 
 #if 0 //todo
-	const int32 RequestAsyncLoad(const std::string& in_key);
+	const int32 RequestAsyncLoad(const std::string& in_key, const int32 in_overlayId);
 	void HasAsyncLoadFinished(const int32 in_id);
 	void HasAllAsyncLoadFinished(const int32 in_id);
 #endif
