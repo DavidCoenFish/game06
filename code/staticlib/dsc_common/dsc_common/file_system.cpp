@@ -2,6 +2,14 @@
 #include "file_system.h"
 #include "file_overlay_local.h"
 
+namespace
+{
+	//std::unique_ptr<DscCommon::IFileOverlay> TestCreation()
+	//{
+	//	return std::make_unique<DscCommon::FileOverlayLocal>();
+	//}
+} //namespace
+
 const std::string DscCommon::FileSystem::GetTempFilePath()
 {
 	return std::filesystem::temp_directory_path().string(); // u8string();
@@ -12,10 +20,13 @@ const std::string DscCommon::FileSystem::JoinPath(const std::string& in_lhs, con
 	return (std::filesystem::path(in_lhs) / in_rhs).string(); //.u8string();
 }
 
-std::unique_ptr<DscCommon::IFileOverlay>&& DscCommon::FileSystem::FactoryOverlayLocal()
+std::unique_ptr<DscCommon::IFileOverlay> DscCommon::FileSystem::FactoryOverlayLocal()
 {
-	auto pConsumer = std::make_unique<FileOverlayLocal>();
-	return std::move(pConsumer);
+	//auto pConsumer = std::make_unique<FileOverlayLocal>();
+	//return std::move(pConsumer);
+	//return std::make_unique<FileOverlayLocal>();
+	//return TestCreation();
+	return std::make_unique<FileOverlayLocal>();
 }
 
 DscCommon::FileSystem::FileSystem(std::vector<std::unique_ptr<IFileOverlay>>&& in_consumerArray)

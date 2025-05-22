@@ -36,10 +36,11 @@ static const std::string FormatString(const char* const pFormat, va_list vaArgs)
 
 } // namespace
 
-std::unique_ptr<DscCommon::ILogConsumer>&& DscCommon::LogSystem::FactoryConsumerOutputDebugString()
+std::unique_ptr<DscCommon::ILogConsumer> DscCommon::LogSystem::FactoryConsumerOutputDebugString()
 {
-	auto pConsumer = std::make_unique<LogConsumerOutputDebugString>();
-	return std::move(pConsumer);
+	//auto pConsumer = std::make_unique<LogConsumerOutputDebugString>();
+	//return std::move(pConsumer);
+	return std::make_unique<LogConsumerOutputDebugString>();
 }
 
 const std::string DscCommon::LogSystem::Printf(const char* const in_format, ... )

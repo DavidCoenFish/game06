@@ -16,7 +16,8 @@ class ILogConsumer;
 class LogSystem
 {
 public:
-	static std::unique_ptr<ILogConsumer>&& FactoryConsumerOutputDebugString();
+	//static std::unique_ptr<ILogConsumer>&& FactoryConsumerOutputDebugString();
+	static std::unique_ptr<ILogConsumer> FactoryConsumerOutputDebugString();
 	static const std::string Printf(const char* const in_format, ... );
 	static void AddMessage(
 		const std::string& in_channelName, 

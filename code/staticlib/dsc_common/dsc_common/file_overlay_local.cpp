@@ -1,6 +1,17 @@
 #include "common.h"
 #include "file_overlay_local.h"
 
+
+DscCommon::FileOverlayLocal::FileOverlayLocal()
+{
+	//nop
+}
+
+DscCommon::FileOverlayLocal::~FileOverlayLocal()
+{
+	//nop
+}
+
 const bool DscCommon::FileOverlayLocal::LoadFile(std::vector<uint8>& out_data, const std::string& in_filePath)
 {
 	std::ifstream stream;

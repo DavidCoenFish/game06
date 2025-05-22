@@ -12,9 +12,11 @@ public:
 	// don't provide just a Load/Save local file as we may want to expressly prohibit this at certain stages of app development
 	// the default overlay has a simple load/save file, and have that provided as default
 
+	//example C:\Users\DavidC\AppData\Local\Temp\ 
 	static const std::string GetTempFilePath();
 	static const std::string JoinPath(const std::string& in_lhs, const std::string& in_rhs);
-	static std::unique_ptr<IFileOverlay>&& FactoryOverlayLocal();
+	//static std::unique_ptr<IFileOverlay>&& FactoryOverlayLocal();
+	static std::unique_ptr<IFileOverlay> FactoryOverlayLocal();
 
 	FileSystem(std::vector<std::unique_ptr<IFileOverlay>>&& in_consumerArray);
 	FileSystem(std::unique_ptr<IFileOverlay>&& in_overlay = FactoryOverlayLocal());
