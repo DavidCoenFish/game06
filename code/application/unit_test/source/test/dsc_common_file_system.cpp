@@ -48,6 +48,25 @@ const bool TestPathLocalFileSystemBasic()
 	return ok;
 }
 
+const bool TestPathLocalFileSystemFolder()
+{
+	const std::string tempPath = DscCommon::FileSystem::GetTempFilePath();
+	DscCommon::FileSystem fileSystem;
+	const std::string filePath = DscCommon::FileSystem::JoinPath(tempPath, "test_folder");
+
+	bool ok = true;
+
+	// inital delete is allowed to fail
+	fileSystem.DeleteFolder(filePath);
+	ok = TEST_UTIL_EQUAL(ok, fileSystem.CreateFolder(filePath), true);
+	ok = TEST_UTIL_EQUAL(ok, fileSystem.QueryFile(filePath), true);
+
+	ok = TEST_UTIL_EQUAL(ok, fileSystem.DeleteFolder(filePath), true);
+	ok = TEST_UTIL_EQUAL(ok, fileSystem.QueryFile(filePath), false);
+
+	return ok;
+}
+
 }//namespace
 
 const bool DscCommonFileSystem()
@@ -57,6 +76,7 @@ const bool DscCommonFileSystem()
 	ok &= TestTempPath();
 	ok &= TestPathJoin();
 	ok &= TestPathLocalFileSystemBasic();
+	ok &= TestPathLocalFileSystemFolder();
 
 	return ok;
 }
