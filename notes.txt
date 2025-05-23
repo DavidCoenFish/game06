@@ -1,6 +1,4 @@
-boot strap -> runs app facet via cmd line
-
-static lib common: boot strap, log, thread task, math, file system
+static lib common: boot strap, thread task, math
 static lib dag:
 static lib render:
 static lib dag render:
@@ -8,6 +6,4 @@ static lib ui:
 
 executable common: app facet [unit test]
 executable render: app facet [triangle, ...]
-
-tool: automatron [build, test, commit]
 

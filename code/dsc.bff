@@ -33,7 +33,7 @@
 VSSolution("solution")
 {
     .SolutionOutput = "solution.sln"
-    .SolutionProjects = {"dsc_common_project", "unit_test_project"}
+    .SolutionProjects = {"dsc_common_project", "unit_test_project", "render_triangle_project"}
     .SolutionBuildProject = "unit_test_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
@@ -52,7 +52,7 @@ VSSolution("solution")
     {
         .temp = [
             .Path           = "application"
-            .Projects       = { "unit_test_project" }
+            .Projects       = { "render_triangle_project", "unit_test_project" }
         ]
         ^SolutionFolders + .temp
     }

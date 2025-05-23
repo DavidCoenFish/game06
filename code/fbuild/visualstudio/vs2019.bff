@@ -172,7 +172,7 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
                                     + ' /manifest:embed'
                                     + ' /DEBUG'
-                                    + ' /SUBSYSTEM:CONSOLE'
+                                    //+ ' /SUBSYSTEM:CONSOLE'
                                     //+ ' /SUBSYSTEM:WINDOWS'
                                     + ' /MACHINE:X64'
                                     + ' /TLBID:1'

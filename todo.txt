@@ -1,3 +1,3 @@
-- run unit test against common, log to stdout
 - draw triangle
 - draw dag triangle (dont render unless input changed)
+- ui
