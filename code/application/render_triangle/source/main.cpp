@@ -1,4 +1,4 @@
-#include <dsc_common\common.h>
+#include <dsc_common/common.h>
 #include "main.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

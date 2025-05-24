@@ -110,7 +110,7 @@ Compiler( 'Compiler-VS2019-x64' )
     .Platform                       = 'x64'
 
     // Paths
-    .VSIncludePaths                 = ' -I"$VS2019_ToolchainPath$/include/"'
+    .VSIncludePaths                 = ' /I"$VS2019_ToolchainPath$/include/"'
     .VSIncludePaths_ClangCl         = ' /imsvc "$VS2019_ToolchainPath$/include/"'
     .VSLibPaths                     = ' /LIBPATH:"$VS2019_ToolchainPath$/lib/x64"'
     .VCPackagesPath                 = '$VS2019_BasePath$/../Common7/IDE/VC/vcpackages'
@@ -147,7 +147,7 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /wd5039'            // ignore warning, winbase.h triggering pointer or reference to potentially throwing function passed to 'extern "C"' function under -EHc
 
                                     // Include Paths
-                                    + ' /I"./"'
+                                    //+ ' /I"./"'
                                     + .VSIncludePaths
 
     .CompilerOptions                = ' $CommonCompilerOptions$ "%1" /Fo"%2"'

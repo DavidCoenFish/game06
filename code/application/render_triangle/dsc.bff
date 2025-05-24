@@ -11,6 +11,6 @@
     ^SolutionItemArray + .temp
 }
 
-.LibraryDependencyArray = {"dsc_common"}
+.LibraryDependencyArray = {"dsc_common", "dsc_windows", }
 DscVsprojectWindowExe("render_triangle" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
 

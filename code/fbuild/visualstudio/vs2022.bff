@@ -154,7 +154,7 @@ Compiler( 'Compiler-VS2022-x64' )
                                     + ' /wd5220' // '%s': a non-static data member with a volatile qualified type no longer implies that compiler generated copy/move constructors and copy/move assignment operators are not trivial
 
                                     // Include Paths
-                                    + ' /I"./"'
+                                    //+ ' /I"./"'
                                     + .VSIncludePaths
 
     .CompilerOptions                = ' $CommonCompilerOptions$ "%1" /Fo"%2"'

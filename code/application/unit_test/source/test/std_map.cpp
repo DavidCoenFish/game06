@@ -1,4 +1,4 @@
-#include <dsc_common\common.h>
+#include <dsc_common/common.h>
 #include "std_map.h"
 #include "test_util.h"
 

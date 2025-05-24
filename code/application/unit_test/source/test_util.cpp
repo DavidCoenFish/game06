@@ -1,4 +1,4 @@
-#include <dsc_common\common.h>
+#include <dsc_common/common.h>
 #include "test_util.h"
 
 namespace
@@ -10,14 +10,24 @@ namespace
 	}
 };
 
-const bool TestUtil::AlmostEqual(const bool ok, const float valueLhs, const float valueRhs, const std::string& fileName, const int lineNumber)
+const bool TestUtil::AlmostEqual(const bool in_ok, const float in_valueLhs, const float in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
 {
-	if (std::numeric_limits<float>::epsilon() < std::abs(valueLhs - valueRhs))
+	if (std::numeric_limits<float>::epsilon() < std::abs(in_valueLhs - in_valueRhs))
 	{
-		std::cerr << "AlmostEqual failed, lhs:" << valueLhs << " rhs:" << valueRhs << " file:" << fileName << " line:" << lineNumber << std::endl;
-		return ok;
+		std::cerr << "AlmostEqual failed, lhs:" << in_valueLhs << " rhs:" << in_valueRhs << " file:" << in_fileName << " line:" << in_lineNumber << std::endl;
+		return false;
 	}
-	return false;
+	return in_ok;
+}
+
+const bool TestUtil::EqualString(const bool in_ok, const std::string& in_valueLhs, const std::string& in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
+{
+	if (in_valueLhs != in_valueRhs)
+	{
+		std::cerr << "EqualString failed, lhs:" << in_valueLhs << " rhs:" << in_valueRhs << " file:" << in_fileName << " line:" << in_lineNumber << std::endl;
+		return false;
+	}
+	return in_ok;
 }
 
 void TestUtil::AddTest(const std::function<bool()>& in_test)

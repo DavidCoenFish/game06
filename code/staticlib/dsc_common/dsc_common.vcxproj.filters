@@ -63,6 +63,12 @@
     <CustomBuild Include="dsc_common\math_angle.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
+    <CustomBuild Include="dsc_common\utf8.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\utf8.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="dsc_common">

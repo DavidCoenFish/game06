@@ -11,7 +11,5 @@
     ^SolutionItemArray + .temp
 }
 
-//pull in child scripts
-#include "dsc_common/dsc.bff"
-#include "dsc_render\dsc.bff"
-#include "dsc_windows\dsc.bff"
+.LibraryDependencyArray = {}
+DscVsprojectStaticLib("dsc_render" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)

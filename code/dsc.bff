@@ -33,8 +33,15 @@
 VSSolution("solution")
 {
     .SolutionOutput = "solution.sln"
-    .SolutionProjects = {"dsc_common_project", "unit_test_project", "render_triangle_project"}
-    .SolutionBuildProject = "unit_test_project"
+    .SolutionProjects = {
+        "dsc_common_project", 
+        "dsc_render_project", 
+        "dsc_windows_project", 
+        "unit_test_project", 
+        "render_triangle_project",
+        }
+    //.SolutionBuildProject = "unit_test_project"
+    .SolutionBuildProject = "render_triangle_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            
@@ -45,14 +52,21 @@ VSSolution("solution")
     {
         .temp = [
             .Path           = "staticlib"
-            .Projects       = { "dsc_common_project" }
+            .Projects       = { 
+                "dsc_common_project",  
+                "dsc_render_project",  
+                "dsc_windows_project",  
+                }
         ]
         ^SolutionFolders + .temp
     }
     {
         .temp = [
             .Path           = "application"
-            .Projects       = { "render_triangle_project", "unit_test_project" }
+            .Projects       = { 
+                "render_triangle_project", 
+                "unit_test_project" 
+                }
         ]
         ^SolutionFolders + .temp
     }
