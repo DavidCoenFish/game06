@@ -4,7 +4,7 @@
 #include "i_log_consumer.h"
 
 #if defined(DSC_LOG)
-	#define DSC_LOG_MESSAGE(TOPIC, LEVEL, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, LEVEL, format, ##__VA_ARGS__)
+	#define DSC_LOG_MESSAGE(TOPIC, LEVEL, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, LEVEL, FORMAT, ##__VA_ARGS__)
 #else
 	#define DSC_LOG_MESSAGE(TOPIC, LEVEL, FORMAT, ...) (void)0
 #endif

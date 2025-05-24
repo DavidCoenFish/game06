@@ -63,17 +63,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform)</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -showcmds</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -showcmds</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -showcmds</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectName).lib</NMakeOutput>
     <IntDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/intermediate</IntDir>
     <OutDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/output</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform)</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform)</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform)</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -showcmds</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -showcmds</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform) -summary -verbose -showcmds</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectName).lib</NMakeOutput>
     <IntDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/intermediate</IntDir>
     <OutDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/output</OutDir>

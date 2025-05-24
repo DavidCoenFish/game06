@@ -36,13 +36,14 @@
     }
     {
         Using(.Windows10_SDK_X64)
-        ^LibrarianOptions + .LibrarianOptions
         ^CompilerOptions + .CompilerOptions
         ^LinkerOptions + .LinkerOptions
+        // LibrarianOptions si not appended by the .Windows10_SDK_X64
     }
-]
 
-//Print(.CommonConfig)
+    Print(.Linker)
+    Print(.LinkerOptions)
+]
 
 // debug x64
 {
@@ -87,7 +88,7 @@
 
 .CommonVcproject = [
         .ProjectInputPathsRecurse   = true
-//#define DEVELOPMENT_BUILD_CMD
+#define DEVELOPMENT_BUILD_CMD
 #if DEVELOPMENT_BUILD_CMD
         .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
         .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
@@ -166,7 +167,7 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
         {
             .CompilerInputPath = "$RelativePath$/"
             .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
-            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source/"'
+            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source"'
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
                 ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
@@ -232,7 +233,7 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
         {
             .CompilerInputPath = "$RelativePath$/"
             .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
-            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source/"'
+            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source"'
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
                 ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
@@ -241,6 +242,7 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
 
         .LinkerOptions + ' /PDB:"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/$ProjectName$.pdb"'
                        + ' /SUBSYSTEM:WINDOWS'
+                       + ' "user32.lib"'
         Executable( "$ProjectName$_$Config$_$Platform$" )
         {
             .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"

@@ -3,7 +3,7 @@
 #include "dsc_windows.h"
 #include "i_window_application.h"
 
-IWindowApplication::IWindowApplication(const HWND in_hwnd, const bool in_full_screen, const int in_defaultWidth, const int in_defaultHeight)
+DscWindows::IWindowApplication::IWindowApplication(const HWND in_hwnd, const bool in_full_screen, const int in_defaultWidth, const int in_defaultHeight)
    : _defaultWidth(in_defaultWidth)
    , _defaultHeight(in_defaultHeight)
    , _hwnd(in_hwnd)
@@ -12,65 +12,65 @@ IWindowApplication::IWindowApplication(const HWND in_hwnd, const bool in_full_sc
    , _minimized(false)
    , _full_screen(in_full_screen)
 {
-	DSC_LOG_MESSAGE(LOG_TOPIC_DSC_WINDOWS, DscCommon::LogLevel::Diagnostic, "IWindowApplication ctor %p", this);
+	DSC_LOG_MESSAGE(LOG_TOPIC_DSC_WINDOWS, DscCommon::LogLevel::Diagnostic, "IWindowApplication ctor %p\n", this);
 }
 
-IWindowApplication::~IWindowApplication()
+DscWindows::IWindowApplication::~IWindowApplication()
 {
-	DSC_LOG_MESSAGE(LOG_TOPIC_DSC_WINDOWS, DscCommon::LogLevel::Diagnostic, "IWindowApplication dtor %p", this);
+	DSC_LOG_MESSAGE(LOG_TOPIC_DSC_WINDOWS, DscCommon::LogLevel::Diagnostic, "IWindowApplication dtor %p\n", this);
 }
 
-void IWindowApplication::Update()
-{
-   return;
-}
-
-void IWindowApplication::OnWindowMoved()
+void DscWindows::IWindowApplication::Update()
 {
    return;
 }
 
-void IWindowApplication::OnWindowSizeChanged(const int, const int)
+void DscWindows::IWindowApplication::OnWindowMoved()
 {
    return;
 }
 
-void IWindowApplication::OnActivated()
+void DscWindows::IWindowApplication::OnWindowSizeChanged(const int, const int)
 {
    return;
 }
 
-void IWindowApplication::OnDeactivated()
+void DscWindows::IWindowApplication::OnActivated()
 {
    return;
 }
 
-void IWindowApplication::OnSuspending()
+void DscWindows::IWindowApplication::OnDeactivated()
 {
    return;
 }
 
-void IWindowApplication::OnResuming()
+void DscWindows::IWindowApplication::OnSuspending()
 {
    return;
 }
 
-void IWindowApplication::OnKey(const int, const int, const bool, const int, bool)
+void DscWindows::IWindowApplication::OnResuming()
 {
    return;
 }
 
-void IWindowApplication::OnScroll(const int, const int)
+void DscWindows::IWindowApplication::OnKey(const int, const int, const bool, const int, bool)
+{
+   return;
+}
+
+void DscWindows::IWindowApplication::OnScroll(const int, const int)
 {
 	return;
 }
 
-void IWindowApplication::OnDestroy(const int)
-{
-	return;
-}
+//void DscWindows::IWindowApplication::OnDestroy(const int)
+//{
+//	return;
+//}
 
-const bool IWindowApplication::GetMouseState(
+const bool DscWindows::IWindowApplication::GetMouseState(
 	int& out_x,
 	int& out_y,
 	bool& out_left_button,
