@@ -28,13 +28,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
 {
     DscCommon::LogSystem logSystem(DscCommon::LogLevel::Diagnostic);
 
-    auto createApplication = [](const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)->DscWindows::IWindowApplication*
-    {
-        return new Application(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight);
-    };
-
     DscWindows::WindowHelper(
-        createApplication,
+        [](const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)->DscWindows::IWindowApplication*
+        {
+            return new Application(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight);
+        },
         800,
         600,
         false,

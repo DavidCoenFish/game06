@@ -1,0 +1,5 @@
+x basic windowed app
+- d3dx12 app that correctly handels release of resources/ window resize
+- draw triangle
+- draw dag triangle (dont render unless input changed)
+- ui
