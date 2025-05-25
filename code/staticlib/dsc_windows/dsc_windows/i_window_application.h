@@ -1,4 +1,5 @@
 #pragma once
+#include <dsc_common/common.h>
 
 class WindowApplicationParam;
 class TaskWindow;
@@ -48,12 +49,12 @@ namespace DscWindows
 			bool& out_right_button
 		);
 
+		HWND GetHwnd() const { return _hwnd; }
 
 	private:
+		HWND _hwnd;
 		const int _defaultWidth;
 		const int _defaultHeight;
-
-		HWND _hwnd;
 
 		bool _sizemove;
 		bool _suspend;

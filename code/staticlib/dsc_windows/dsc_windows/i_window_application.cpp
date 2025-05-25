@@ -4,20 +4,20 @@
 #include "i_window_application.h"
 
 DscWindows::IWindowApplication::IWindowApplication(const HWND in_hwnd, const bool in_full_screen, const int in_defaultWidth, const int in_defaultHeight)
-   : _defaultWidth(in_defaultWidth)
+   : _hwnd(in_hwnd)
+   , _defaultWidth(in_defaultWidth)
    , _defaultHeight(in_defaultHeight)
-   , _hwnd(in_hwnd)
    , _sizemove(false)
    , _suspend(false)
    , _minimized(false)
    , _full_screen(in_full_screen)
 {
-	DSC_LOG_MESSAGE(LOG_TOPIC_DSC_WINDOWS, DscCommon::LogLevel::Diagnostic, "IWindowApplication ctor %p\n", this);
+	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_WINDOWS, "IWindowApplication ctor %p\n", this);
 }
 
 DscWindows::IWindowApplication::~IWindowApplication()
 {
-	DSC_LOG_MESSAGE(LOG_TOPIC_DSC_WINDOWS, DscCommon::LogLevel::Diagnostic, "IWindowApplication dtor %p\n", this);
+	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_WINDOWS, "IWindowApplication dtor %p\n", this);
 }
 
 void DscWindows::IWindowApplication::Update()

@@ -38,11 +38,8 @@
         Using(.Windows10_SDK_X64)
         ^CompilerOptions + .CompilerOptions
         ^LinkerOptions + .LinkerOptions
-        // LibrarianOptions si not appended by the .Windows10_SDK_X64
+        // LibrarianOptions is not appended by the .Windows10_SDK_X64
     }
-
-    Print(.Linker)
-    Print(.LinkerOptions)
 ]
 
 // debug x64
@@ -88,7 +85,7 @@
 
 .CommonVcproject = [
         .ProjectInputPathsRecurse   = true
-#define DEVELOPMENT_BUILD_CMD
+//#define DEVELOPMENT_BUILD_CMD
 #if DEVELOPMENT_BUILD_CMD
         .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
         .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
@@ -220,7 +217,7 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
     }
 }
 
-function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryBaseNameDependency)
+function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryBaseNameDependency .LinkerAdditionalDependency)
 {
     ForEach( .ConfigIter in .ParamConfigurationArray )
     {
@@ -243,6 +240,11 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
         .LinkerOptions + ' /PDB:"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/$ProjectName$.pdb"'
                        + ' /SUBSYSTEM:WINDOWS'
                        + ' "user32.lib"'
+        ForEach( .lib in .LinkerAdditionalDependency )
+        {
+            ^LinkerOptions + ' "$lib$"'
+        }
+
         Executable( "$ProjectName$_$Config$_$Platform$" )
         {
             .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"
@@ -266,7 +268,7 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
 
     VCXProject( "$ProjectName$_project" )
     {
-        Print("VCXProject $ProjectName$_project")
+        //Print("VCXProject $ProjectName$_project")
         .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
         .ProjectConfigs = .ParamConfigurationArray
         .ProjectInputPaths  = "$RelativePath$/"

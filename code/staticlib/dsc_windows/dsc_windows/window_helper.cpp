@@ -28,16 +28,23 @@ namespace
 		break;
 
 		case WM_PAINT:
-			if ((nullptr != application) && (true == application->GetInSizemove()))
+			if (nullptr != application)
 			{
 				application->Update();
-			}
-			else
-			{
 				PAINTSTRUCT ps;
 				(void)BeginPaint(in_hwnd, &ps);
 				EndPaint(in_hwnd, &ps);
 			}
+			//if ((nullptr != application) && (true == application->GetInSizemove()))
+			//{
+			//	application->Update();
+			//}
+			//else
+			//{
+			//	PAINTSTRUCT ps;
+			//	(void)BeginPaint(in_hwnd, &ps);
+			//	EndPaint(in_hwnd, &ps);
+			//}
 			// An application returns zero if it processes this message.
 			return 0;
 

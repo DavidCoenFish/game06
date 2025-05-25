@@ -69,6 +69,12 @@
     <CustomBuild Include="dsc_common\utf8.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_float4.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_float4.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="dsc_common">

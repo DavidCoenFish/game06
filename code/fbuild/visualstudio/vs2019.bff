@@ -142,9 +142,11 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /WX'                // Warnings as errors
                                     //https://learn.microsoft.com/en-us/cpp/preprocessor/compiler-warnings-that-are-off-by-default?view=msvc-170
                                     + ' /wd4365'            // ignore warning, std lib triggering conversion signed/unsigned mismatch
+                                    + ' /wd4061'            // ignore warning, in switch XXX is not explicitly handled by a case label
                                     + ' /wd4820'            // ignore warning, padding needed
                                     + ' /wd5045'            // ignore warning, Compiler will insert Spectre mitigation
                                     + ' /wd5039'            // ignore warning, winbase.h triggering pointer or reference to potentially throwing function passed to 'extern "C"' function under -EHc
+
 
                                     // Include Paths
                                     //+ ' /I"./"'

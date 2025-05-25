@@ -25,10 +25,10 @@ typedef unsigned __int64 uint64;
 #define NOHELP // WinHelp is deprecated
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-
 #include <cassert>
 
 //std lib
+#include <array>
 #include <cmath>
 #include <codecvt>
 #include <filesystem>
@@ -36,10 +36,37 @@ typedef unsigned __int64 uint64;
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <list>
 #include <locale>
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
+#include <mutex>
+
+//D3DX12
+#pragma warning( push )
+#pragma warning( disable: 4265 ) // class has virtual functions, but its non-trivial destructor is not virtual
+#pragma warning( disable: 4625 ) // copy constructor was implicitly defined as deleted
+#pragma warning( disable: 4626 ) // assignment operator was implicitly defined as deleted
+#pragma warning( disable: 4986 ) // exception specification does not match previous declaration
+#pragma warning( disable: 5220 ) // a non-static data member with a volatile qualified
+#pragma warning( disable: 5204 ) // class has virtual functions, but its trivial destructor is not virtual
+#include <d3d12.h>
+#include <d3dcommon.h>
+#include <dxgi1_3.h>
+#include <dxgi1_6.h>
+#include <unknwn.h>
+#include <wrl/client.h>
+#include <wrl/event.h>
+#ifdef _DEBUG
+#include <dxgidebug.h>
+#endif
+// To use graphics and CPU markup events with the latest version of PIX, change this to include <pix3.h>
+// then add the NuGet package WinPixEventRuntime to the project.
+//#include <pix.h>
+#pragma warning(pop)
+
 
 //Macro
 #define TOKEN_PAIR(TOKEN) TOKEN,#TOKEN

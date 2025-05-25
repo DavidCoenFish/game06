@@ -4,9 +4,16 @@
 #include "i_log_consumer.h"
 
 #if defined(DSC_LOG)
-	#define DSC_LOG_MESSAGE(TOPIC, LEVEL, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, LEVEL, FORMAT, ##__VA_ARGS__)
+#define DSC_LOG_ERROR(TOPIC, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, DscCommon::LogLevel::Error, FORMAT, ##__VA_ARGS__)
+#define DSC_LOG_WARNING(TOPIC, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, DscCommon::LogLevel::Warning, FORMAT, ##__VA_ARGS__)
+#define DSC_LOG_INFO(TOPIC, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, DscCommon::LogLevel::Info, FORMAT, ##__VA_ARGS__)
+#define DSC_LOG_DIAGNOSTIC(TOPIC, FORMAT, ...) DscCommon::LogSystem::AddMessage(TOPIC, DscCommon::LogLevel::Diagnostic, FORMAT, ##__VA_ARGS__)
+
 #else
-	#define DSC_LOG_MESSAGE(TOPIC, LEVEL, FORMAT, ...) (void)0
+#define DSC_LOG_ERROR(TOPIC, FORMAT, ...) (void)0
+#define DSC_LOG_WARNING(TOPIC, FORMAT, ...) (void)0
+#define DSC_LOG_INFO(TOPIC, FORMAT, ...) (void)0
+#define DSC_LOG_DIAGNOSTIC(TOPIC, FORMAT, ...) (void)0
 #endif
 
 namespace DscCommon
@@ -16,7 +23,6 @@ class ILogConsumer;
 class LogSystem
 {
 public:
-	//static std::unique_ptr<ILogConsumer>&& FactoryConsumerOutputDebugString();
 	static std::unique_ptr<ILogConsumer> FactoryConsumerOutputDebugString();
 	static const std::string Printf(const char* const in_format, ... );
 	static void AddMessage(

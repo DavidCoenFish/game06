@@ -11,5 +11,5 @@
     ^SolutionItemArray + .temp
 }
 
-.LibraryDependencyArray = {}
+.LibraryDependencyArray = {"dsc_common"}
 DscVsprojectStaticLib("dsc_render" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
