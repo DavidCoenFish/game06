@@ -74,6 +74,8 @@
     .LinkerOptions                  = ' /LIBPATH:"$Windows10_SDKBasePath$/Lib/$Windows10_SDKVersion$/um/x64"'
                                     + ' /LIBPATH:"$Windows10_SDKBasePath$/Lib/$Windows10_SDKVersion$/ucrt/x64"'
                                     + ' /MACHINE:X64'
+
+    .EffectCompilerTool             = '$Windows10_SDKBasePath$\bin\$Windows10_SDKVersion$\x86\fxc.exe'
 ]
 .Windows10_SDK_X64_ClangCl =
 [

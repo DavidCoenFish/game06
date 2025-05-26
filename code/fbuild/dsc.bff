@@ -42,6 +42,13 @@
     }
 ]
 
+.EffectCompilerTool = ""
+{
+    Using(.Windows10_SDK_X64)
+    ^EffectCompilerTool = .EffectCompilerTool
+}
+Print(.EffectCompilerTool)
+
 // debug x64
 {
     .Config = [
@@ -239,7 +246,6 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
 
         .LinkerOptions + ' /PDB:"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/$ProjectName$.pdb"'
                        + ' /SUBSYSTEM:WINDOWS'
-                       + ' "user32.lib"'
         ForEach( .lib in .LinkerAdditionalDependency )
         {
             ^LinkerOptions + ' "$lib$"'
