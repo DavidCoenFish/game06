@@ -18,7 +18,7 @@ public:
     Application(const Application&) = delete;
 
 private:
-    virtual void Update() override;
+    virtual const bool Update() override;
     virtual void OnWindowSizeChanged(const int in_width, const int in_height) override;
 
 private:

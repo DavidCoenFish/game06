@@ -19,10 +19,10 @@ Application::~Application()
     _draw_system.reset();
 }
 
-void Application::Update()
+const bool Application::Update()
 {
     BaseType::Update();
-    if (_draw_system)
+    if (_draw_system && (false == GetMinimized()))
     {
         ID3D12GraphicsCommandList* _command_list = nullptr;
         _draw_system->Prepare(_command_list);
@@ -33,7 +33,7 @@ void Application::Update()
         _draw_system->Present();
     }
     
-    //InvalidateRect(GetHwnd(), NULL, TRUE);
+    return true;
 }
 void Application::OnWindowSizeChanged(const int in_width, const int in_height)
 {

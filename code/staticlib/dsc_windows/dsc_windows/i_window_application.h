@@ -16,7 +16,7 @@ namespace DscWindows
 
 		virtual ~IWindowApplication();
 
-		virtual void Update();
+		virtual const bool Update();
 		virtual void OnWindowMoved();
 		virtual void OnWindowSizeChanged(const int in_width, const int in_height);
 		virtual void OnActivated();

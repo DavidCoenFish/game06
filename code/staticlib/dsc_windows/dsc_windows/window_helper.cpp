@@ -7,10 +7,23 @@ namespace
 {
 	typedef std::function< DscWindows::IWindowApplication* (const HWND in_hwnd)> TCreateFunction;
 
+	void SetWindowApplication(const HWND in_hwnd, DscWindows::IWindowApplication* const in_pWindowApplicaiton)
+	{
+		SetWindowLongPtr(in_hwnd, GWLP_USERDATA, (LONG_PTR)in_pWindowApplicaiton);
+	}
+
+	DscWindows::IWindowApplication* const GetWindowApplication(const HWND in_hwnd)
+	{
+		auto application = reinterpret_cast<DscWindows::IWindowApplication* const>(GetWindowLongPtr(in_hwnd, GWLP_USERDATA));
+		return application;
+	}
+
 	// Windows procedure
 	LRESULT CALLBACK WndProc(HWND in_hwnd, UINT in_message, WPARAM in_wparam, LPARAM in_lparam)
 	{
-		auto application = reinterpret_cast<DscWindows::IWindowApplication*>(GetWindowLongPtr(in_hwnd, GWLP_USERDATA));
+		// can be null before WM_CREATE
+		auto application = GetWindowApplication(in_hwnd);
+
 		//LOG_MESSAGE_DEBUG("WndProc message:%d in_wparam:%p in_lparam:%p application:%p", message, in_wparam, in_lparam, application);
 
 		switch (in_message)
@@ -22,8 +35,20 @@ namespace
 			if (create_function)
 			{
 				auto application_new = (*create_function)(in_hwnd);
-				SetWindowLongPtr(in_hwnd, GWLP_USERDATA, (LONG_PTR)application_new);
+				SetWindowApplication(in_hwnd, application_new);
 			}
+		}
+		break;
+
+		case WM_DESTROY:
+		{
+			if (nullptr != application)
+			{
+				delete application;
+			}
+			SetWindowApplication(in_hwnd, nullptr);
+			//WM_QUIT is never sent to window, but you can pull it out of the GetMessage/PeekMessage
+			PostQuitMessage(0);
 		}
 		break;
 
@@ -149,19 +174,6 @@ namespace
 			}
 			break;
 
-		case WM_DESTROY:
-		{
-			if (nullptr != application)
-			{
-			//	application->OnDestroy(0);
-				delete application;
-			}
-			SetWindowLongPtr(in_hwnd, GWLP_USERDATA, (LONG)0);
-			//WM_QUIT is never sent to window, but you can pull it out of the GetMessage/PeekMessage
-			PostQuitMessage(0);
-		}
-		break;
-
 		//https://learn.microsoft.com/en-us/windows/win32/inputdev/about-keyboard-input#keystroke-message-flags
 		case WM_KEYDOWN:
 		case WM_KEYUP:
@@ -240,7 +252,18 @@ namespace
 
 } // namespace
 
-const int32 DscWindows::WindowHelper(
+const bool DscWindows::UpdateApplication(const HWND in_hwnd)
+{
+	bool _continue = false; // true; // there may be cycles at startup where pApplication is null, else set _continue as false?
+	DscWindows::IWindowApplication* const pApplication = GetWindowApplication(in_hwnd);
+	if (nullptr != pApplication)
+	{
+		_continue = pApplication->Update();
+	}
+	return _continue;
+}
+
+const HWND DscWindows::WindowHelper(
 	const TWindowApplicationFactory& in_application_factory,
 	const int32 in_defaultWidth, 
 	const int32 in_defaultHeight,
@@ -267,12 +290,12 @@ const int32 DscWindows::WindowHelper(
 		wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
 		if (!RegisterClassExW(&wcex))
 		{
-			return -1;
+			return NULL;
 		}
 	}
 
-
 	// Create window
+	HWND hwnd = NULL;
 	{
 		RECT rc = { 0, 0, static_cast<LONG>(in_defaultWidth), static_cast<LONG>(in_defaultHeight) };
 
@@ -282,18 +305,18 @@ const int32 DscWindows::WindowHelper(
 		};
 		DWORD dwStyle = in_fullScreen ? WS_POPUP : WS_OVERLAPPEDWINDOW;
 		AdjustWindowRect(&rc, dwStyle, FALSE);
-		HWND hwnd = CreateWindowExW(in_fullScreen ? WS_EX_TOPMOST : 0, className.c_str(), name.c_str(), dwStyle,
+		hwnd = CreateWindowExW(in_fullScreen ? WS_EX_TOPMOST : 0, className.c_str(), name.c_str(), dwStyle,
 			CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, 
 			nullptr, in_instance, &createFunction);
 
 		if (!hwnd)
 		{
-			return -1;
+			return NULL;
 		}
 
 		ShowWindow(hwnd, in_fullScreen ? SW_SHOWMAXIMIZED : in_cmd_show);
 		UpdateWindow(hwnd);
 	}
 
-	return 0;
+	return hwnd;
 }

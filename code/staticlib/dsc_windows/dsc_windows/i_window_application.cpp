@@ -20,9 +20,9 @@ DscWindows::IWindowApplication::~IWindowApplication()
 	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_WINDOWS, "IWindowApplication dtor %p\n", this);
 }
 
-void DscWindows::IWindowApplication::Update()
+const bool DscWindows::IWindowApplication::Update()
 {
-   return;
+   return false;
 }
 
 void DscWindows::IWindowApplication::OnWindowMoved()
