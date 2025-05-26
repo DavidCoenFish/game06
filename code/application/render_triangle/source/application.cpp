@@ -33,7 +33,7 @@ void Application::Update()
         _draw_system->Present();
     }
     
-    InvalidateRect(GetHwnd(), NULL, TRUE);
+    //InvalidateRect(GetHwnd(), NULL, TRUE);
 }
 void Application::OnWindowSizeChanged(const int in_width, const int in_height)
 {

@@ -23,7 +23,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
         "RenderTriangle",
         in_nCmdShow
     );
-
+    // what if we ran the update via a reference to the application while(pApplication->Run(error_code)){;}
+#if 1
     // Main message loop:
     MSG msg = {};
     // GetMessage returns non zero on messages other than WM_QUIT
@@ -37,4 +38,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
     }
 
     return (int)msg.wParam;
+#else
+    int exitCode = 0;
+    while (true == _continue)
+    {
+        MSG msg = {};
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (WM_QUIT == msg.message)
+            {
+                exitCode = (int)msg.wParam;
+                break;
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else
+        {
+            for (auto iter : _application_list)
+            {
+                iter->Update();
+            }
+        }
+    }
+
+#endif
 }
