@@ -41,13 +41,14 @@
         // LibrarianOptions is not appended by the .Windows10_SDK_X64
     }
 ]
-
-.EffectCompilerTool = ""
 {
     Using(.Windows10_SDK_X64)
-    ^EffectCompilerTool = .EffectCompilerTool
+    Compiler( 'fxc' )
+    {
+      .Executable = .EffectCompilerTool
+      .CompilerFamily = "custom"
+    }
 }
-Print(.EffectCompilerTool)
 
 // debug x64
 {
@@ -63,6 +64,8 @@ Print(.EffectCompilerTool)
                             + ' /Od'
                             + ' /JMC'
                             + ' /D "DSC_LOG"'
+        .EffectCompilerToolArgumentsVS = '/nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
+        .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
     ]
     ^ConfigurationArray + .Config
 }
@@ -86,13 +89,15 @@ Print(.EffectCompilerTool)
          .LinkerOptions     + ' /OPT:REF'
                             + ' /OPT:ICF'
                             + ' /LTCG:incremental'
+        .EffectCompilerToolArgumentsVS = '/nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" "%1"'
+        .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" "%1"'
     ]
     ^ConfigurationArray + .Config
 }
 
 .CommonVcproject = [
         .ProjectInputPathsRecurse   = true
-//#define DEVELOPMENT_BUILD_CMD
+#define DEVELOPMENT_BUILD_CMD
 #if DEVELOPMENT_BUILD_CMD
         .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
         .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
@@ -251,7 +256,27 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
             ^LinkerOptions + ' "$lib$"'
         }
 
-        Executable( "$ProjectName$_$Config$_$Platform$" )
+        ObjectList("vs_$ProjectName$_$Config$_$Platform$")
+        {
+            .Compiler = "fxc"
+            .CompilerOptions = .EffectCompilerToolArgumentsVS
+            .CompilerOutputExtension = ".cso"
+            .CompilerInputPath = "$RelativePath$/Shader"
+            .CompilerInputPattern = "*_vs.hlsl"
+            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/shader"
+        }
+
+        ObjectList("ps_$ProjectName$_$Config$_$Platform$")
+        {
+            .Compiler = "fxc"
+            .CompilerOptions = .EffectCompilerToolArgumentsPS
+            .CompilerOutputExtension = ".cso"
+            .CompilerInputPath = "$RelativePath$/Shader"
+            .CompilerInputPattern = "*_ps.hlsl"
+            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/shader"
+        }
+
+        Executable( "exe_$ProjectName$_$Config$_$Platform$" )
         {
             .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"
             .Libraries = {"obj_$ProjectName$_$Config$_$Platform$"}
@@ -259,8 +284,16 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
             {
                 .Temp = {"$LibraryName$_$Config$_$Platform$"}
                 ^Libraries + .Temp
-
             }
+        }
+
+        Alias( "$ProjectName$_$Config$_$Platform$" )
+        {
+          .Targets = { 
+                "vs_$ProjectName$_$Config$_$Platform$", 
+                "ps_$ProjectName$_$Config$_$Platform$", 
+                "exe_$ProjectName$_$Config$_$Platform$" 
+                }
         }
 
         RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
@@ -280,6 +313,15 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
         .ProjectInputPaths  = "$RelativePath$/"
         .ProjectBasePath = '$RelativePath$/'
         .ProjectFiles = "$RelativePath$/dsc.bff"
+        .ProjectAllowedFileExtensions 	= {
+                                  '*.cpp', '*.hpp', '*.cxx', '*.hxx', '*.c',   '*.h',  '*.cc',   '*.hh',
+                                  '*.cp',  '*.hp',  '*.cs',  '*.inl', '*.bff', '*.rc', '*.resx', '*.m',  '*.mm',
+                                  '*.cu',
+                                  '*.asm', '*.s',
+                                  '*.natvis', '*.editorconfig',
+                                  '.hlsl', '.hlsli'
+
+                              }
 
         Using (.CommonVcproject)
 

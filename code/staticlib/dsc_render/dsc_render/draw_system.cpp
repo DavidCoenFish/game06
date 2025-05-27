@@ -178,7 +178,7 @@ void DscRender::DrawSystem::CustomCommandListFinish(ID3D12GraphicsCommandList* i
 
 void DscRender::DrawSystem::Prepare(ID3D12GraphicsCommandList*& in_command_list)
 {
-	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "Prepare\n");
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "Prepare\n");
 
 	//RemoveCompletedResourceList();
 

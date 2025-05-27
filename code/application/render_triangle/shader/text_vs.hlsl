@@ -11,7 +11,6 @@ struct Vertex
     float4 _mask : COLOR0;
 
     float4 _colour : COLOR1;
-
 };
 
 Interpolant main(Vertex in_input)
