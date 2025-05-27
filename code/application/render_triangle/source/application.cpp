@@ -3,6 +3,7 @@
 
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
+#include <dsc_render_resource/frame.h>
 
 Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)
     : DscWindows::IWindowApplication(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight)
@@ -24,13 +25,9 @@ const bool Application::Update()
     BaseType::Update();
     if (_draw_system && (false == GetMinimized()))
     {
-        ID3D12GraphicsCommandList* _command_list = nullptr;
-        _draw_system->Prepare(_command_list);
+        std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
 
-        DscRender::IRenderTarget* render_target = _draw_system->GetRenderTargetBackBuffer();
-        render_target->StartRender(_command_list, true);
-        render_target->EndRender(_command_list);
-        _draw_system->Present();
+        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
     }
     
     return true;

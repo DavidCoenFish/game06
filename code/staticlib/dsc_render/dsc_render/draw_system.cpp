@@ -5,6 +5,7 @@
 #include "heap_wrapper.h"
 #include "heap_wrapper_item.h"
 #include "dsc_render.h"
+#include "resource_list.h"
 #include <dsc_common/log_system.h>
 
 std::unique_ptr<DscRender::DrawSystem> DscRender::DrawSystem::Factory(
@@ -176,6 +177,28 @@ void DscRender::DrawSystem::CustomCommandListFinish(ID3D12GraphicsCommandList* i
 	return;
 }
 
+std::shared_ptr<DscRender::ResourceList> DscRender::DrawSystem::MakeResourceList()
+{
+	auto device = _device_resources ? _device_resources->GetD3dDevice() : nullptr;
+	if (nullptr != device)
+	{
+		return DscRender::ResourceList::Factory(*device);
+	}
+	return nullptr;
+}
+
+void DscRender::DrawSystem::FinishResourceList(
+	std::shared_ptr<DscRender::ResourceList>& in_resource_list
+)
+{
+	ID3D12CommandQueue* const command_queue = _device_resources ? _device_resources->GetCommandQueue() : nullptr;
+	if ((nullptr != command_queue) && (nullptr != in_resource_list))
+	{
+		_resource_list.push_back(in_resource_list);
+		in_resource_list->MarkFinished(command_queue);
+	}
+}
+
 void DscRender::DrawSystem::Prepare(ID3D12GraphicsCommandList*& in_command_list)
 {
 	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "Prepare\n");
@@ -191,7 +214,7 @@ void DscRender::DrawSystem::Prepare(ID3D12GraphicsCommandList*& in_command_list)
 
 void DscRender::DrawSystem::Present()
 {
-	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "Present\n");
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "Present\n");
 
 	if (nullptr == _device_resources)
 	{

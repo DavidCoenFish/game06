@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_common", "staticlib\dsc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_render", "staticlib\dsc_render\dsc_render.vcxproj", "{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_render_resource", "staticlib\dsc_render_resource\dsc_render_resource.vcxproj", "{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_windows", "staticlib\dsc_windows\dsc_windows.vcxproj", "{9A116E39-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}"
@@ -81,6 +83,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_render", "dsc_render", 
 		staticlib\dsc_render\dsc.bff = staticlib\dsc_render\dsc.bff
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_render_resource", "dsc_render_resource", "{D6F06568-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		staticlib\dsc_render_resource\dsc.bff = staticlib\dsc_render_resource\dsc.bff
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_windows", "dsc_windows", "{0271BBBB-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		staticlib\dsc_windows\dsc.bff = staticlib\dsc_windows\dsc.bff
@@ -104,6 +111,8 @@ Global
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
 		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
 		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
+		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
+		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
 		{9A116E39-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
 		{9A116E39-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
 	EndGlobalSection
@@ -115,6 +124,7 @@ Global
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
+		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{9A116E39-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{A9795628-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
 		{26B3F472-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
@@ -125,6 +135,7 @@ Global
 		{6F950BFE-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
 		{7D4A481A-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{0CFAA121-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
+		{D6F06568-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{0271BBBB-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 	EndGlobalSection
 EndGlobal

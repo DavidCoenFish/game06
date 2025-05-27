@@ -36,6 +36,7 @@ VSSolution("solution")
     .SolutionProjects = {
         "dsc_common_project", 
         "dsc_render_project", 
+        "dsc_render_resource_project", 
         "dsc_windows_project", 
         "unit_test_project", 
         "render_triangle_project",
@@ -53,9 +54,10 @@ VSSolution("solution")
         .temp = [
             .Path           = "staticlib"
             .Projects       = { 
-                "dsc_common_project",  
-                "dsc_render_project",  
-                "dsc_windows_project",  
+                "dsc_common_project",
+                "dsc_render_project",
+                "dsc_render_resource_project",
+                "dsc_windows_project",
                 }
         ]
         ^SolutionFolders + .temp

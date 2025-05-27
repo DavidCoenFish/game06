@@ -10,6 +10,7 @@ namespace DscRender
 	class HeapWrapperItem;
 	class IRenderTarget;
 	class IResource;
+	class ResourceList;
 
 	class DrawSystem
 	{
@@ -53,6 +54,12 @@ namespace DscRender
 		);
 		void CustomCommandListFinish(ID3D12GraphicsCommandList* in_command_list);
 
+		std::shared_ptr<ResourceList> MakeResourceList();
+		/// Mark the resource list as finished and wait for fence before destroying it, transfer ownership
+		void FinishResourceList(
+			std::shared_ptr<ResourceList>& in_resource_list
+		);
+
 		void Prepare(ID3D12GraphicsCommandList*& in_command_list);
 		void Present();
 
@@ -84,7 +91,7 @@ namespace DscRender
 		std::shared_ptr<HeapWrapper> _heap_wrapper_render_target_view;
 		std::shared_ptr<HeapWrapper> _heap_wrapper_depth_stencil_view;
 
-		/// list of resource waiting for gpu usage to finish
-		//std::vector<std::shared_ptr<DrawSystemResourceList>> _resource_list;
+		// list of resource waiting for gpu usage to finish
+		std::vector<std::shared_ptr<ResourceList>> _resource_list;
 	};
 } // namespace DscRender

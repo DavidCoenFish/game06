@@ -11,7 +11,7 @@
     ^SolutionItemArray + .temp
 }
 
-.LibraryDependencyArray = {"dsc_common", "dsc_windows", "dsc_render", }
+.LibraryDependencyArray = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource" }
 .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib"}
 DscVsprojectWindowExe("render_triangle" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray .LinkerAdditionalDependency)
 
