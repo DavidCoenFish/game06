@@ -1,4 +1,8 @@
 #include "geometry_generic.h"
+#include <dsc_render/draw_system.h>
+#include <dsc_render/dsc_render.h>
+#include <dsc_render/heap_wrapper_item.h>
+#include <dsc_render/d3dx12.h>
 
 DscRenderResource::GeometryGeneric::GeometryGeneric(
 	DscRender::DrawSystem* const in_draw_system,
@@ -39,7 +43,7 @@ void DscRenderResource::GeometryGeneric::Draw(ID3D12GraphicsCommandList* const i
 }
 
 void DscRenderResource::GeometryGeneric::UpdateVertexData(
-	DrawSystem* const in_draw_system,
+	DscRender::DrawSystem* const in_draw_system,
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device,
 	const std::vector<uint8_t>& in_vertex_data_raw
@@ -67,13 +71,13 @@ void DscRenderResource::GeometryGeneric::UpdateVertexData(
 
 		const int byte_vertex_size = sizeof(float) * _float_per_vertex;
 
-		const int byte_total_size = _vertex_raw_data.size();
+		const size_t byte_total_size = _vertex_raw_data.size();
 		auto buffer_resource_desc = CD3DX12_RESOURCE_DESC::Buffer(byte_total_size);
 		auto upload_memory = in_draw_system->AllocateUpload(byte_total_size);
 
 		{
 			auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-				in_vertex_buffer.Get(),
+				_vertex_buffer.Get(),
 				D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
 				D3D12_RESOURCE_STATE_COPY_DEST
 			);
@@ -99,7 +103,7 @@ void DscRenderResource::GeometryGeneric::UpdateVertexData(
 
 		{
 			auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-				in_vertex_buffer.Get(),
+				_vertex_buffer.Get(),
 				D3D12_RESOURCE_STATE_COPY_DEST,
 				D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER
 			);
@@ -179,7 +183,7 @@ void DscRenderResource::GeometryGeneric::OnDeviceRestored(
 			&barrier
 		);
 	}
-	_vertex_buffer_view.BufferLocation = in_vertex_buffer->GetGPUVirtualAddress();
+	_vertex_buffer_view.BufferLocation = _vertex_buffer->GetGPUVirtualAddress();
 	_vertex_buffer_view.StrideInBytes = byte_vertex_size;
 	_vertex_buffer_view.SizeInBytes = byte_total_size;
 	return;

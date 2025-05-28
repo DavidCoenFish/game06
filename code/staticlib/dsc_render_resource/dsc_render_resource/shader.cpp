@@ -1,17 +1,11 @@
-#include "common/common_pch.h"
+#include "shader.h"
+#include <dsc_render/draw_system.h>
 
-#include "common/draw_system/draw_system.h"
-#include "common/draw_system/i_resource.h"
-#include "common/draw_system/shader/constant_buffer.h"
-#include "common/draw_system/shader/constant_buffer_info.h"
-#include "common/draw_system/shader/shader.h"
-#include "common/draw_system/shader/shader_constant_buffer.h"
-#include "common/draw_system/shader/shader_resource_info.h"
-#include "common/draw_system/shader/unordered_access_info.h"
-
-std::shared_ptr<ConstantBuffer> MakeConstantBuffer(
-	DrawSystem* const in_draw_system,
-	const std::shared_ptr<ConstantBufferInfo>& in_constant_buffer_info
+namespace
+{
+std::shared_ptr<DscRenderResource::ConstantBuffer> DscRenderResource::MakeConstantBuffer(
+	DscRender::DrawSystem* const in_draw_system,
+	const std::shared_ptr<DscRenderResource::ConstantBufferInfo>& in_constant_buffer_info
 	)
 {
 	if (nullptr == in_constant_buffer_info)
@@ -102,9 +96,9 @@ static void RemoveDenyFlag(
 // Https://docs.microsoft.com/en-us/windows/win32/direct3d12/creating-a-root-signature
 Microsoft::WRL::ComPtr<ID3D12RootSignature> MakeRootSignature(
 	ID3D12Device* const in_device,
-	const std::vector<std::shared_ptr<ShaderResourceInfo>>& in_shader_texture_info_array,
-	const std::vector<std::shared_ptr<ConstantBufferInfo>>& in_constant_buffer_info_array,
-	const std::vector<std::shared_ptr<UnorderedAccessInfo>>& in_array_unordered_access_info
+	const std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>>& in_shader_texture_info_array,
+	const std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>>& in_constant_buffer_info_array,
+	const std::vector<std::shared_ptr<DscRenderResource::UnorderedAccessInfo>>& in_array_unordered_access_info
 	)
 {
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> root_signature;
@@ -263,7 +257,7 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineState(
 	const std::shared_ptr < std::vector < uint8_t >>& in_vertex_shader_data,
 	const std::shared_ptr < std::vector < uint8_t >>& in_geometry_shader_data,
 	const std::shared_ptr < std::vector < uint8_t >>& in_pixel_shader_data,
-	const ShaderPipelineStateData& in_pipeline_state_data
+	const DscRenderResource::ShaderPipelineStateData& in_pipeline_state_data
 	)
 {
 	Microsoft::WRL::ComPtr < ID3D12PipelineState > pipeline_state;
@@ -330,8 +324,10 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineState(
 	return pipeline_state;
 }
 
-Shader::Shader(
-	DrawSystem* const in_draw_system,
+} // namespace
+
+DscRenderResource::Shader::Shader(
+	DscRender::DrawSystem* const in_draw_system,
 	const ShaderPipelineStateData&in_pipeline_state_data,
 	const std::shared_ptr < std::vector < uint8_t > >&in_vertex_shader_data,
 	const std::shared_ptr < std::vector < uint8_t > >&in_geometry_shader_data,
@@ -354,19 +350,19 @@ Shader::Shader(
 	// Nop
 }
 
-Shader::~Shader()
+DscRenderResource::Shader::~Shader()
 {
 	// Nop
 }
 
-void Shader::SetDebugName(const std::string& in_name)
+void DscRenderResource::Shader::SetDebugName(const std::string& in_name)
 {
 	_debug_name = in_name;
 }
 
-void Shader::SetActive(
+void DscRenderResource::Shader::SetActive(
 	ID3D12GraphicsCommandList* const in_command_list,
-	ShaderConstantBuffer* const in_shader_constant_buffer
+	DscRenderResource::ShaderConstantBuffer* const in_shader_constant_buffer
 	)
 {
 	if (false == _pipeline_state_data._compute_shader)
@@ -408,7 +404,7 @@ void Shader::SetActive(
 	}
 }
 
-void Shader::SetShaderResourceViewHandle(
+void DscRenderResource::Shader::SetShaderResourceViewHandle(
 	const int in_index,
 	const std::shared_ptr < HeapWrapperItem >& in_shader_resource_view_handle
 	)
@@ -420,7 +416,7 @@ void Shader::SetShaderResourceViewHandle(
 	return;
 }
 
-void Shader::SetUnorderedAccessViewHandle(
+void DscRenderResource::Shader::SetUnorderedAccessViewHandle(
 	const int in_index,
 	const std::shared_ptr < HeapWrapperItem >&in_unordered_access_view_handle
 	)
@@ -432,13 +428,13 @@ void Shader::SetUnorderedAccessViewHandle(
 	return;
 }
 
-void Shader::OnDeviceLost()
+void DscRenderResource::Shader::OnDeviceLost()
 {
 	_root_signature.Reset();
 	_pipeline_state.Reset();
 }
 
-void Shader::OnDeviceRestored(
+void DscRenderResource::Shader::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const,
 	ID3D12Device2* const in_device
 	)
@@ -471,8 +467,8 @@ void Shader::OnDeviceRestored(
 	return;
 }
 
-std::shared_ptr<ShaderConstantBuffer> Shader::MakeShaderConstantBuffer(
-	DrawSystem* const in_draw_system
+std::shared_ptr<DscRenderResource::ShaderConstantBuffer> DscRenderResource::Shader::MakeShaderConstantBuffer(
+	DscRender::DrawSystem* const in_draw_system
 	) const
 {
 	std::vector<std::shared_ptr<ConstantBuffer>> array_constant_buffer;
@@ -489,7 +485,7 @@ std::shared_ptr<ShaderConstantBuffer> Shader::MakeShaderConstantBuffer(
 		}
 	}
 
-	auto shader_constant_buffer = std::make_shared<ShaderConstantBuffer>(
+	auto shader_constant_buffer = std::make_shared<DscRenderResource::ShaderConstantBuffer>(
 		in_draw_system,
 		array_constant_buffer
 		);

@@ -1,10 +1,11 @@
-#include "common/common_pch.h"
+#include "shader_resource_info.h"
+#include <dsc_render/draw_system.h>
+#include <dsc_render/dsc_render.h>
+#include <dsc_render/heap_wrapper_item.h>
+#include <dsc_render/d3dx12.h>
 
-#include "common/draw_system/heap_wrapper/heap_wrapper_item.h"
-#include "common/draw_system/shader/shader_resource_info.h"
-
-std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactorySampler(
-	const std::shared_ptr<HeapWrapperItem>& in_shader_resource_view_handle,
+std::shared_ptr<DscRenderResource::ShaderResourceInfo> DscRenderResource::ShaderResourceInfo::FactorySampler(
+	const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_handle,
 	const D3D12_SHADER_VISIBILITY in_visiblity,
 	const bool in_mip_map
 	)
@@ -31,8 +32,8 @@ std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactorySampler(
 		);
 }
 
-std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactoryClampSampler(
-	const std::shared_ptr<HeapWrapperItem>& in_shader_resource_view_handle,
+std::shared_ptr<DscRenderResource::ShaderResourceInfo> DscRenderResource::ShaderResourceInfo::FactoryClampSampler(
+	const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_handle,
 	const D3D12_SHADER_VISIBILITY in_visiblity,
 	const bool in_mip_map
 	)
@@ -59,8 +60,8 @@ std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactoryClampSampler(
 		);
 }
 
-std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactoryDataSampler(
-	const std::shared_ptr<HeapWrapperItem>& in_shader_resource_view_handle,
+std::shared_ptr<DscRenderResource::ShaderResourceInfo> DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
+	const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_handle,
 	const D3D12_SHADER_VISIBILITY in_visiblity
 	)
 {
@@ -86,8 +87,8 @@ std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactoryDataSampler(
 		);
 }
 
-std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactoryNoSampler(
-	const std::shared_ptr<HeapWrapperItem>& in_shader_resource_view_handle,
+std::shared_ptr<DscRenderResource::ShaderResourceInfo> DscRenderResource::ShaderResourceInfo::FactoryNoSampler(
+	const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_handle,
 	const D3D12_SHADER_VISIBILITY in_visiblity
 	)
 {
@@ -113,8 +114,8 @@ std::shared_ptr<ShaderResourceInfo> ShaderResourceInfo::FactoryNoSampler(
 		);
 }
 
-ShaderResourceInfo::ShaderResourceInfo(
-	const std::shared_ptr<HeapWrapperItem>& in_shader_resource_view_handle,
+DscRenderResource::ShaderResourceInfo::ShaderResourceInfo(
+	const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_handle,
 	const D3D12_STATIC_SAMPLER_DESC&in_static_sampler_desc,
 	const bool in_use_sampler
 	) 
@@ -125,7 +126,7 @@ ShaderResourceInfo::ShaderResourceInfo(
 	return;
 }
 
-void ShaderResourceInfo::Activate(
+void DscRenderResource::ShaderResourceInfo::Activate(
 	ID3D12GraphicsCommandList* const in_command_list,
 	const int in_root_param_index
 	)
@@ -145,14 +146,14 @@ void ShaderResourceInfo::Activate(
 	return;
 }
 
-void ShaderResourceInfo::SetShaderResourceViewHandle(const std::shared_ptr<HeapWrapperItem>&\
+void DscRenderResource::ShaderResourceInfo::SetShaderResourceViewHandle(const std::shared_ptr<DscRender::HeapWrapperItem>&\
 	in_shader_resource_view_handle)
 {
 	_shader_resource_view_handle = in_shader_resource_view_handle;
 	return;
 }
 
-const D3D12_SHADER_VISIBILITY ShaderResourceInfo::GetVisiblity() const
+const D3D12_SHADER_VISIBILITY DscRenderResource::ShaderResourceInfo::GetVisiblity() const
 {
 	return _static_sampler_desc.ShaderVisibility;
 }

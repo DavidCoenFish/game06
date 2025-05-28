@@ -1,17 +1,8 @@
-#include "common/common_pch.h"
-#include "common/draw_system/shader/shader_constant_buffer.h"
+#include "shader_constant_buffer.h"
+#include <dsc_render/draw_system.h>
 
-#include "common/draw_system/draw_system.h"
-#include "common/draw_system/i_resource.h"
-#include "common/draw_system/shader/constant_buffer.h"
-#include "common/draw_system/shader/constant_buffer_info.h"
-#include "common/draw_system/shader/shader.h"
-#include "common/draw_system/shader/shader_resource_info.h"
-#include "common/draw_system/shader/shader_resource_info.h"
-#include "common/draw_system/shader/unordered_access_info.h"
-
-ShaderConstantBuffer::ShaderConstantBuffer(
-	DrawSystem* const in_draw_system,
+DscRenderResource::ShaderConstantBuffer::ShaderConstantBuffer(
+	DscRender::DrawSystem* const in_draw_system,
 	const std::vector<std::shared_ptr<ConstantBuffer>>& _array_constant_buffer
 	) 
 	: IResource(in_draw_system)
@@ -20,12 +11,12 @@ ShaderConstantBuffer::ShaderConstantBuffer(
 	return;
 }
 
-ShaderConstantBuffer::~ShaderConstantBuffer()
+DscRenderResource::ShaderConstantBuffer::~ShaderConstantBuffer()
 {
 	// Nop
 }
 
-void ShaderConstantBuffer::SetActive(
+void DscRenderResource::ShaderConstantBuffer::SetActive(
 	ID3D12GraphicsCommandList* const in_command_list,
 	int& in_out_root_paramter_index
 	)
@@ -43,7 +34,7 @@ void ShaderConstantBuffer::SetActive(
 	return;
 }
 
-void ShaderConstantBuffer::SetConstantBufferData(
+void DscRenderResource::ShaderConstantBuffer::SetConstantBufferData(
 	const int in_index,
 	const std::vector<float>& in_data
 	)
@@ -60,7 +51,7 @@ void ShaderConstantBuffer::SetConstantBufferData(
 	return;
 }
 
-void ShaderConstantBuffer::OnDeviceLost()
+void DscRenderResource::ShaderConstantBuffer::OnDeviceLost()
 {
 	for (auto&constant_buffer : _array_constant_buffer)
 	{
@@ -68,7 +59,7 @@ void ShaderConstantBuffer::OnDeviceLost()
 	}
 }
 
-void ShaderConstantBuffer::OnDeviceRestored(
+void DscRenderResource::ShaderConstantBuffer::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const,
 	ID3D12Device2* const in_device
 	)

@@ -1,11 +1,11 @@
-#include "common/common_pch.h"
-#include "common/draw_system/shader/constant_buffer.h"
+#include "constant_buffer.h"
+#include <dsc_render/draw_system.h>
+#include <dsc_render/dsc_render.h>
+#include <dsc_render/heap_wrapper_item.h>
+#include <dsc_render/d3dx12.h>
 
-#include "common/direct_xtk12/d3dx12.h"
-#include "common/draw_system/heap_wrapper/heap_wrapper_item.h"
-
-ConstantBuffer::ConstantBuffer(
-	const std::shared_ptr < HeapWrapperItem >&in_heap_wrapper_item,
+DscRenderResource::ConstantBuffer::ConstantBuffer(
+	const std::shared_ptr < DscRender::HeapWrapperItem >&in_heap_wrapper_item,
 	const std::vector<uint8_t>& in_data,
 	const D3D12_SHADER_VISIBILITY in_visiblity
 	) 
@@ -17,14 +17,14 @@ ConstantBuffer::ConstantBuffer(
 	// Nop
 }
 
-void ConstantBuffer::DeviceLost()
+void DscRenderResource::ConstantBuffer::DeviceLost()
 {
 	_constant_buffer_upload_heap.Reset();
 	_gpu_address = 0;
 	return;
 }
 
-void ConstantBuffer::DeviceRestored(ID3D12Device* const in_device)
+void DscRenderResource::ConstantBuffer::DeviceRestored(ID3D12Device* const in_device)
 {
 	const auto heap_properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	const auto resource_desc = CD3DX12_RESOURCE_DESC::Buffer(1024* 64);
@@ -65,7 +65,7 @@ void ConstantBuffer::DeviceRestored(ID3D12Device* const in_device)
 	// Memcpy(m_pGPUAddress[i], &cbColorMultiplierData, sizeof(cbColorMultiplierData));
 }
 
-void ConstantBuffer::Activate(
+void DscRenderResource::ConstantBuffer::Activate(
 	ID3D12GraphicsCommandList* const in_command_list,
 	// Void* const pData,
 	const int in_root_param_index
@@ -95,12 +95,12 @@ void ConstantBuffer::Activate(
 	return;
 }
 
-const int ConstantBuffer::GetNum32BitValues() const
+const int DscRenderResource::ConstantBuffer::GetNum32BitValues() const
 {
 	return (int)(_data.size() / 4);
 }
 
-void ConstantBuffer::UpdateData(
+void DscRenderResource::ConstantBuffer::UpdateData(
 	const void* const in_data,
 	const size_t in_data_size
 	)

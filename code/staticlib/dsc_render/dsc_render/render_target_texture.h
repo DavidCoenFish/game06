@@ -10,6 +10,7 @@ namespace DscRender
 	struct RenderTargetFormatData;
 	struct RenderTargetDepthData;
 
+	// todo: move to DscRenderResource
 	class RenderTargetTexture : public IRenderTarget, public IResource
 	{
 	public:

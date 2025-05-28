@@ -1,9 +1,7 @@
-#include "common/common_pch.h"
-
-#include "common/draw_system/shader/shader_pipeline_state_data.h"
+#include "shader_pipeline_state_data.h"
 
 //result = foreground + (1 - foreground.alpha) * background
-const D3D12_BLEND_DESC ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied()
+const D3D12_BLEND_DESC DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied()
 {
 	D3D12_BLEND_DESC blend_desc;
 	blend_desc.AlphaToCoverageEnable = FALSE;
@@ -32,7 +30,7 @@ const D3D12_BLEND_DESC ShaderPipelineStateData::FactoryBlendDescAlphaPremultipli
 	return blend_desc;
 }
 
-ShaderPipelineStateData ShaderPipelineStateData::FactoryComputeShader()
+DscRenderResource::ShaderPipelineStateData DscRenderResource::ShaderPipelineStateData::FactoryComputeShader()
 {
 	return ShaderPipelineStateData(
 		std::vector < D3D12_INPUT_ELEMENT_DESC > (),
@@ -46,7 +44,7 @@ ShaderPipelineStateData ShaderPipelineStateData::FactoryComputeShader()
 		);
 }
 
-ShaderPipelineStateData::ShaderPipelineStateData(
+DscRenderResource::ShaderPipelineStateData::ShaderPipelineStateData(
 	const std::vector < D3D12_INPUT_ELEMENT_DESC >&in_input_element_desc_array,
 	const D3D12_PRIMITIVE_TOPOLOGY_TYPE in_primitive_topology_type,
 	const DXGI_FORMAT in_depth_stencil_view_format,

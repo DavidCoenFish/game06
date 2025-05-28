@@ -1,10 +1,8 @@
-#include "common/common_pch.h"
+#include "unordered_access_info.h"
+#include <dsc_render/heap_wrapper_item.h>
 
-#include "common/draw_system/heap_wrapper/heap_wrapper_item.h"
-#include "common/draw_system/shader/unordered_access_info.h"
-
-std::shared_ptr<UnorderedAccessInfo> UnorderedAccessInfo::Factory(
-	const std::shared_ptr<HeapWrapperItem>& in_unordered_access_view_handle,
+std::shared_ptr<DscRenderResource::UnorderedAccessInfo> DscRenderResource::UnorderedAccessInfo::Factory(
+	const std::shared_ptr<DscRender::HeapWrapperItem>& in_unordered_access_view_handle,
 	const D3D12_SHADER_VISIBILITY in_visiblity
 	)
 {
@@ -15,8 +13,8 @@ std::shared_ptr<UnorderedAccessInfo> UnorderedAccessInfo::Factory(
 }
 
 
-UnorderedAccessInfo::UnorderedAccessInfo(
-	const std::shared_ptr < HeapWrapperItem >&in_unordered_access_view_handle,
+DscRenderResource::UnorderedAccessInfo::UnorderedAccessInfo(
+	const std::shared_ptr < DscRender::HeapWrapperItem >&in_unordered_access_view_handle,
 	const D3D12_SHADER_VISIBILITY in_visiblity
 	) 
 	: _unordered_access_view_handle(in_unordered_access_view_handle)
@@ -25,14 +23,14 @@ UnorderedAccessInfo::UnorderedAccessInfo(
 	return;
 }
 
-void UnorderedAccessInfo::SetUnorderedAccessViewHandle(const std::shared_ptr < HeapWrapperItem >&\
+void DscRenderResource::UnorderedAccessInfo::SetUnorderedAccessViewHandle(const std::shared_ptr < DscRender::HeapWrapperItem >&\
 	in_unordered_access_view_handle)
 {
 	_unordered_access_view_handle = in_unordered_access_view_handle;
 	return;
 }
 
-void UnorderedAccessInfo::Activate(
+void DscRenderResource::UnorderedAccessInfo::Activate(
 	ID3D12GraphicsCommandList* const in_command_list,
 	const int in_root_param_index
 	)

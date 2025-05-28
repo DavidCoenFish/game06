@@ -1,20 +1,17 @@
-#include "common/common_pch.h"
+#include "shader_resource.h"
+#include <dsc_render/draw_system.h>
+#include <dsc_render/dsc_render.h>
+#include <dsc_render/heap_wrapper_item.h>
+#include <dsc_render/d3dx12.h>
 
-#include "common/direct_xtk12/direct_x_helpers.h"
-#include "common/direct_xtk12/graphics_memory.h"
-#include "common/direct_xtk12/d3dx12.h"
-#include "common/draw_system/draw_system.h"
-#include "common/draw_system/heap_wrapper/heap_wrapper_item.h"
-#include "common/draw_system/shader/shader_resource.h"
-
-ShaderResource::ShaderResource(
-	DrawSystem* const in_draw_system,
-	const std::shared_ptr<HeapWrapperItem>&in_shader_resource,
+DscRenderResource::ShaderResource::ShaderResource(
+	DscRender::DrawSystem* const in_draw_system,
+	const std::shared_ptr<DscRender::HeapWrapperItem>&in_shader_resource,
 	const D3D12_RESOURCE_DESC& in_desc,
 	const D3D12_SHADER_RESOURCE_VIEW_DESC& in_shader_resource_view_desc,
 	const std::vector<uint8_t>& in_data
 	) 
-	: IResource(in_draw_system)
+	: DscRender::IResource(in_draw_system)
 	, _shader_resource(in_shader_resource)
 	, _desc(in_desc)
 	, _shader_resource_view_desc(in_shader_resource_view_desc)
@@ -24,18 +21,18 @@ ShaderResource::ShaderResource(
 	return;
 }
 
-void ShaderResource::OnDeviceLost()
+void DscRenderResource::ShaderResource::OnDeviceLost()
 {
 	_resource.Reset();
 }
 
-std::shared_ptr < HeapWrapperItem > ShaderResource::GetHeapWrapperItem() const
+std::shared_ptr < DscRender::HeapWrapperItem > DscRenderResource::ShaderResource::GetHeapWrapperItem() const
 {
 	return _shader_resource;
 }
 
-void ShaderResource::UploadData(
-	DrawSystem* const in_draw_system,
+void DscRenderResource::ShaderResource::UploadData(
+	DscRender::DrawSystem* const in_draw_system,
 	ID3D12GraphicsCommandList* const in_command_list
 	)
 {
@@ -54,8 +51,8 @@ void ShaderResource::UploadData(
 }
 
 
-void ShaderResource::UploadResource(
-	DrawSystem* const in_draw_system,
+void DscRenderResource::ShaderResource::UploadResource(
+	DscRender::DrawSystem* const in_draw_system,
 	ID3D12GraphicsCommandList* const in_command_list,
 	Microsoft::WRL::ComPtr<ID3D12Resource> &in_resource,
 	const D3D12_RESOURCE_DESC& in_desc,
@@ -92,18 +89,13 @@ void ShaderResource::UploadResource(
 				1,
 				&ShaderResource2DData
 				);
-
-			//OnResourceBarrier(
-			//	in_command_list,
-			//	D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
-			//	);
 		}
 	}
 
 	return;
 }
 
-void ShaderResource::OnDeviceRestored(
+void DscRenderResource::ShaderResource::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device
 	)
@@ -111,7 +103,7 @@ void ShaderResource::OnDeviceRestored(
 	_current_state = D3D12_RESOURCE_STATE_COPY_DEST;
 
 	CD3DX12_HEAP_PROPERTIES heap_default(D3D12_HEAP_TYPE_DEFAULT);
-	DX::ThrowIfFailed(in_device->CreateCommittedResource(
+	DirectX::ThrowIfFailed(in_device->CreateCommittedResource(
 		&heap_default,
 		D3D12_HEAP_FLAG_NONE,
 		&_desc,
@@ -143,7 +135,7 @@ void ShaderResource::OnDeviceRestored(
 	return;
 }
 
-void ShaderResource::OnResourceBarrier(
+void DscRenderResource::ShaderResource::OnResourceBarrier(
 	ID3D12GraphicsCommandList* const in_command_list,
 	D3D12_RESOURCE_STATES in_new_state
 )

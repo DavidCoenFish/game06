@@ -12,8 +12,12 @@ namespace DscRenderResource
 	class GeometryGeneric : public DscRender::IResource
 	{
 	public:
+		GeometryGeneric() = delete;
+		GeometryGeneric& operator=(const GeometryGeneric&) = delete;
+		GeometryGeneric(const GeometryGeneric&) = delete;
+
 		GeometryGeneric(
-			DrawSystem* const in_draw_system,
+			DscRender::DrawSystem* const in_draw_system,
 			const D3D_PRIMITIVE_TOPOLOGY in_primitive_topology,
 			const std::vector<D3D12_INPUT_ELEMENT_DESC>& in_input_element_desc_array,
 			const std::vector<uint8_t>& in_vertex_data_raw,
@@ -25,7 +29,7 @@ namespace DscRenderResource
 		/// this is why GetVertexDataByteSize is now exposed
 		/// can not push this down as GeometryGeneric is the IResource managing the lifespan, so need to check above
 		void UpdateVertexData(
-			DrawSystem* const in_draw_system,
+			DscRender::DrawSystem* const in_draw_system,
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,
 			const std::vector<uint8_t>& in_vertex_data_raw
