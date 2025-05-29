@@ -5,6 +5,15 @@
 #include <dsc_render/d3dx12.h>
 #include <dsc_render/graphics_memory.h>
 
+void DscRenderResource::GeometryGeneric::AppendData(std::vector<uint8_t>& in_out_data, const uint8_t* const in_value, const int32_t in_size)
+{
+	for (int index = 0; index < in_size; ++index)
+	{
+		in_out_data.push_back(in_value[index]);
+	}
+	return;
+}
+
 DscRenderResource::GeometryGeneric::GeometryGeneric(
 	DscRender::DrawSystem* const in_draw_system,
 	const D3D_PRIMITIVE_TOPOLOGY in_primitive_topology,

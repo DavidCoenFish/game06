@@ -2,9 +2,22 @@
 #include <dsc_common/common.h>
 #include <dsc_windows/i_window_application.h>
 
+#define LOG_TOPIC_APPLICATION "APPLICATION"
+
+namespace DscCommon
+{
+    class FileSystem;
+}
+
 namespace DscRender
 {
     class DrawSystem;
+}
+
+namespace DscRenderResource
+{
+    class GeometryGeneric;
+    class Shader;
 }
 
 class Application : public DscWindows::IWindowApplication
@@ -23,6 +36,9 @@ private:
 
 private:
     typedef DscWindows::IWindowApplication BaseType;
+    std::unique_ptr<DscCommon::FileSystem> _file_system;
     std::unique_ptr<DscRender::DrawSystem> _draw_system;
+    std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_generic;
+    std::shared_ptr<DscRenderResource::Shader> _shader;
 
 };

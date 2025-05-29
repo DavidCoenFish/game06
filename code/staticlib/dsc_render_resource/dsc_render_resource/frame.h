@@ -11,7 +11,10 @@ namespace DscRender
 
 namespace DscRenderResource
 {
+	class GeometryGeneric;
 	class RenderTargetTexture;
+	class Shader;
+	class ShaderConstantBuffer;
 
 	class Frame
 	{
@@ -45,16 +48,16 @@ namespace DscRenderResource
 			const std::shared_ptr<DscRender::IResource>& in_resource
 		);
 
-		///// pass ref smart pointer as need to extend resource lifespan till command list completed
-		//void SetShader(
-		//	const std::shared_ptr<Shader>& in_shader,
-		//	const std::shared_ptr<ShaderConstantBuffer>& in_shader_constant_buffer = nullptr
-		//);
+		// pass ref smart pointer as need to extend resource lifespan till command list completed
+		void SetShader(
+			const std::shared_ptr<Shader>& in_shader,
+			const std::shared_ptr<ShaderConstantBuffer>& in_shader_constant_buffer = nullptr
+		);
 
-		///// pass ref smart pointer as need to extend resource lifespan till command list completed
-		//void Draw(
-		//	const std::shared_ptr<GeometryGeneric>& in_geometry
-		//);
+		// pass ref smart pointer as need to extend resource lifespan till command list completed
+		void Draw(
+			const std::shared_ptr<GeometryGeneric>& in_geometry
+		);
 
 		/// Trigger compute shader, thread_group_count as the number of steps for each thread to do
 		//void Dispatch(

@@ -64,6 +64,8 @@ namespace DscRender
 			ID3D12GraphicsCommandList* const in_command_list,
 			IResource* const in_resource
 		);
+		ID3D12Device2* const GetD3dDevice();
+
 
 		ID3D12GraphicsCommandList* CreateCustomCommandList(
 			ID3D12PipelineState* const in_pipeline_state_object_or_null = nullptr

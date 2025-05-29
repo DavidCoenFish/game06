@@ -9,6 +9,13 @@
 
 namespace
 {
+struct PipelineStateStream
+{
+public:
+	CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE in_root_signature;
+	CD3DX12_PIPELINE_STATE_STREAM_CS CS;
+};
+
 std::shared_ptr<DscRenderResource::ConstantBuffer> MakeConstantBuffer(
 	DscRender::DrawSystem* const in_draw_system,
 	const std::shared_ptr<DscRenderResource::ConstantBufferInfo>& in_constant_buffer_info
@@ -229,27 +236,15 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> MakeRootSignature(
 Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineStateComputeShader(
 	ID3D12Device2* const in_device,
 	const Microsoft::WRL::ComPtr < ID3D12RootSignature >&in_root_signature,
-	const std::shared_ptr < std::vector < uint8_t >>&in_compute_shader_data
+	const std::vector<uint8_t >& in_compute_shader_data
 	)
 {
 	Microsoft::WRL::ComPtr < ID3D12PipelineState > pipeline_state;
 	// Create the PSO for GenerateMips shader.
-	struct PipelineStateStream
-	{
-	public:
-		CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE in_root_signature;
-		CD3DX12_PIPELINE_STATE_STREAM_CS CS;
-	}pipeline_state_stream;
+	PipelineStateStream pipeline_state_stream;
 	pipeline_state_stream.in_root_signature = in_root_signature.Get();
-	if (nullptr != in_compute_shader_data)
-	{
-		pipeline_state_stream.CS =
-		{
-			in_compute_shader_data->data(), in_compute_shader_data->size()};
-	}
-	D3D12_PIPELINE_STATE_STREAM_DESC pipeline_state_stream_desc =
-	{
-		sizeof (PipelineStateStream),&pipeline_state_stream};
+	pipeline_state_stream.CS = {in_compute_shader_data.data(), in_compute_shader_data.size()};
+	D3D12_PIPELINE_STATE_STREAM_DESC pipeline_state_stream_desc = { sizeof (PipelineStateStream), &pipeline_state_stream};
 	DirectX::ThrowIfFailed(in_device->CreatePipelineState(
 		&pipeline_state_stream_desc,
 		IID_PPV_ARGS(pipeline_state.ReleaseAndGetAddressOf())
@@ -260,9 +255,9 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineStateComputeShader(
 Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineState(
 	ID3D12Device* const in_device,
 	const Microsoft::WRL::ComPtr < ID3D12RootSignature >& in_root_signature,
-	const std::shared_ptr < std::vector < uint8_t >>& in_vertex_shader_data,
-	const std::shared_ptr < std::vector < uint8_t >>& in_geometry_shader_data,
-	const std::shared_ptr < std::vector < uint8_t >>& in_pixel_shader_data,
+	const std::vector<uint8_t>& in_vertex_shader_data,
+	const std::vector<uint8_t>& in_geometry_shader_data,
+	const std::vector<uint8_t>& in_pixel_shader_data,
 	const DscRenderResource::ShaderPipelineStateData& in_pipeline_state_data
 	)
 {
@@ -270,27 +265,27 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineState(
 	// Describe and create the graphics pipeline state object (PSO).
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pso_desc = {};
 	pso_desc.pRootSignature = in_root_signature.Get();
-	if (nullptr != in_vertex_shader_data)
+	if (0 < in_vertex_shader_data.size())
 	{
 		pso_desc.VS =
 		{
-			in_vertex_shader_data->data(), in_vertex_shader_data->size()
+			in_vertex_shader_data.data(), in_vertex_shader_data.size()
 		};
 	}
-	if (nullptr != in_pixel_shader_data)
+	if (0 < in_pixel_shader_data.size())
 	{
 		pso_desc.PS =
 		{
-			in_pixel_shader_data->data(), in_pixel_shader_data->size()
+			in_pixel_shader_data.data(), in_pixel_shader_data.size()
 		};
 	}
 	// D3D12_SHADER_BYTECODE DS;
 	// D3D12_SHADER_BYTECODE HS;
-	if (nullptr != in_geometry_shader_data)
+	if (0 < in_geometry_shader_data.size())
 	{
 		pso_desc.GS =
 		{
-			in_geometry_shader_data->data(), in_geometry_shader_data->size()
+			in_geometry_shader_data.data(), in_geometry_shader_data.size()
 		};
 	}
 	// D3D12_STREAM_OUTPUT_DESC StreamOutput;
@@ -335,12 +330,12 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineState(
 DscRenderResource::Shader::Shader(
 	DscRender::DrawSystem* const in_draw_system,
 	const ShaderPipelineStateData&in_pipeline_state_data,
-	const std::shared_ptr < std::vector < uint8_t > >&in_vertex_shader_data,
-	const std::shared_ptr < std::vector < uint8_t > >&in_geometry_shader_data,
-	const std::shared_ptr < std::vector < uint8_t > >&in_pixel_shader_data,
+	const std::vector<uint8_t>& in_vertex_shader_data,
+	const std::vector<uint8_t>& in_geometry_shader_data,
+	const std::vector<uint8_t>& in_pixel_shader_data,
 	const std::vector < std::shared_ptr < ShaderResourceInfo > >&in_array_shader_resource_info,
 	const std::vector < std::shared_ptr < ConstantBufferInfo > >&in_array_shader_constants_info,
-	const std::shared_ptr < std::vector < uint8_t > >&in_compute_shader_data,
+	const std::vector<uint8_t>& in_compute_shader_data,
 	const std::vector < std::shared_ptr < UnorderedAccessInfo > >&in_array_unordered_access_info
 	) 
 	: IResource(in_draw_system)
@@ -353,7 +348,7 @@ DscRenderResource::Shader::Shader(
 	, _array_constants_buffer_info(in_array_shader_constants_info)
 	, _array_unordered_access_info(in_array_unordered_access_info)
 {
-	// Nop
+	DeviceRestored(in_draw_system->GetD3dDevice());
 }
 
 DscRenderResource::Shader::~Shader()
@@ -442,6 +437,15 @@ void DscRenderResource::Shader::OnDeviceLost()
 
 void DscRenderResource::Shader::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const,
+	ID3D12Device2* const in_device
+	)
+{
+	DeviceRestored(
+		in_device
+		);
+}
+
+void DscRenderResource::Shader::DeviceRestored(
 	ID3D12Device2* const in_device
 	)
 {

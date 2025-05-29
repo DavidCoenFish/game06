@@ -118,7 +118,7 @@ void DscRender::DrawSystem::ResizeRenderTargetTexture(
 			);
 	}
 }
-
+*/
 void DscRender::DrawSystem::ForceRestore(
 	ID3D12GraphicsCommandList* const in_command_list,
 	IResource* const in_resource
@@ -133,6 +133,16 @@ void DscRender::DrawSystem::ForceRestore(
 	}
 }
 
+ID3D12Device2* const DscRender::DrawSystem::GetD3dDevice()
+{
+	if (nullptr != _device_resources)
+	{
+		return _device_resources->GetD3dDevice();
+	}
+	return nullptr;
+}
+
+/*
 std::shared_ptr<CustomCommandList> DscRender::DrawSystem::CreateCustomCommandList(
 	ID3D12PipelineState* const in_pipeline_state_object_or_null
 	)

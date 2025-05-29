@@ -12,6 +12,9 @@ typedef unsigned __int32 uint32;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
+#define LOG_TOPIC_DSC_COMMON "DSC_COMMON"
+
+
 // Windows
 #include <winsdkver.h>
 #define _WIN32_WINNT 0x0A00

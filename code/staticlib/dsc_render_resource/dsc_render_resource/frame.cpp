@@ -2,6 +2,9 @@
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include "render_target_texture.h"
+#include "shader.h"
+#include "shader_constant_buffer.h"
+#include "geometry_generic.h"
 #include <dsc_render/resource_list.h>
 
 std::unique_ptr<DscRenderResource::Frame> DscRenderResource::Frame::CreateNewFrame(DscRender::DrawSystem& in_draw_system)
@@ -88,31 +91,31 @@ void DscRenderResource::Frame::AddFrameResource(
 	return;
 }
 
-//void DscRenderResource::Frame::SetShader(
-//	const std::shared_ptr<Shader>& in_shader,
-//	const std::shared_ptr<ShaderConstantBuffer>& in_shader_constant_buffer
-//	)
-//{
-//	in_shader->SetActive(
-//		_command_list,
-//		in_shader_constant_buffer.get()
-//		);
-//	_resource_list->AddResource(in_shader);
-//	_resource_list->AddResource(in_shader_constant_buffer);
-//
-//	return;
-//}
-//
-//void DscRenderResource::Frame::Draw(
-//	const std::shared_ptr<GeometryGeneric>& in_geometry
-//	)
-//{
-//	in_geometry->Draw(_command_list);
-//	_resource_list->AddResource(in_geometry);
-//
-//	return;
-//}
-//
+void DscRenderResource::Frame::SetShader(
+	const std::shared_ptr<Shader>& in_shader,
+	const std::shared_ptr<ShaderConstantBuffer>& in_shader_constant_buffer
+	)
+{
+	in_shader->SetActive(
+		_command_list,
+		in_shader_constant_buffer.get()
+		);
+	_resource_list->AddResource(in_shader);
+	_resource_list->AddResource(in_shader_constant_buffer);
+
+	return;
+}
+
+void DscRenderResource::Frame::Draw(
+	const std::shared_ptr<GeometryGeneric>& in_geometry
+	)
+{
+	in_geometry->Draw(_command_list);
+	_resource_list->AddResource(in_geometry);
+
+	return;
+}
+
 //void DscRenderResource::Frame::Dispatch(
 //	uint32_t in_thread_group_count_x,
 //	uint32_t in_thread_group_count_y,
