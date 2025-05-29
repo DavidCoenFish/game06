@@ -1,9 +1,15 @@
 #include "shader.h"
 #include <dsc_render/draw_system.h>
+#include <dsc_render/dsc_render.h>
+#include "constant_buffer.h"
+#include "unordered_access_info.h"
+#include "shader_resource_info.h"
+#include "shader_constant_buffer.h"
+#include "constant_buffer_info.h"
 
 namespace
 {
-std::shared_ptr<DscRenderResource::ConstantBuffer> DscRenderResource::MakeConstantBuffer(
+std::shared_ptr<DscRenderResource::ConstantBuffer> MakeConstantBuffer(
 	DscRender::DrawSystem* const in_draw_system,
 	const std::shared_ptr<DscRenderResource::ConstantBufferInfo>& in_constant_buffer_info
 	)
@@ -13,7 +19,7 @@ std::shared_ptr<DscRenderResource::ConstantBuffer> DscRenderResource::MakeConsta
 		return nullptr;
 	}
 	const D3D12_SHADER_VISIBILITY visiblity = in_constant_buffer_info->GetVisiblity();
-	auto constant_buffer = std::make_shared < ConstantBuffer > (
+	auto constant_buffer = std::make_shared < DscRenderResource::ConstantBuffer > (
 		in_draw_system->MakeHeapWrapperCbvSrvUav(),
 		in_constant_buffer_info->_data,
 		visiblity
@@ -31,12 +37,12 @@ static Microsoft::WRL::ComPtr<ID3D12RootSignature> MakeRootSignatureLocal(
 	{
 		Microsoft::WRL::ComPtr<ID3DBlob> signature;
 		Microsoft::WRL::ComPtr<ID3DBlob> error;
-		DX::ThrowIfFailed(D3D12SerializeVersionedRootSignature(
+		DirectX::ThrowIfFailed(D3D12SerializeVersionedRootSignature(
 			&in_root_signature_desc,
 			&signature,
 			&error
 			));
-		DX::ThrowIfFailed(in_device->CreateRootSignature(
+		DirectX::ThrowIfFailed(in_device->CreateRootSignature(
 			0,
 			signature->GetBufferPointer(),
 			signature->GetBufferSize(),
@@ -244,7 +250,7 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineStateComputeShader(
 	D3D12_PIPELINE_STATE_STREAM_DESC pipeline_state_stream_desc =
 	{
 		sizeof (PipelineStateStream),&pipeline_state_stream};
-	DX::ThrowIfFailed(in_device->CreatePipelineState(
+	DirectX::ThrowIfFailed(in_device->CreatePipelineState(
 		&pipeline_state_stream_desc,
 		IID_PPV_ARGS(pipeline_state.ReleaseAndGetAddressOf())
 		));
@@ -316,7 +322,7 @@ Microsoft::WRL::ComPtr < ID3D12PipelineState > MakePipelineState(
 	// UINT NodeMask;
 	// D3D12_CACHED_PIPELINE_STATE CachedPSO;
 	// D3D12_PIPELINE_STATE_FLAGS Flags;
-	DX::ThrowIfFailed(in_device->CreateGraphicsPipelineState(
+	DirectX::ThrowIfFailed(in_device->CreateGraphicsPipelineState(
 		&pso_desc,
 		IID_PPV_ARGS(pipeline_state.ReleaseAndGetAddressOf())
 		));
@@ -338,13 +344,13 @@ DscRenderResource::Shader::Shader(
 	const std::vector < std::shared_ptr < UnorderedAccessInfo > >&in_array_unordered_access_info
 	) 
 	: IResource(in_draw_system)
-	, _pipeline_state_data(in_pipeline_state_data)
 	, _vertex_shader_data(in_vertex_shader_data)
 	, _geometry_shader_data(in_geometry_shader_data)
 	, _pixel_shader_data(in_pixel_shader_data)
+	, _compute_shader_data(in_compute_shader_data)
+	, _pipeline_state_data(in_pipeline_state_data)
 	, _array_shader_resource_info(in_array_shader_resource_info)
 	, _array_constants_buffer_info(in_array_shader_constants_info)
-	, _compute_shader_data(in_compute_shader_data)
 	, _array_unordered_access_info(in_array_unordered_access_info)
 {
 	// Nop
@@ -406,7 +412,7 @@ void DscRenderResource::Shader::SetActive(
 
 void DscRenderResource::Shader::SetShaderResourceViewHandle(
 	const int in_index,
-	const std::shared_ptr < HeapWrapperItem >& in_shader_resource_view_handle
+	const std::shared_ptr < DscRender::HeapWrapperItem >& in_shader_resource_view_handle
 	)
 {
 	if ((0 <= in_index) && (in_index < (int) _array_shader_resource_info.size()))
@@ -418,7 +424,7 @@ void DscRenderResource::Shader::SetShaderResourceViewHandle(
 
 void DscRenderResource::Shader::SetUnorderedAccessViewHandle(
 	const int in_index,
-	const std::shared_ptr < HeapWrapperItem >&in_unordered_access_view_handle
+	const std::shared_ptr < DscRender::HeapWrapperItem >&in_unordered_access_view_handle
 	)
 {
 	if ((0 <= in_index) && (in_index < (int) _array_unordered_access_info.size()))

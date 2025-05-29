@@ -2,6 +2,12 @@
 #include <dsc_common/common.h>
 #include "render_target_format_data.h"
 #include "render_target_depth_data.h"
+//#include "graphics_memory.h"
+
+namespace DirectX
+{
+	class GraphicsResource;
+}
 
 namespace DscRender
 {
@@ -43,6 +49,16 @@ namespace DscRender
 		{
 			return _back_buffer_count;
 		}
+
+		DirectX::GraphicsResource AllocateConstant(
+			const std::size_t in_size,
+			void* const in_constants
+		);
+		DirectX::GraphicsResource AllocateUpload(
+			const std::size_t in_size,
+			void* const in_data_or_nullptr = nullptr,
+			size_t in_alignment = 16
+		);
 
 		void ForceRestore(
 			ID3D12GraphicsCommandList* const in_command_list,

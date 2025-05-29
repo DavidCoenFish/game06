@@ -13,6 +13,10 @@ namespace DscRenderResource
 	struct ConstantBuffer
 	{
 	public:
+		ConstantBuffer() = delete;
+		ConstantBuffer& operator=(const ConstantBuffer&) = delete;
+		ConstantBuffer(const ConstantBuffer&) = delete;
+
 		ConstantBuffer(
 			const std::shared_ptr < DscRender::HeapWrapperItem >& in_heap_wrapper_item,
 			const std::vector<uint8_t>& in_data,
@@ -33,8 +37,10 @@ namespace DscRenderResource
 		const int GetNum32BitValues() const;
 
 		void UpdateData(
-			const void* const in_data,
-			const size_t in_data_size
+			const void* const in_data
+#if defined(_DEBUG)
+			, const size_t in_data_size
+#endif
 		);
 
 		const size_t GetBufferSize() const

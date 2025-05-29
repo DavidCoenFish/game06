@@ -1,7 +1,7 @@
 #include "frame.h"
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
-#include <dsc_render/render_target_texture.h>
+#include "render_target_texture.h"
 #include <dsc_render/resource_list.h>
 
 std::unique_ptr<DscRenderResource::Frame> DscRenderResource::Frame::CreateNewFrame(DscRender::DrawSystem& in_draw_system)
@@ -69,10 +69,11 @@ void DscRenderResource::Frame::SetRenderTarget(
 }
 
 void DscRenderResource::Frame::SetRenderTargetTexture(
-	const std::shared_ptr<DscRender::RenderTargetTexture>& in_render_target,
+	const std::shared_ptr<RenderTargetTexture>& in_render_target,
 	const bool in_allow_clear
 	)
 {
+	//std::shared_ptr<RenderTargetTexture> resource(in_render_target);
 	AddFrameResource(in_render_target);
 	SetRenderTarget(in_render_target.get(), in_allow_clear);
 	return;

@@ -349,7 +349,6 @@ const int DscRender::DeviceResources::GetBackBufferIndex() const
 	return 0;
 }
 
-/*
 DirectX::GraphicsResource DscRender::DeviceResources::AllocateUpload(
 	const std::size_t in_size,
 	void* const in_data_or_nullptr,
@@ -371,7 +370,6 @@ DirectX::GraphicsResource DscRender::DeviceResources::AllocateUpload(
 	}
 	return graphics_resource;
 }
-*/
 
 void DscRender::DeviceResources::GetAdapter(
 	IDXGIAdapter1** in_pp_adapter,

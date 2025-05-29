@@ -72,7 +72,6 @@ DscRender::DrawSystem::~DrawSystem()
 	_device_resources.reset();
 }
 
-/*
 DirectX::GraphicsResource DscRender::DrawSystem::AllocateConstant(
 	const std::size_t in_size,
 	void* const in_constants
@@ -101,6 +100,8 @@ DirectX::GraphicsResource DscRender::DrawSystem::AllocateUpload(
 	}
 	return DirectX::GraphicsResource();
 }
+
+/*
 
 void DscRender::DrawSystem::ResizeRenderTargetTexture(
 	ID3D12GraphicsCommandList* const in_command_list,

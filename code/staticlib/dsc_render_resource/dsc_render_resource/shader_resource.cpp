@@ -3,6 +3,7 @@
 #include <dsc_render/dsc_render.h>
 #include <dsc_render/heap_wrapper_item.h>
 #include <dsc_render/d3dx12.h>
+#include <dsc_render/graphics_memory.h>
 
 DscRenderResource::ShaderResource::ShaderResource(
 	DscRender::DrawSystem* const in_draw_system,

@@ -1,18 +1,18 @@
 #include "render_target_texture.h"
-#include "heap_wrapper_item.h"
-#include "render_target_format_data.h"
-#include "dsc_render.h"
-#include "draw_system.h"
-#include "d3dx12.h"
+#include <dsc_render/heap_wrapper_item.h>
+#include <dsc_render/render_target_format_data.h>
+#include <dsc_render/dsc_render.h>
+#include <dsc_render/draw_system.h>
+#include <dsc_render/d3dx12.h>
 
 static int s_id = 0;
 
-DscRender::RenderTargetTexture::Resource::Resource(
+DscRenderResource::RenderTargetTexture::Resource::Resource(
 	const D3D12_CLEAR_VALUE&in_clear_value,
 	const DXGI_FORMAT format,
 	const Microsoft::WRL::ComPtr < ID3D12Resource >&in_render_target,
-	const std::shared_ptr < HeapWrapperItem >&in_render_target_view_descriptor,
-	const std::shared_ptr < HeapWrapperItem >&in_shader_resource_view_descriptor,
+	const std::shared_ptr < DscRender::HeapWrapperItem >&in_render_target_view_descriptor,
+	const std::shared_ptr < DscRender::HeapWrapperItem >&in_shader_resource_view_descriptor,
 	const bool in_clear_color,
 	const bool in_clear_depth,
 	const bool in_clear_stencil
@@ -29,10 +29,10 @@ DscRender::RenderTargetTexture::Resource::Resource(
 	return;
 }
 
-DscRender::RenderTargetTexture::RenderTargetTexture(
-	DrawSystem* const in_draw_system,
-	const std::vector < RenderTargetFormatData >&in_target_format_data_array,
-	const RenderTargetDepthData&in_target_depth_data,
+DscRenderResource::RenderTargetTexture::RenderTargetTexture(
+	DscRender::DrawSystem* const in_draw_system,
+	const std::vector < DscRender::RenderTargetFormatData >&in_target_format_data_array,
+	const DscRender::RenderTargetDepthData& in_target_depth_data,
 	const int32 in_size_width,
 	const int32 in_size_height,
 	const bool in_resize_with_screen
@@ -87,14 +87,14 @@ DscRender::RenderTargetTexture::RenderTargetTexture(
 	return;
 }
 
-DscRender::RenderTargetTexture::~RenderTargetTexture()
+DscRenderResource::RenderTargetTexture::~RenderTargetTexture()
 {
 	//LOG_MESSAGE_RENDER("RenderTargetTexture dtor %d", _id);
 
 	return;
 }
 
-std::shared_ptr < DscRender::HeapWrapperItem > DscRender::RenderTargetTexture::GetShaderResourceHeapWrapperItem(const int in_index) const
+std::shared_ptr < DscRender::HeapWrapperItem > DscRenderResource::RenderTargetTexture::GetShaderResourceHeapWrapperItem(const int in_index) const
 {
 	if ((0 <= in_index) && (in_index < (int) _target_resource_array.size()))
 	{
@@ -103,7 +103,7 @@ std::shared_ptr < DscRender::HeapWrapperItem > DscRender::RenderTargetTexture::G
 	return nullptr;
 }
 
-std::shared_ptr < DscRender::HeapWrapperItem > DscRender::RenderTargetTexture::GetDepthResourceHeapWrapperItem() const
+std::shared_ptr < DscRender::HeapWrapperItem > DscRenderResource::RenderTargetTexture::GetDepthResourceHeapWrapperItem() const
 {
 	if (_depth_resource)
 	{
@@ -112,7 +112,7 @@ std::shared_ptr < DscRender::HeapWrapperItem > DscRender::RenderTargetTexture::G
 	return nullptr;
 }
 
-std::shared_ptr < DscRender::HeapWrapperItem > DscRender::RenderTargetTexture::GetDepthShaderResourceHeapWrapperItem() const
+std::shared_ptr < DscRender::HeapWrapperItem > DscRenderResource::RenderTargetTexture::GetDepthShaderResourceHeapWrapperItem() const
 {
 	if (_depth_resource)
 	{
@@ -121,7 +121,7 @@ std::shared_ptr < DscRender::HeapWrapperItem > DscRender::RenderTargetTexture::G
 	return nullptr;
 }
 
-void DscRender::RenderTargetTexture::Resize(
+void DscRenderResource::RenderTargetTexture::Resize(
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device,
 	const int32 in_size_width,
@@ -146,17 +146,17 @@ void DscRender::RenderTargetTexture::Resize(
 		);
 }
 
-const int32 DscRender::RenderTargetTexture::GetWidth() const
+const int32 DscRenderResource::RenderTargetTexture::GetWidth() const
 {
 	return _size_width;
 }
 
-const int32 DscRender::RenderTargetTexture::GetHeight() const
+const int32 DscRenderResource::RenderTargetTexture::GetHeight() const
 {
 	return _size_height;
 }
 
-void DscRender::RenderTargetTexture::OnDeviceLost()
+void DscRenderResource::RenderTargetTexture::OnDeviceLost()
 {
 	for (auto iter : _target_resource_array)
 	{
@@ -168,7 +168,7 @@ void DscRender::RenderTargetTexture::OnDeviceLost()
 	}
 }
 
-void DscRender::RenderTargetTexture::OnDeviceRestored(
+void DscRenderResource::RenderTargetTexture::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const,
 	ID3D12Device2* const in_device
 	)
@@ -266,7 +266,7 @@ void DscRender::RenderTargetTexture::OnDeviceRestored(
 	return;
 }
 
-void DscRender::RenderTargetTexture::OnResize(
+void DscRenderResource::RenderTargetTexture::OnResize(
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device,
 	const int32 in_size_width,
@@ -286,7 +286,7 @@ void DscRender::RenderTargetTexture::OnResize(
 	return;
 }
 
-void DscRender::RenderTargetTexture::StartRender(ID3D12GraphicsCommandList* const in_command_list, const bool in_allow_clear)
+void DscRenderResource::RenderTargetTexture::StartRender(ID3D12GraphicsCommandList* const in_command_list, const bool in_allow_clear)
 {
 	//LOG_MESSAGE_RENDER("RenderTargetTexture StartRender %d [%dx%d]", _id, _size[0], _size[1]);
 
@@ -364,7 +364,7 @@ void DscRender::RenderTargetTexture::StartRender(ID3D12GraphicsCommandList* cons
 	return;
 }
 
-void DscRender::RenderTargetTexture::EndRender(ID3D12GraphicsCommandList* const in_command_list)
+void DscRenderResource::RenderTargetTexture::EndRender(ID3D12GraphicsCommandList* const in_command_list)
 {
 	TransitionResource(
 		in_command_list,
@@ -374,7 +374,7 @@ void DscRender::RenderTargetTexture::EndRender(ID3D12GraphicsCommandList* const 
 	return;
 }
 
-void DscRender::RenderTargetTexture::TransitionResource(
+void DscRenderResource::RenderTargetTexture::TransitionResource(
 	ID3D12GraphicsCommandList* const in_command_list,
 	const D3D12_RESOURCE_STATES in_new_state_render_target,
 	const D3D12_RESOURCE_STATES in_new_state_depth_resource
@@ -414,7 +414,7 @@ void DscRender::RenderTargetTexture::TransitionResource(
 	}
 }
 
-void DscRender::RenderTargetTexture::GetFormatData(
+void DscRenderResource::RenderTargetTexture::GetFormatData(
 	DXGI_FORMAT& in_depth_format,
 	int& in_render_target_view_format_count,
 	const DXGI_FORMAT*& in_render_target_view_format

@@ -119,9 +119,9 @@ DscRenderResource::ShaderResourceInfo::ShaderResourceInfo(
 	const D3D12_STATIC_SAMPLER_DESC&in_static_sampler_desc,
 	const bool in_use_sampler
 	) 
-	: _shader_resource_view_handle(in_shader_resource_view_handle)
+	: _use_sampler(in_use_sampler)
+	, _shader_resource_view_handle(in_shader_resource_view_handle)
 	, _static_sampler_desc(in_static_sampler_desc)
-	, _use_sampler(in_use_sampler)
 {
 	return;
 }

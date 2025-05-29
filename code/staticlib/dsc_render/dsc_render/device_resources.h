@@ -6,6 +6,7 @@
 namespace DirectX
 {
 	class GraphicsMemory;
+	class GraphicsResource;
 } // DirectX
 
 namespace DscRender
@@ -38,6 +39,11 @@ public:
 		int32& out_Height
 		);
 	const int GetBackBufferIndex() const;
+	DirectX::GraphicsResource AllocateUpload(
+		const std::size_t in_size,
+		void* const in_data_or_nullptr,
+		size_t in_alignment = 16
+	);
 
 	void Prepare(ID3D12GraphicsCommandList*& in_command_list);
 	const bool Present();

@@ -10,9 +10,9 @@ DscRenderResource::ConstantBuffer::ConstantBuffer(
 	const D3D12_SHADER_VISIBILITY in_visiblity
 	) 
 	: _heap_wrapper_item(in_heap_wrapper_item)
+	, _gpu_address(nullptr)
 	, _data(in_data)
 	, _visiblity(in_visiblity)
-	, _gpu_address(nullptr)
 {
 	// Nop
 }
@@ -28,7 +28,7 @@ void DscRenderResource::ConstantBuffer::DeviceRestored(ID3D12Device* const in_de
 {
 	const auto heap_properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	const auto resource_desc = CD3DX12_RESOURCE_DESC::Buffer(1024* 64);
-	DX::ThrowIfFailed(in_device->CreateCommittedResource(
+	DirectX::ThrowIfFailed(in_device->CreateCommittedResource(
 		&heap_properties,
 		// This heap will be used to upload the constant buffer data
 		D3D12_HEAP_FLAG_NONE,
@@ -57,7 +57,7 @@ void DscRenderResource::ConstantBuffer::DeviceRestored(ID3D12Device* const in_de
 		0
 		);
 	// We do not intend to read from this resource on the CPU. (End is less than or equal to begin)
-	DX::ThrowIfFailed(_constant_buffer_upload_heap->Map(
+	DirectX::ThrowIfFailed(_constant_buffer_upload_heap->Map(
 		0,
 		&read_range,
 		reinterpret_cast < void** > (&_gpu_address)
@@ -101,11 +101,12 @@ const int DscRenderResource::ConstantBuffer::GetNum32BitValues() const
 }
 
 void DscRenderResource::ConstantBuffer::UpdateData(
-	const void* const in_data,
-	const size_t in_data_size
-	)
+	const void* const in_data
+#if defined(_DEBUG)
+	, const size_t in_data_size
+#endif
+)
 {
-	in_data_size;
 	DSC_ASSERT(in_data_size == _data.size(), "param size doesn't match data size");
 	memcpy(
 		_data.data(),

@@ -3,6 +3,7 @@
 #include <dsc_render/dsc_render.h>
 #include <dsc_render/heap_wrapper_item.h>
 #include <dsc_render/d3dx12.h>
+#include <dsc_render/graphics_memory.h>
 
 DscRenderResource::GeometryGeneric::GeometryGeneric(
 	DscRender::DrawSystem* const in_draw_system,
@@ -134,7 +135,7 @@ void DscRenderResource::GeometryGeneric::OnDeviceRestored(
 	)
 {
 	const int byte_vertex_size = sizeof(float) * _float_per_vertex;
-	const int byte_total_size = _vertex_raw_data.size();
+	const int byte_total_size = static_cast<int>(_vertex_raw_data.size());
 	// We could return null vertex buffer on no geometry, but what then happens on an update
 	if (0 == byte_total_size)
 	{
@@ -150,7 +151,7 @@ void DscRenderResource::GeometryGeneric::OnDeviceRestored(
 			&buffer_resource_desc,
 			D3D12_RESOURCE_STATE_COPY_DEST,
 			nullptr,
-			IID_PPV_ARGS(in_vertex_buffer.ReleaseAndGetAddressOf())
+			IID_PPV_ARGS(_vertex_buffer.ReleaseAndGetAddressOf())
 		);
 		_vertex_buffer->SetName(L"GeometryVertexBuffer");
 	}
@@ -158,7 +159,7 @@ void DscRenderResource::GeometryGeneric::OnDeviceRestored(
 	{
 		if (in_command_list)
 		{
-			auto upload_memory = in_draw_system->AllocateUpload(byte_total_size);
+			auto upload_memory = _draw_system->AllocateUpload(byte_total_size);
 			D3D12_SUBRESOURCE_DATA vertex_data = {};
 			vertex_data.pData = _vertex_raw_data.data();
 			vertex_data.RowPitch = byte_total_size;

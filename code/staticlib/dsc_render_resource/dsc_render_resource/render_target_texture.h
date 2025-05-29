@@ -1,7 +1,7 @@
 #pragma once
 #include <dsc_common/common.h>
-#include "i_render_target.h"
-#include "i_resource.h"
+#include <dsc_render/i_render_target.h>
+#include <dsc_render/i_resource.h>
 
 namespace DscRender
 {
@@ -9,9 +9,11 @@ namespace DscRender
 	class HeapWrapperItem;
 	struct RenderTargetFormatData;
 	struct RenderTargetDepthData;
+}//DscRender
 
-	// todo: move to DscRenderResource
-	class RenderTargetTexture : public IRenderTarget, public IResource
+namespace DscRenderResource
+{
+	class RenderTargetTexture : public DscRender::IRenderTarget, public DscRender::IResource
 	{
 	public:
 		struct Resource
@@ -21,8 +23,8 @@ namespace DscRender
 				const D3D12_CLEAR_VALUE& in_clear_value,
 				const DXGI_FORMAT in_format = DXGI_FORMAT_UNKNOWN,
 				const Microsoft::WRL::ComPtr<ID3D12Resource>& in_render_target = nullptr,
-				const std::shared_ptr<HeapWrapperItem>& in_render_target_view_descriptor = nullptr,
-				const std::shared_ptr<HeapWrapperItem>& in_shader_resource_view_descriptor = nullptr,
+				const std::shared_ptr<DscRender::HeapWrapperItem>& in_render_target_view_descriptor = nullptr,
+				const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_descriptor = nullptr,
 				const bool in_clear_color = false,
 				const bool in_clear_depth = false,
 				const bool in_clear_stencil = false
@@ -32,24 +34,24 @@ namespace DscRender
 			D3D12_CLEAR_VALUE _clear_value;
 			DXGI_FORMAT _format;
 			Microsoft::WRL::ComPtr < ID3D12Resource > _render_target;
-			std::shared_ptr < HeapWrapperItem > _render_target_view_descriptor;
-			std::shared_ptr < HeapWrapperItem > _shader_resource_view_descriptor;
+			std::shared_ptr < DscRender::HeapWrapperItem > _render_target_view_descriptor;
+			std::shared_ptr < DscRender::HeapWrapperItem > _shader_resource_view_descriptor;
 			bool _clear_color;
 			bool _clear_depth;
 			bool _clear_stencil;
 		};
 		RenderTargetTexture(
-			DrawSystem* const in_draw_system,
-			const std::vector < RenderTargetFormatData >& in_target_format_data_array,
-			const RenderTargetDepthData& in_target_depth_data,
+			DscRender::DrawSystem* const in_draw_system,
+			const std::vector < DscRender::RenderTargetFormatData >& in_target_format_data_array,
+			const DscRender::RenderTargetDepthData& in_target_depth_data,
 			const int32 in_size_width,
 			const int32 in_size_height,
 			const bool in_resize_with_screen = false
 		);
 		virtual ~RenderTargetTexture();
-		std::shared_ptr<HeapWrapperItem> GetShaderResourceHeapWrapperItem(const int in_index = 0) const;
-		std::shared_ptr<HeapWrapperItem> GetDepthResourceHeapWrapperItem() const;
-		std::shared_ptr<HeapWrapperItem> GetDepthShaderResourceHeapWrapperItem() const;
+		std::shared_ptr<DscRender::HeapWrapperItem> GetShaderResourceHeapWrapperItem(const int in_index = 0) const;
+		std::shared_ptr<DscRender::HeapWrapperItem> GetDepthResourceHeapWrapperItem() const;
+		std::shared_ptr<DscRender::HeapWrapperItem> GetDepthShaderResourceHeapWrapperItem() const;
 		void Resize(
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,
@@ -105,4 +107,4 @@ namespace DscRender
 		int _id;
 
 	};
-}//namespace DscRender
+}//namespace DscRenderResource

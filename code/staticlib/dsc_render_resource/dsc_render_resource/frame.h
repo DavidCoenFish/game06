@@ -7,11 +7,12 @@ namespace DscRender
 	class IRenderTarget;
 	class IResource;
 	class ResourceList;
-	class RenderTargetTexture;
 }
 
 namespace DscRenderResource
 {
+	class RenderTargetTexture;
+
 	class Frame
 	{
 	public:
@@ -35,7 +36,7 @@ namespace DscRenderResource
 		);
 
 		void SetRenderTargetTexture(
-			const std::shared_ptr<DscRender::RenderTargetTexture>& in_render_target,
+			const std::shared_ptr<RenderTargetTexture>& in_render_target,
 			const bool in_allow_clear = true
 		);
 
