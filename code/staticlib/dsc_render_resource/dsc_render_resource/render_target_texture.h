@@ -65,6 +65,9 @@ namespace DscRenderResource
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device
 		) override;
+		void DeviceRestored(
+			ID3D12Device2* const in_device
+		);
 		virtual void OnResize(
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,

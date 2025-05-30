@@ -84,6 +84,10 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 			in_target_depth_data._clear_stencil_on_set
 			);
 	}
+
+	ID3D12Device2* const device = in_draw_system->GetD3dDevice();
+	DeviceRestored(device);
+
 	return;
 }
 
@@ -171,6 +175,13 @@ void DscRenderResource::RenderTargetTexture::OnDeviceLost()
 void DscRenderResource::RenderTargetTexture::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const,
 	ID3D12Device2* const in_device
+)
+{
+	DeviceRestored(in_device);
+}
+
+void DscRenderResource::RenderTargetTexture::DeviceRestored(
+		ID3D12Device2* const in_device
 	)
 {
 	// So, is this a good idea, to allow Resize(), call OnDeviceLost
