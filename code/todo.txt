@@ -1,26 +1,7 @@
-x basic windowed app
-- d3dx12 app that correctly handels release of resources/ window resize
-- draw triangle
-- draw dag triangle (dont render unless input changed)
-- ui
+- render target
+- version project
+- ?draw dag triangle (dont render unless input changed)
+- ?ui
 
 
-//debug
-C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe /nologo /E"main" /T vs_4_0_level_9_3 /Fo "G:\development\game05\build\application\x64\Debug\output\shader\text_vertex.cso" /Od /Zi shader\text_vertex.hlsl
-C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe /nologo /E"main" /T ps_4_0_level_9_3 /Fo "G:\development\game05\build\application\x64\Debug\output\shader\text_pixel.cso" /Od /Zi shader\text_pixel.hlsl
-
-//release
-C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe /nologo /E"main" /T vs_4_0_level_9_3 /Fo "G:\development\game05\build\application\x64\Release\output\shader\text_vertex.cso" shader\text_vertex.hlsl
-C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe /nologo /E"main" /T ps_4_0_level_9_3 /Fo "G:\development\game05\build\application\x64\Release\output\shader\text_pixel.cso" shader\text_pixel.hlsl
-
-
- .ExecExecutable = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe"
-// release
- .ExecArguments /nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" %1
- .ExecArguments /nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" %1
-// debug
- .ExecArguments /nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" /Od /Zi %1
- .ExecArguments /nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" /Od /Zi %1
-
- .ExecWorkingDir
-
+what is our target project, jank, 2d anime shirow anime draw? 

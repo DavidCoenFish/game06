@@ -15,12 +15,6 @@
 
 namespace
 {
-struct Vertex
-{
-public:
-    float _position[2];
-    float _uv[2];
-};
 }
 
 Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)

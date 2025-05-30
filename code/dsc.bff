@@ -39,11 +39,12 @@ VSSolution("solution")
         "dsc_render_resource_project", 
         "dsc_windows_project", 
         "unit_test_project", 
+        "render_target_project",
         "render_texture_project",
         "render_triangle_project",
         }
     //.SolutionBuildProject = "unit_test_project"
-    .SolutionBuildProject = "render_texture_project"
+    .SolutionBuildProject = "render_target_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            
@@ -67,6 +68,7 @@ VSSolution("solution")
         .temp = [
             .Path           = "application"
             .Projects       = { 
+                "render_target_project",
                 "render_texture_project",
                 "render_triangle_project", 
                 "unit_test_project" 

@@ -33,7 +33,7 @@ namespace DscRenderResource
 			const int in_index
 		)
 		{
-			if ((0 <= in_index) && (in_index < _array_constant_buffer.size()))
+			if ((0 <= in_index) && (in_index < static_cast<int>(_array_constant_buffer.size())))
 			{
 				auto& constants_buffer = *_array_constant_buffer[in_index];
 				assert(sizeof(CONSTANTS) == constants_buffer.GetBufferSize());

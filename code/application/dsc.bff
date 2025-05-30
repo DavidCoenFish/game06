@@ -12,6 +12,7 @@
 }
 
 //pull in child scripts
-#include "unit_test\dsc.bff"
-#include "render_triangle\dsc.bff"
+#include "render_target\dsc.bff"
 #include "render_texture\dsc.bff"
+#include "render_triangle\dsc.bff"
+#include "unit_test\dsc.bff"
