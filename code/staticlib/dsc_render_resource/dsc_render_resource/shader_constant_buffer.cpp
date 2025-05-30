@@ -8,7 +8,8 @@ DscRenderResource::ShaderConstantBuffer::ShaderConstantBuffer(
 	: IResource(in_draw_system)
 	, _array_constant_buffer(_array_constant_buffer)
 {
-	return;
+	ID3D12Device2* const device = in_draw_system->GetD3dDevice();
+	DeviceRestored(device);
 }
 
 DscRenderResource::ShaderConstantBuffer::~ShaderConstantBuffer()
@@ -64,10 +65,19 @@ void DscRenderResource::ShaderConstantBuffer::OnDeviceRestored(
 	ID3D12Device2* const in_device
 	)
 {
-	for (auto&constant_buffer : _array_constant_buffer)
+	DeviceRestored(in_device);
+	return;
+}
+
+void DscRenderResource::ShaderConstantBuffer::DeviceRestored(
+	ID3D12Device2* const in_device
+)
+{
+	for (auto& constant_buffer : _array_constant_buffer)
 	{
 		constant_buffer->DeviceRestored(in_device);
 	}
 	return;
 }
+
 

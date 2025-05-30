@@ -19,6 +19,13 @@ DscRenderResource::ShaderResource::ShaderResource(
 	, _data(in_data)
 	, _current_state(D3D12_RESOURCE_STATE_COPY_DEST)
 {
+	ID3D12GraphicsCommandList* command_list = in_draw_system->CreateCommandList();
+	ID3D12Device2* const device = in_draw_system->GetD3dDevice();
+
+	UploadResource(command_list, device);
+
+	in_draw_system->CommandListFinish(command_list);
+
 	return;
 }
 
@@ -101,38 +108,7 @@ void DscRenderResource::ShaderResource::OnDeviceRestored(
 	ID3D12Device2* const in_device
 	)
 {
-	_current_state = D3D12_RESOURCE_STATE_COPY_DEST;
-
-	CD3DX12_HEAP_PROPERTIES heap_default(D3D12_HEAP_TYPE_DEFAULT);
-	DirectX::ThrowIfFailed(in_device->CreateCommittedResource(
-		&heap_default,
-		D3D12_HEAP_FLAG_NONE,
-		&_desc,
-		_current_state,
-		nullptr,
-		IID_PPV_ARGS(_resource.ReleaseAndGetAddressOf())
-		));
-	_resource->SetName(L"Shader Texture2D resource");
-
-	UploadResource(
-		_draw_system,
-		in_command_list,
-		_resource,
-		_desc,
-		_data.size(),
-		_data.size() ? _data.data() : nullptr
-		);
-
-	OnResourceBarrier(
-		in_command_list,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
-		);
-
-	in_device->CreateShaderResourceView(
-		_resource.Get(),
-		&_shader_resource_view_desc,
-		_shader_resource->GetCPUHandleFrame()
-	);
+	UploadResource(in_command_list, in_device);
 	return;
 }
 
@@ -157,5 +133,44 @@ void DscRenderResource::ShaderResource::OnResourceBarrier(
 
 	in_command_list->ResourceBarrier(1, &barrierDesc);
 	_current_state = in_new_state;
-
 }
+
+void DscRenderResource::ShaderResource::UploadResource(
+	ID3D12GraphicsCommandList* const in_command_list,
+	ID3D12Device2* const in_device
+	)
+{
+	_current_state = D3D12_RESOURCE_STATE_COPY_DEST;
+
+	CD3DX12_HEAP_PROPERTIES heap_default(D3D12_HEAP_TYPE_DEFAULT);
+	DirectX::ThrowIfFailed(in_device->CreateCommittedResource(
+		&heap_default,
+		D3D12_HEAP_FLAG_NONE,
+		&_desc,
+		_current_state,
+		nullptr,
+		IID_PPV_ARGS(_resource.ReleaseAndGetAddressOf())
+	));
+	_resource->SetName(L"Shader Texture2D resource");
+
+	UploadResource(
+		_draw_system,
+		in_command_list,
+		_resource,
+		_desc,
+		_data.size(),
+		_data.size() ? _data.data() : nullptr
+	);
+
+	OnResourceBarrier(
+		in_command_list,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+	);
+
+	in_device->CreateShaderResourceView(
+		_resource.Get(),
+		&_shader_resource_view_desc,
+		_shader_resource->GetCPUHandleFrame()
+	);
+}
+

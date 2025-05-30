@@ -49,6 +49,11 @@ namespace DscRenderResource
 			D3D12_RESOURCE_STATES in_new_state
 		) override;
 
+		void UploadResource(
+			ID3D12GraphicsCommandList* const in_command_list,
+			ID3D12Device2* const in_device
+		);
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> _resource;
 		std::shared_ptr<DscRender::HeapWrapperItem> _shader_resource;

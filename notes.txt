@@ -7,3 +7,4 @@ static lib ui:
 executable common: app facet [unit test]
 executable render: app facet [triangle, ...]
 
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics

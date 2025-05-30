@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_texture", "application\render_texture\render_texture.vcxproj", "{51318CAF-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_triangle", "application\render_triangle\render_triangle.vcxproj", "{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "application\unit_test\unit_test.vcxproj", "{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}"
@@ -38,6 +40,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{A9795628-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		application\dsc.bff = application\dsc.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_texture", "render_texture", "{1F2097EE-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		application\render_texture\dsc.bff = application\render_texture\dsc.bff
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_triangle", "render_triangle", "{26B3F472-6C94-4F93-BC2A-7F5284B7D434}"
@@ -101,10 +108,12 @@ Global
 		release|x64 = release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.Build.0 = debug|x64
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.release|x64.Build.0 = release|x64
 		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.Build.0 = debug|x64
 		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.release|x64.Build.0 = release|x64
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
@@ -120,6 +129,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
@@ -127,6 +137,7 @@ Global
 		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{9A116E39-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{A9795628-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
+		{1F2097EE-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{26B3F472-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{CEFCE296-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{6970340D-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}

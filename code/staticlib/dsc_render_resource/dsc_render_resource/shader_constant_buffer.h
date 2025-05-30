@@ -51,6 +51,10 @@ namespace DscRenderResource
 			ID3D12Device2* const in_device
 		) override;
 
+		void DeviceRestored(
+			ID3D12Device2* const in_device
+		);
+
 	private:
 		std::vector<std::shared_ptr<ConstantBuffer>> _array_constant_buffer;
 
