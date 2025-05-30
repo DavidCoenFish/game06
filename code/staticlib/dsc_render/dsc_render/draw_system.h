@@ -66,11 +66,10 @@ namespace DscRender
 		);
 		ID3D12Device2* const GetD3dDevice();
 
-
-		ID3D12GraphicsCommandList* CreateCustomCommandList(
+		ID3D12GraphicsCommandList* CreateCommandList(
 			ID3D12PipelineState* const in_pipeline_state_object_or_null = nullptr
 		);
-		void CustomCommandListFinish(ID3D12GraphicsCommandList* in_command_list);
+		void CommandListFinish(ID3D12GraphicsCommandList* in_command_list);
 
 		std::shared_ptr<ResourceList> MakeResourceList();
 		/// Mark the resource list as finished and wait for fence before destroying it, transfer ownership
@@ -89,6 +88,7 @@ namespace DscRender
 		std::shared_ptr<HeapWrapperItem> MakeHeapWrapperDepthStencilView(const int in_length = 1);
 	private:
 		void CreateDeviceResources();
+		void RemoveCompletedResourceList();
 
 	private:
 		/// window handle which hosts the d3dx12 draw surface

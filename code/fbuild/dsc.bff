@@ -79,7 +79,7 @@
 
         .CompilerOptions    + ' /MD'
                             + ' /Oi'
-                            + ' /D "_DEBUG"'
+                            //+ ' /D "_DEBUG"'
                             + ' /Zi'
                             + ' /Gy'
                             + ' /GL'

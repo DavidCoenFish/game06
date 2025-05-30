@@ -55,7 +55,7 @@ public:
 	ID3D12GraphicsCommandList* GetCustomCommandList(
 		ID3D12PipelineState* const in_pipeline_state_object_or_null
 	);
-	void CustomCommandListFinish(ID3D12GraphicsCommandList* in_command_list);
+	void CommandListFinish(ID3D12GraphicsCommandList* in_command_list);
 
 	// Return true if size changed
 	const bool CreateWindowSizeDependentResources(

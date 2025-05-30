@@ -29,7 +29,12 @@ DscRenderResource::GeometryGeneric::GeometryGeneric(
 	, _vertex_buffer()
 	, _vertex_buffer_view{}
 {
-	// Nop
+	ID3D12GraphicsCommandList* command_list = in_draw_system->CreateCommandList();
+	ID3D12Device2* const device = in_draw_system->GetD3dDevice();
+
+	UploadResources(command_list, device);
+
+	in_draw_system->CommandListFinish(command_list);
 }
 
 void DscRenderResource::GeometryGeneric::Draw(ID3D12GraphicsCommandList* const in_command_list)
@@ -141,6 +146,14 @@ void DscRenderResource::GeometryGeneric::OnDeviceLost()
 void DscRenderResource::GeometryGeneric::OnDeviceRestored(
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device
+)
+{
+	UploadResources(in_command_list, in_device);
+}
+
+void DscRenderResource::GeometryGeneric::UploadResources(
+		ID3D12GraphicsCommandList* const in_command_list,
+		ID3D12Device2* const in_device
 	)
 {
 	const int byte_vertex_size = sizeof(float) * _float_per_vertex;

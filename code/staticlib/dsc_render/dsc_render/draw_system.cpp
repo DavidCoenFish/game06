@@ -68,7 +68,7 @@ DscRender::DrawSystem::~DrawSystem()
 		iter->OnDeviceLost();
 	}
 	_list_resource.clear();
-	//_resource_list.clear();
+	_resource_list.clear();
 	_device_resources.reset();
 }
 
@@ -143,7 +143,7 @@ ID3D12Device2* const DscRender::DrawSystem::GetD3dDevice()
 }
 
 /*
-std::shared_ptr<CustomCommandList> DscRender::DrawSystem::CreateCustomCommandList(
+std::shared_ptr<CustomCommandList> DscRender::DrawSystem::CreateCommandList(
 	ID3D12PipelineState* const in_pipeline_state_object_or_null
 	)
 {
@@ -158,16 +158,16 @@ std::shared_ptr<CustomCommandList> DscRender::DrawSystem::CreateCustomCommandLis
 	return nullptr;
 }
 
-void DscRender::DrawSystem::CustomCommandListFinish(ID3D12GraphicsCommandList* in_command_list)
+void DscRender::DrawSystem::CommandListFinish(ID3D12GraphicsCommandList* in_command_list)
 {
 	if (_device_resources)
 	{
-		_device_resources->CustomCommandListFinish(in_command_list);
+		_device_resources->CommandListFinish(in_command_list);
 	}
 	return;
 }
 */
-ID3D12GraphicsCommandList* DscRender::DrawSystem::CreateCustomCommandList(
+ID3D12GraphicsCommandList* DscRender::DrawSystem::CreateCommandList(
 	ID3D12PipelineState* const in_pipeline_state_object_or_null
 )
 {
@@ -179,11 +179,11 @@ ID3D12GraphicsCommandList* DscRender::DrawSystem::CreateCustomCommandList(
 	return nullptr;
 }
 
-void DscRender::DrawSystem::CustomCommandListFinish(ID3D12GraphicsCommandList* in_command_list)
+void DscRender::DrawSystem::CommandListFinish(ID3D12GraphicsCommandList* in_command_list)
 {
 	if (_device_resources)
 	{
-		_device_resources->CustomCommandListFinish(in_command_list);
+		_device_resources->CommandListFinish(in_command_list);
 	}
 	return;
 }
@@ -214,7 +214,7 @@ void DscRender::DrawSystem::Prepare(ID3D12GraphicsCommandList*& in_command_list)
 {
 	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "Prepare\n");
 
-	//RemoveCompletedResourceList();
+	RemoveCompletedResourceList();
 
 	if (nullptr != _device_resources)
 	{
@@ -306,7 +306,7 @@ void DscRender::DrawSystem::OnResize()
 	}
 	if ((true == resized) && (0 < _list_resource.size()))
 	{
-		auto command_list = CreateCustomCommandList();
+		auto command_list = CreateCommandList();
 		for (auto iter : _list_resource)
 		{
 			iter->OnResize(
@@ -316,7 +316,7 @@ void DscRender::DrawSystem::OnResize()
 				size_height
 				);
 		}
-		CustomCommandListFinish(command_list);
+		CommandListFinish(command_list);
 	}
 }
 
@@ -368,7 +368,7 @@ void DscRender::DrawSystem::CreateDeviceResources()
 		);
 	if (0 < _list_resource.size())
 	{
-		auto command_list = CreateCustomCommandList();
+		auto command_list = CreateCommandList();
 		for (auto iter : _list_resource)
 		{
 			iter->OnDeviceRestored(
@@ -376,11 +376,11 @@ void DscRender::DrawSystem::CreateDeviceResources()
 				_device_resources->GetD3dDevice()
 				);
 		}
-		CustomCommandListFinish(command_list);
+		CommandListFinish(command_list);
 	}
 }
 
-/*
+
 void DscRender::DrawSystem::RemoveCompletedResourceList()
 {
 	// Release completed frame assets
@@ -388,9 +388,8 @@ void DscRender::DrawSystem::RemoveCompletedResourceList()
 		std::remove_if(
 			_resource_list.begin(), 
 			_resource_list.end(),
-			[](const std::shared_ptr<DrawSystemResourceList>& item) { 
+			[](const std::shared_ptr<ResourceList>& item) { 
 				return item->GetFinished();
 			}), 
 		_resource_list.end());
 }
-*/

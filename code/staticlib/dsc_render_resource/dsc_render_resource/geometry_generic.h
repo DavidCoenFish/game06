@@ -64,6 +64,11 @@ namespace DscRenderResource
 			ID3D12Device2* const in_device
 		) override;
 
+		void UploadResources(
+			ID3D12GraphicsCommandList* const in_command_list,
+			ID3D12Device2* const in_device
+		);
+
 	private:
 		const D3D_PRIMITIVE_TOPOLOGY _primitive_topology;
 		const std::vector<D3D12_INPUT_ELEMENT_DESC> _input_element_desc_array;

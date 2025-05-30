@@ -3,9 +3,9 @@
 struct Vertex
 {
     // [-1 ... 1]
-    float2 _position : Position;
+    float2 _position : POSITION;
     // [0 ... 1]
-    float4 _colour : COLOR1;
+    float4 _colour : COLOR0;
 };
 
 Interpolant main(Vertex in_input)

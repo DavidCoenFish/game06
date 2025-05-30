@@ -42,12 +42,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     std::vector<uint8> vertex_shader_data;
     if (false == _file_system->LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "test_vs.cso")))
     {
-        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load vertex shader");
+        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load vertex shader\n");
     }
     std::vector<uint8> pixel_shader_data;
     if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "test_ps.cso")))
     {
-        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load pixel shader");
+        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load pixel shader\n");
     }
     std::vector < DXGI_FORMAT > render_target_format;
     render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
@@ -88,6 +88,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
 Application::~Application()
 {
+    _geometry_generic.reset();
+    _shader.reset();
     if (_draw_system)
     {
         _draw_system->WaitForGpu();

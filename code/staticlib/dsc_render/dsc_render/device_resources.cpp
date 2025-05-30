@@ -26,7 +26,7 @@ DscRender::DeviceResources::DeviceResources(
 {
 	static int s_count = - 1;
 	s_count += 1;
-/*
+
 #if defined (_DEBUG)
 		// Enable the debug layer (requires the Graphics Tools "optional feature").
 		//
@@ -74,7 +74,7 @@ DscRender::DeviceResources::DeviceResources(
 			}
 		}
 #endif
-*/
+
 
 #if 1
 	DirectX::ThrowIfFailed(CreateDXGIFactory2(
@@ -545,7 +545,7 @@ ID3D12GraphicsCommandList* DscRender::DeviceResources::GetCustomCommandList(
 	return _custom_command_list.Get();
 }
 
-void DscRender::DeviceResources::CustomCommandListFinish(ID3D12GraphicsCommandList* in_command_list)
+void DscRender::DeviceResources::CommandListFinish(ID3D12GraphicsCommandList* in_command_list)
 {
 	in_command_list->Close();
 	_command_queue->ExecuteCommandLists(
