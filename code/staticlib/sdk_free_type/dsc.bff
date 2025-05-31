@@ -1,0 +1,39 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { 
+		"$_CURRENT_BFF_DIR_$\dsc.bff" 
+		"$_CURRENT_BFF_DIR_$\license.txt" 
+		"$_CURRENT_BFF_DIR_$\readme" 
+		}
+    ]
+    ^SolutionItemArray + .temp
+}
+
+{
+    .ConfigurationArray = {}
+    {            
+        .Config = [
+            Using(.Config_debug_x64)
+            .CompilerOptions    + ' /D "FT_DEBUG_LEVEL_ERROR"'
+            .CompilerOptions    + ' /D "FT_DEBUG_LEVEL_TRACE"'
+            .CompilerOptions    + ' /D "FT2_BUILD_LIBRARY"'
+        ]
+        ^ConfigurationArray + .Config
+    }
+    {            
+        .Config = [
+            Using(.Config_release_x64)
+            .CompilerOptions    + ' /D "FT2_BUILD_LIBRARY"'
+        ]
+        ^ConfigurationArray + .Config
+    }
+
+    .LibraryDependencyArray = {}
+    DscVsprojectStaticLib("sdk_free_type" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
+}

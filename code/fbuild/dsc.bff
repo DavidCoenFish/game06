@@ -51,6 +51,7 @@
 }
 
 // debug x64
+.Config_debug_x64 = []
 {
     .Config = [
         .Platform = "x64"
@@ -68,9 +69,11 @@
         .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
     ]
     ^ConfigurationArray + .Config
+    ^Config_debug_x64 = .Config
 }
 
 // release x64
+.Config_release_x64 = []
 {
     .Config = [
         .Platform = "x64"
@@ -79,7 +82,6 @@
 
         .CompilerOptions    + ' /MD'
                             + ' /Oi'
-                            //+ ' /D "_DEBUG"'
                             + ' /Zi'
                             + ' /Gy'
                             + ' /GL'
@@ -93,6 +95,7 @@
         .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" "%1"'
     ]
     ^ConfigurationArray + .Config
+    ^Config_release_x64 = .Config
 }
 
 .CommonVcproject = [
@@ -123,12 +126,15 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
         {
             .LibrarianOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.lib"
             .CompilerInputPath = "$RelativePath$/"
+            .CompilerInputPattern = {"*.cpp", "*.c"}
             .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
             .CompilerOptions + ' /I"$RootPath$/$RelativePath$"'
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
                 ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
             }
+            //Print("$ProjectName$_$Config$_$Platform$")
+            //Print(.CompilerOptions)
         }
 
         RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )

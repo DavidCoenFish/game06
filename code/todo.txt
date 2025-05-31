@@ -1,7 +1,58 @@
-- render target
-- version project
+- text
+- ?version project
 - ?draw dag triangle (dont render unless input changed)
 - ?ui
 
 
 what is our target project, jank, 2d anime shirow anime draw? 
+
+
+freetype
+debug
+/JMC 
+/permissive- 
+/ifcOutput "G:\development\game05\engine\..\build\free_type\x64\Debug\intermediate\" 
+/GS /W3 /Zc:wchar_t 
+/I"G:\development\game05\engine\sdk\free_type\Include" 
+/I"C:\Program Files (x86)\Visual Leak Detector\include" 
+/ZI /Gm- /Od /Ob0 /sdl 
+/Fd"G:\development\game05\engine\..\build\free_type\x64\Debug\output\free_type.pdb" 
+/Zc:inline /fp:precise 
+/D "_DEBUG" 
+/D "_LIB" 
+/D "_CRT_SECURE_NO_WARNINGS" 
+/D "FT_DEBUG_LEVEL_ERROR" 
+/D "FT_DEBUG_LEVEL_TRACE" 
+/D "FT2_BUILD_LIBRARY" 
+/D "_UNICODE" 
+/D "UNICODE" 
+/errorReport:prompt /WX- /Zc:forScope /RTC1 /Gd /MDd /FC 
+/Fa"G:\development\game05\engine\..\build\free_type\x64\Debug\intermediate\" 
+/EHsc /nologo 
+/Fo"G:\development\game05\engine\..\build\free_type\x64\Debug\intermediate\" 
+/Fp"G:\development\game05\engine\..\build\free_type\x64\Debug\intermediate\free_type.pch" 
+/diagnostics:column 
+
+release
+/permissive- 
+/ifcOutput "G:\development\game05\engine\..\build\free_type\x64\Release\intermediate\" 
+/GS /GL /W3 /Gy /Zc:wchar_t 
+/I"G:\development\game05\engine\sdk\free_type\Include" 
+/I"C:\Program Files (x86)\Visual Leak Detector\include" 
+/Zi /Gm- /O2 /sdl 
+/Fd"G:\development\game05\engine\..\build\free_type\x64\Release\output\free_type.pdb" 
+/Zc:inline /fp:precise 
+/D "NDEBUG" 
+/D "_LIB" 
+/D "_CRT_SECURE_NO_WARNINGS" 
+/D "FT2_BUILD_LIBRARY" 
+/D "_UNICODE" 
+/D "UNICODE" 
+/errorReport:prompt 
+/WX- /Zc:forScope /Gd /Oi /MD /FC 
+/Fa"G:\development\game05\engine\..\build\free_type\x64\Release\intermediate\" 
+/EHsc /nologo 
+/Fo"G:\development\game05\engine\..\build\free_type\x64\Release\intermediate\" 
+/Fp"G:\development\game05\engine\..\build\free_type\x64\Release\intermediate\free_type.pch" 
+/diagnostics:column 
+

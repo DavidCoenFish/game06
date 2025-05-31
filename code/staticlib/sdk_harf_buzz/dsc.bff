@@ -1,0 +1,20 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { 
+            "$_CURRENT_BFF_DIR_$\copying" 
+            "$_CURRENT_BFF_DIR_$\dsc.bff" 
+            "$_CURRENT_BFF_DIR_$\news"
+            "$_CURRENT_BFF_DIR_$\readme.md"
+            }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+.LibraryDependencyArray = {}
+DscVsprojectStaticLib("sdk_harf_buzz" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
