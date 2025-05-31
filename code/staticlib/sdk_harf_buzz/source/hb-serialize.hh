@@ -106,14 +106,14 @@ struct hb_serialize_context_t
       // of the object.
       return (tail - head == o.tail - o.head)
 	  && (real_links.length == o.real_links.length)
-	  && 0 == hb_memcmp (head, o.head, tail - head)
+	  && 0 == hb_memcmp (head, o.head, (unsigned int)(tail - head))
 	  && real_links.as_bytes () == o.real_links.as_bytes ();
     }
     uint32_t hash () const
     {
       // Virtual links aren't considered for equality since they don't affect the functionality
       // of the object.
-      return hb_bytes_t (head, tail - head).hash () ^
+      return hb_bytes_t (head, (unsigned int)(tail - head)).hash () ^
           real_links.as_bytes ().hash ();
     }
 
@@ -242,7 +242,7 @@ struct hb_serialize_context_t
 
   template <typename T1, typename T2>
   bool check_assign (T1 &v1, T2 &&v2, hb_serialize_error_t err_type)
-  { return check_equal (v1 = v2, v2, err_type); }
+  { return check_equal (v1, v2, err_type); }
 
   template <typename T> bool propagate_error (T &&obj)
   { return check_success (!hb_deref (obj).in_error ()); }
@@ -336,7 +336,7 @@ struct hb_serialize_context_t
     current = current->next;
     obj->tail = head;
     obj->next = nullptr;
-    unsigned len = obj->tail - obj->head;
+    unsigned len = (unsigned int)(obj->tail - obj->head);
     head = obj->head; /* Rewind head. */
 
     if (!len)
@@ -491,7 +491,7 @@ struct hb_serialize_context_t
     if (!base) return 0;
     assert (current);
     assert (current->head <= (const char *) base);
-    return (const char *) base - current->head;
+    return (unsigned int)((const char *)base - current->head);
   }
 
   void resolve_links ()
@@ -508,9 +508,9 @@ struct hb_serialize_context_t
 	if (unlikely (!child)) { err (HB_SERIALIZE_ERROR_OTHER); return; }
 	unsigned offset = 0;
 	switch ((whence_t) link.whence) {
-	case Head:     offset = child->head - parent->head; break;
-	case Tail:     offset = child->head - parent->tail; break;
-	case Absolute: offset = (head - start) + (child->head - tail); break;
+	case Head:     offset = (unsigned int)(child->head - parent->head); break;
+	case Tail:     offset = (unsigned int)(child->head - parent->tail); break;
+	case Absolute: offset = (unsigned int)((head - start) + (child->head - tail)); break;
 	}
 
 	assert (offset >= link.bias);
@@ -539,7 +539,7 @@ struct hb_serialize_context_t
   unsigned int length () const
   {
     if (unlikely (!current)) return 0;
-    return this->head - current->head;
+    return (unsigned int)(this->head - current->head);
   }
 
   void align (unsigned int alignment)
@@ -571,7 +571,7 @@ struct hb_serialize_context_t
       err (HB_SERIALIZE_ERROR_OUT_OF_ROOM);
       return nullptr;
     }
-    hb_memset (this->head, 0, size);
+    hb_memset (this->head, 0, (unsigned int)(size));
     char *ret = this->head;
     this->head += size;
     return reinterpret_cast<Type *> (ret);
@@ -658,8 +658,8 @@ struct hb_serialize_context_t
   {
     assert (successful ());
     /* Copy both items from head side and tail side... */
-    unsigned int len = (this->head - this->start)
-		     + (this->end  - this->tail);
+    unsigned int len = (unsigned int)((this->head - this->start)
+		     + (this->end  - this->tail));
 
     // If len is zero don't hb_malloc as the memory won't get properly
     // cleaned up later.

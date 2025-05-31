@@ -108,6 +108,8 @@ struct hb_mutex_t
 
 struct hb_lock_t
 {
+	hb_lock_t& operator=(const hb_lock_t&) = delete;
+
   hb_lock_t (hb_mutex_t &mutex_) : mutex (mutex_) { mutex.lock (); }
   ~hb_lock_t () { mutex.unlock (); }
   private:

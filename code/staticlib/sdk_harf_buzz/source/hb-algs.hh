@@ -85,7 +85,7 @@
 static inline constexpr uint16_t hb_uint16_swap (uint16_t v)
 { return (v >> 8) | (v << 8); }
 static inline constexpr uint32_t hb_uint32_swap (uint32_t v)
-{ return (hb_uint16_swap (v) << 16) | hb_uint16_swap (v >> 16); }
+{ return (hb_uint16_swap ((uint16_t)v) << 16) | hb_uint16_swap ((uint16_t)(v >> 16)); }
 
 template <typename Type, int Bytes = sizeof (Type)>
 struct BEInt;
@@ -248,7 +248,7 @@ struct
   }
 
   template <typename T> constexpr auto
-  impl (const T& v, hb_priority<0>) const HB_RETURN (uint32_t, std::hash<hb_decay<decltype (hb_deref (v))>>{} (hb_deref (v)))
+  impl (const T& v, hb_priority<0>) const HB_RETURN (uint32_t, (uint32_t)(std::hash<hb_decay<decltype (hb_deref (v))>>{} (hb_deref (v))))
 
   public:
 
@@ -292,6 +292,11 @@ HB_FUNCOBJ (hb_invoke);
 template <unsigned Pos, typename Appl, typename V>
 struct hb_partial_t
 {
+    hb_partial_t() = delete;
+    hb_partial_t& operator=(const hb_partial_t&) = delete;
+    hb_partial_t(const hb_partial_t&) = delete;
+
+
   hb_partial_t (Appl a, V v) : a (a), v (v) {}
 
   static_assert (Pos > 0, "");
@@ -503,6 +508,17 @@ struct hb_pair_t
   typedef T2 second_t;
   typedef hb_pair_t<T1, T2> pair_t;
 
+  hb_pair_t& operator=(const hb_pair_t& rhs) {
+      first = rhs.first;
+      second = rhs.second;
+      return *this;
+  }
+  hb_pair_t(const hb_pair_t& rhs) {
+      first = rhs.first;
+      second = rhs.second;
+      return;
+  }
+
   template <typename U1 = T1, typename U2 = T2,
 	    hb_enable_if (std::is_default_constructible<U1>::value &&
 			  std::is_default_constructible<U2>::value)>
@@ -592,17 +608,17 @@ static inline unsigned int
 hb_popcount (T v)
 {
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) || defined(__clang__)
-  if (sizeof (T) <= sizeof (unsigned int))
+  if constexpr (sizeof (T) <= sizeof (unsigned int))
     return __builtin_popcount (v);
 
-  if (sizeof (T) <= sizeof (unsigned long))
+  if constexpr (sizeof (T) <= sizeof (unsigned long))
     return __builtin_popcountl (v);
 
-  if (sizeof (T) <= sizeof (unsigned long long))
+  if constexpr (sizeof (T) <= sizeof (unsigned long long))
     return __builtin_popcountll (v);
 #endif
 
-  if (sizeof (T) <= 4)
+  if constexpr (sizeof (T) <= 4)
   {
     /* "HACKMEM 169" */
     uint32_t y;
@@ -611,13 +627,13 @@ hb_popcount (T v)
     return (((y + (y >> 3)) & 030707070707) % 077);
   }
 
-  if (sizeof (T) == 8)
+  if constexpr (sizeof (T) == 8)
   {
     unsigned int shift = 32;
     return hb_popcount<uint32_t> ((uint32_t) v) + hb_popcount ((uint32_t) (v >> shift));
   }
 
-  if (sizeof (T) == 16)
+  if constexpr (sizeof (T) == 16)
   {
     unsigned int shift = 64;
     return hb_popcount<uint64_t> ((uint64_t) v) + hb_popcount ((uint64_t) (v >> shift));
@@ -635,25 +651,25 @@ hb_bit_storage (T v)
   if (unlikely (!v)) return 0;
 
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) || defined(__clang__)
-  if (sizeof (T) <= sizeof (unsigned int))
+  if constexpr (sizeof (T) <= sizeof (unsigned int))
     return sizeof (unsigned int) * 8 - __builtin_clz (v);
 
-  if (sizeof (T) <= sizeof (unsigned long))
+  if constexpr (sizeof (T) <= sizeof (unsigned long))
     return sizeof (unsigned long) * 8 - __builtin_clzl (v);
 
-  if (sizeof (T) <= sizeof (unsigned long long))
+  if constexpr (sizeof (T) <= sizeof (unsigned long long))
     return sizeof (unsigned long long) * 8 - __builtin_clzll (v);
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1500) || (defined(__MINGW32__) && (__GNUC__ < 4))
-  if (sizeof (T) <= sizeof (unsigned int))
+  if constexpr (sizeof (T) <= sizeof (unsigned int))
   {
     unsigned long where;
     _BitScanReverse (&where, v);
     return 1 + where;
   }
 # if defined(_WIN64)
-  if (sizeof (T) <= 8)
+  if constexpr (sizeof (T) <= 8)
   {
     unsigned long where;
     _BitScanReverse64 (&where, v);
@@ -662,7 +678,7 @@ hb_bit_storage (T v)
 # endif
 #endif
 
-  if (sizeof (T) <= 4)
+  if constexpr (sizeof (T) <= 4)
   {
     /* "bithacks" */
     const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
@@ -676,7 +692,7 @@ hb_bit_storage (T v)
       }
     return r + 1;
   }
-  if (sizeof (T) <= 8)
+  if constexpr (sizeof (T) <= 8)
   {
     /* "bithacks" */
     const uint64_t b[] = {0x2ULL, 0xCULL, 0xF0ULL, 0xFF00ULL, 0xFFFF0000ULL, 0xFFFFFFFF00000000ULL};
@@ -690,7 +706,7 @@ hb_bit_storage (T v)
       }
     return r + 1;
   }
-  if (sizeof (T) == 16)
+  if constexpr (sizeof (T) == 16)
   {
     unsigned int shift = 64;
     return (v >> shift) ? hb_bit_storage<uint64_t> ((uint64_t) (v >> shift)) + shift :
@@ -709,25 +725,25 @@ hb_ctz (T v)
   if (unlikely (!v)) return 8 * sizeof (T);
 
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) || defined(__clang__)
-  if (sizeof (T) <= sizeof (unsigned int))
+  if constexpr (sizeof (T) <= sizeof (unsigned int))
     return __builtin_ctz (v);
 
-  if (sizeof (T) <= sizeof (unsigned long))
+  if constexpr (sizeof (T) <= sizeof (unsigned long))
     return __builtin_ctzl (v);
 
-  if (sizeof (T) <= sizeof (unsigned long long))
+  if constexpr (sizeof (T) <= sizeof (unsigned long long))
     return __builtin_ctzll (v);
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1500) || (defined(__MINGW32__) && (__GNUC__ < 4))
-  if (sizeof (T) <= sizeof (unsigned int))
+  if constexpr (sizeof (T) <= sizeof (unsigned int))
   {
     unsigned long where;
     _BitScanForward (&where, v);
     return where;
   }
 # if defined(_WIN64)
-  if (sizeof (T) <= 8)
+  if constexpr (sizeof (T) <= 8)
   {
     unsigned long where;
     _BitScanForward64 (&where, v);
@@ -736,7 +752,7 @@ hb_ctz (T v)
 # endif
 #endif
 
-  if (sizeof (T) <= 4)
+  if constexpr (sizeof (T) <= 4)
   {
     /* "bithacks" */
     unsigned int c = 32;
@@ -749,7 +765,7 @@ hb_ctz (T v)
     if (v & 0x55555555) c -= 1;
     return c;
   }
-  if (sizeof (T) <= 8)
+  if constexpr (sizeof (T) <= 8)
   {
     /* "bithacks" */
     unsigned int c = 64;
@@ -763,7 +779,7 @@ hb_ctz (T v)
     if (v & 0x5555555555555555ULL) c -= 1;
     return c;
   }
-  if (sizeof (T) == 16)
+  if constexpr (sizeof (T) == 16)
   {
     unsigned int shift = 64;
     return (uint64_t) v ? hb_bit_storage<uint64_t> ((uint64_t) v) :
@@ -1333,7 +1349,7 @@ struct hb_vector_size_t
   elt_t& operator [] (unsigned int i) { return v[i]; }
   const elt_t& operator [] (unsigned int i) const { return v[i]; }
 
-  void clear (unsigned char v = 0) { memset (this, v, sizeof (*this)); }
+  void clear (unsigned char _v = 0) { memset (this, _v, sizeof (*this)); }
 
   template <typename Op>
   hb_vector_size_t process (const Op& op) const

@@ -49,7 +49,7 @@ VSSolution("solution")
         "unit_test_project", 
         }
     //.SolutionBuildProject = "unit_test_project"
-    .SolutionBuildProject = "render_target_project"
+    .SolutionBuildProject = "sdk_harf_buzz_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            

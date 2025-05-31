@@ -49,6 +49,10 @@ struct postV2Tail
 {
   friend struct post;
 
+  postV2Tail() = delete;
+  postV2Tail& operator=(const postV2Tail&) = delete;
+  postV2Tail(const postV2Tail&) = delete;
+
   bool sanitize (hb_sanitize_context_t *c) const
   {
     TRACE_SANITIZE (this);

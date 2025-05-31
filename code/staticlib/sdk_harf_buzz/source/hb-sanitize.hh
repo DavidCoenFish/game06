@@ -198,7 +198,7 @@ struct hb_sanitize_context_t :
   void start_processing ()
   {
     reset_object ();
-    if (unlikely (hb_unsigned_mul_overflows (this->end - this->start, HB_SANITIZE_MAX_OPS_FACTOR)))
+    if (unlikely (hb_unsigned_mul_overflows ((unsigned int)(this->end - this->start), HB_SANITIZE_MAX_OPS_FACTOR)))
       this->max_ops = HB_SANITIZE_MAX_OPS_MAX;
     else
       this->max_ops = hb_clamp ((unsigned) (this->end - this->start) * HB_SANITIZE_MAX_OPS_FACTOR,

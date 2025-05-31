@@ -640,11 +640,11 @@ struct hb_bit_set_t
 
     for (; i < page_map.length; i++)
     {
-      const page_map_t &current = page_map.arrayZ[i];
-      hb_codepoint_t m = pages_array[current.index].get_min ();
+      const page_map_t &_current = page_map.arrayZ[i];
+      hb_codepoint_t m = pages_array[_current.index].get_min ();
       if (m != INVALID)
       {
-	*codepoint = current.major * page_t::PAGE_BITS + m;
+	*codepoint = _current.major * page_t::PAGE_BITS + m;
         last_page_lookup.set_relaxed (i);
 	return true;
       }

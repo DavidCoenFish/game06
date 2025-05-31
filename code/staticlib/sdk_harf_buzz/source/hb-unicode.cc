@@ -182,8 +182,8 @@ hb_unicode_funcs_t *
 hb_unicode_funcs_create (hb_unicode_funcs_t *parent)
 {
   hb_unicode_funcs_t *ufuncs;
-
-  if (!(ufuncs = hb_object_create<hb_unicode_funcs_t> ()))
+  ufuncs = hb_object_create<hb_unicode_funcs_t>();
+  if (!(ufuncs))
     return hb_unicode_funcs_get_empty ();
 
   if (!parent)

@@ -56,3 +56,71 @@ release
 /Fp"G:\development\game05\engine\..\build\free_type\x64\Release\intermediate\free_type.pch" 
 /diagnostics:column 
 
+sdk_half_buzz
+/c 
+/permissive- 
+/GS /W3 /Zc:wchar_t 
+/Gm- /sdl 
+/Zc:inline /fp:precise 
+/D "_UNICODE" 
+/D "UNICODE" 
+/errorReport:prompt 
+/Zc:forScope /Gd /FC /FS /EHsc /nologo /diagnostics:column 
+/std:c++17 /Wall /WX /wd4365 /wd4061 /wd4820 /wd5045 /wd5039 
+/I"G:/bin/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/include/" "%1" /Fo"%2" 
+/I"C:\Program Files (x86)\Windows Kits\10/Include/10.0.19041.0/ucrt" 
+/I"C:\Program Files (x86)\Windows Kits\10/Include/10.0.19041.0/um" 
+/I"C:\Program Files (x86)\Windows Kits\10/Include/10.0.19041.0/shared" 
+/D "__WINDOWS__" 
+/D "WIN64" /MD /Oi /Zi /Gy /GL /D "NDEBUG" /O2 /D "HAVE_FREETYPE"'
+
+
+harf buzz
+debug
+/JMC 
+/permissive- 
+/ifcOutput "G:\development\game05\engine\..\build\harf_buzz\x64\Debug\intermediate\" 
+/GS /W3 /Zc:wchar_t 
+/I"G:\development\game05\engine\sdk\harf_buzz\Include" 
+/I"G:\development\game05\engine\sdk\free_type\Include" 
+/I"C:\Program Files (x86)\Visual Leak Detector\include" 
+/ZI /Gm- /Od /sdl 
+/Fd"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\output\harf_buzz.pdb" 
+/Zc:inline /fp:precise 
+/D "_DEBUG" 
+/D "_LIB" 
+/D "HAVE_FREETYPE" 
+/D "_UNICODE" 
+/D "UNICODE" 
+/errorReport:prompt 
+/WX- 
+/Zc:forScope /RTC1 /Gd /MDd /FC 
+/Fa"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\intermediate\" 
+/EHsc /nologo 
+/Fo"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\intermediate\" 
+/Fp"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\intermediate\harf_buzz.pch" 
+/diagnostics:column 
+
+release
+/permissive- 
+/ifcOutput "G:\development\game05\engine\..\build\harf_buzz\x64\Release\intermediate\" 
+/GS /GL /W3 /Gy 
+/Zc:wchar_t 
+/I"G:\development\game05\engine\sdk\harf_buzz\Include" 
+/I"G:\development\game05\engine\sdk\free_type\Include" 
+/I"C:\Program Files (x86)\Visual Leak Detector\include" 
+/Zi /Gm- /O2 /sdl 
+/Fd"G:\development\game05\engine\..\build\harf_buzz\x64\Release\output\harf_buzz.pdb" 
+/Zc:inline 
+/fp:precise 
+/D "NDEBUG" 
+/D "_LIB" 
+/D "HAVE_FREETYPE" 
+/D "_UNICODE" 
+/D "UNICODE" 
+/errorReport:prompt 
+/WX- /Zc:forScope /Gd /Oi /MD /FC 
+/Fa"G:\development\game05\engine\..\build\harf_buzz\x64\Release\intermediate\" /EHsc /nologo 
+/Fo"G:\development\game05\engine\..\build\harf_buzz\x64\Release\intermediate\" 
+/Fp"G:\development\game05\engine\..\build\harf_buzz\x64\Release\intermediate\harf_buzz.pch" /diagnostics:column 
+

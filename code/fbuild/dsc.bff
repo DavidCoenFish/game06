@@ -126,7 +126,7 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
         {
             .LibrarianOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.lib"
             .CompilerInputPath = "$RelativePath$/"
-            .CompilerInputPattern = {"*.cpp", "*.c"}
+            .CompilerInputPattern = {"*.cpp", "*.c", "*.cc", }
             .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
             .CompilerOptions + ' /I"$RootPath$/$RelativePath$"'
             ForEach( .LibraryName in .LibraryBaseNameDependency )

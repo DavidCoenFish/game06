@@ -97,7 +97,7 @@ hb_style_get_value (hb_font_t *font, hb_style_tag_t style_tag)
   switch ((unsigned) style_tag)
   {
   case HB_STYLE_TAG_ITALIC:
-    return face->table.OS2->is_italic () || face->table.head->is_italic () ? 1 : 0;
+    return (float)(face->table.OS2->is_italic () || face->table.head->is_italic () ? 1 : 0);
   case HB_STYLE_TAG_OPTICAL_SIZE:
   {
     unsigned int lower, design, upper;

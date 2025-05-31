@@ -216,7 +216,7 @@ struct hb_subset_plan_t
   add_table (hb_tag_t tag,
 	     hb_blob_t *contents)
   {
-    if (HB_DEBUG_SUBSET)
+    if constexpr (HB_DEBUG_SUBSET)
     {
       hb_blob_t *source_blob = source->reference_table (tag);
       DEBUG_MSG(SUBSET, nullptr, "add table %c%c%c%c, dest %d bytes, source %d bytes",

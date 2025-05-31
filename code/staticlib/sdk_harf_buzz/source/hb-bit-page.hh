@@ -90,8 +90,8 @@ struct hb_bit_page_t
       *lb &= ~((mask (b) << 1) - 1);
     }
   }
-  void set_range (hb_codepoint_t a, hb_codepoint_t b, bool v)
-  { if (v) add_range (a, b); else del_range (a, b); }
+  void set_range (hb_codepoint_t a, hb_codepoint_t b, bool _v)
+  { if (_v) add_range (a, b); else del_range (a, b); }
 
 
   // Writes out page values to the array p. Returns the number of values

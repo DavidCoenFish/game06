@@ -40,7 +40,11 @@ namespace OT {
 
 struct DataMap
 {
-  int cmp (hb_tag_t a) const { return tag.cmp (a); }
+	DataMap() = delete;
+	DataMap& operator=(const DataMap&) = delete;
+	DataMap(const DataMap&) = delete;
+
+	int cmp (hb_tag_t a) const { return tag.cmp (a); }
 
   hb_tag_t get_tag () const { return tag; }
 

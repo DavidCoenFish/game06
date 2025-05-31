@@ -50,7 +50,8 @@ struct hb_priority_queue_t
 
   void insert (int64_t priority, unsigned value)
   {
-    heap.push (item_t (priority, value));
+    //item_t item(priority, value);
+    heap.push (item_t(priority, value));
     if (unlikely (heap.in_error ())) return;
     bubble_up (heap.length - 1);
   }

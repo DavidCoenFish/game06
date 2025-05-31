@@ -396,8 +396,8 @@ struct hb_font_t
   {
     if (!get_font_h_extents (extents))
     {
-      extents->ascender = y_scale * .8;
-      extents->descender = extents->ascender - y_scale;
+      extents->ascender = (hb_position_t)((float)(y_scale) * .8f);
+      extents->descender = (hb_position_t)(extents->ascender - y_scale);
       extents->line_gap = 0;
     }
   }
@@ -605,7 +605,7 @@ struct hb_font_t
   {
     if (get_glyph_from_name (s, len, glyph)) return true;
 
-    if (len == -1) len = strlen (s);
+    if (len == -1) len = (int)(strlen (s));
 
     /* Straight glyph index. */
     if (hb_codepoint_parse (s, len, 10, glyph))
@@ -631,14 +631,14 @@ struct hb_font_t
 
   void mults_changed ()
   {
-    float upem = face->get_upem ();
-    x_multf = x_scale / upem;
-    y_multf = y_scale / upem;
+    float upem = (float)(face->get_upem ());
+    x_multf = ((float)x_scale) / upem;
+    y_multf = ((float)y_scale) / upem;
     bool x_neg = x_scale < 0;
-    x_mult = (x_neg ? -((int64_t) -x_scale << 16) : ((int64_t) x_scale << 16)) / upem;
+    x_mult = (int64_t)((float)(x_neg ? -((int64_t) -x_scale << 16) : ((int64_t) x_scale << 16)) / upem);
     bool y_neg = y_scale < 0;
-    y_mult = (y_neg ? -((int64_t) -y_scale << 16) : ((int64_t) y_scale << 16)) / upem;
-    slant_xy = y_scale ? slant * x_scale / y_scale : 0.f;
+    y_mult = (int64_t)((float)(y_neg ? -((int64_t) -y_scale << 16) : ((int64_t) y_scale << 16)) / upem);
+    slant_xy = (float)(y_scale ? (slant * (float)x_scale / (float)y_scale) : 0.f);
 
     data.fini ();
   }
