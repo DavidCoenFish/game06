@@ -139,10 +139,6 @@ HB_FUNCOBJ (hb_deref);
 template <typename T>
 struct hb_reference_wrapper
 {
-	hb_reference_wrapper() = delete;
-	hb_reference_wrapper& operator=(const hb_reference_wrapper&) = delete;
-	hb_reference_wrapper(const hb_reference_wrapper&) = delete;
-	
 	hb_reference_wrapper (T v) : v (v) {}
   bool operator == (const hb_reference_wrapper& o) const { return v == o.v; }
   bool operator != (const hb_reference_wrapper& o) const { return v != o.v; }

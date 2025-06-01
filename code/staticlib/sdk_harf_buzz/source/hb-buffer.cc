@@ -81,9 +81,10 @@ hb_segment_properties_equal (const hb_segment_properties_t *a,
 unsigned int
 hb_segment_properties_hash (const hb_segment_properties_t *p)
 {
-  return ((unsigned int) p->direction * 31 +
+  return (unsigned int
+  )(((unsigned int) p->direction * 31 +
 	  (unsigned int) p->script) * 31 +
-	 (intptr_t) (p->language);
+	 (intptr_t) (p->language));
 }
 
 /**
@@ -1624,7 +1625,7 @@ hb_buffer_add_utf (hb_buffer_t  *buffer,
     hb_codepoint_t u;
     const T *old_next = next;
     next = utf_t::next (next, end, &u, replacement);
-    buffer->add (u, old_next - (const T *) text);
+    buffer->add (u, (unsigned int)(old_next - (const T *) text));
   }
 
   /* Add post-context */

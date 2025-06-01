@@ -56,10 +56,10 @@
 #endif
 #define HB_MARK_AS_FLAG_T(T) \
 	extern "C++" { \
-	  static inline constexpr T operator | (T l, T r) { return T ((unsigned) l | (unsigned) r); } \
-	  static inline constexpr T operator & (T l, T r) { return T ((unsigned) l & (unsigned) r); } \
-	  static inline constexpr T operator ^ (T l, T r) { return T ((unsigned) l ^ (unsigned) r); } \
-	  static inline constexpr unsigned operator ~ (T r) { return (~(unsigned) r); } \
+	  static inline T operator | (T l, T r) { return T ((unsigned) l | (unsigned) r); } \
+	  static inline T operator & (T l, T r) { return T ((unsigned) l & (unsigned) r); } \
+	  static inline T operator ^ (T l, T r) { return T ((unsigned) l ^ (unsigned) r); } \
+	  static inline unsigned operator ~ (T r) { return (~(unsigned) r); } \
 	  static inline T& operator |= (T &l, T r) { l = l | r; return l; } \
 	  static inline T& operator &= (T& l, T r) { l = l & r; return l; } \
 	  static inline T& operator ^= (T& l, T r) { l = l ^ r; return l; } \
@@ -82,9 +82,9 @@
  */
 
 /* Endian swap, used in Windows related backends */
-static inline constexpr uint16_t hb_uint16_swap (uint16_t v)
+static inline uint16_t hb_uint16_swap (uint16_t v)
 { return (v >> 8) | (v << 8); }
-static inline constexpr uint32_t hb_uint32_swap (uint32_t v)
+static inline uint32_t hb_uint32_swap (uint32_t v)
 { return (hb_uint16_swap ((uint16_t)v) << 16) | hb_uint16_swap ((uint16_t)(v >> 16)); }
 
 template <typename Type, int Bytes = sizeof (Type)>
@@ -94,8 +94,8 @@ struct BEInt<Type, 1>
 {
   public:
   BEInt () = default;
-  constexpr BEInt (Type V) : v {uint8_t (V)} {}
-  constexpr operator Type () const { return v; }
+  BEInt (Type V) : v {uint8_t (V)} {}
+  operator Type () const { return v; }
   private: uint8_t v;
 };
 template <typename Type>
@@ -103,11 +103,11 @@ struct BEInt<Type, 2>
 {
   public:
   BEInt () = default;
-  constexpr BEInt (Type V) : v {uint8_t ((V >>  8) & 0xFF),
+  BEInt (Type V) : v {uint8_t ((V >>  8) & 0xFF),
 			        uint8_t ((V      ) & 0xFF)} {}
 
   struct __attribute__((packed)) packed_uint16_t { uint16_t v; };
-  constexpr operator Type () const
+  operator Type () const
   {
 #if defined(__OPTIMIZE__) && !defined(HB_NO_PACKED) && \
     ((defined(__GNUC__) && __GNUC__ >= 5) || defined(__clang__)) && \
@@ -133,11 +133,11 @@ struct BEInt<Type, 3>
   static_assert (!std::is_signed<Type>::value, "");
   public:
   BEInt () = default;
-  constexpr BEInt (Type V) : v {uint8_t ((V >> 16) & 0xFF),
+  BEInt (Type V) : v {uint8_t ((V >> 16) & 0xFF),
 				uint8_t ((V >>  8) & 0xFF),
 				uint8_t ((V      ) & 0xFF)} {}
 
-  constexpr operator Type () const { return (v[0] << 16)
+  operator Type () const { return (v[0] << 16)
 					  + (v[1] <<  8)
 					  + (v[2]      ); }
   private: uint8_t v[3];
@@ -147,13 +147,13 @@ struct BEInt<Type, 4>
 {
   public:
   BEInt () = default;
-  constexpr BEInt (Type V) : v {uint8_t ((V >> 24) & 0xFF),
+  BEInt (Type V) : v {uint8_t ((V >> 24) & 0xFF),
 			        uint8_t ((V >> 16) & 0xFF),
 			        uint8_t ((V >>  8) & 0xFF),
 			        uint8_t ((V      ) & 0xFF)} {}
 
   struct __attribute__((packed)) packed_uint32_t { uint32_t v; };
-  constexpr operator Type () const {
+  operator Type () const {
 #if defined(__OPTIMIZE__) && !defined(HB_NO_PACKED) && \
     ((defined(__GNUC__) && __GNUC__ >= 5) || defined(__clang__)) && \
     defined(__BYTE_ORDER) && \
@@ -200,31 +200,31 @@ _hb_roundf (float x) { return floorf (x + .5f); }
 struct
 {
   /* Note.  This is dangerous in that if it's passed an rvalue, it returns rvalue-reference. */
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (T&& v) const HB_AUTO_RETURN ( std::forward<T> (v) )
 }
 HB_FUNCOBJ (hb_identity);
 struct
 {
   /* Like identity(), but only retains lvalue-references.  Rvalues are returned as rvalues. */
-  template <typename T> constexpr T&
+  template <typename T> T&
   operator () (T& v) const { return v; }
 
-  template <typename T> constexpr hb_remove_reference<T>
+  template <typename T> hb_remove_reference<T>
   operator () (T&& v) const { return v; }
 }
 HB_FUNCOBJ (hb_lidentity);
 struct
 {
   /* Like identity(), but always returns rvalue. */
-  template <typename T> constexpr hb_remove_reference<T>
+  template <typename T> hb_remove_reference<T>
   operator () (T&& v) const { return v; }
 }
 HB_FUNCOBJ (hb_ridentity);
 
 struct
 {
-  template <typename T> constexpr bool
+  template <typename T> bool
   operator () (T&& v) const { return bool (std::forward<T> (v)); }
 }
 HB_FUNCOBJ (hb_bool);
@@ -233,26 +233,26 @@ struct
 {
   private:
 
-  template <typename T> constexpr auto
+  template <typename T> auto
   impl (const T& v, hb_priority<1>) const HB_RETURN (uint32_t, hb_deref (v).hash ())
 
-  template <typename T> constexpr uint32_t
+  template <typename T> uint32_t
   impl (const hb::shared_ptr<T>& v, hb_priority<1>) const
   {
     return v.get () ? v.get ()->hash () : 0;
   }
-  template <typename T> constexpr uint32_t
+  template <typename T> uint32_t
   impl (const hb::unique_ptr<T>& v, hb_priority<1>) const
   {
     return v.get () ? v.get ()->hash () : 0;
   }
 
-  template <typename T> constexpr auto
+  template <typename T> auto
   impl (const T& v, hb_priority<0>) const HB_RETURN (uint32_t, (uint32_t)(std::hash<hb_decay<decltype (hb_deref (v))>>{} (hb_deref (v))))
 
   public:
 
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T& v) const HB_RETURN (uint32_t, impl (v, hb_prioritize))
 }
 HB_FUNCOBJ (hb_hash);
@@ -292,11 +292,6 @@ HB_FUNCOBJ (hb_invoke);
 template <unsigned Pos, typename Appl, typename V>
 struct hb_partial_t
 {
-    hb_partial_t() = delete;
-    hb_partial_t& operator=(const hb_partial_t&) = delete;
-    hb_partial_t(const hb_partial_t&) = delete;
-
-
   hb_partial_t (Appl a, V v) : a (a), v (v) {}
 
   static_assert (Pos > 0, "");
@@ -508,16 +503,16 @@ struct hb_pair_t
   typedef T2 second_t;
   typedef hb_pair_t<T1, T2> pair_t;
 
-  hb_pair_t& operator=(const hb_pair_t& rhs) {
-      first = rhs.first;
-      second = rhs.second;
-      return *this;
-  }
-  hb_pair_t(const hb_pair_t& rhs) {
-      first = rhs.first;
-      second = rhs.second;
-      return;
-  }
+  //hb_pair_t& operator=(const hb_pair_t& rhs) {
+  //    first = rhs.first;
+  //    second = rhs.second;
+  //    return *this;
+  //}
+  //hb_pair_t(const hb_pair_t& rhs) {
+  //    first = rhs.first;
+  //    second = rhs.second;
+  //    return;
+  //}
 
   template <typename U1 = T1, typename U2 = T2,
 	    hb_enable_if (std::is_default_constructible<U1>::value &&
@@ -549,14 +544,14 @@ hb_pair (T1&& a, T2&& b) { return hb_pair_t<T1, T2> (a, b); }
 
 struct
 {
-  template <typename Pair> constexpr typename Pair::first_t
+  template <typename Pair> typename Pair::first_t
   operator () (const Pair& pair) const { return pair.first; }
 }
 HB_FUNCOBJ (hb_first);
 
 struct
 {
-  template <typename Pair> constexpr typename Pair::second_t
+  template <typename Pair> typename Pair::second_t
   operator () (const Pair& pair) const { return pair.second; }
 }
 HB_FUNCOBJ (hb_second);
@@ -567,21 +562,21 @@ HB_FUNCOBJ (hb_second);
  * comparing integers of different signedness. */
 struct
 {
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (T&& a, T2&& b) const HB_AUTO_RETURN
   (a <= b ? std::forward<T> (a) : std::forward<T2> (b))
 }
 HB_FUNCOBJ (hb_min);
 struct
 {
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (T&& a, T2&& b) const HB_AUTO_RETURN
   (a >= b ? std::forward<T> (a) : std::forward<T2> (b))
 }
 HB_FUNCOBJ (hb_max);
 struct
 {
-  template <typename T, typename T2, typename T3> constexpr auto
+  template <typename T, typename T2, typename T3> auto
   operator () (T&& x, T2&& min, T3&& max) const HB_AUTO_RETURN
   (hb_min (hb_max (std::forward<T> (x), std::forward<T2> (min)), std::forward<T3> (max)))
 }
@@ -608,32 +603,32 @@ static inline unsigned int
 hb_popcount (T v)
 {
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) || defined(__clang__)
-  if constexpr (sizeof (T) <= sizeof (unsigned int))
+  if (sizeof (T) <= sizeof (unsigned int))
     return __builtin_popcount (v);
 
-  if constexpr (sizeof (T) <= sizeof (unsigned long))
+  if (sizeof (T) <= sizeof (unsigned long))
     return __builtin_popcountl (v);
 
-  if constexpr (sizeof (T) <= sizeof (unsigned long long))
+  if (sizeof (T) <= sizeof (unsigned long long))
     return __builtin_popcountll (v);
 #endif
 
-  if constexpr (sizeof (T) <= 4)
+  if (sizeof (T) <= 4)
   {
     /* "HACKMEM 169" */
     uint32_t y;
     y = (v >> 1) &033333333333;
-    y = v - y - ((y >>1) & 033333333333);
+    y = (uint32_t)(v - y - ((y >>1) & 033333333333));
     return (((y + (y >> 3)) & 030707070707) % 077);
   }
 
-  if constexpr (sizeof (T) == 8)
+  if (sizeof (T) == 8)
   {
     unsigned int shift = 32;
     return hb_popcount<uint32_t> ((uint32_t) v) + hb_popcount ((uint32_t) (v >> shift));
   }
 
-  if constexpr (sizeof (T) == 16)
+  if (sizeof (T) == 16)
   {
     unsigned int shift = 64;
     return hb_popcount<uint64_t> ((uint64_t) v) + hb_popcount ((uint64_t) (v >> shift));
@@ -651,25 +646,25 @@ hb_bit_storage (T v)
   if (unlikely (!v)) return 0;
 
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) || defined(__clang__)
-  if constexpr (sizeof (T) <= sizeof (unsigned int))
+  if (sizeof (T) <= sizeof (unsigned int))
     return sizeof (unsigned int) * 8 - __builtin_clz (v);
 
-  if constexpr (sizeof (T) <= sizeof (unsigned long))
+  if (sizeof (T) <= sizeof (unsigned long))
     return sizeof (unsigned long) * 8 - __builtin_clzl (v);
 
-  if constexpr (sizeof (T) <= sizeof (unsigned long long))
+  if (sizeof (T) <= sizeof (unsigned long long))
     return sizeof (unsigned long long) * 8 - __builtin_clzll (v);
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1500) || (defined(__MINGW32__) && (__GNUC__ < 4))
-  if constexpr (sizeof (T) <= sizeof (unsigned int))
+  if (sizeof (T) <= sizeof (unsigned int))
   {
     unsigned long where;
-    _BitScanReverse (&where, v);
+    _BitScanReverse (&where, (unsigned long)(v));
     return 1 + where;
   }
 # if defined(_WIN64)
-  if constexpr (sizeof (T) <= 8)
+  if (sizeof (T) <= 8)
   {
     unsigned long where;
     _BitScanReverse64 (&where, v);
@@ -678,7 +673,7 @@ hb_bit_storage (T v)
 # endif
 #endif
 
-  if constexpr (sizeof (T) <= 4)
+  if (sizeof (T) <= 4)
   {
     /* "bithacks" */
     const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
@@ -692,7 +687,7 @@ hb_bit_storage (T v)
       }
     return r + 1;
   }
-  if constexpr (sizeof (T) <= 8)
+  if (sizeof (T) <= 8)
   {
     /* "bithacks" */
     const uint64_t b[] = {0x2ULL, 0xCULL, 0xF0ULL, 0xFF00ULL, 0xFFFF0000ULL, 0xFFFFFFFF00000000ULL};
@@ -706,7 +701,7 @@ hb_bit_storage (T v)
       }
     return r + 1;
   }
-  if constexpr (sizeof (T) == 16)
+  if (sizeof (T) == 16)
   {
     unsigned int shift = 64;
     return (v >> shift) ? hb_bit_storage<uint64_t> ((uint64_t) (v >> shift)) + shift :
@@ -725,25 +720,25 @@ hb_ctz (T v)
   if (unlikely (!v)) return 8 * sizeof (T);
 
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) || defined(__clang__)
-  if constexpr (sizeof (T) <= sizeof (unsigned int))
+  if (sizeof (T) <= sizeof (unsigned int))
     return __builtin_ctz (v);
 
-  if constexpr (sizeof (T) <= sizeof (unsigned long))
+  if (sizeof (T) <= sizeof (unsigned long))
     return __builtin_ctzl (v);
 
-  if constexpr (sizeof (T) <= sizeof (unsigned long long))
+  if (sizeof (T) <= sizeof (unsigned long long))
     return __builtin_ctzll (v);
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1500) || (defined(__MINGW32__) && (__GNUC__ < 4))
-  if constexpr (sizeof (T) <= sizeof (unsigned int))
+  if (sizeof (T) <= sizeof (unsigned int))
   {
     unsigned long where;
-    _BitScanForward (&where, v);
+    _BitScanForward (&where, (unsigned long)(v));
     return where;
   }
 # if defined(_WIN64)
-  if constexpr (sizeof (T) <= 8)
+  if (sizeof (T) <= 8)
   {
     unsigned long where;
     _BitScanForward64 (&where, v);
@@ -752,7 +747,7 @@ hb_ctz (T v)
 # endif
 #endif
 
-  if constexpr (sizeof (T) <= 4)
+  if (sizeof (T) <= 4)
   {
     /* "bithacks" */
     unsigned int c = 32;
@@ -765,7 +760,7 @@ hb_ctz (T v)
     if (v & 0x55555555) c -= 1;
     return c;
   }
-  if constexpr (sizeof (T) <= 8)
+  if (sizeof (T) <= 8)
   {
     /* "bithacks" */
     unsigned int c = 64;
@@ -779,7 +774,7 @@ hb_ctz (T v)
     if (v & 0x5555555555555555ULL) c -= 1;
     return c;
   }
-  if constexpr (sizeof (T) == 16)
+  if (sizeof (T) == 16)
   {
     unsigned int shift = 64;
     return (uint64_t) v ? hb_bit_storage<uint64_t> ((uint64_t) v) :
@@ -1230,110 +1225,110 @@ hb_codepoint_parse (const char *s, unsigned int len, int base, hb_codepoint_t *o
 
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (a & b)
 }
 HB_FUNCOBJ (hb_bitwise_and);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (a | b)
 }
 HB_FUNCOBJ (hb_bitwise_or);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (a ^ b)
 }
 HB_FUNCOBJ (hb_bitwise_xor);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (~a & b)
 }
 HB_FUNCOBJ (hb_bitwise_lt);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (a & ~b)
 }
 HB_FUNCOBJ (hb_bitwise_gt); // aka sub
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (~a | b)
 }
 HB_FUNCOBJ (hb_bitwise_le);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a, const T &b) const HB_AUTO_RETURN (a | ~b)
 }
 HB_FUNCOBJ (hb_bitwise_ge);
 struct
 {
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a) const HB_AUTO_RETURN (~a)
 }
 HB_FUNCOBJ (hb_bitwise_neg);
 
 struct
 { HB_PARTIALIZE(2);
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (const T &a, const T2 &b) const HB_AUTO_RETURN (a + b)
 }
 HB_FUNCOBJ (hb_add);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (const T &a, const T2 &b) const HB_AUTO_RETURN (a - b)
 }
 HB_FUNCOBJ (hb_sub);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (const T &a, const T2 &b) const HB_AUTO_RETURN (b - a)
 }
 HB_FUNCOBJ (hb_rsub);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (const T &a, const T2 &b) const HB_AUTO_RETURN (a * b)
 }
 HB_FUNCOBJ (hb_mul);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (const T &a, const T2 &b) const HB_AUTO_RETURN (a / b)
 }
 HB_FUNCOBJ (hb_div);
 struct
 { HB_PARTIALIZE(2);
-  template <typename T, typename T2> constexpr auto
+  template <typename T, typename T2> auto
   operator () (const T &a, const T2 &b) const HB_AUTO_RETURN (a % b)
 }
 HB_FUNCOBJ (hb_mod);
 struct
 {
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a) const HB_AUTO_RETURN (+a)
 }
 HB_FUNCOBJ (hb_pos);
 struct
 {
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (const T &a) const HB_AUTO_RETURN (-a)
 }
 HB_FUNCOBJ (hb_neg);
 struct
 {
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (T &a) const HB_AUTO_RETURN (++a)
 }
 HB_FUNCOBJ (hb_inc);
 struct
 {
-  template <typename T> constexpr auto
+  template <typename T> auto
   operator () (T &a) const HB_AUTO_RETURN (--a)
 }
 HB_FUNCOBJ (hb_dec);

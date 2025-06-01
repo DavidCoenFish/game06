@@ -481,7 +481,7 @@ struct hb_serialize_context_t
 
     link.is_signed = std::is_signed<hb_unwrap_type (T)>::value;
     link.whence = (unsigned) whence;
-    link.position = (const char *) &ofs - current->head;
+    link.position = (unsigned int)((const char *) &ofs - current->head);
     link.bias = bias;
   }
 
@@ -550,7 +550,7 @@ struct hb_serialize_context_t
   }
 
   template <typename Type = void>
-  Type *start_embed (const Type *obj HB_UNUSED = nullptr) const
+  Type *start_embed (const Type *obj HB_UNUSED = 0) const
   { return reinterpret_cast<Type *> (this->head); }
   template <typename Type>
   Type *start_embed (const Type &obj) const

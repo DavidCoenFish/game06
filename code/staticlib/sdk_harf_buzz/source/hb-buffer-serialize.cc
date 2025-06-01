@@ -184,7 +184,7 @@ _hb_buffer_serialize_glyphs_json (hb_buffer_t *buffer,
     if (i == end-1)
       *p++ = ']';
 
-    unsigned int l = p - b;
+    unsigned int l = (unsigned int)(p - b);
     if (buf_size > l)
     {
       memcpy (buf, b, l);
@@ -242,7 +242,7 @@ _hb_buffer_serialize_unicode_json (hb_buffer_t *buffer,
     if (i == end-1)
       *p++ = ']';
 
-    unsigned int l = p - b;
+    unsigned int l = (unsigned int)(p - b);
     if (buf_size > l)
     {
       memcpy (buf, b, l);
@@ -330,7 +330,7 @@ _hb_buffer_serialize_glyphs_text (hb_buffer_t *buffer,
       *p++ = ']';
     }
 
-    unsigned int l = p - b;
+    unsigned int l = (unsigned int)(p - b);
     if (buf_size > l)
     {
       memcpy (buf, b, l);
@@ -382,7 +382,7 @@ _hb_buffer_serialize_unicode_text (hb_buffer_t *buffer,
     if (i == end-1)
       *p++ = '>';
 
-    unsigned int l = p - b;
+    unsigned int l = (unsigned int)(p - b);
     if (buf_size > l)
     {
       memcpy (buf, b, l);
@@ -767,7 +767,7 @@ hb_buffer_deserialize_glyphs (hb_buffer_t *buffer,
   }
 
   if (buf_len == -1)
-    buf_len = strlen (buf);
+    buf_len = (int)(strlen (buf));
 
   if (!buf_len)
   {
@@ -838,7 +838,7 @@ hb_buffer_deserialize_unicode (hb_buffer_t *buffer,
   }
 
   if (buf_len == -1)
-    buf_len = strlen (buf);
+    buf_len = (int)(strlen (buf));
 
   if (!buf_len)
   {

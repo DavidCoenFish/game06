@@ -433,7 +433,7 @@ hb_ft_get_glyph_h_advances (hb_font_t* font, void* font_data,
   FT_Get_Transform (ft_face, &matrix, nullptr);
   float mult = matrix.xx / 65536.f;
 #else
-  float mult = font->x_scale < 0 ? -1 : +1;
+  float mult = (float)(font->x_scale < 0 ? -1 : +1);
 #endif
 
   for (unsigned int i = 0; i < count; i++)
@@ -471,7 +471,7 @@ hb_ft_get_glyph_v_advance (hb_font_t *font,
   FT_Get_Transform (ft_font->ft_face, &matrix, nullptr);
   float y_mult = matrix.yy / 65536.f;
 #else
-  float y_mult = font->y_scale < 0 ? -1 : +1;
+  float y_mult = (float)(font->y_scale < 0 ? -1 : +1);
 #endif
 
   if (unlikely (FT_Get_Advance (ft_font->ft_face, glyph, ft_font->load_flags | FT_LOAD_VERTICAL_LAYOUT, &v)))
@@ -504,8 +504,8 @@ hb_ft_get_glyph_v_origin (hb_font_t *font,
   float x_mult = matrix.xx / 65536.f;
   float y_mult = matrix.yy / 65536.f;
 #else
-  float x_mult = font->x_scale < 0 ? -1 : +1;
-  float y_mult = font->y_scale < 0 ? -1 : +1;
+  float x_mult = (float)(font->x_scale < 0 ? -1 : +1);
+  float y_mult = (float)(font->y_scale < 0 ? -1 : +1);
 #endif
 
   if (unlikely (FT_Load_Glyph (ft_face, glyph, ft_font->load_flags)))
@@ -559,8 +559,8 @@ hb_ft_get_glyph_extents (hb_font_t *font,
   float x_mult = matrix.xx / 65536.f;
   float y_mult = matrix.yy / 65536.f;
 #else
-  float x_mult = font->x_scale < 0 ? -1 : +1;
-  float y_mult = font->y_scale < 0 ? -1 : +1;
+  float x_mult = (float)( font->x_scale < 0 ? -1 : +1);
+  float y_mult = (float)(font->y_scale < 0 ? -1 : +1);
 #endif
 
   if (unlikely (FT_Load_Glyph (ft_face, glyph, ft_font->load_flags)))
@@ -668,7 +668,7 @@ hb_ft_get_font_h_extents (hb_font_t *font HB_UNUSED,
   FT_Get_Transform (ft_face, &matrix, nullptr);
   float y_mult = matrix.yy / 65536.f;
 #else
-  float y_mult = font->y_scale < 0 ? -1 : +1;
+  float y_mult = (float)(font->y_scale < 0 ? -1 : +1);
 #endif
 
   if (ft_face->units_per_EM != 0)
@@ -698,7 +698,7 @@ static int
 _hb_ft_move_to (const FT_Vector *to,
 		hb_draw_session_t *drawing)
 {
-  drawing->move_to (to->x, to->y);
+  drawing->move_to ((float)(to->x), (float)(to->y));
   return FT_Err_Ok;
 }
 
@@ -706,7 +706,7 @@ static int
 _hb_ft_line_to (const FT_Vector *to,
 		hb_draw_session_t *drawing)
 {
-  drawing->line_to (to->x, to->y);
+  drawing->line_to ((float)(to->x), (float)(to->y));
   return FT_Err_Ok;
 }
 
@@ -715,8 +715,8 @@ _hb_ft_conic_to (const FT_Vector *control,
 		 const FT_Vector *to,
 		 hb_draw_session_t *drawing)
 {
-  drawing->quadratic_to (control->x, control->y,
-			 to->x, to->y);
+  drawing->quadratic_to ((float)(control->x), (float)(control->y),
+      (float)(to->x), (float)(to->y));
   return FT_Err_Ok;
 }
 
@@ -726,9 +726,9 @@ _hb_ft_cubic_to (const FT_Vector *control1,
 		 const FT_Vector *to,
 		 hb_draw_session_t *drawing)
 {
-  drawing->cubic_to (control1->x, control1->y,
-		     control2->x, control2->y,
-		     to->x, to->y);
+  drawing->cubic_to ((float)(control1->x), (float)(control1->y),
+      (float)(control2->x), (float)(control2->y),
+      (float)(to->x), (float)(to->y));
   return FT_Err_Ok;
 }
 

@@ -111,7 +111,7 @@ struct AxisRecord
       v = (v - default_value) / (default_value - min_value);
     else
       v = (v - default_value) / (max_value - default_value);
-    return roundf (v * 16384.f);
+    return (int)(roundf (v * 16384.f));
   }
 
   float unnormalize_axis_value (int v) const

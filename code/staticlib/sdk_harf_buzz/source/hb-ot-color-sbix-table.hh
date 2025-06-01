@@ -102,7 +102,7 @@ struct SBIXStrike
 
     unsigned int retry_count = 8;
     unsigned int sbix_len = sbix_blob->length;
-    unsigned int strike_offset = (const char *) this - (const char *) sbix_blob->data;
+    unsigned int strike_offset = (unsigned int)((const char *) this - (const char *) sbix_blob->data);
     assert (strike_offset < sbix_len);
 
   retry:

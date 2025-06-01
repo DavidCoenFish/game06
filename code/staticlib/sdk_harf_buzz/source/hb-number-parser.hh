@@ -215,7 +215,7 @@ _again:
 
   *end_ptr = p;
 
-  if (frac_count) value += frac / _pow10 (frac_count);
+  if (frac_count) value += frac / _pow10 ((unsigned int)(frac_count));
   if (neg) value *= -1.;
 
   if (unlikely (exp_overflow))

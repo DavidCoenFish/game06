@@ -271,23 +271,12 @@ struct hb_hashmap_t
   /*
    * Iterator
    */
-#if 1
-
-  auto iter() const -> decltype ((+hb_array(items, mask ? mask + 1 : 0)
-      | hb_filter(&item_t::is_real)
-      | hb_map(&item_t::get_pair)
-      )) { return (+hb_array(items, mask ? mask + 1 : 0)
-      | hb_filter(&item_t::is_real)
-      | hb_map(&item_t::get_pair)
-      ); }
-#else
   auto iter () const HB_AUTO_RETURN
   (
     + hb_array (items, mask ? mask + 1 : 0)
     | hb_filter (&item_t::is_real)
     | hb_map (&item_t::get_pair)
   )
-#endif
   auto iter_ref () const HB_AUTO_RETURN
   (
     + hb_array (items, mask ? mask + 1 : 0)

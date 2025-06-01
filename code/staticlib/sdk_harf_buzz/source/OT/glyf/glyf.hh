@@ -229,10 +229,10 @@ struct glyf_accelerator_t
 	}
 	else
 	{
-	  extents->x_bearing = roundf (min_x);
-	  extents->width = roundf (max_x - extents->x_bearing);
-	  extents->y_bearing = roundf (max_y);
-	  extents->height = roundf (min_y - extents->y_bearing);
+	  extents->x_bearing = (hb_position_t)(roundf (min_x));
+	  extents->width = (hb_position_t)(roundf (max_x - extents->x_bearing));
+	  extents->y_bearing = (hb_position_t)(roundf (max_y));
+	  extents->height = (hb_position_t)(roundf (min_y - extents->y_bearing));
 	}
       }
 
@@ -278,7 +278,7 @@ struct glyf_accelerator_t
     float result = is_vertical
 		 ? phantoms[glyf_impl::PHANTOM_TOP].y - phantoms[glyf_impl::PHANTOM_BOTTOM].y
 		 : phantoms[glyf_impl::PHANTOM_RIGHT].x - phantoms[glyf_impl::PHANTOM_LEFT].x;
-    return hb_clamp (roundf (result), 0.f, (float) UINT_MAX / 2);
+    return (unsigned)(hb_clamp (roundf (result), 0.f, (float) UINT_MAX / 2));
   }
 
   bool get_leading_bearing_with_var_unscaled (hb_font_t *font, hb_codepoint_t gid, bool is_vertical, int *lsb) const
@@ -291,9 +291,9 @@ struct glyf_accelerator_t
     if (unlikely (!get_points (font, gid, points_aggregator_t (font, &extents, phantoms, false))))
       return false;
 
-    *lsb = is_vertical
+    *lsb = (int)(is_vertical
 	 ? roundf (phantoms[glyf_impl::PHANTOM_TOP].y) - extents.y_bearing
-	 : roundf (phantoms[glyf_impl::PHANTOM_LEFT].x);
+	 : roundf (phantoms[glyf_impl::PHANTOM_LEFT].x));
     return true;
   }
 #endif

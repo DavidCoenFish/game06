@@ -219,7 +219,7 @@ struct hb_vector_t : std::conditional<sorted, hb_vector_t<Type, false>, hb_empty
     /* Emplace. */
     length++;
     Type *p = std::addressof (arrayZ[length - 1]);
-    return new (p) Type (std::forward<T> (v));
+    return new (p) Type ((Type)(std::forward<T> (v)));
   }
 
   bool in_error () const { return allocated < 0; }

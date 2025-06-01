@@ -252,7 +252,7 @@ struct hmtxvmtx
       if (var_table->get_lsb_delta_unscaled (glyph, font->coords, font->num_coords, &delta) &&
 	  get_leading_bearing_without_var_unscaled (glyph, lsb))
       {
-	*lsb += roundf (delta);
+	*lsb += (int)(roundf (delta));
 	return true;
       }
 
@@ -306,11 +306,11 @@ struct hmtxvmtx
 	return advance;
 
       if (var_table.get_length ())
-	return advance + roundf (var_table->get_advance_delta_unscaled (glyph,
+	return (unsigned int)(advance + roundf (var_table->get_advance_delta_unscaled (glyph,
 									font->coords, font->num_coords,
-									store_cache)); // TODO Optimize?!
+									store_cache))); // TODO Optimize?!
 
-      return _glyf_get_advance_with_var_unscaled (font, glyph, T::tableTag == HB_OT_TAG_vmtx);
+      return (unsigned int)(_glyf_get_advance_with_var_unscaled (font, glyph, T::tableTag == HB_OT_TAG_vmtx));
 #else
       return advance;
 #endif

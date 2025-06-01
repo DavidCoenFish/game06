@@ -123,9 +123,9 @@ hb_style_get_value (hb_font_t *font, hb_style_tag_t style_tag)
 	      face->table.head->is_expanded () ? 125 :
 	      100);
   case HB_STYLE_TAG_WEIGHT:
-    return face->table.OS2->has_data ()
+    return (float)(face->table.OS2->has_data ()
 	   ? face->table.OS2->usWeightClass
-	   : (face->table.head->is_bold () ? 700 : 400);
+	   : (face->table.head->is_bold () ? 700 : 400));
   default:
     return 0;
   }

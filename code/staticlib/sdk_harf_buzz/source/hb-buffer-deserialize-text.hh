@@ -565,7 +565,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -626,7 +626,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -644,7 +644,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -750,7 +750,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -760,7 +760,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -780,7 +780,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -809,7 +809,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -836,7 +836,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -848,7 +848,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -879,7 +879,7 @@ _resume:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -911,7 +911,7 @@ _again:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -1001,7 +1001,7 @@ _again:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }
@@ -1030,7 +1030,7 @@ _again:
 	{
 	/* TODO Unescape delimiters. */
 	if (!hb_font_glyph_from_string (font,
-					tok, p - tok,
+					tok, (int)(p - tok),
 					&info.codepoint))
 	  return false;
 }

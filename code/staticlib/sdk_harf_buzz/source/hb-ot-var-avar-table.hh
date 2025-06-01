@@ -90,8 +90,8 @@ struct SegmentMaps : Array16Of<AxisValueMap>
       return arrayZ[i-1].toCoord;
 
     int denom = arrayZ[i].fromCoord - arrayZ[i-1].fromCoord;
-    return roundf (arrayZ[i-1].toCoord + ((float) (arrayZ[i].toCoord - arrayZ[i-1].toCoord) *
-					  (value - arrayZ[i-1].fromCoord)) / denom);
+    return (int)(roundf (arrayZ[i-1].toCoord + ((float) (arrayZ[i].toCoord - arrayZ[i-1].toCoord) *
+					  (value - arrayZ[i-1].fromCoord)) / denom));
 #undef toCoord
 #undef fromCoord
   }

@@ -124,10 +124,10 @@ struct Glyph
 		       - font->face->get_upem ()
 #endif
 		       ;
-      phantoms[PHANTOM_LEFT].x = h_delta;
-      phantoms[PHANTOM_RIGHT].x = h_adv + h_delta;
-      phantoms[PHANTOM_TOP].y = v_orig;
-      phantoms[PHANTOM_BOTTOM].y = v_orig - (int) v_adv;
+      phantoms[PHANTOM_LEFT].x = (float)(h_delta);
+      phantoms[PHANTOM_RIGHT].x = (float)(h_adv + h_delta);
+      phantoms[PHANTOM_TOP].y = (float)(v_orig);
+      phantoms[PHANTOM_BOTTOM].y = (float)(v_orig - (int) v_adv);
     }
 
 #ifndef HB_NO_VAR

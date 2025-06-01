@@ -305,7 +305,7 @@ struct CmapSubtableFormat4
     for (unsigned i : + hb_range (segcount)
 		      | hb_filter ([&] (const unsigned _) { return idDelta[_] == 0; }))
     {
-      idRangeOffset[i] = 2 * (c->start_embed<HBUINT16> () - idRangeOffset - i);
+      idRangeOffset[i] = (uint16_t)(2 * (c->start_embed<HBUINT16> () - idRangeOffset - i));
       for (hb_codepoint_t cp = startCode[i]; cp <= endCode[i]; cp++)
       {
         HBUINT16 gid;
@@ -417,7 +417,7 @@ struct CmapSubtableFormat4
 					  this->segCount + 1);
       if (unlikely (!found))
 	return false;
-      unsigned int i = found - endCount;
+      unsigned int i = (unsigned int)(found - endCount);
 
       hb_codepoint_t gid;
       unsigned int rangeOffset = this->idRangeOffset[i];
@@ -1225,7 +1225,7 @@ struct CmapSubtableFormat14
     if (unlikely (!c->check_success (!obj_indices.in_error ())))
       return;
 
-    int tail_len = init_tail - c->tail;
+    int tail_len = (int)(init_tail - c->tail);
     c->check_assign (this->length, c->length () - table_initpos + tail_len,
                      HB_SERIALIZE_ERROR_INT_OVERFLOW);
     c->check_assign (this->record.len,

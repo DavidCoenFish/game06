@@ -874,10 +874,10 @@ struct CBDT
       /* Convert to font units. */
       float x_scale = upem / (float) strike.ppemX;
       float y_scale = upem / (float) strike.ppemY;
-      extents->x_bearing = roundf (extents->x_bearing * x_scale);
-      extents->y_bearing = roundf (extents->y_bearing * y_scale);
-      extents->width = roundf (extents->width * x_scale);
-      extents->height = roundf (extents->height * y_scale);
+      extents->x_bearing = (hb_position_t)(roundf (extents->x_bearing * x_scale));
+      extents->y_bearing = (hb_position_t)(roundf (extents->y_bearing * y_scale));
+      extents->width = (hb_position_t)(roundf (extents->width * x_scale));
+      extents->height = (hb_position_t)(roundf (extents->height * y_scale));
 
       return true;
     }

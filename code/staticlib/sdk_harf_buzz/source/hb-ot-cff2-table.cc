@@ -124,8 +124,8 @@ bool OT::cff2::accelerator_t::get_extents (hb_font_t *font,
   }
   else
   {
-    extents->x_bearing = font->em_scalef_x (param.min_x.to_real ());
-    extents->width = font->em_scalef_x (param.max_x.to_real ()) - extents->x_bearing;
+    extents->x_bearing = font->em_scalef_x ((float)(param.min_x.to_real ()));
+    extents->width = font->em_scalef_x ((float)(param.max_x.to_real ())) - extents->x_bearing;
   }
   if (param.min_y >= param.max_y)
   {
@@ -134,8 +134,8 @@ bool OT::cff2::accelerator_t::get_extents (hb_font_t *font,
   }
   else
   {
-    extents->y_bearing = font->em_scalef_y (param.max_y.to_real ());
-    extents->height = font->em_scalef_y (param.min_y.to_real ()) - extents->y_bearing;
+    extents->y_bearing = font->em_scalef_y ((float)(param.max_y.to_real ()));
+    extents->height = font->em_scalef_y ((float)(param.min_y.to_real ())) - extents->y_bearing;
   }
 
   return true;
@@ -150,16 +150,16 @@ struct cff2_path_param_t
   }
 
   void move_to (const point_t &p)
-  { draw_session->move_to (font->em_fscalef_x (p.x.to_real ()), font->em_fscalef_y (p.y.to_real ())); }
+  { draw_session->move_to (font->em_fscalef_x ((float)(p.x.to_real ())), font->em_fscalef_y ((float)(p.y.to_real ()))); }
 
   void line_to (const point_t &p)
-  { draw_session->line_to (font->em_fscalef_x (p.x.to_real ()), font->em_fscalef_y (p.y.to_real ())); }
+  { draw_session->line_to (font->em_fscalef_x ((float)(p.x.to_real ())), font->em_fscalef_y ((float)(p.y.to_real ()))); }
 
   void cubic_to (const point_t &p1, const point_t &p2, const point_t &p3)
   {
-    draw_session->cubic_to (font->em_fscalef_x (p1.x.to_real ()), font->em_fscalef_y (p1.y.to_real ()),
-			   font->em_fscalef_x (p2.x.to_real ()), font->em_fscalef_y (p2.y.to_real ()),
-			   font->em_fscalef_x (p3.x.to_real ()), font->em_fscalef_y (p3.y.to_real ()));
+    draw_session->cubic_to (font->em_fscalef_x ((float)(p1.x.to_real ())), font->em_fscalef_y ((float)(p1.y.to_real ())),
+			   font->em_fscalef_x ((float)(p2.x.to_real ())), font->em_fscalef_y ((float)(p2.y.to_real ())),
+			   font->em_fscalef_x ((float)(p3.x.to_real ())), font->em_fscalef_y ((float)(p3.y.to_real ())));
   }
 
   protected:

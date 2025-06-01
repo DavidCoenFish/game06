@@ -389,11 +389,6 @@ struct hb_map_iter_t :
 template <typename Proj, hb_function_sortedness_t Sorted>
 struct hb_map_iter_factory_t
 {
-    hb_map_iter_factory_t() = delete;
-    hb_map_iter_factory_t& operator=(const hb_map_iter_factory_t&) = delete;
-    hb_map_iter_factory_t(const hb_map_iter_factory_t&) = delete;
-
-
   hb_map_iter_factory_t (Proj f) : f (f) {}
 
   template <typename Iter,
@@ -436,10 +431,6 @@ struct hb_filter_iter_t :
   hb_iter_with_fallback_t<hb_filter_iter_t<Iter, Pred, Proj>,
 			  typename Iter::item_t>
 {
-    hb_filter_iter_t() = delete;
-    hb_filter_iter_t& operator=(const hb_filter_iter_t&) = delete;
-    hb_filter_iter_t(const hb_filter_iter_t&) = delete;
-
   hb_filter_iter_t (const Iter& it_, Pred p_, Proj f_) : it (it_), p (p_), f (f_)
   { while (it && !hb_has (p.get (), hb_get (f.get (), *it))) ++it; }
 
@@ -461,10 +452,6 @@ struct hb_filter_iter_t :
 template <typename Pred, typename Proj>
 struct hb_filter_iter_factory_t
 {
-    hb_filter_iter_factory_t() = delete;
-    hb_filter_iter_factory_t& operator=(const hb_filter_iter_factory_t&) = delete;
-    hb_filter_iter_factory_t(const hb_filter_iter_factory_t&) = delete;
-
    hb_filter_iter_factory_t (Pred p, Proj f) : p (p), f (f) {}
 
   template <typename Iter,
@@ -876,10 +863,6 @@ HB_FUNCOBJ (hb_chop);
 template <typename Sink>
 struct hb_sink_t
 {
-    hb_sink_t() = delete;
-    hb_sink_t& operator=(const hb_sink_t&) = delete;
-    hb_sink_t(const hb_sink_t&) = delete;
-
   hb_sink_t (Sink s) : s (s) {}
 
   template <typename Iter,

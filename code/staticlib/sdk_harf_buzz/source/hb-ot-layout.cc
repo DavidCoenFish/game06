@@ -514,7 +514,7 @@ hb_ot_layout_table_choose_script (hb_face_t      *face,
 {
   const hb_tag_t *t;
   for (t = script_tags; *t; t++);
-  return hb_ot_layout_table_select_script (face, table_tag, t - script_tags, script_tags, script_index, chosen_script);
+  return hb_ot_layout_table_select_script (face, table_tag, (unsigned int)(t - script_tags), script_tags, script_index, chosen_script);
 }
 #endif
 

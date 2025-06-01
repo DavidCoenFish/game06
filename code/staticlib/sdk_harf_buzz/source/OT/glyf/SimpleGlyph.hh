@@ -88,7 +88,7 @@ struct SimpleGlyph
     }
 
     if (unlikely (coords_with_flags != num_coordinates)) return hb_bytes_t ();
-    return bytes.sub_array (0, bytes.length + coord_bytes - (glyph_end - glyph));
+    return bytes.sub_array (0, (unsigned int)(bytes.length + coord_bytes - (glyph_end - glyph)));
   }
 
   /* zero instruction length */
@@ -169,7 +169,7 @@ struct SimpleGlyph
 	  p += HBINT16::static_size;
 	}
       }
-      points_.arrayZ[i].*m = v;
+      points_.arrayZ[i].*m = (float)(v);
     }
     return true;
   }

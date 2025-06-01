@@ -56,14 +56,14 @@ static const char _deserialize_json_key_spans[] = {
 };
 
 static const short _deserialize_json_index_offsets[] = {
-	0, 0, 116, 143, 165, 168, 170, 221, 
-	271, 282, 400, 518, 636, 638, 689, 739, 
-	750, 868, 986, 988, 990, 1041, 1091, 1209, 
-	1327, 1330, 1332, 1383, 1433, 1444, 1562, 1680, 
-	1682, 1733, 1783, 1794, 1912, 2030, 2032, 2034, 
-	2085, 2135, 2253, 2371, 2373, 2424, 2474, 2534, 
-	2652, 2712, 2830, 2948, 2950, 3001, 3051, 3169, 
-	3255, 3371
+	(short)0, 0, 116, 143, 165, 168, 170, 221, 
+	(short)271, 282, 400, 518, 636, 638, 689, 739, 
+	(short)750, 868, 986, 988, 990, 1041, 1091, 1209, 
+	(short)1327, 1330, 1332, 1383, 1433, 1444, 1562, 1680, 
+	(short)1682, 1733, 1783, 1794, 1912, 2030, 2032, 2034, 
+	(short)2085, 2135, 2253, 2371, 2373, 2424, 2474, 2534, 
+	(short)2652, 2712, 2830, 2948, 2950, 3001, 3051, 3169, 
+	(short)3255, 3371
 };
 
 static const char _deserialize_json_indicies[] = {
@@ -623,7 +623,7 @@ _resume:
 	{
 	/* TODO Unescape \" and \\ if found. */
 	if (!hb_font_glyph_from_string (font,
-					tok+1, p - tok - 2, /* Skip "" */
+					tok+1, (int)(p - tok - 2), /* Skip "" */
 					&info.codepoint))
 	  return false;
 }
@@ -677,7 +677,7 @@ _resume:
 	{
 	/* TODO Unescape \" and \\ if found. */
 	if (!hb_font_glyph_from_string (font,
-					tok+1, p - tok - 2, /* Skip "" */
+					tok+1, (int)(p - tok - 2), /* Skip "" */
 					&info.codepoint))
 	  return false;
 }

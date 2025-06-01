@@ -672,7 +672,7 @@ fail_without_close:
   if (unlikely (!file)) return nullptr;
 
   HANDLE fd;
-  unsigned int size = strlen (file_name) + 1;
+  unsigned int size = (unsigned int)(strlen (file_name) + 1);
   size_t converted_count = 0;
   wchar_t * wchar_file_name = (wchar_t *) hb_malloc (sizeof (wchar_t) * size);
   if (unlikely (!wchar_file_name)) goto fail_without_close;
@@ -762,7 +762,7 @@ fail_without_close:
       data = new_data;
     }
 
-    unsigned long addition = fread (data + len, 1, allocated - len, fp);
+    unsigned long addition = (unsigned long)(fread (data + len, 1, allocated - len, fp));
 
     int err = ferror (fp);
 #ifdef EINTR // armcc doesn't have it

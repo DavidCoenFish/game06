@@ -111,13 +111,13 @@ struct TrackData
 	break;
       }
     }
-    if (!trackTableEntry) return 0.;
+    if (!trackTableEntry) return 0;
 
     /*
      * Choose size.
      */
     unsigned int sizes = nSizes;
-    if (!sizes) return 0.;
+    if (!sizes) return 0;
     if (sizes == 1) return trackTableEntry->get_value (base, 0, sizes);
 
     hb_array_t<const HBFixed> size_table ((base+sizeTable).arrayZ, sizes);
@@ -126,8 +126,8 @@ struct TrackData
       if (size_table[size_index].to_float () >= ptem)
 	break;
 
-    return roundf (interpolate_at (size_index ? size_index - 1 : 0, ptem,
-				   *trackTableEntry, base));
+    return (int)(roundf (interpolate_at (size_index ? size_index - 1 : 0, ptem,
+				   *trackTableEntry, base)));
   }
 
   bool sanitize (hb_sanitize_context_t *c, const void *base) const
@@ -172,8 +172,8 @@ struct trak
     {
       const TrackData &trackData = this+horizData;
       int tracking = trackData.get_tracking (this, ptem);
-      hb_position_t offset_to_add = c->font->em_scalef_x (tracking / 2);
-      hb_position_t advance_to_add = c->font->em_scalef_x (tracking);
+      hb_position_t offset_to_add = c->font->em_scalef_x ((float)(tracking / 2));
+      hb_position_t advance_to_add = c->font->em_scalef_x ((float)(tracking));
       foreach_grapheme (buffer, start, end)
       {
 	if (!(buffer->info[start].mask & trak_mask)) continue;
@@ -185,8 +185,8 @@ struct trak
     {
       const TrackData &trackData = this+vertData;
       int tracking = trackData.get_tracking (this, ptem);
-      hb_position_t offset_to_add = c->font->em_scalef_y (tracking / 2);
-      hb_position_t advance_to_add = c->font->em_scalef_y (tracking);
+      hb_position_t offset_to_add = c->font->em_scalef_y ((float)(tracking / 2));
+      hb_position_t advance_to_add = c->font->em_scalef_y ((float)(tracking));
       foreach_grapheme (buffer, start, end)
       {
 	if (!(buffer->info[start].mask & trak_mask)) continue;

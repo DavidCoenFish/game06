@@ -159,7 +159,7 @@ struct post
       unsigned int count = get_glyph_count ();
       if (unlikely (!count)) return false;
 
-      if (len < 0) len = strlen (name);
+      if (len < 0) len = (int)(strlen (name));
 
       if (unlikely (!len)) return false;
 

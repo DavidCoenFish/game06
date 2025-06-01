@@ -464,8 +464,8 @@ hb_language_matches (hb_language_t language,
 
   const char *l = language->s;
   const char *s = specific->s;
-  unsigned ll = strlen (l);
-  unsigned sl = strlen (s);
+  unsigned ll = (unsigned)(strlen(l));
+  unsigned sl = (unsigned)(strlen(s));
 
   if (ll > sl)
     return false;
@@ -847,7 +847,7 @@ parse_tag (const char **pp, const char *end, hb_tag_t *tag)
   if (p == *pp || *pp - p > 4)
     return false;
 
-  *tag = hb_tag_from_string (p, *pp - p);
+  *tag = (int)(hb_tag_from_string (p, (int)(*pp - p)));
 
   if (quote)
   {
@@ -967,7 +967,7 @@ hb_feature_from_string (const char *str, int len,
   hb_feature_t feat;
 
   if (len < 0)
-    len = strlen (str);
+    len = (int)(strlen (str));
 
   if (likely (parse_one_feature (&str, str + len, &feat)))
   {
@@ -1039,7 +1039,7 @@ parse_variation_value (const char **pp, const char *end, hb_variation_t *variati
   double v;
   if (unlikely (!hb_parse_double (pp, end, &v))) return false;
 
-  variation->value = v;
+  variation->value = (float)(v);
   return true;
 }
 
@@ -1079,7 +1079,7 @@ hb_variation_from_string (const char *str, int len,
   hb_variation_t var;
 
   if (len < 0)
-    len = strlen (str);
+    len = (int)(strlen (str));
 
   if (likely (parse_one_variation (&str, str + len, &var)))
   {

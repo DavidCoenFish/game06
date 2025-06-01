@@ -1364,7 +1364,7 @@ struct cff1
 	str_len = ubyte_str.length;
       }
       if (!str_len) return false;
-      unsigned int len = hb_min (buf_len - 1, str_len);
+      unsigned int len = (unsigned int)(hb_min (buf_len - 1, str_len));
       strncpy_s (buf, 128, (const char*)str, len);
       buf[len] = '\0';
       return true;
@@ -1375,7 +1375,7 @@ struct cff1
     {
       if (unlikely (!is_valid ())) return false;
       if (is_CID()) return false;
-      if (len < 0) len = strlen (name);
+      if (len < 0) len = (int)(strlen (name));
       if (unlikely (!len)) return false;
 
     retry:
