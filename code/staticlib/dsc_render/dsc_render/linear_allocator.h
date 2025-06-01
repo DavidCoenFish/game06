@@ -40,7 +40,7 @@
 // Http://go.microsoft.com/fwlink/?LinkID=615561
 // --------------------------------------------------------------------------------------
 #pragma once
-#include <dsc_common/common.h>
+#include <dsc_common/dsc_common.h>
 
 #include <atomic>
 

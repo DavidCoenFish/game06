@@ -45,9 +45,11 @@ void DscRenderResource::ShaderConstantBuffer::SetConstantBufferData(
 		auto& constant_buffer =* _array_constant_buffer[in_index];
 		const void* const data = &in_data[0];
 		constant_buffer.UpdateData(
-			data,
-			sizeof(float) * in_data.size()
-			);
+			data
+#if defined(_DEBUG)
+			,sizeof(float) * in_data.size()
+#endif
+		);
 	}
 	return;
 }

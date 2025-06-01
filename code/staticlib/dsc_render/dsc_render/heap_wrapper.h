@@ -1,5 +1,5 @@
 #pragma once
-#include <dsc_common/common.h>
+#include <dsc_common/dsc_common.h>
 #include "i_resource.h"
 
 namespace DscRender

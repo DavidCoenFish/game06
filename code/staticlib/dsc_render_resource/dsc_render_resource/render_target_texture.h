@@ -1,5 +1,5 @@
 #pragma once
-#include <dsc_common/common.h>
+#include <dsc_common/dsc_common.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render/i_resource.h>
 
