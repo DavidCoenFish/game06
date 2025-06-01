@@ -100,7 +100,7 @@
 
 .CommonVcproject = [
         .ProjectInputPathsRecurse   = true
-#define DEVELOPMENT_BUILD_CMD
+//#define DEVELOPMENT_BUILD_CMD
 #if DEVELOPMENT_BUILD_CMD
         .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
         .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"

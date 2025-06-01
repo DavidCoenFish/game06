@@ -1,45 +1,8 @@
 - text
-- ?version project
+- ?version info
+- ?dsc_dag
 - ?draw dag triangle (dont render unless input changed)
 - ?ui
 
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 
-
-harf_buzz debug
-G:\bin\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\CL.exe 
-/c 
-/IG:\development\game05\engine\sdk\harf_buzz\Include 
-/IG:\development\game05\engine\sdk\free_type\Include 
-/I"C:\Program Files (x86)\Visual Leak Detector\include" 
-/ZI 
-/JMC 
-/nologo 
-/W3 
-/WX- 
-/diagnostics:column 
-/sdl 
-/Od 
-/D _DEBUG 
-/D _LIB 
-/D HAVE_FREETYPE 
-/D _UNICODE 
-/D UNICODE 
-/Gm- 
-/EHsc 
-/RTC1 
-/MDd 
-/GS 
-/fp:precise 
-/permissive- 
-/Zc:wchar_t 
-/Zc:forScope 
-/Zc:inline 
-/Fo"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\intermediate\\" 
-/Fd"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\output\harf_buzz.pdb" 
-/external:W3 
-/Gd 
-/TP 
-/FC 
-/errorReport:prompt 
-"Source\hb-aat-layout.cc"

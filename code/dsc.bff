@@ -38,18 +38,20 @@ VSSolution("solution")
         "dsc_common_project", 
         "dsc_render_project", 
         "dsc_render_resource_project", 
+        "dsc_text_project", 
         "dsc_windows_project", 
         "sdk_free_type_project",
         "sdk_harf_buzz_project",
 
         //applications
         "render_target_project",
+        "render_text_project",
         "render_texture_project",
         "render_triangle_project",
         "unit_test_project", 
         }
     //.SolutionBuildProject = "unit_test_project"
-    .SolutionBuildProject = "sdk_harf_buzz_project"
+    .SolutionBuildProject = "dsc_text_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            
@@ -64,6 +66,7 @@ VSSolution("solution")
                 "dsc_common_project",
                 "dsc_render_project",
                 "dsc_render_resource_project",
+                "dsc_text_project",
                 "dsc_windows_project",
                 "sdk_free_type_project",
                 "sdk_harf_buzz_project",
@@ -76,6 +79,7 @@ VSSolution("solution")
             .Path           = "application"
             .Projects       = { 
                 "render_target_project",
+                "render_text_project",
                 "render_texture_project",
                 "render_triangle_project", 
                 "unit_test_project" 

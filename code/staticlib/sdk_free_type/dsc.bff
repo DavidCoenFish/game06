@@ -17,18 +17,16 @@
 
 {
     .ConfigurationArray = {}
-    {            
+    ForEach (.Item in ^ConfigurationArray)
+    {
+        .Needle = "debug"
         .Config = [
-            Using(.Config_debug_x64)
-            .CompilerOptions    + ' /D "FT_DEBUG_LEVEL_ERROR"'
-            .CompilerOptions    + ' /D "FT_DEBUG_LEVEL_TRACE"'
-            .CompilerOptions    + ' /D "FT2_BUILD_LIBRARY"'
-        ]
-        ^ConfigurationArray + .Config
-    }
-    {            
-        .Config = [
-            Using(.Config_release_x64)
+            Using(.Item)
+            If (.Config == .Needle)
+            {
+                ^CompilerOptions    + ' /D "FT_DEBUG_LEVEL_ERROR"'
+                ^CompilerOptions    + ' /D "FT_DEBUG_LEVEL_TRACE"'
+            }
             .CompilerOptions    + ' /D "FT2_BUILD_LIBRARY"'
         ]
         ^ConfigurationArray + .Config

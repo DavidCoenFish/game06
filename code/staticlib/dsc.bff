@@ -15,6 +15,7 @@
 #include "dsc_common\dsc.bff"
 #include "dsc_render\dsc.bff"
 #include "dsc_render_resource\dsc.bff"
+#include "dsc_text\dsc.bff"
 #include "dsc_windows\dsc.bff"
 #include "sdk_free_type\dsc.bff"
 #include "sdk_harf_buzz\dsc.bff"

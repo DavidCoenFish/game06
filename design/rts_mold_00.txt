@@ -1,0 +1,160 @@
+slime mold rts
+
+start with one building and 10 units, 100 food, near some food. units can collect the food and take it to any building. 
+each unit gathers about 5 food every 10 seconds.
+1000 food at each base location.
+four units selected allows you to build another build, consuming the four units
+one unit allows you to build an add on that must be attached to a building, consuming the unit
+by default, building can create a worker every 10 seconds, costing 50 food. initial health is 25
+building has 100 health, addons have 25 health
+addon attached to a building modify the units built from that building going forward, not including unfinished units. 
+you get a limited number of add ons of each type say 10, not replenished over 3 rounds? but have a lot of differnt addons.
+add on may do things like add mellee attack, reduce cost/time, add attack range, add flight, add move speed, add armour, 
+root into ground (x2 armor, x2 range?), visiblity range, cliff jump, swim, 
+building has six slots for add ons, adjacent addons of the same type can be combined to form ablitites, 2 for passive, 3 for active, with more addons reducing cooldown time
+2 adjacent "extra health" gives passive healing, 3 gives castable heal
+2 adjacent "melle attack" gives splash?
+2 adjacent "armor" gives shields that recover over time
+2 adjacent "range" gives splash, 3  gives gerenade? or tentical reach?
+2 adjacent "projectile", 3 gives snipe? 
+damage over time/ posion
+2 adjacent "flight" speed, 3 for ablity to land and take off?
+cliff jump -> blink
+abilty to transport others?
+root to ground -> burrow
+visiblity range -> see burrowed/ cloaked
+move speed -> boost?
+consume food ablity? vampire? faster gather?
+stun -> neural
+some abblity that ends up allowing garrioned units to leave at other building? or is that default? cliff jump->tepeport
+or would telleporting buildings be more fun. you may get quite the cool down
+
+using both ablities (cliff jump, boost) allows teleport?
+
+
+is there a way to get to neural parrisite? viper grappling shot? damage over time anti air?
+
+all units have default "gather food" slow mellee attach
+
+flying uints can use mellee attacks on other flyers, includeding gather "food"/eat
+
+
+
+aim for 20 addons? reserve on key for making builing, and some/two keys for ablitites? 
+max of two ablities if it takes 3 addons joinded to make an ablity?
+
+to build a unit, the food cost and time to build increase with nb of addons.
+
+can gather food from dead units? can also gather food from alive units, amount of food is production cost minus health
+pathfinding blocked? by dead big units?
+increase trave cost over tiles related to population in the tile, either gound, underground or in sky
+
+all units can gather food?
+all units can be converted to buildings
+building get dimished version of skills of input units. does this allow flying buildings. yes. not very fast and only flying units could drop off food.
+addon get dimished version of skill, but is still attached to building
+
+can buildings use ablitites? if all 4 input units had some ablity. do ablities mix into new ablitites, so a builds still gets the 'w','e' ablitites....
+
+units food gather/ damage to things not dead is half speed of gather food otherwise
+cancling building losses health that was converted to building. damaged units build/ transform slower
+
+
+building can eat your own units for food? slow? a flying building could eat a neural controlled flying building, but may not finish before neural, so eating is a form of damage
+
+building is 4x4 with corners knocked off
+ **
+****
+****
+ **
+add on is 2x2
+**
+**
+unit mostly fills up one square, but as they get more addons (other than cheaper) they gain size. cheaper addon make things smaller/ cheapers/ weaker?
+
+building - make unit, start to eat garrisoned, spit out garrisoned, ablity a, ablity b (if most of units that built building had compatable ablities)
+unit - garrison, ablity a, b, transform to building, transform to attachment [a,b,c,d,.....]
+
+get the audio where your cursor is? buildings sing? (do[c] do[d] do[c]-di[e]-do[d]-do[c])  addons just angry hummm, units make quick (nomnomnomnom) while eating
+cliff jump say "boing"?
+
+big units build a bigger building?
+(max 7 addons)
+ ***
+*****
+*****
+*****
+ ***
+
+(max 8 addons)
+  ****
+  ****
+********
+********
+********
+********
+  ****
+  ****
+
+use hex grid, not squares?
+base (max 6 add ons)
+	* *
+   * * *
+	* *
+addon
+	* *
+	 *
+big base
+	* * *
+   * * * *
+  * * * * *
+   * * * *
+	* * *
+	max 9 addons?
+	  * 
+   * * * *
+	* * *  
+   * * * *
+	  *  
+
+
+is random to get skill of input units on building, but 100% if all four input units have the same skill
+
+can't garrison while making units? and cant make units while garrion? can ungarrison from any building?
+or can't garrison if all buildings are building. can queue up into negative, but need the food to be submitted before you can build. can remove units from build queue
+
+trapped in starter tutorial till killing tutorial host... if you ignore the tutorial instructions the host start to take things seriously and tries to win
+tutorial host otherwise is just a flying building with neural "yeap, i am a flying building in an rts, bet you have never seen that before"
+
+dead bodies can accumulate to block map, can be gather for food or damaged to remove
+
+implementation
+	photoshop style cached tiles of traversal distance maps, invalidate tile on change, and paths using tile
+	density map of population/ slowdown of each cell
+	visiblity map, what each player can currently see, has seen of the map
+	render list units/ buildings and what they are doing.
+	frame state database (unit build, unit move, build building, gather resources, special abblities, camera)
+		state database can rewind (single player's undo/ and multiplay network message stitch in)
+		save to current time, save full database
+		- how to order input from multiple players on same frame? mod order for player index?
+
+
+extern to input is the change id of the frame input- only have what needs to be saved in the input database, but have extra data for each frame like the change id
+frame change id array std::vector<{int byte stream offset, int change id}>
+input database
+	initial config, engine version, game mode, map id, initial nb players? starting pos? bytestream length
+	byte stream of [command length, id, data....][command length, ...
+	0 frame id [4 bytes]
+	1 set selection self, unit id
+	2 add selection self, unit id
+	3 set selection generic, player count, player id, unit count, units
+	2 build drone, unit id
+	3 selected unit command gather
+	4 selected unit command gather target coord
+	5 set building waypoint
+	6 select unit move
+	6 select unit attack move 
+
+
+snapshot
+	frame id, 
