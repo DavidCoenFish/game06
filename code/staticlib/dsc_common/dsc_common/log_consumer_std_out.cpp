@@ -1,4 +1,4 @@
-#include "common.h"
+#include <dsc_common\dsc_common.h>
 #include "log_consumer_std_out.h"
 
 void DscCommon::LogConsumerStdOut::AddMessage(const DscCommon::LogLevel in_level, const std::string& in_message)

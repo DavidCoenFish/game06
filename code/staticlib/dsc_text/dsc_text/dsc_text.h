@@ -1,11 +1,5 @@
 #pragma once
-#include <dsc_common/common.h>
+#include <dsc_common/dsc_common.h>
 
-#define LOG_TOPIC_DSC_WINDOWS "DSC_WINDOWS"
-
-// this didn't work?
-//#define DSC_LOG_WINDOWS_ERROR(FORMAT, ...)		DSC_LOG_ERROR(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
-//#define DSC_LOG_WINDOWS_WARNING(FORMAT, ...)	DSC_LOG_WARNING(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
-//#define DSC_LOG_WINDOWS_INFO(FORMAT, ...)		DSC_LOG_INFO(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
-//#define DSC_LOG_WINDOWS_DIAGNOSTIC(FORMAT, ...)	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
+#define LOG_TOPIC_DSC_TEXT "DSC_TEXT"
 

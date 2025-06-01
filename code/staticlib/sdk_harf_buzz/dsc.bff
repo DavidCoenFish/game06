@@ -16,18 +16,17 @@
     ^SolutionItemArray + .temp
 }
 
-///D "HAVE_FREETYPE"
-
 {
-    // had a go at modifying harf_buzz to c++17, but was rather loud, so just it's default compilation flags, but with warnings as errors
     .ConfigurationArray = {}
-    {            
+    ForEach (.Item in ^ConfigurationArray)
+    {
+        .NeedleDebug = "debug"
+        .NeedleRelease = "release"
         .Config = [
-            Using(.Config_debug_x64)
-            .CompilerOptions    = '/c'
-                                //+ ' /IG:\development\game05\engine\sdk\harf_buzz\Include'
-                                //+ ' /IG:\development\game05\engine\sdk\free_type\Include'
-                                //+ ' /I"C:\Program Files (x86)\Visual Leak Detector\include"'
+            Using(.Item)
+            If (.Config == .NeedleDebug)
+            {
+                ^CompilerOptions = '/c'
                                 + ' /ZI'
                                 + ' /JMC'
                                 + ' /nologo'
@@ -37,7 +36,6 @@
                                 + ' /sdl'
                                 + ' /Od'
                                 + ' /D _DEBUG'
-                                //+ ' /D _LIB'
                                 + ' /D HAVE_FREETYPE'
                                 + ' /D _UNICODE'
                                 + ' /D UNICODE'
@@ -53,23 +51,16 @@
                                 + ' /Zc:forScope'
                                 + ' /Zc:inline'
                                 + ' /Fo"%2"'
-                                //+ ' /Fd"G:\development\game05\engine\..\build\harf_buzz\x64\Debug\output\harf_buzz.pdb"'
                                 + ' /external:W3'
                                 + ' /Gd'
                                 + ' /TP'
                                 + ' /FC'
                                 + ' /errorReport:prompt'
                                 + ' "%1"'
-        ]
-        ^ConfigurationArray + .Config
-    }
-    {            
-        .Config = [
-            Using(.Config_release_x64)
-            .CompilerOptions    = '/c'
-                                //+ ' /IG:\development\game05\engine\sdk\harf_buzz\Include 
-                                //+ ' /IG:\development\game05\engine\sdk\free_type\Include 
-                                //+ ' /I"C:\Program Files (x86)\Visual Leak Detector\include" 
+            }
+            If (.Config == .NeedleRelease)
+            {
+                ^CompilerOptions = '/c'
                                 + ' /Zi'
                                 + ' /nologo'
                                 + ' /W3'
@@ -80,7 +71,6 @@
                                 + ' /Oi'
                                 + ' /GL'
                                 + ' /D NDEBUG'
-                                //+ ' /D _LIB'
                                 + ' /D HAVE_FREETYPE'
                                 + ' /D _UNICODE'
                                 + ' /D UNICODE'
@@ -96,13 +86,15 @@
                                 + ' /Zc:forScope'
                                 + ' /Zc:inline'
                                 + ' /Fo"%2"'
-                                //+ ' /Fd"G:\development\game05\engine\..\build\harf_buzz\x64\Release\output\harf_buzz.pdb" 
                                 + ' /external:W3'
                                 + ' /Gd'
                                 + ' /TP'
                                 + ' /FC'
                                 + ' /errorReport:prompt'
                                 + ' "%1"'
+            }
+            
+            .CompilerOptions    + ' /D "FT2_BUILD_LIBRARY"'
         ]
         ^ConfigurationArray + .Config
     }

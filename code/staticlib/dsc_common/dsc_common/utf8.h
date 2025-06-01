@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <dsc_common\dsc_common.h>
 
 namespace DscCommon
 {

@@ -1,4 +1,4 @@
-#include "common.h"
+#include <dsc_common\dsc_common.h>
 #include "log_consumer_output_debug_string.h"
 
 namespace

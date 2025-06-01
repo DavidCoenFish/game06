@@ -1,4 +1,4 @@
-BFF file 'G:\development\game06\code\staticlib\sdk_free_type\dsc.bff' has changed (reparsing will occur).
+BFF file 'G:\development\game06\code\dsc.bff' has changed (reparsing will occur).
 Loading BFF 'G:\development\game06\code\dsc.bff'
 Loading BFF 'G:\development\game06\code\fbuild\dsc.bff'
 Loading BFF 'G:\development\game06\code\fbuild\visualstudio\visualstudio.bff'
@@ -7,6 +7,7 @@ Loading BFF 'G:\development\game06\code\fbuild\windows\windows.bff'
 Loading BFF 'G:\development\game06\code\fbuild\windows\windows10sdk.bff'
 Loading BFF 'G:\development\game06\code\staticlib\dsc.bff'
 Loading BFF 'G:\development\game06\code\staticlib\dsc_common\dsc.bff'
+Loading BFF 'G:\development\game06\code\staticlib\dsc_dag\dsc.bff'
 Loading BFF 'G:\development\game06\code\staticlib\dsc_render\dsc.bff'
 Loading BFF 'G:\development\game06\code\staticlib\dsc_render_resource\dsc.bff'
 Loading BFF 'G:\development\game06\code\staticlib\dsc_text\dsc.bff'
@@ -27,33 +28,12 @@ Additional library 'user32.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
 Additional library 'D3d12.lib' assumed to be 'C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64\D3d12.lib'
 Additional library 'DXGI.lib' assumed to be 'C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64\DXGI.lib'
 Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64\dxguid.lib'
-8> Dir: 'G:\development\game06\code\staticlib\dsc_render_resource\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (25 files)
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc.bff
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer_info.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer_info.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\frame.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\frame.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\geometry_generic.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\geometry_generic.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\render_target_texture.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\render_target_texture.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_constant_buffer.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_constant_buffer.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_pipeline_state_data.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_pipeline_state_data.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource_info.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource_info.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access.h
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access_info.cpp
- - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access_info.h
-1> Dir: 'G:\development\game06\code\staticlib\dsc_common\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (25 files)
+1> Dir: 'G:\development\game06\code\staticlib\dsc_dag\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (3 files)
+ - G:\development\game06\code\staticlib\dsc_dag\dsc.bff
+ - G:\development\game06\code\staticlib\dsc_dag\dsc_dag\dsc_text.cpp
+ - G:\development\game06\code\staticlib\dsc_dag\dsc_dag\dsc_text.h
+1> -Build: 0 ms	G:\development\game06\code\staticlib\dsc_dag\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+4> Dir: 'G:\development\game06\code\staticlib\dsc_common\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (25 files)
  - G:\development\game06\code\staticlib\dsc_common\dsc.bff
  - G:\development\game06\code\staticlib\dsc_common\dsc_common\common.cpp
  - G:\development\game06\code\staticlib\dsc_common\dsc_common\common.h
@@ -79,7 +59,48 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\staticlib\dsc_common\dsc_common\utf8.h
  - G:\development\game06\code\staticlib\dsc_common\dsc_common\vector_float4.cpp
  - G:\development\game06\code\staticlib\dsc_common\dsc_common\vector_float4.h
-6> Dir: 'G:\development\game06\code\application\unit_test\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (15 files)
+3> Dir: 'G:\development\game06\code\staticlib\dsc_render_resource\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (25 files)
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc.bff
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer_info.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\constant_buffer_info.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\frame.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\frame.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\geometry_generic.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\geometry_generic.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\render_target_texture.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\render_target_texture.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_constant_buffer.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_constant_buffer.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_pipeline_state_data.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_pipeline_state_data.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource_info.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\shader_resource_info.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access.h
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access_info.cpp
+ - G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource\unordered_access_info.h
+4> -Build: 0 ms	G:\development\game06\code\staticlib\dsc_common\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+8> Dir: 'G:\development\game06\code\application\render_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (11 files)
+ - G:\development\game06\code\application\render_text\dsc.bff
+ - G:\development\game06\code\application\render_text\shader\present_interpolant.hlsli
+ - G:\development\game06\code\application\render_text\shader\present_ps.hlsl
+ - G:\development\game06\code\application\render_text\shader\present_vs.hlsl
+ - G:\development\game06\code\application\render_text\shader\triangle_interpolant.hlsli
+ - G:\development\game06\code\application\render_text\shader\triangle_ps.hlsl
+ - G:\development\game06\code\application\render_text\shader\triangle_vs.hlsl
+ - G:\development\game06\code\application\render_text\source\application.cpp
+ - G:\development\game06\code\application\render_text\source\application.h
+ - G:\development\game06\code\application\render_text\source\main.cpp
+ - G:\development\game06\code\application\render_text\source\main.h
+3> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_render_resource\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+8> -Build: 1 ms	G:\development\game06\code\application\render_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
+2> Dir: 'G:\development\game06\code\application\unit_test\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (15 files)
  - G:\development\game06\code\application\unit_test\dsc.bff
  - G:\development\game06\code\application\unit_test\source\main.cpp
  - G:\development\game06\code\application\unit_test\source\main.h
@@ -95,22 +116,27 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\application\unit_test\source\test\std_map.h
  - G:\development\game06\code\application\unit_test\source\test_util.cpp
  - G:\development\game06\code\application\unit_test\source\test_util.h
-3> Dir: 'G:\development\game06\code\application\render_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (11 files)
- - G:\development\game06\code\application\render_text\dsc.bff
- - G:\development\game06\code\application\render_text\shader\present_interpolant.hlsli
- - G:\development\game06\code\application\render_text\shader\present_ps.hlsl
- - G:\development\game06\code\application\render_text\shader\present_vs.hlsl
- - G:\development\game06\code\application\render_text\shader\triangle_interpolant.hlsli
- - G:\development\game06\code\application\render_text\shader\triangle_ps.hlsl
- - G:\development\game06\code\application\render_text\shader\triangle_vs.hlsl
- - G:\development\game06\code\application\render_text\source\application.cpp
- - G:\development\game06\code\application\render_text\source\application.h
- - G:\development\game06\code\application\render_text\source\main.cpp
- - G:\development\game06\code\application\render_text\source\main.h
-8> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_render_resource\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-1> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_common\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-6> -Build: 1 ms	G:\development\game06\code\application\unit_test\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-5> Dir: 'G:\development\game06\code\application\render_texture\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (8 files)
+4> VCXProject: G:\development\game06\code\staticlib\dsc_dag\dsc_dag.vcxproj
+2> -Build: 1 ms	G:\development\game06\code\application\unit_test\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+7> Dir: 'G:\development\game06\code\staticlib\dsc_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (3 files)
+ - G:\development\game06\code\staticlib\dsc_text\dsc.bff
+ - G:\development\game06\code\staticlib\dsc_text\dsc_text\dsc_text.cpp
+ - G:\development\game06\code\staticlib\dsc_text\dsc_text\dsc_text.h
+7> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+1> Dir: 'G:\development\game06\code\application\render_target\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (11 files)
+ - G:\development\game06\code\application\render_target\dsc.bff
+ - G:\development\game06\code\application\render_target\shader\present_interpolant.hlsli
+ - G:\development\game06\code\application\render_target\shader\present_ps.hlsl
+ - G:\development\game06\code\application\render_target\shader\present_vs.hlsl
+ - G:\development\game06\code\application\render_target\shader\triangle_interpolant.hlsli
+ - G:\development\game06\code\application\render_target\shader\triangle_ps.hlsl
+ - G:\development\game06\code\application\render_target\shader\triangle_vs.hlsl
+ - G:\development\game06\code\application\render_target\source\application.cpp
+ - G:\development\game06\code\application\render_target\source\application.h
+ - G:\development\game06\code\application\render_target\source\main.cpp
+ - G:\development\game06\code\application\render_target\source\main.h
+1> -Build: 1 ms	G:\development\game06\code\application\render_target\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
+8> Dir: 'G:\development\game06\code\application\render_texture\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (8 files)
  - G:\development\game06\code\application\render_texture\dsc.bff
  - G:\development\game06\code\application\render_texture\shader\test_interpolant.hlsli
  - G:\development\game06\code\application\render_texture\shader\test_ps.hlsl
@@ -119,13 +145,7 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\application\render_texture\source\application.h
  - G:\development\game06\code\application\render_texture\source\main.cpp
  - G:\development\game06\code\application\render_texture\source\main.h
-3> -Build: 1 ms	G:\development\game06\code\application\render_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
-7> Dir: 'G:\development\game06\code\staticlib\dsc_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (2 files)
- - G:\development\game06\code\staticlib\dsc_text\dsc.bff
- - G:\development\game06\code\staticlib\dsc_text\dsc_text\dsc_text.h
-5> -Build: 1 ms	G:\development\game06\code\application\render_texture\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
-7> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_text\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-1> Dir: 'G:\development\game06\code\staticlib\dsc_render\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (32 files)
+2> Dir: 'G:\development\game06\code\staticlib\dsc_render\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (32 files)
  - G:\development\game06\code\staticlib\dsc_render\dsc.bff
  - G:\development\game06\code\staticlib\dsc_render\dsc_render\d3dx12.h
  - G:\development\game06\code\staticlib\dsc_render\dsc_render\device_resources.cpp
@@ -158,16 +178,9 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\staticlib\dsc_render\dsc_render\resource_list.h
  - G:\development\game06\code\staticlib\dsc_render\dsc_render\screen_size_resources.cpp
  - G:\development\game06\code\staticlib\dsc_render\dsc_render\screen_size_resources.h
-6> Dir: 'G:\development\game06\code\staticlib\dsc_windows\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (6 files)
- - G:\development\game06\code\staticlib\dsc_windows\dsc.bff
- - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\dsc_windows.h
- - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\i_window_application.cpp
- - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\i_window_application.h
- - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\window_helper.cpp
- - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\window_helper.h
-1> -Build: 0 ms	G:\development\game06\code\staticlib\dsc_render\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-6> -Build: 0 ms	G:\development\game06\code\staticlib\dsc_windows\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-8> Dir: 'G:\development\game06\code\application\render_triangle\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (8 files)
+2> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_render\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+8> -Build: 1 ms	G:\development\game06\code\application\render_texture\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
+3> Dir: 'G:\development\game06\code\application\render_triangle\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (8 files)
  - G:\development\game06\code\application\render_triangle\dsc.bff
  - G:\development\game06\code\application\render_triangle\shader\test_interpolant.hlsli
  - G:\development\game06\code\application\render_triangle\shader\test_ps.hlsl
@@ -176,31 +189,23 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\application\render_triangle\source\application.h
  - G:\development\game06\code\application\render_triangle\source\main.cpp
  - G:\development\game06\code\application\render_triangle\source\main.h
-8> -Build: 1 ms	G:\development\game06\code\application\render_triangle\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
-3> Dir: 'G:\development\game06\code\application\render_target\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r' (11 files)
- - G:\development\game06\code\application\render_target\dsc.bff
- - G:\development\game06\code\application\render_target\shader\present_interpolant.hlsli
- - G:\development\game06\code\application\render_target\shader\present_ps.hlsl
- - G:\development\game06\code\application\render_target\shader\present_vs.hlsl
- - G:\development\game06\code\application\render_target\shader\triangle_interpolant.hlsli
- - G:\development\game06\code\application\render_target\shader\triangle_ps.hlsl
- - G:\development\game06\code\application\render_target\shader\triangle_vs.hlsl
- - G:\development\game06\code\application\render_target\source\application.cpp
- - G:\development\game06\code\application\render_target\source\application.h
- - G:\development\game06\code\application\render_target\source\main.cpp
- - G:\development\game06\code\application\render_target\source\main.h
-3> -Build: 1 ms	G:\development\game06\code\application\render_target\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
-7> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_common\dsc_common.vcxproj
-5> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource.vcxproj
-1> -Build: 1 ms	G:\development\game06\code\application\unit_test\unit_test.vcxproj
-8> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_text\dsc_text.vcxproj
-6> -Build: 1 ms	G:\development\game06\code\application\render_text\render_text.vcxproj
-3> -Build: 1 ms	G:\development\game06\code\application\render_texture\render_texture.vcxproj
-7> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_render\dsc_render.vcxproj
-5> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_windows\dsc_windows.vcxproj
-1> -Build: 1 ms	G:\development\game06\code\application\render_triangle\render_triangle.vcxproj
-8> -Build: 0 ms	G:\development\game06\code\application\render_target\render_target.vcxproj
-4> Dir: 'G:\development\game06\code\staticlib\sdk_harf_buzz\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (334 files)
+3> -Build: 1 ms	G:\development\game06\code\application\render_triangle\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig<*.hlsl<*.hlsli|r
+7> Dir: 'G:\development\game06\code\staticlib\dsc_windows\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (6 files)
+ - G:\development\game06\code\staticlib\dsc_windows\dsc.bff
+ - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\dsc_windows.h
+ - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\i_window_application.cpp
+ - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\i_window_application.h
+ - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\window_helper.cpp
+ - G:\development\game06\code\staticlib\dsc_windows\dsc_windows\window_helper.h
+7> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_windows\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+1> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_common\dsc_common.vcxproj
+3> VCXProject: G:\development\game06\code\staticlib\dsc_text\dsc_text.vcxproj
+8> -Build: 1 ms	G:\development\game06\code\application\render_text\render_text.vcxproj
+2> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource.vcxproj
+1> -Build: 1 ms	G:\development\game06\code\application\render_texture\render_texture.vcxproj
+8> -Build: 1 ms	G:\development\game06\code\staticlib\dsc_windows\dsc_windows.vcxproj
+1> -Build: 1 ms	G:\development\game06\code\application\render_target\render_target.vcxproj
+5> Dir: 'G:\development\game06\code\staticlib\sdk_harf_buzz\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (334 files)
  - G:\development\game06\code\staticlib\sdk_harf_buzz\dsc.bff
  - G:\development\game06\code\staticlib\sdk_harf_buzz\sdk_harf_buzz\hb-aat-layout.h
  - G:\development\game06\code\staticlib\sdk_harf_buzz\sdk_harf_buzz\hb-aat.h
@@ -535,9 +540,16 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\staticlib\sdk_harf_buzz\source\hb-version.h
  - G:\development\game06\code\staticlib\sdk_harf_buzz\source\hb.h
  - G:\development\game06\code\staticlib\sdk_harf_buzz\source\hb.hh
-4> -Build: 6 ms	G:\development\game06\code\staticlib\sdk_harf_buzz\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-6> -Build: 1 ms	G:\development\game06\code\staticlib\sdk_harf_buzz\sdk_harf_buzz.vcxproj
-2> Dir: 'G:\development\game06\code\staticlib\sdk_free_type\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (478 files)
+2> -Build: 3 ms	G:\development\game06\code\application\unit_test\unit_test.vcxproj
+5> -Build: 7 ms	G:\development\game06\code\staticlib\sdk_harf_buzz\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+8> -Build: 2 ms	G:\development\game06\code\application\render_triangle\render_triangle.vcxproj
+7> -Build: 4 ms	G:\development\game06\code\staticlib\dsc_render\dsc_render.vcxproj
+3> VCXProject: G:\development\game06\code\staticlib\dsc_text\dsc_text.vcxproj.filters
+4> VCXProject: G:\development\game06\code\staticlib\dsc_dag\dsc_dag.vcxproj.filters
+1> -Build: 2 ms	G:\development\game06\code\staticlib\sdk_harf_buzz\sdk_harf_buzz.vcxproj
+3> -Build: 8 ms	G:\development\game06\code\staticlib\dsc_text\dsc_text.vcxproj
+4> -Build: 10 ms	G:\development\game06\code\staticlib\dsc_dag\dsc_dag.vcxproj
+6> Dir: 'G:\development\game06\code\staticlib\sdk_free_type\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r' (478 files)
  - G:\development\game06\code\staticlib\sdk_free_type\dsc.bff
  - G:\development\game06\code\staticlib\sdk_free_type\ft2build.h
  - G:\development\game06\code\staticlib\sdk_free_type\sdk_free_type\config\ftconfig.h
@@ -1016,49 +1028,50 @@ Additional library 'dxguid.lib' assumed to be 'C:\Program Files (x86)\Windows Ki
  - G:\development\game06\code\staticlib\sdk_free_type\source\winfonts\fnterrs.h
  - G:\development\game06\code\staticlib\sdk_free_type\source\winfonts\winfnt.c
  - G:\development\game06\code\staticlib\sdk_free_type\source\winfonts\winfnt.h
-2> -Build: 12 ms	G:\development\game06\code\staticlib\sdk_free_type\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
-3> -Build: 1 ms	G:\development\game06\code\staticlib\sdk_free_type\sdk_free_type.vcxproj
-7> -Build: 0 ms	G:\development\game06\code\solution.sln
-5> -Build: 0 ms	all
+6> -Build: 14 ms	G:\development\game06\code\staticlib\sdk_free_type\|*.cpp<*.hpp<*.cxx<*.hxx<*.c<*.h<*.cc<*.hh<*.cp<*.hp<*.cs<*.inl<*.bff<*.rc<*.resx<*.m<*.mm<*.cu<*.asm<*.s<*.natvis<*.editorconfig|r
+2> -Build: 2 ms	G:\development\game06\code\staticlib\sdk_free_type\sdk_free_type.vcxproj
+5> SLN: G:\development\game06\code\solution.sln
+5> -Build: 2 ms	G:\development\game06\code\solution.sln
+8> -Build: 0 ms	all
 Saving DepGraph '..\build\dsc.fdb'
-Saving DepGraph Complete in 0.002s
+Saving DepGraph Complete in 0.001s
 --- Most Expensive ----------------------------------------------
 Time (s)  Name:
-0.012     G:\development\game06\code\staticlib\sdk_free_type\ (recursive), files: 478 
-0.006     G:\development\game06\code\staticlib\sdk_harf_buzz\ (recursive), files: 334 
-0.001     G:\development\game06\code\application\render_text\render_text.vcxproj
-0.001     G:\development\game06\code\application\render_text\ (recursive), files: 11 
-0.001     G:\development\game06\code\application\render_texture\render_texture.vcxproj
-0.001     G:\development\game06\code\application\render_triangle\render_triangle.vcxproj
-0.001     G:\development\game06\code\application\render_triangle\ (recursive), files: 8 
-0.001     G:\development\game06\code\application\unit_test\unit_test.vcxproj
+0.014     G:\development\game06\code\staticlib\sdk_free_type\ (recursive), files: 478 
+0.010     G:\development\game06\code\staticlib\dsc_dag\dsc_dag.vcxproj
+0.008     G:\development\game06\code\staticlib\dsc_text\dsc_text.vcxproj
+0.007     G:\development\game06\code\staticlib\sdk_harf_buzz\ (recursive), files: 334 
+0.004     G:\development\game06\code\staticlib\dsc_render\dsc_render.vcxproj
+0.003     G:\development\game06\code\application\unit_test\unit_test.vcxproj
+0.002     G:\development\game06\code\solution.sln
+0.002     G:\development\game06\code\staticlib\sdk_harf_buzz\sdk_harf_buzz.vcxproj
+0.002     G:\development\game06\code\staticlib\sdk_free_type\sdk_free_type.vcxproj
+0.002     G:\development\game06\code\application\render_triangle\render_triangle.vcxproj
 0.001     G:\development\game06\code\application\render_texture\ (recursive), files: 8 
-0.001     G:\development\game06\code\staticlib\dsc_common\dsc_common.vcxproj
-0.001     G:\development\game06\code\application\render_target\ (recursive), files: 11 
-0.001     G:\development\game06\code\staticlib\dsc_render\dsc_render.vcxproj
+0.001     G:\development\game06\code\application\render_text\ (recursive), files: 11 
+0.001     G:\development\game06\code\application\unit_test\ (recursive), files: 15 
+0.001     G:\development\game06\code\application\render_triangle\ (recursive), files: 8 
+0.001     G:\development\game06\code\staticlib\dsc_render\ (recursive), files: 32 
 0.001     G:\development\game06\code\staticlib\dsc_render_resource\dsc_render_resource.vcxproj
 0.001     G:\development\game06\code\staticlib\dsc_render_resource\ (recursive), files: 25 
-0.001     G:\development\game06\code\staticlib\dsc_text\dsc_text.vcxproj
-0.001     G:\development\game06\code\staticlib\dsc_text\ (recursive), files: 2 
+0.001     G:\development\game06\code\application\render_texture\render_texture.vcxproj
+0.001     G:\development\game06\code\staticlib\dsc_text\ (recursive), files: 3 
 0.001     G:\development\game06\code\staticlib\dsc_windows\dsc_windows.vcxproj
-0.001     G:\development\game06\code\staticlib\sdk_free_type\sdk_free_type.vcxproj
-0.001     G:\development\game06\code\application\unit_test\ (recursive), files: 15 
-0.001     G:\development\game06\code\staticlib\sdk_harf_buzz\sdk_harf_buzz.vcxproj
 
 --- Summary -----------------------------------------------------
                                  /----- Cache -----\
 Build:          Seen    Built   Hit     Miss    Store   CPU
- - Directory  : 12      12      -       -       -       0.026s
+ - Directory  : 13      13      -       -       -       0.030s
  - Alias      : 1       1       -       -       -       0.000s
- - VCXProj    : 12      12      -       -       -       0.011s
- - SLN        : 1       1       -       -       -       0.000s
+ - VCXProj    : 13      13      -       -       -       0.037s
+ - SLN        : 1       1       -       -       -       0.002s
 Cache:
  - Hits       : 0 (0.0 %)
  - Misses     : 0
  - Stores     : 0
 Time:
- - Real       : 0.020s
- - Local CPU  : 0.037s (1.9:1)
+ - Real       : 0.023s
+ - Local CPU  : 0.069s (3.0:1)
  - Remote CPU : 0.000s (0.0:1)
 -----------------------------------------------------------------
 FBuild: OK: all

@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="dsc.bff" />
-    <CustomBuild Include="dsc_common\common.cpp" />
-    <CustomBuild Include="dsc_common\common.h" />
+    <CustomBuild Include="dsc_common\dsc_common.cpp" />
+    <CustomBuild Include="dsc_common\dsc_common.h" />
     <CustomBuild Include="dsc_common\file_overlay_local.cpp" />
     <CustomBuild Include="dsc_common\file_overlay_local.h" />
     <CustomBuild Include="dsc_common\file_system.cpp" />
@@ -82,12 +82,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <BuildLog>
-    <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
+      <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <BuildLog>
-    <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
+      <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

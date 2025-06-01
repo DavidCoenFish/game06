@@ -51,7 +51,6 @@
 }
 
 // debug x64
-.Config_debug_x64 = []
 {
     .Config = [
         .Platform = "x64"
@@ -69,11 +68,9 @@
         .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
     ]
     ^ConfigurationArray + .Config
-    ^Config_debug_x64 = .Config
 }
 
 // release x64
-.Config_release_x64 = []
 {
     .Config = [
         .Platform = "x64"
@@ -95,7 +92,6 @@
         .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" "%1"'
     ]
     ^ConfigurationArray + .Config
-    ^Config_release_x64 = .Config
 }
 
 .CommonVcproject = [

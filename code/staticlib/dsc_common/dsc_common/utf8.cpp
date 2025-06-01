@@ -1,4 +1,4 @@
-#include "common.h"
+#include <dsc_common\dsc_common.h>
 #include "utf8.h"
 
 const std::wstring DscCommon::Utf8::Utf8ToUtf16( const std::string& in_utf8 )

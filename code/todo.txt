@@ -6,3 +6,39 @@
 
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 
+
+
+IDagNode
+	MarkDirty // assert on value node
+	AddOutput
+	RemoveOutput
+	SetIndexInput
+	AddInput
+	RemoveInput
+	SetValue // variant/ assert on calculate node
+	GetValue // variant?
+DagNodeCalculate
+	_calculate // callback, std::set<std::shared_ptr<IDagNode>>, std::vector<std::shared_ptr<IDagNode>>
+	_variant // if node is dirty, calculate
+DagNodeValue
+	_mark outputs dirty logic (on value change, on value set, on value not zero, ...?)
+	_variant
+//DagNodeLocaleString // typedef?
+//	GetLocale() // enum? string?
+//	GetString()
+//DagNodeLocale
+//	GetLocale() // enum? string?
+
+//DagComponentOutput
+//	std::set<std::shared_ptr<IDagNode>> _outputList;
+//DagComponentInput
+//	std::set<std::shared_ptr<IDagNode>> _input;
+//	std::vector<std::shared_ptr<IDagNode>> _indexInput;
+
+DagNodeCollection
+	//point of ownership of DagNode? all external ref are void* "tokens"? 
+
+
+a locale system might get queried with a key and give back a DagValueString
+a text renderer, on change of selected locale may be a good time to trigger a release of all the rendered glyphs
+

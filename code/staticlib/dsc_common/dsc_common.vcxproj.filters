@@ -3,10 +3,10 @@
   <ItemGroup>
     <CustomBuild Include="dsc.bff">
     </CustomBuild>
-    <CustomBuild Include="dsc_common\common.cpp">
+    <CustomBuild Include="dsc_common\dsc_common.cpp">
       <Filter>dsc_common</Filter>
     </CustomBuild>
-    <CustomBuild Include="dsc_common\common.h">
+    <CustomBuild Include="dsc_common\dsc_common.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\file_overlay_local.cpp">

@@ -36,6 +36,7 @@ VSSolution("solution")
     .SolutionProjects = {
         //static lib
         "dsc_common_project", 
+        "dsc_dag_project", 
         "dsc_render_project", 
         "dsc_render_resource_project", 
         "dsc_text_project", 
@@ -64,6 +65,7 @@ VSSolution("solution")
             .Path           = "staticlib"
             .Projects       = { 
                 "dsc_common_project",
+                "dsc_dag_project", 
                 "dsc_render_project",
                 "dsc_render_resource_project",
                 "dsc_text_project",

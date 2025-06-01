@@ -32,6 +32,7 @@ typedef unsigned __int64 uint64;
 
 //std lib
 #include <array>
+#include <any>
 #include <cmath>
 #include <codecvt>
 #include <filesystem>
