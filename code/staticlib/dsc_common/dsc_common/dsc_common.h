@@ -42,6 +42,7 @@ typedef unsigned __int64 uint64;
 #include <limits>
 #include <list>
 #include <locale>
+#include <set>
 #include <string>
 #include <vector>
 #include <map>
@@ -81,6 +82,6 @@ typedef unsigned __int64 uint64;
    #define DSC_ASSERT_ALWAYS(MESSAGE) assert(MESSAGE && false)
 #else
    #define DSC_ASSERT(CONDITION, MESSAGE) __noop
-   #define DSC_ASSERT_ALWAYS __noop
+   #define DSC_ASSERT_ALWAYS(MESSAGE) __noop
 #endif
 #define DSC_TODO(MESSAGE, ...) DSC_ASSERT_ALWAYS(MESSAGE)

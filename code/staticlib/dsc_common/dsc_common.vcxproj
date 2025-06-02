@@ -82,12 +82,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <BuildLog>
-      <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
+    <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <BuildLog>
-      <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
+    <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

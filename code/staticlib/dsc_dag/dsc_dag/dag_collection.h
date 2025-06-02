@@ -1,25 +1,28 @@
+#pragma once
 #include <dsc_common\dsc_common.h>
+#include <dsc_dag\i_dag_node.h>
 
 namespace DscDag
 {
-	typedef void* NodeToken;
-	constexpr NodeToken NullToken = nullptr;
+	typedef std::function<void(std::any&, std::set<NodeToken>, std::vector<NodeToken>)> TCalculateFunction;
 
-	class IDagNode
+	class DagCollection
 	{
 	public:
-		virtual ~IDagNode() {}
+		NodeToken CreateValue(std::any& in_value);
+		NodeToken CreateCalculate(const TCalculateFunction& in_calculate);
 
-		//assert on value node
-		virtual void MarkDirty() = 0;
-		virtual void AddOutput(NodeToken in_nodeID) = 0;
-		virtual void RemoveOutput(NodeToken in_nodeID) = 0;
-		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) = 0;
-		virtual void AddInput(NodeToken in_nodeID) = 0;
-		virtual void RemoveInput(NodeToken in_nodeID) = 0;
-		virtual void SetValue(const std::any& value) = 0;
-		// not const as calculate may trigger state change
-		virtual const std::any& GetValue() = 0;
+		void LinkNodes(NodeToken in_input, NodeToken in_output);
+		void LinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output);
 
+		void UnlinkNodes(NodeToken in_input, NodeToken in_output);
+		void UnlinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output);
+
+		// don't wnat to keep passing around a DagCollection just to get value from nodes?
+		//std::any& GetValue(NodeToken in_input);
+		//void SetValue(NodeToken in_input, std::any& in_value);
+
+	private:
+		std::set<std::unique_ptr<IDagNode>> _nodes = {};
 	}; // IDagNode
 } //DscDag
