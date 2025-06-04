@@ -1,6 +1,10 @@
 #include <dsc_dag/dag_node_value.h>
 
-DscDag::DagNodeValue::DagNodeValue(std::any& in_value)
+namespace
+{
+}
+
+DscDag::DagNodeValue::DagNodeValue(const std::any& in_value)
 	: _value(in_value)
 {
 	// Nop
@@ -28,12 +32,57 @@ void DscDag::DagNodeValue::RemoveOutput(NodeToken in_nodeID)
 
 void DscDag::DagNodeValue::SetValue(const std::any& in_value)
 {
-#if 0 // provide a callback cmp operator?
-	if (_value == in_value)
+	// bail out if value is already equal
+	if (_value.has_value() && in_value.has_value())
 	{
-		return;
+		if (_value.type() == in_value.type())
+		{
+			if (in_value.type() == typeid(bool))
+			{
+				if (std::any_cast<bool>(_value) == std::any_cast<bool>(in_value))
+				{
+					return;
+				}
+			}
+			else if (in_value.type() == typeid(char))
+			{
+				if (std::any_cast<char>(_value) == std::any_cast<char>(in_value))
+				{
+					return;
+				}
+			}
+			else if (in_value.type() == typeid(double))
+			{
+				if (std::any_cast<double>(_value) == std::any_cast<double>(in_value))
+				{
+					return;
+				}
+			}
+			else if (in_value.type() == typeid(float))
+			{
+				if (std::any_cast<float>(_value) == std::any_cast<float>(in_value))
+				{
+					return;
+				}
+			}
+			else if (in_value.type() == typeid(int))
+			{
+				if (std::any_cast<int>(_value) == std::any_cast<int>(in_value))
+				{
+					return;
+				}
+			}
+			else if (in_value.type() == typeid(std::string))
+			{
+				if (std::any_cast<std::string>(_value) == std::any_cast<std::string>(in_value))
+				{
+					return;
+				}
+			}
+
+		}
 	}
-#endif
+
 	_value = in_value;
 	for (auto& item : _output)
 	{

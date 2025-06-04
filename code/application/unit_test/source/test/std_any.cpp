@@ -59,7 +59,7 @@ const bool TestComparison()
 	//ok = TEST_UTIL_EQUAL(ok, v0.type(), typeid(int));
 	std::any v1 = 1.4f;
 	//ok = TEST_UTIL_EQUAL(ok, v0.type(), typeid(float));
-	//std::cout << v0.type() << std::endl;
+	//std::cout << v0.type().name() << std::endl;
 	//const std::type_info& r0 = v0.type();
 	ok = TEST_UTIL_EQUAL(ok, false, v0.type() == v1.type());
 	ok = TEST_UTIL_EQUAL(ok, true, v0.type() == typeid(int));
@@ -69,7 +69,6 @@ const bool TestComparison()
 	//ok = TEST_UTIL_EQUAL(ok, true, v0 == v2);
 	std::any v3 = {};
 	ok = TEST_UTIL_EQUAL(ok, false, v0.type() == v3.type());
-	//std::count << std::to_string(r0) << std::endl;
 
 	ok = TEST_UTIL_EQUAL(ok, true, std::any_cast<int>(v0) == std::any_cast<int>(v2));
 	ok = TEST_UTIL_EQUAL(ok, 3, std::any_cast<int>(v0));

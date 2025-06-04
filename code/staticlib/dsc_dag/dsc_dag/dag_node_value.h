@@ -7,7 +7,7 @@ namespace DscDag
 	class DagNodeValue : public IDagNode
 	{
 	public:
-		DagNodeValue(std::any& in_value);
+		DagNodeValue(const std::any& in_value);
 
 	private:
 		virtual void AddOutput(NodeToken in_nodeID) override;

@@ -2,7 +2,7 @@
 #include <dsc_dag/dag_node_value.h>
 #include <dsc_dag/dag_node_calculate.h>
 
-DscDag::NodeToken DscDag::DagCollection::CreateValue(std::any& in_value)
+DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value)
 {
 	auto node = std::make_unique<DagNodeValue>(in_value);
 	NodeToken nodeToken = node.get();
@@ -68,7 +68,16 @@ void DscDag::DagCollection::UnlinkIndexNodes(int32 in_index, NodeToken in_input,
 	return;
 }
 
-//std::any& DscDag::DagCollection::GetValue(NodeToken in_input)
-//void DscDag::DagCollection::SetValue(NodeToken in_input, std::any& in_value)
+const std::any& DscDag::DagCollection::GetValue(NodeToken in_input)
+{
+	DSC_ASSERT(nullptr != in_input, "invalid param");
+	return in_input->GetValue();
+}
 
+void DscDag::DagCollection::SetValue(NodeToken in_input, const std::any& in_value)
+{
+	DSC_ASSERT(nullptr != in_input, "invalid param");
+	in_input->SetValue(in_value);
+	return;
+}
 

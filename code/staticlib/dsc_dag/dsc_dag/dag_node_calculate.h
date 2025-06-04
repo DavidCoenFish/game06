@@ -4,7 +4,7 @@
 
 namespace DscDag
 {
-	typedef std::function<void(std::any&, std::set<NodeToken>, std::vector<NodeToken>)> TCalculateFunction;
+	typedef std::function<void(std::any&, std::set<NodeToken>&, std::vector<NodeToken>&)> TCalculateFunction;
 
 	class DagNodeCalculate : public IDagNode
 	{
