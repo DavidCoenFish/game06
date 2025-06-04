@@ -50,7 +50,32 @@ const bool TestPair()
 	ok = TEST_UTIL_EQUAL(ok, false, v0.has_value());
 
 	return ok;
+}
 
+const bool TestComparison()
+{
+	std::any v0 = 3;
+	bool ok = true;
+	//ok = TEST_UTIL_EQUAL(ok, v0.type(), typeid(int));
+	std::any v1 = 1.4f;
+	//ok = TEST_UTIL_EQUAL(ok, v0.type(), typeid(float));
+	//std::cout << v0.type() << std::endl;
+	//const std::type_info& r0 = v0.type();
+	ok = TEST_UTIL_EQUAL(ok, false, v0.type() == v1.type());
+	ok = TEST_UTIL_EQUAL(ok, true, v0.type() == typeid(int));
+	ok = TEST_UTIL_EQUAL(ok, true, v1.type() == typeid(float));
+	std::any v2 = 3;
+	//ok = TEST_UTIL_EQUAL(ok, false, v0 == v1);
+	//ok = TEST_UTIL_EQUAL(ok, true, v0 == v2);
+	std::any v3 = {};
+	ok = TEST_UTIL_EQUAL(ok, false, v0.type() == v3.type());
+	//std::count << std::to_string(r0) << std::endl;
+
+	ok = TEST_UTIL_EQUAL(ok, true, std::any_cast<int>(v0) == std::any_cast<int>(v2));
+	ok = TEST_UTIL_EQUAL(ok, 3, std::any_cast<int>(v0));
+	ok = TEST_UTIL_EQUAL(ok, 3, std::any_cast<int>(v2));
+
+	return ok;
 }
 
 }//namespace
@@ -61,6 +86,7 @@ const bool StdAny()
 	ok &= TestBasic();
 	ok &= TestString();
 	ok &= TestPair();
+	ok &= TestComparison();
 
 	return ok;
 }

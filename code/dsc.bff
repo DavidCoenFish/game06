@@ -52,7 +52,7 @@ VSSolution("solution")
         "unit_test_project", 
         }
     //.SolutionBuildProject = "unit_test_project"
-    .SolutionBuildProject = "dsc_text_project"
+    .SolutionBuildProject = "unit_test_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            

@@ -42,12 +42,13 @@ typedef unsigned __int64 uint64;
 #include <limits>
 #include <list>
 #include <locale>
-#include <set>
-#include <string>
-#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
+#include <string>
+//#include <typeinfo>
+#include <vector>
 
 //D3DX12
 #pragma warning( push )

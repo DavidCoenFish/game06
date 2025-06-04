@@ -117,26 +117,26 @@ Compiler( 'Compiler-VS2019-x64' )
 
     // Compiler
     .Compiler                       = 'Compiler-VS2019-X64'
-    .CommonCompilerOptions          = ' /c'
-                                    + ' /permissive-'
-                                    + ' /GS'
-                                    + ' /W3'
-                                    + ' /Zc:wchar_t'
-                                    + ' /Gm-' 
-                                    + ' /sdl'
-                                    + ' /Zc:inline'
-                                    + ' /fp:precise'
+    .CommonCompilerOptions          = ' /c'                 // Compile Without Linking
+                                    + ' /permissive-'       // This option disables permissive behaviors, and sets the /Zc compiler options for strict conformance
+                                    + ' /GS'                // Buffer Security Check
+                                    //+ ' /GR'                // Enable Run-Time Type Information
+                                    + ' /Zc:wchar_t'        // Parse wchar_t as a built-in type according to the C++ standard.
+                                    + ' /Zc:inline'         // Remove unreferenced COMDAT
+                                    + ' /Zc:forScope'       // Force Conformance in for Loop Scope
+                                    //+ ' /Gm-'             // Enable Minimal Rebuild
+                                    + ' /sdl'               // Enable Additional Security Checks
+                                    + ' /std:c++17'         // Specify Language Standard Version
+                                    + ' /fp:precise'        // Specify floating-point behavior
+                                    + ' /errorReport:prompt' //Report Internal Compiler Errors
+                                    + ' /Gd'                // specifies the __cdecl calling convention for all functions unless marked
+                                    + ' /FC'                // Full path of source code file in diagnostics
+                                    + ' /FS'                // Force Synchronous PDB Writes
+                                    + ' /EHsc'              // C++ standard for exception handling
+                                    + ' /nologo'            // Suppress Startup Banner
+                                    + ' /diagnostics:classic' // Compiler diagnostic options
                                     + ' /D "_UNICODE"' 
                                     + ' /D "UNICODE"'
-                                    + ' /errorReport:prompt'
-                                    + ' /Zc:forScope'
-                                    + ' /Gd'
-                                    + ' /FC'
-                                    + ' /FS'
-                                    + ' /EHsc'
-                                    + ' /nologo'
-                                    + ' /diagnostics:column'
-                                    + ' /std:c++17'
                                     // Warnings
                                     + ' /Wall'              // Enable all warnings (we'll disable those that are not useful)
                                     + ' /WX'                // Warnings as errors

@@ -18,7 +18,7 @@ namespace DscDag
 		void UnlinkNodes(NodeToken in_input, NodeToken in_output);
 		void UnlinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output);
 
-		// don't wnat to keep passing around a DagCollection just to get value from nodes?
+		// don't want to keep passing around a DagCollection just to get value from nodes?
 		//std::any& GetValue(NodeToken in_input);
 		//void SetValue(NodeToken in_input, std::any& in_value);
 
