@@ -1,4 +1,4 @@
-#include "i_resource.h"
+#include <dsc_render/i_resource.h>
 #include "draw_system.h"
 
 #if defined(DRAW_SYSTEM_RESOURCE_ALIVE_COUNT)

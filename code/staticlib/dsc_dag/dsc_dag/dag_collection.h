@@ -33,6 +33,17 @@ namespace DscDag
 			return kData;
 		}
 
+		template <typename TYPE>
+		static void SetValueType(NodeToken in_input, const TYPE in_value)
+		{
+			SetValue(in_input, std::any(in_value));
+		}
+		template <typename TYPE>
+		static void SetValueTypeRef(NodeToken in_input, const TYPE& in_value)
+		{
+			SetValue(in_input, std::any(in_value));
+		}
+
 	private:
 		std::set<std::unique_ptr<IDagNode>> _nodes = {};
 	}; // IDagNode

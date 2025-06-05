@@ -37,6 +37,7 @@ VSSolution("solution")
         //static lib
         "dsc_common_project", 
         "dsc_dag_project", 
+        "dsc_dag_render_project", 
         "dsc_render_project", 
         "dsc_render_resource_project", 
         "dsc_text_project", 
@@ -66,6 +67,7 @@ VSSolution("solution")
             .Projects       = { 
                 "dsc_common_project",
                 "dsc_dag_project", 
+                "dsc_dag_render_project", 
                 "dsc_render_project",
                 "dsc_render_resource_project",
                 "dsc_text_project",
