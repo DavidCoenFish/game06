@@ -1,5 +1,10 @@
 #pragma once
 #include <dsc_common/dsc_common.h>
+#include <dsc_text/i_text_run.h>
 
-#define LOG_TOPIC_DSC_TEXT "DSC_TEXT"
-
+namespace DscText
+{
+	class TextRunText : public ITextRun
+	{
+	};
+}

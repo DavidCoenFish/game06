@@ -38,6 +38,9 @@ namespace DscRenderResource
 			void* in_data
 		);
 
+		//void SetDirty()
+		//void SetRegionDirty(const int32 in_height_low, const int32 in_height_high);
+
 	private:
 		virtual void OnDeviceLost() override;
 		virtual void OnDeviceRestored(
