@@ -86,3 +86,23 @@ typedef unsigned __int64 uint64;
    #define DSC_ASSERT_ALWAYS(MESSAGE) __noop
 #endif
 #define DSC_TODO(MESSAGE, ...) DSC_ASSERT_ALWAYS(MESSAGE)
+
+#define ARRAY_LITERAL_SIZE(DATA) (sizeof(DATA)/sizeof(DATA[0]))
+
+#define TOKEN_PAIR(TOKEN) TOKEN,#TOKEN
+#define ENUM_TOKEN_PAIR(ENUM, TOKEN) ENUM::TOKEN,#TOKEN
+
+template<class ENUM>
+class EnumSoftBind
+{
+public:
+	static const ENUM EnumFromString(const std::string& in_string);
+	static const std::string EnumToString(const ENUM in_enum);
+
+private:
+	EnumSoftBind() = delete;
+	EnumSoftBind(const EnumSoftBind&) = delete;
+	EnumSoftBind(EnumSoftBind&&) = delete;
+	EnumSoftBind& operator=(const EnumSoftBind&) = delete;
+
+};

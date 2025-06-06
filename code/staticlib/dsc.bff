@@ -15,6 +15,7 @@
 #include "dsc_common\dsc.bff"
 #include "dsc_dag\dsc.bff"
 #include "dsc_dag_render\dsc.bff"
+#include "dsc_locale\dsc.bff"
 #include "dsc_render\dsc.bff"
 #include "dsc_render_resource\dsc.bff"
 #include "dsc_text\dsc.bff"

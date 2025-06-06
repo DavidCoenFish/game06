@@ -4,6 +4,7 @@
 namespace DscRender
 {
 	class DrawSystem;
+	class HeapWrapperItem;
 }
 
 namespace DscRenderResource
@@ -16,6 +17,10 @@ namespace DscText
 	class GlyphAtlasTexture
 	{
 	public:
+		GlyphAtlasTexture() = delete;
+		GlyphAtlasTexture& operator=(const GlyphAtlasTexture&) = delete;
+		GlyphAtlasTexture(const GlyphAtlasTexture&) = delete;
+
 		int32 AddIcon(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_4b);
 		int32 AddGlyph(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_1b);
 

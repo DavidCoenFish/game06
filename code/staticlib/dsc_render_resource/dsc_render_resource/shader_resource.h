@@ -38,6 +38,8 @@ namespace DscRenderResource
 			void* in_data
 		);
 
+		// or do we make a ShaderResourceDirtyUpload
+		//void UploadIfDirty()
 		//void SetDirty()
 		//void SetRegionDirty(const int32 in_height_low, const int32 in_height_high);
 
@@ -60,7 +62,7 @@ namespace DscRenderResource
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> _resource;
 		std::shared_ptr<DscRender::HeapWrapperItem> _shader_resource;
-		D3D12_RESOURCE_DESC _desc;
+		D3D12_RESOURCE_DESC _desc; //has width, height 
 		D3D12_SHADER_RESOURCE_VIEW_DESC _shader_resource_view_desc;
 		std::vector<uint8_t> _data;
 
