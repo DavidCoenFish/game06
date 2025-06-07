@@ -7,7 +7,9 @@
 #define _WIN32_WINNT 0x0600
 
 // Needed on windows so that we can use sprintf without warning.
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <dlg/output.h>
 #include <dlg/dlg.h>

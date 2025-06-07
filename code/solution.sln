@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_glyph", "application\render_glyph\render_glyph.vcxproj", "{45130EE1-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_target", "application\render_target\render_target.vcxproj", "{817C3DF8-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_text", "application\render_text\render_text.vcxproj", "{FBA23A1C-6C94-4F93-BC2A-7F5284B7D434}"
@@ -11,6 +13,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_triangle", "application\render_triangle\render_triangle.vcxproj", "{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "application\unit_test\unit_test.vcxproj", "{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "free_type", "sdk\free_type\free_type.vcxproj", "{E571E6AF-77D1-47A4-988B-365AF9C5B2BC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_common", "staticlib\dsc_common\dsc_common.vcxproj", "{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
@@ -28,10 +32,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_text", "staticlib\dsc_t
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_windows", "staticlib\dsc_windows\dsc_windows.vcxproj", "{9A116E39-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdk_free_type", "staticlib\sdk_free_type\sdk_free_type.vcxproj", "{5348687B-6C94-4F93-BC2A-7F5284B7D434}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdk_harf_buzz", "staticlib\sdk_harf_buzz\sdk_harf_buzz.vcxproj", "{DEC934A6-6C94-4F93-BC2A-7F5284B7D434}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parent", "parent", "{3D8E604F-6C94-4F93-BC2A-7F5284B7D434}"
@@ -46,6 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parent", "parent", "{3D8E60
 		..\todo.txt = ..\todo.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdk", "sdk", "{72071968-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution_items", "solution_items", "{CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		dsc.bff = dsc.bff
@@ -56,6 +58,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{A9795628-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		application\dsc.bff = application\dsc.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_glyph", "render_glyph", "{22BED631-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		application\render_glyph\dsc.bff = application\render_glyph\dsc.bff
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_target", "render_target", "{D2821C79-6C94-4F93-BC2A-7F5284B7D434}"
@@ -99,6 +106,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{4109
 	ProjectSection(SolutionItems) = preProject
 		fbuild\windows\windows.bff = fbuild\windows\windows.bff
 		fbuild\windows\windows10sdk.bff = fbuild\windows\windows10sdk.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdk", "sdk", "{37259A92-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		sdk\dsc.bff = sdk\dsc.bff
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "staticlib", "staticlib", "{6F950BFE-6C94-4F93-BC2A-7F5284B7D434}"
@@ -146,71 +158,58 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_windows", "dsc_windows"
 		staticlib\dsc_windows\dsc.bff = staticlib\dsc_windows\dsc.bff
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdk_free_type", "sdk_free_type", "{EEB9CAC2-6C94-4F93-BC2A-7F5284B7D434}"
-	ProjectSection(SolutionItems) = preProject
-		staticlib\sdk_free_type\dsc.bff = staticlib\sdk_free_type\dsc.bff
-		staticlib\sdk_free_type\license.txt = staticlib\sdk_free_type\license.txt
-		staticlib\sdk_free_type\readme = staticlib\sdk_free_type\readme
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdk_harf_buzz", "sdk_harf_buzz", "{FB2DE32E-6C94-4F93-BC2A-7F5284B7D434}"
-	ProjectSection(SolutionItems) = preProject
-		staticlib\sdk_harf_buzz\copying = staticlib\sdk_harf_buzz\copying
-		staticlib\sdk_harf_buzz\dsc.bff = staticlib\sdk_harf_buzz\dsc.bff
-		staticlib\sdk_harf_buzz\news = staticlib\sdk_harf_buzz\news
-		staticlib\sdk_harf_buzz\readme.md = staticlib\sdk_harf_buzz\readme.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "staticlib", "staticlib", "{51B0D35D-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		debug|x64 = debug|x64
-		release|x64 = release|x64
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{817C3DF8-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{817C3DF8-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{FBA23A1C-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{FBA23A1C-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.Build.0 = debug|x64
-		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.release|x64.Build.0 = release|x64
-		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{DC1202D0-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{DC1202D0-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{6EACFF0D-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{6EACFF0D-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{9A116E39-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{9A116E39-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{5348687B-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{5348687B-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
-		{DEC934A6-6C94-4F93-BC2A-7F5284B7D434}.debug|x64.ActiveCfg = debug|x64
-		{DEC934A6-6C94-4F93-BC2A-7F5284B7D434}.release|x64.ActiveCfg = release|x64
+		{45130EE1-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{45130EE1-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
+		{45130EE1-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{45130EE1-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
+		{817C3DF8-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{817C3DF8-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{FBA23A1C-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{FBA23A1C-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{51318CAF-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{E571E6AF-77D1-47A4-988B-365AF9C5B2BC}.Debug|x64.ActiveCfg = Debug|x64
+		{E571E6AF-77D1-47A4-988B-365AF9C5B2BC}.Release|x64.ActiveCfg = Release|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{DC1202D0-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{DC1202D0-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{6EACFF0D-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{6EACFF0D-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{9A116E39-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{9A116E39-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{45130EE1-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{817C3DF8-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{FBA23A1C-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{51318CAF-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{B41DFBBE-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
+		{E571E6AF-77D1-47A4-988B-365AF9C5B2BC} = {72071968-6C94-4F93-BC2A-7F5284B7D434}
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{DC1202D0-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{6EACFF0D-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
@@ -219,9 +218,8 @@ Global
 		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{9A116E39-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
-		{5348687B-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
-		{DEC934A6-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{A9795628-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
+		{22BED631-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{D2821C79-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{E0A1CE5E-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{1F2097EE-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
@@ -230,6 +228,7 @@ Global
 		{6970340D-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
 		{F38DCC4D-6C94-4F93-BC2A-7F5284B7D434} = {6970340D-6C94-4F93-BC2A-7F5284B7D434}
 		{4109EF68-6C94-4F93-BC2A-7F5284B7D434} = {6970340D-6C94-4F93-BC2A-7F5284B7D434}
+		{37259A92-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
 		{6F950BFE-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
 		{7D4A481A-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{86D9C41F-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
@@ -239,7 +238,5 @@ Global
 		{D6F06568-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{92AE7F44-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{0271BBBB-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
-		{EEB9CAC2-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
-		{FB2DE32E-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 	EndGlobalSection
 EndGlobal

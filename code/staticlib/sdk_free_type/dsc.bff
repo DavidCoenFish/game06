@@ -28,6 +28,8 @@
                 ^CompilerOptions    + ' /D "FT_DEBUG_LEVEL_TRACE"'
             }
             .CompilerOptions    + ' /D "FT2_BUILD_LIBRARY"'
+            .CompilerOptions    + ' /D "_CRT_SECURE_NO_WARNINGS"'
+            .CompilerOptions    + ' /D "FT_MAKE_OPTION_SINGLE_OBJECT"'
         ]
         ^ConfigurationArray + .Config
     }

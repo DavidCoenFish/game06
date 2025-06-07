@@ -11,7 +11,7 @@
 /* noise LSB bits during operations, due to rounding errors..        */
 #define  THRESHOLD  64
 
-  static  error = 0;
+  static int error = 0;
 
   static void
   test_cos( void )

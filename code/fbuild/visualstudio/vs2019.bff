@@ -54,7 +54,7 @@
                 #else
                     #if file_exists( "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30037/bin/Hostx64/x64/cl.exe" )
                         .VS2019_BasePath        = 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC'
-                        .VS2019_Version         = '14.29.30037'
+                        .VS2019_Version         = '16.0.33214.272' //'14.29.30037'
                         .VS2019_MSC_VER         = '1929'
                     #else
                         //

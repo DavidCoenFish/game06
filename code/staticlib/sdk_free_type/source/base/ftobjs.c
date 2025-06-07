@@ -4708,9 +4708,9 @@
     FT_Renderer  renderer;
 
 
-    switch ( slot->format )
+    //switch ( slot->format )
     {
-    default:
+    //default:
       if ( slot->internal->load_flags & FT_LOAD_COLOR )
       {
         FT_LayerIterator  iterator;

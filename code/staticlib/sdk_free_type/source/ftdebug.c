@@ -543,7 +543,7 @@
 
       if ( ft_component_flag || ft_timestamp_flag )
       {
-        ft_strncpy( features_buf, features, features_length );
+        ft_strncpy( features_buf, 128, features, features_length );
         bufp += features_length - 1;
       }
 

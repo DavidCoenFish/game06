@@ -1,0 +1,37 @@
+#once
+//https://www.fastbuild.org/docs/documentation.html
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+//$_CURRENT_BFF_DIR_$ sdk
+//G:\development\game06\code\sdk\dsc.bff
+//G:\development\game06\code\sdk\free_type\free_type.vcxproj
+//    <ProjectGuid>{e571e6af-77d1-47a4-988b-365af9c5b2bc}</ProjectGuid>
+
+{
+    .X64DebugConfig   = [ .Platform = 'x64'   .Config = 'Debug' ]
+    .X64ReleaseConfig = [ .Platform = 'x64'   .Config = 'Release' ]
+    .ProjectConfigs   = {
+                            .X64DebugConfig, .X64ReleaseConfig 
+                        }
+
+    VSProjectExternal( "free_type_project" )
+    {
+      // Input Options
+      .ExternalProjectPath            = "sdk\free_type\free_type.vcxproj"
+      .ProjectGuid = "{e571e6af-77d1-47a4-988b-365af9c5b2bc}"
+      .ProjectTypeGuid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+  
+      // Build Config Options
+      //.ProjectConfigs
+
+    }
+
+}

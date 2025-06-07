@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <DscBuildDir>$(SolutionDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</DscBuildDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(DscBuildDir)output\</OutDir>
+    <IntDir>$(DscBuildDir)intermediate\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(SolutionDir)sdk\free_type\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_FREETYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="DscBuildDir">
+      <Value>$(DscBuildDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

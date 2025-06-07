@@ -97,7 +97,7 @@
 #define ft_strcpy   strcpy
 #define ft_strlen   strlen
 #define ft_strncmp  strncmp
-#define ft_strncpy  strncpy
+#define ft_strncpy  strncpy_s
 #define ft_strrchr  strrchr
 #define ft_strstr   strstr
 

@@ -12,6 +12,7 @@
 }
 
 //pull in child scripts
+#include "render_glyph\dsc.bff"
 #include "render_target\dsc.bff"
 #include "render_text\dsc.bff"
 #include "render_texture\dsc.bff"

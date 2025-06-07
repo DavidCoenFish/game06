@@ -27,7 +27,7 @@
 #include <sdk_free_type/internal/ftdrv.h>
 #include <sdk_free_type/internal/services/svpscmap.h>
 #include <sdk_free_type/internal/pshints.h>
-
+#include <sdk_free_type/internal/compiler-macros.h>
 
 FT_BEGIN_HEADER
 

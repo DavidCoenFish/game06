@@ -54,7 +54,7 @@
 {
     .Config = [
         .Platform = "x64"
-        .Config = "debug"
+        .Config = "Debug"
         Using(.CommonConfig)
 
         .CompilerOptions    + ' /MDd'
@@ -74,7 +74,7 @@
 {
     .Config = [
         .Platform = "x64"
-        .Config = "release"
+        .Config = "Release"
         Using(.CommonConfig)
 
         .CompilerOptions    + ' /MD'
@@ -124,10 +124,11 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
             .CompilerInputPath = "$RelativePath$/"
             .CompilerInputPattern = {"*.cpp", "*.c", "*.cc", }
             .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
-            .CompilerOptions + ' /I"$RootPath$/$RelativePath$"'
+            .CompilerOptions + ' /I"$RootPath$\$RelativePath$"'
+            .CompilerOptions + ' /I"$RootPath$\$RelativePath$\Source"'
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
-                ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
+                ^CompilerOptions + ' /I"$RootPath$\staticlib\$LibraryName$"'
             }
             //Print("$ProjectName$_$Config$_$Platform$")
             //Print(.CompilerOptions)

@@ -870,7 +870,6 @@
     size_t       new_length;
     FT_Error     error;
 
-
     new_length = ft_strlen( original_name ) + ft_strlen( insertion );
     if ( FT_QALLOC( new_name, new_length + 1 ) )
       return NULL;
@@ -878,7 +877,7 @@
     tmp = ft_strrchr( original_name, '/' );
     if ( tmp )
     {
-      ft_strncpy( new_name,
+      ft_strncpy( new_name, new_length + 1,
                   original_name,
                   (size_t)( tmp - original_name + 1 ) );
       new_name[tmp - original_name + 1] = '\0';

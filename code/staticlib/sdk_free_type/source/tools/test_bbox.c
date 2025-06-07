@@ -1,5 +1,6 @@
 #include <sdk_free_type/freetype.h>
 #include <sdk_free_type/ftbbox.h>
+#include <sdk_free_type/ftoutln.h>
 
 
 #include <time.h>    /* for clock() */
@@ -150,7 +151,7 @@
              XVAL( bbox.yMin ),
              XVAL( bbox.xMax ),
              XVAL( bbox.yMax ) );
-    printf( "cbox_hex = [%08X %08X %08X %08X]\n",
+    printf( "cbox_hex = [%d %d %d %d]\n",
              bbox.xMin, bbox.yMin, bbox.xMax, bbox.yMax );
 
 
