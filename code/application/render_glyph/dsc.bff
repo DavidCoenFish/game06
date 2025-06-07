@@ -12,9 +12,22 @@
 }
 
 .LibraryDependencyArray = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource"}
-//, "sdk_free_type" }
-.LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib"}
-DscVsprojectWindowExe("render_glyph" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray .LinkerAdditionalDependency)
+.LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "free_type.lib"}
+
+.WindowExeParam = [
+    .RootPath = ^_WORKING_DIR_
+    .RelativePath = ^_CURRENT_BFF_DIR_
+    .ConfigurationArray = ^ConfigurationArray
+    .VisualStudioSettings = ^VisualStudioSettings 
+    .CommonVcproject = ^CommonVcproject 
+    .LibraryBaseNameDependency = ^LibraryDependencyArray
+    .LinkerAdditionalDependency = ^LinkerAdditionalDependency
+    .AdditionalStaicLibPaths = {"$RootPath$/../build/free_type"}
+    .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include"}
+]
+
+DscVsprojectWindowExe("render_glyph" .WindowExeParam)
+
 
 .SolutionProjects + "render_glyph_project"
 .SolutionItemsApplicationProject + "render_glyph_project"

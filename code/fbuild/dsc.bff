@@ -232,9 +232,21 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
     }
 }
 
-function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryBaseNameDependency .LinkerAdditionalDependency)
+function DscVsprojectWindowExe( .ProjectName .Param )
 {
-    ForEach( .ConfigIter in .ParamConfigurationArray )
+    .RootPath = ""
+    .RelativePath = ""
+    .ConfigurationArray = []
+    .VisualStudioSettings = []
+    .CommonVcproject = {}
+    .LibraryBaseNameDependency = {}
+    .LinkerAdditionalDependency = {}
+    .AdditionalStaicLibPaths = {}
+    .AdditionalIncludePaths = {}
+
+    Using (.Param)
+
+    ForEach( .ConfigIter in .ConfigurationArray )
     {
         Using( .ConfigIter )
 
@@ -249,6 +261,10 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
             ForEach( .LibraryName in .LibraryBaseNameDependency )
             {
                 ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
+            }
+            ForEach( .Path in .AdditionalIncludePaths )
+            {
+                ^CompilerOptions + ' /I"$Path$"'
             }
         }
 
@@ -288,6 +304,12 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
                 .Temp = {"$LibraryName$_$Config$_$Platform$"}
                 ^Libraries + .Temp
             }
+            .LinkerOptions = ^LinkerOptions
+            ForEach( .StaicLibPath in .AdditionalStaicLibPaths )
+            {
+                ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$/$Platform$/$Config$/output"'
+            }
+            //Print(.LinkerOptions)
         }
 
         Alias( "$ProjectName$_$Config$_$Platform$" )
@@ -312,7 +334,7 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
     {
         //Print("VCXProject $ProjectName$_project")
         .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
-        .ProjectConfigs = .ParamConfigurationArray
+        .ProjectConfigs = .ConfigurationArray
         .ProjectInputPaths  = "$RelativePath$/"
         .ProjectBasePath = '$RelativePath$/'
         .ProjectFiles = "$RelativePath$/dsc.bff"
@@ -340,4 +362,3 @@ function DscVsprojectWindowExe( .ProjectName .RootPath .RelativePath .ParamConfi
         }
     }
 }
-

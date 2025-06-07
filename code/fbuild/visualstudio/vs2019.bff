@@ -170,7 +170,7 @@ Compiler( 'Compiler-VS2019-x64' )
     .Linker                         = '$VS2019_ToolchainPath$/bin/Hostx64/x64/link.exe'
     .LinkerOptions                  = '/OUT:"%2" "%1"'
                                     + ' /ERRORREPORT:PROMPT'
-                                    + ' /INCREMENTAL:NO'
+                                    //+ ' /INCREMENTAL:NO'
                                     + ' /NOLOGO'
                                     + ' /MANIFEST'
                                     + ' /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'

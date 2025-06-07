@@ -5,6 +5,6 @@ struct Interpolant
     float4 _position : SV_Position;
 
     // [0 ... 1]
-    float4 _colour : COLOR1;
+    float2 _uv : TEXCOORD0;
 
 };

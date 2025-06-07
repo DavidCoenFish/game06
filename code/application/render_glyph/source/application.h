@@ -17,9 +17,8 @@ namespace DscRender
 namespace DscRenderResource
 {
     class GeometryGeneric;
-    class RenderTargetTexture;
     class Shader;
-    class ShaderConstantBuffer;
+    class ShaderResource;
 }
 
 class Application : public DscWindows::IWindowApplication
@@ -40,17 +39,8 @@ private:
     typedef DscWindows::IWindowApplication BaseType;
     std::unique_ptr<DscCommon::FileSystem> _file_system;
     std::unique_ptr<DscRender::DrawSystem> _draw_system;
-
-    struct Resources
-    {
-        std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_triangle;
-        std::shared_ptr<DscRenderResource::Shader> _shader_triangle;
-        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer;
-        std::shared_ptr<DscRenderResource::RenderTargetTexture> _render_target_texture;
-        std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_present;
-        std::shared_ptr<DscRenderResource::Shader> _shader_present;
-    };
-    std::unique_ptr<Resources> _resources;
-    float _time_accumulation = 0.0f;
+    std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_generic;
+    std::shared_ptr<DscRenderResource::Shader> _shader;
+    std::shared_ptr<DscRenderResource::ShaderResource> _texture;
 
 };
