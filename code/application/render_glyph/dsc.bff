@@ -16,3 +16,7 @@
 .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib"}
 DscVsprojectWindowExe("render_glyph" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray .LinkerAdditionalDependency)
 
+.SolutionProjects + "render_glyph_project"
+.SolutionItemsApplicationProject + "render_glyph_project"
+.SolutionBuildProject = "render_glyph_project"
+

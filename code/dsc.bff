@@ -26,6 +26,12 @@
     ^SolutionItemArray + .temp;
 }
 
+.SolutionItemsSdkProject = {}
+.SolutionItemsStaticLibProject = {}
+.SolutionItemsApplicationProject = {}
+.SolutionProjects = {}
+.SolutionBuildProject = ""
+
 #include "fbuild\dsc.bff"
 #include "sdk\dsc.bff"
 #include "staticlib\dsc.bff"
@@ -34,30 +40,6 @@
 VSSolution("solution")
 {
     .SolutionOutput = "solution.sln"
-    .SolutionProjects = {
-        //static lib
-        "dsc_common_project", 
-        "dsc_dag_project", 
-        "dsc_dag_render_project", 
-        "dsc_locale_project",
-        "dsc_render_project", 
-        "dsc_render_resource_project", 
-        "dsc_text_project", 
-        "dsc_windows_project", 
-        //"sdk_free_type_project",
-        //"sdk_harf_buzz_project",
-        "free_type_project",
-
-        //applications
-        "render_glyph_project",
-        "render_target_project",
-        "render_text_project",
-        "render_texture_project",
-        "render_triangle_project",
-        "unit_test_project", 
-        }
-    //.SolutionBuildProject = "unit_test_project"
-    .SolutionBuildProject = "render_glyph_project"
     .SolutionConfigs = {}
     ForEach( .Config in .ConfigurationArray )
     {            
@@ -68,9 +50,7 @@ VSSolution("solution")
     {
         .temp = [
             .Path           = "sdk"
-            .Projects       = { 
-                "free_type_project"
-                }
+            .Projects       = .SolutionItemsSdkProject
         ]
         ^SolutionFolders + .temp
     }
@@ -78,18 +58,7 @@ VSSolution("solution")
     {
         .temp = [
             .Path           = "staticlib"
-            .Projects       = { 
-                "dsc_common_project",
-                "dsc_dag_project", 
-                "dsc_dag_render_project", 
-                "dsc_locale_project",
-                "dsc_render_project",
-                "dsc_render_resource_project",
-                "dsc_text_project",
-                "dsc_windows_project",
-                //"sdk_free_type_project",
-                //"sdk_harf_buzz_project"
-                }
+            .Projects       = .SolutionItemsStaticLibProject
         ]
         ^SolutionFolders + .temp
     }
@@ -97,14 +66,7 @@ VSSolution("solution")
     {
         .temp = [
             .Path           = "application"
-            .Projects       = { 
-                "render_glyph_project",
-                "render_target_project",
-                "render_text_project",
-                "render_texture_project",
-                "render_triangle_project", 
-                "unit_test_project" 
-                }
+            .Projects       = .SolutionItemsApplicationProject
         ]
         ^SolutionFolders + .temp
     }

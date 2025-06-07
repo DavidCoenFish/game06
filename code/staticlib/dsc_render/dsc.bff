@@ -13,3 +13,7 @@
 
 .LibraryDependencyArray = {"dsc_common"}
 DscVsprojectStaticLib("dsc_render" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
+
+.SolutionProjects + "dsc_render_project"
+.SolutionItemsStaticLibProject + "dsc_render_project"
+//^SolutionBuildProject = "dsc_render_project"

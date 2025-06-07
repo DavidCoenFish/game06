@@ -26,8 +26,7 @@
     Using( .VisualStudioSettings )	
     Print( 'Using VS$VS_Version_HumanReadable$ (v$VS_Version$) from $VS_ToolchainPath$' )
 }
-Print("=================================================no")
-Print(.VisualStudioSettings)
+//Print(.VisualStudioSettings)
 //Using( .VisualStudioSettings )
 //Print( 'Using VS$VS_Version_HumanReadable$ (v$VS_Version$) from $VS_ToolchainPath$' )
 //Using( .ToolChain_VS_Windows_X64 )

@@ -15,3 +15,6 @@
 .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib"}
 DscVsprojectWindowExe("render_texture" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray .LinkerAdditionalDependency)
 
+.SolutionProjects + "render_texture_project"
+.SolutionItemsApplicationProject + "render_texture_project"
+//.SolutionBuildProject = "render_texture_project"

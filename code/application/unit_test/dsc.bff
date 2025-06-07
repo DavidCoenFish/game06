@@ -15,3 +15,7 @@ Print("hello world")
 .LibraryDependencyArray = {"dsc_common", "dsc_dag"}
 DscVsprojectConsoleExe("unit_test" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
 
+.SolutionProjects + "unit_test_project"
+.SolutionItemsApplicationProject + "unit_test_project"
+//.SolutionBuildProject = "unit_test_project"
+
