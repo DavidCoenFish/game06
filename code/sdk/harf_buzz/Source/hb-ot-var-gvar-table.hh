@@ -222,7 +222,7 @@ struct GlyphVariationData
 	const HBUINT8 *base = &(var_data+var_data->data);
 	const HBUINT8 *p = base;
 	if (!unpack_points (p, shared_indices, (const HBUINT8 *) (var_data_bytes.arrayZ + var_data_bytes.length))) return false;
-	data_offset = p - base;
+	data_offset = (unsigned int)(p - base);
       }
       return true;
     }
@@ -449,13 +449,13 @@ struct gvar
       unsigned int shared_tuple_size = F2DOT14::static_size * axisCount * sharedTupleCount;
       F2DOT14 *tuples = c->serializer->allocate_size<F2DOT14> (shared_tuple_size);
       if (!tuples) return_trace (false);
-      out->sharedTuples = (char *) tuples - (char *) out;
+      out->sharedTuples = (unsigned int)((char *) tuples - (char *) out);
       memcpy (tuples, this+sharedTuples, shared_tuple_size);
     }
 
     char *subset_data = c->serializer->allocate_size<char> (subset_data_size);
     if (!subset_data) return_trace (false);
-    out->dataZ = subset_data - (char *) out;
+    out->dataZ = (unsigned int)(subset_data - (char *) out);
 
     unsigned int glyph_offset = 0;
     for (hb_codepoint_t gid = (c->plan->flags & HB_SUBSET_FLAGS_NOTDEF_OUTLINE) ? 0 : 1;

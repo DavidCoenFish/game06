@@ -129,7 +129,7 @@ struct post
       for (const uint8_t *data = pool;
 	   index_to_offset.length < 65535 && data < end && data + *data < end;
 	   data += 1 + *data)
-	index_to_offset.push (data - pool);
+	index_to_offset.push ((uint32_t)(data - pool));
     }
     ~accelerator_t ()
     {
@@ -155,7 +155,7 @@ struct post
       unsigned int count = get_glyph_count ();
       if (unlikely (!count)) return false;
 
-      if (len < 0) len = strlen (name);
+      if (len < 0) len = (int)(strlen (name));
 
       if (unlikely (!len)) return false;
 

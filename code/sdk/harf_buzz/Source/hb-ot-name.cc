@@ -96,12 +96,12 @@ hb_ot_name_convert_utf (hb_bytes_t                       bytes,
       src = src_next;
     }
 
-    *text_size = dst - text;
+    *text_size = (unsigned int)(dst - text);
     *dst = 0; /* NUL-terminate. */
   }
 
   /* Accumulate length of rest. */
-  unsigned int dst_len = dst - text;
+  unsigned int dst_len = (unsigned int)(dst - text);
   while (src < src_end)
   {
     src = in_utf_t::next (src, src_end, &unicode, replacement);

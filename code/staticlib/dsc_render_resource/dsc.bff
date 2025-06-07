@@ -16,4 +16,4 @@ DscVsprojectStaticLib("dsc_render_resource" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .C
 
 .SolutionProjects + "dsc_render_resource_project"
 .SolutionItemsStaticLibProject + "dsc_render_resource_project"
-//^SolutionBuildProject = "dsc_render_resource_project"
+//.SolutionBuildProject = "dsc_render_resource_project"

@@ -16,4 +16,4 @@ DscVsprojectStaticLib("dsc_text" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .Configuratio
 
 .SolutionProjects + "dsc_text_project"
 .SolutionItemsStaticLibProject + "dsc_text_project"
-//^SolutionBuildProject = "dsc_text_project"
+//.SolutionBuildProject = "dsc_text_project"

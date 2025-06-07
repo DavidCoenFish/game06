@@ -16,5 +16,5 @@ DscVsprojectStaticLib("dsc_common" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .Configurat
 
 .SolutionProjects + "dsc_common_project"
 .SolutionItemsStaticLibProject + "dsc_common_project"
-//^SolutionBuildProject = "dsc_common_project"
+//.SolutionBuildProject = "dsc_common_project"
 

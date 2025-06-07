@@ -112,7 +112,7 @@ _hb_print_func (const char *func)
     /* Skip parameter list */
     const char *paren = strchr (func, '(');
     if (paren)
-      func_len = paren - func;
+      func_len = (unsigned int)(paren - func);
     fprintf (stderr, "%.*s", func_len, func);
   }
 }

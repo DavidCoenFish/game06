@@ -15,5 +15,5 @@
 DscVsprojectStaticLib("dsc_windows" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
 
 .SolutionProjects + "dsc_windows_project"
-.SolutionItemsStaticLibProject + "dsc_text_project"
-//^SolutionBuildProject = "dsc_text_project"
+.SolutionItemsStaticLibProject + "dsc_windows_project"
+//.SolutionBuildProject = "dsc_windows_project"

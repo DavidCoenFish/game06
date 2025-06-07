@@ -172,7 +172,7 @@ typedef struct OpenTypeOffsetTable
 	*checksum_adjustment = 0;
       }
 
-      rec.checkSum.set_for_data (start, end - start);
+      rec.checkSum.set_for_data (start, (unsigned int)(end - start));
       i++;
     }
 
@@ -184,7 +184,7 @@ typedef struct OpenTypeOffsetTable
 
       /* The following line is a slower version of the following block. */
       //checksum.set_for_data (this, (const char *) c->head - (const char *) this);
-      checksum.set_for_data (this, dir_end - (const char *) this);
+      checksum.set_for_data (this, (unsigned int)(dir_end - (const char *) this));
       for (unsigned int i = 0; i < num_items; i++)
       {
 	TableRecord &rec = tables.arrayZ[i];
@@ -420,7 +420,7 @@ struct ResourceForkHeader
   {
     const OpenTypeFontFace &face = (this+map).get_face (idx, &(this+data));
     if (base_offset)
-      *base_offset = (const char *) &face - (const char *) this;
+      *base_offset = (unsigned int)((const char *) &face - (const char *) this);
     return face;
   }
 

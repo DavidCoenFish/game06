@@ -249,7 +249,7 @@ struct CompositeGlyph
     if (unlikely (!last)) return 0;
 
     if (last->has_instructions ())
-      start = (char *) last - &bytes + last->get_size ();
+      start = (unsigned int)((char *) last - &bytes + last->get_size ());
     if (unlikely (start > end)) return 0;
     return end - start;
   }

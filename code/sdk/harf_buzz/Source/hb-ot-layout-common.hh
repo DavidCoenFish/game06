@@ -863,8 +863,8 @@ struct Feature
 	closure->tag == HB_TAG ('s','i','z','e') &&
 	closure->list_base && closure->list_base < this)
     {
-      unsigned int new_offset_int = orig_offset -
-				    (((char *) this) - ((char *) closure->list_base));
+      unsigned int new_offset_int = (unsigned int)(orig_offset -
+				    (((char *) this) - ((char *) closure->list_base)));
 
       Offset16To<FeatureParams> new_offset;
       /* Check that it would not overflow. */
@@ -1219,8 +1219,8 @@ struct Lookup
   {
     const HBUINT16 &markFilteringSet = StructAfter<const HBUINT16> (subTable);
     if (lookupFlag & LookupFlag::UseMarkFilteringSet)
-      return (const char *) &StructAfter<const char> (markFilteringSet) - (const char *) this;
-    return (const char *) &markFilteringSet - (const char *) this;
+      return (unsigned int)((const char *) &StructAfter<const char> (markFilteringSet) - (const char *) this);
+    return (unsigned int)((const char *) &markFilteringSet - (const char *) this);
   }
 
   unsigned int get_type () const { return lookupType; }

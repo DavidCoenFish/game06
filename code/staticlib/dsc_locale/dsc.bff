@@ -16,5 +16,5 @@ DscVsprojectStaticLib("dsc_locale" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .Configurat
 
 .SolutionProjects + "dsc_locale_project"
 .SolutionItemsStaticLibProject + "dsc_locale_project"
-//^SolutionBuildProject = "dsc_locale_project"
+//.SolutionBuildProject = "dsc_locale_project"
 

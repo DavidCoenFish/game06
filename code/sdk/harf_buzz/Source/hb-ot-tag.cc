@@ -290,7 +290,7 @@ hb_ot_tags_from_language (const char   *lang_str,
     const LangTag *ot_languages = nullptr;
     unsigned ot_languages_len = 0;
     const char *dash = strchr (lang_str, '-');
-    unsigned first_len = dash ? dash - lang_str : limit - lang_str;
+    unsigned first_len = (unsigned int)(dash ? dash - lang_str : limit - lang_str);
     if (first_len == 2)
     {
       ot_languages = ot_languages2;
@@ -334,7 +334,7 @@ hb_ot_tags_from_language (const char   *lang_str,
     s = lang_str + strlen (lang_str);
   if (s - lang_str == 3) {
     /* Assume it's ISO-639-3 and upper-case and use it. */
-    tags[0] = hb_tag_from_string (lang_str, s - lang_str) & ~0x20202000u;
+    tags[0] = hb_tag_from_string (lang_str, (int)(s - lang_str)) & ~0x20202000u;
     *count = 1;
     return;
   }
@@ -590,7 +590,7 @@ hb_ot_tags_to_script_and_language (hb_tag_t       script_tag,
 	buf[len++] = '-';
 	for (shift = 28; shift >= 0; shift -= 4)
 	  buf[len++] = TOHEX (script_tag >> shift);
-	*language = hb_language_from_string ((char *) buf, len);
+	*language = hb_language_from_string ((char *) buf, (int)(len));
 	hb_free (buf);
       }
     }

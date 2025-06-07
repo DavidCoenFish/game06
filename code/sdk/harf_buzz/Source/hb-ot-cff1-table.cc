@@ -422,8 +422,8 @@ bool OT::cff1::accelerator_t::get_extents (hb_font_t *font, hb_codepoint_t glyph
   }
   else
   {
-    extents->x_bearing = font->em_scalef_x (bounds.min.x.to_real ());
-    extents->width = font->em_scalef_x (bounds.max.x.to_real ()) - extents->x_bearing;
+    extents->x_bearing = font->em_scalef_x ((float)(bounds.min.x.to_real ()));
+    extents->width = font->em_scalef_x ((float)(bounds.max.x.to_real ())) - extents->x_bearing;
   }
   if (bounds.min.y >= bounds.max.y)
   {
@@ -432,8 +432,8 @@ bool OT::cff1::accelerator_t::get_extents (hb_font_t *font, hb_codepoint_t glyph
   }
   else
   {
-    extents->y_bearing = font->em_scalef_y (bounds.max.y.to_real ());
-    extents->height = font->em_scalef_y (bounds.min.y.to_real ()) - extents->y_bearing;
+    extents->y_bearing = font->em_scalef_y ((float)(bounds.max.y.to_real ()));
+    extents->height = font->em_scalef_y ((float)(bounds.min.y.to_real ())) - extents->y_bearing;
   }
 
   return true;
@@ -454,14 +454,14 @@ struct cff1_path_param_t
   {
     point_t point = p;
     if (delta) point.move (*delta);
-    draw_session->move_to (font->em_fscalef_x (point.x.to_real ()), font->em_fscalef_y (point.y.to_real ()));
+    draw_session->move_to (font->em_fscalef_x ((float)(point.x.to_real ())), font->em_fscalef_y ((float)(point.y.to_real ())));
   }
 
   void line_to (const point_t &p)
   {
     point_t point = p;
     if (delta) point.move (*delta);
-    draw_session->line_to (font->em_fscalef_x (point.x.to_real ()), font->em_fscalef_y (point.y.to_real ()));
+    draw_session->line_to (font->em_fscalef_x ((float)(point.x.to_real ())), font->em_fscalef_y ((float)(point.y.to_real ())));
   }
 
   void cubic_to (const point_t &p1, const point_t &p2, const point_t &p3)
@@ -473,9 +473,9 @@ struct cff1_path_param_t
       point2.move (*delta);
       point3.move (*delta);
     }
-    draw_session->cubic_to (font->em_fscalef_x (point1.x.to_real ()), font->em_fscalef_y (point1.y.to_real ()),
-			   font->em_fscalef_x (point2.x.to_real ()), font->em_fscalef_y (point2.y.to_real ()),
-			   font->em_fscalef_x (point3.x.to_real ()), font->em_fscalef_y (point3.y.to_real ()));
+    draw_session->cubic_to (font->em_fscalef_x ((float)(point1.x.to_real ())), font->em_fscalef_y ((float)(point1.y.to_real ())),
+			   font->em_fscalef_x ((float)(point2.x.to_real ())), font->em_fscalef_y ((float)(point2.y.to_real ())),
+			   font->em_fscalef_x ((float)(point3.x.to_real ())), font->em_fscalef_y ((float)(point3.y.to_real ())));
   }
 
   void end_path () { draw_session->close_path (); }

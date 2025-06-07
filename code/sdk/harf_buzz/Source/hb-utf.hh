@@ -124,7 +124,7 @@ struct hb_utf8_t
 
   static unsigned int
   strlen (const codepoint_t *text)
-  { return ::strlen ((const char *) text); }
+  { return (unsigned int)(::strlen ((const char *) text)); }
 
   static unsigned int
   encode_len (hb_codepoint_t unicode)

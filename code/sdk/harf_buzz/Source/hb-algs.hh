@@ -248,12 +248,12 @@ struct
   }
 
   template <typename T> constexpr auto
-  impl (const T& v, hb_priority<0>) const HB_RETURN (uint32_t, std::hash<hb_decay<decltype (hb_deref (v))>>{} (hb_deref (v)))
+  impl (const T& v, hb_priority<0>) const HB_RETURN (uint32_t, (uint32_t)(std::hash<hb_decay<decltype (hb_deref (v))>>{} (hb_deref (v))))
 
   public:
 
   template <typename T> constexpr auto
-  operator () (const T& v) const HB_RETURN (uint32_t, impl (v, hb_prioritize))
+  operator () (const T& v) const HB_RETURN (uint32_t, (uint32_t)(impl (v, hb_prioritize)))
 }
 HB_FUNCOBJ (hb_hash);
 
@@ -606,8 +606,8 @@ hb_popcount (T v)
   {
     /* "HACKMEM 169" */
     uint32_t y;
-    y = (v >> 1) &033333333333;
-    y = v - y - ((y >>1) & 033333333333);
+    y = (uint32_t)((v >> 1) &033333333333);
+    y = (uint32_t)(v - y - ((y >>1) & 033333333333));
     return (((y + (y >> 3)) & 030707070707) % 077);
   }
 
@@ -649,7 +649,7 @@ hb_bit_storage (T v)
   if (sizeof (T) <= sizeof (unsigned int))
   {
     unsigned long where;
-    _BitScanReverse (&where, v);
+    _BitScanReverse (&where, (unsigned long)(v));
     return 1 + where;
   }
 # if defined(_WIN64)
@@ -723,7 +723,7 @@ hb_ctz (T v)
   if (sizeof (T) <= sizeof (unsigned int))
   {
     unsigned long where;
-    _BitScanForward (&where, v);
+    _BitScanForward (&where, (unsigned long)(v));
     return where;
   }
 # if defined(_WIN64)

@@ -40,8 +40,8 @@ struct MarkArray : Array16Of<MarkRecord>        /* Array of MarkRecords--in Cove
     glyph_anchor.get_anchor (c, buffer->info[glyph_pos].codepoint, &base_x, &base_y);
 
     hb_glyph_position_t &o = buffer->cur_pos();
-    o.x_offset = roundf (base_x - mark_x);
-    o.y_offset = roundf (base_y - mark_y);
+    o.x_offset = (hb_position_t)(roundf (base_x - mark_x));
+    o.y_offset = (hb_position_t)(roundf (base_y - mark_y));
     o.attach_type() = ATTACH_TYPE_MARK;
     o.attach_chain() = (int) glyph_pos - (int) buffer->idx;
     buffer->scratch_flags |= HB_BUFFER_SCRATCH_FLAG_HAS_GPOS_ATTACHMENT;

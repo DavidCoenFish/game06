@@ -218,10 +218,10 @@ inline unsigned int OpCode_Size (op_code_t op) { return Is_OpCode_ESC (op) ? 2: 
 struct number_t
 {
   void set_int (int v)       { value = v; }
-  int to_int () const        { return value; }
+  int to_int () const        { return (int)(value); }
 
   void set_fixed (int32_t v) { value = v / 65536.0; }
-  int32_t to_fixed () const  { return value * 65536.0; }
+  int32_t to_fixed () const  { return (int32_t)(value * 65536.0); }
 
   void set_real (double v)   { value = v; }
   double to_real () const    { return value; }

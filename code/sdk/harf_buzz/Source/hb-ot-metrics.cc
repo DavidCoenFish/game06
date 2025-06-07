@@ -47,10 +47,10 @@ _fix_ascender_descender (float value, hb_ot_metrics_tag_t metrics_tag)
 {
   if (metrics_tag == HB_OT_METRICS_TAG_HORIZONTAL_ASCENDER ||
       metrics_tag == HB_OT_METRICS_TAG_VERTICAL_ASCENDER)
-    return fabs ((double) value);
+    return (float)(fabs ((double) value));
   if (metrics_tag == HB_OT_METRICS_TAG_HORIZONTAL_DESCENDER ||
       metrics_tag == HB_OT_METRICS_TAG_VERTICAL_DESCENDER)
-    return -fabs ((double) value);
+    return (float)(-fabs ((double) value));
   return value;
 }
 
@@ -196,7 +196,7 @@ hb_ot_metrics_get_position (hb_font_t           *font,
 	*position *= mult;
 
 	if (font->slant)
-	  *position += _hb_roundf (mult * font->slant_xy * rise);
+	  *position += (hb_position_t)(_hb_roundf (mult * font->slant_xy * rise));
       }
 
       return ret;
