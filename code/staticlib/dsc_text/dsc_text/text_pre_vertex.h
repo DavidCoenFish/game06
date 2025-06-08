@@ -2,10 +2,13 @@
 #include "dsc_text.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/vector_int2.h>
+#include <dsc_common/vector_int4.h>
 #include <dsc_common/vector_float4.h>
 
 namespace DscText
 {
+	class Glyph;
+
 	class TextPreVertex
 	{
 		struct PreVertexData

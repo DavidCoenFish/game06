@@ -27,5 +27,5 @@ DscVsprojectWindowExe("render_glyph" .WindowExeParam)
 
 .SolutionProjects + "render_glyph_project"
 .SolutionItemsApplicationProject + "render_glyph_project"
-.SolutionBuildProject = "render_glyph_project"
+//.SolutionBuildProject = "render_glyph_project"
 

@@ -1,4 +1,5 @@
 #include "dsc_locale.h"
+#include <dsc_common\enum_soft_bind.h>
 
 namespace
 {

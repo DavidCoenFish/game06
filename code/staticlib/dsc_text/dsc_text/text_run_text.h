@@ -16,6 +16,11 @@ namespace DscText
 
 	class TextRunText : public ITextRun
 	{
+	public:
+		TextRunText() = delete;
+		TextRunText& operator=(const TextRunText&) = delete;
+		TextRunText(const TextRunText&) = delete;
+
 		explicit TextRunText(
 			const std::string& in_string_utf8 = std::string(""),
 			const TextLocale* const in_locale_token = nullptr,

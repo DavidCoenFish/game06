@@ -28,6 +28,9 @@ namespace DscText
 		GlyphAtlasTexture& operator=(const GlyphAtlasTexture&) = delete;
 		GlyphAtlasTexture(const GlyphAtlasTexture&) = delete;
 
+		GlyphAtlasTexture(DscRender::DrawSystem& drawSystem);
+		~GlyphAtlasTexture();
+
 		std::unique_ptr<Glyph> AddIcon(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_4b);
 		std::unique_ptr<Glyph> AddGlyph(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_1b);
 

@@ -22,6 +22,11 @@ namespace DscRenderResource
     class ShaderConstantBuffer;
 }
 
+namespace DscText
+{
+    class TextManager;
+}
+
 class Application : public DscWindows::IWindowApplication
 {
 public:
@@ -43,14 +48,8 @@ private:
 
     struct Resources
     {
-        std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_triangle;
-        std::shared_ptr<DscRenderResource::Shader> _shader_triangle;
-        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer;
-        std::shared_ptr<DscRenderResource::RenderTargetTexture> _render_target_texture;
-        std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_present;
-        std::shared_ptr<DscRenderResource::Shader> _shader_present;
+        std::shared_ptr<DscText::TextManager> _text_manager;
     };
     std::unique_ptr<Resources> _resources;
-    float _time_accumulation = 0.0f;
 
 };

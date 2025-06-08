@@ -17,11 +17,10 @@
 
 #include "glyph.h"
 #include "glyph_atlas_row.h"
-#include "glyph_atlas_teture.h"
+#include "glyph_atlas_texture.h"
 #include "glyph_collection_icon.h"
 #include "glyph_collection_text.h"
 #include "i_text_run.h"
-#include "text_block_texture.h"
 #include "text_locale.h"
 #include "text_manager.h"
 #include "text_pre_vertex.h"

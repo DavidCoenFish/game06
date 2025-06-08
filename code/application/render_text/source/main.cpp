@@ -1,3 +1,4 @@
+#include "render_text.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/log_system.h>
 #include <dsc_windows/window_helper.h>
