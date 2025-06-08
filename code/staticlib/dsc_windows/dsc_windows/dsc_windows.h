@@ -3,9 +3,13 @@
 
 #define LOG_TOPIC_DSC_WINDOWS "DSC_WINDOWS"
 
-// this didn't work?
-//#define DSC_LOG_WINDOWS_ERROR(FORMAT, ...)		DSC_LOG_ERROR(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
-//#define DSC_LOG_WINDOWS_WARNING(FORMAT, ...)	DSC_LOG_WARNING(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
-//#define DSC_LOG_WINDOWS_INFO(FORMAT, ...)		DSC_LOG_INFO(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
-//#define DSC_LOG_WINDOWS_DIAGNOSTIC(FORMAT, ...)	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_WINDOWS, FORMAT, ...)
+#ifndef DSC_BFF_BUILD
+
+//G:\development\game06\code\staticlib\dsc_dag\dsc_dag\dsc_dag.h
+#include "..\..\dsc_common\dsc_common\dsc_common.h"
+
+#include "i_window_application.h"
+#include "window_helper.h"
+
+#endif //#ifndef DSC_BFF_BUILD
 

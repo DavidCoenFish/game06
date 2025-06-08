@@ -9,6 +9,12 @@
     <CustomBuild Include="dsc_common\dsc_common.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
+    <CustomBuild Include="dsc_common\enum_soft_bind.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\enum_soft_bind.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
     <CustomBuild Include="dsc_common\file_overlay_local.cpp">
       <Filter>dsc_common</Filter>
     </CustomBuild>
@@ -73,6 +79,12 @@
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\vector_float4.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_int2.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_int2.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
   </ItemGroup>

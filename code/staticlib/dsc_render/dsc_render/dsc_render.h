@@ -3,6 +3,29 @@
 
 #define LOG_TOPIC_DSC_RENDER "DSC_RENDER"
 
+#ifndef DSC_BFF_BUILD
+
+//G:\development\game06\code\staticlib\dsc_dag\dsc_dag\dsc_dag.h
+#include "..\..\dsc_common\dsc_common\dsc_common.h"
+
+#include "d3dx12.h"
+#include "device_resources.h"
+#include "draw_system.h"
+#include "graphics_memory.h"
+#include "heap_wrapper.h"
+#include "heap_wrapper_item.h"
+#include "heap_wrapper_page.h"
+#include "i_render_target.h"
+#include "i_resource.h"
+#include "linear_allocator.h"
+#include "render_target_backbuffer.h"
+#include "render_target_depth_data.h"
+#include "render_target_format_data.h"
+#include "resource_list.h"
+#include "screen_size_resources.h"
+
+#endif //#ifndef DSC_BFF_BUILD
+
 //#define DSC_LOG_RENDER_ERROR(FORMAT, ...)		DSC_LOG_ERROR(LOG_TOPIC_DSC_RENDER, FORMAT, ...)
 //#define DSC_LOG_RENDER_WARNING(FORMAT, ...)		DSC_LOG_WARNING(LOG_TOPIC_DSC_RENDER, FORMAT, ...)
 //#define DSC_LOG_RENDER_INFO(FORMAT, ...)		DSC_LOG_INFO(LOG_TOPIC_DSC_RENDER, FORMAT, ...)
@@ -75,3 +98,4 @@ namespace DirectX
 	}
 
 } // DX
+

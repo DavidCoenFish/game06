@@ -137,6 +137,7 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /diagnostics:classic' // Compiler diagnostic options
                                     + ' /D "_UNICODE"' 
                                     + ' /D "UNICODE"'
+                                    + ' /D "DSC_BFF_BUILD"'
                                     // Warnings
                                     + ' /Wall'              // Enable all warnings (we'll disable those that are not useful)
                                     + ' /WX'                // Warnings as errors

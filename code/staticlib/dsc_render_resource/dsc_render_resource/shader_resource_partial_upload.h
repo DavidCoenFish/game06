@@ -13,10 +13,10 @@ namespace DscRender
 namespace DscRenderResource
 {
 	/* was ShaderTexture */
-	class ShaderResource : public DscRender::IResource
+	class ShaderResourcePartialUpload : public DscRender::IResource
 	{
 	public:
-		ShaderResource(
+		ShaderResourcePartialUpload(
 			DscRender::DrawSystem* const in_draw_system,
 			const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource,
 			const D3D12_RESOURCE_DESC& in_desc,
@@ -69,6 +69,10 @@ namespace DscRenderResource
 		std::vector<uint8_t> _data;
 
 		D3D12_RESOURCE_STATES _current_state;
+
+		bool _dirty = false;
+		int32 _dirty_height_low = 0;
+		int32 _dirty_height_high = 0;
 
 	};
 }//namespace DscRenderResource

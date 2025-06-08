@@ -37,7 +37,12 @@ namespace DscText
 		//void UploadTexture(DrawSystem);
 
 	private:
-		std::unique_ptr<DscRenderResource::ShaderResourcePartialUpload> _texture = {};
+		// TODO, make a DscRenderResource::ShaderResourcePartialUpload
+		std::unique_ptr<DscRenderResource::ShaderResource> _texture = {};
+		// move into ShaderResourcePartialUpload?
+		//bool _dirty = false;
+		//int32 _dirty_height_low = 0;
+		//int32 _dirty_height_high = 0;
 
 		std::vector<std::unique_ptr<GlyphAtlasRow>> _array_glyph_row;
 		// No, you would still need to visit _array_glyph_row_full to get the highest line in each 

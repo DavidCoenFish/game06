@@ -1,3 +1,4 @@
+#include "render_glyph.h"
 #include <dsc_common/dsc_common.h>
 #include "application.h"
 

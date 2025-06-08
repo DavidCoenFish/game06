@@ -1,4 +1,6 @@
 #pragma once
+#include "dsc_render_resource.h"
+
 #include <dsc_common/dsc_common.h>
 #include <dsc_render/i_resource.h>
 

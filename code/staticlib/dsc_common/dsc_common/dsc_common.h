@@ -89,20 +89,29 @@ typedef unsigned __int64 uint64;
 
 #define ARRAY_LITERAL_SIZE(DATA) (sizeof(DATA)/sizeof(DATA[0]))
 
-#define TOKEN_PAIR(TOKEN) TOKEN,#TOKEN
-#define ENUM_TOKEN_PAIR(ENUM, TOKEN) ENUM::TOKEN,#TOKEN
+// trying to get visual studio IDE/ intelisense see settings/ includes without bothering fastbuild
+// add DSC_BFF_BUILD to fastbuild defines
+#ifndef DSC_BFF_BUILD
+#ifndef _UNICODE
+#define _UNICODE
+#endif
+#ifndef UNICODE
+#define UNICODE
+#endif
 
-template<class ENUM>
-class EnumSoftBind
-{
-public:
-	static const ENUM EnumFromString(const std::string& in_string);
-	static const std::string EnumToString(const ENUM in_enum);
+#include "enum_soft_bind.h"
+#include "file_overlay_local.h"
+#include "file_system.h"
+#include "i_file_overlay.h"
+#include "i_log_consumer.h"
+#include "log_consumer_output_debug_string.h"
+#include "log_consumer_std_out.h"
+#include "log_system.h"
+#include "math.h"
+#include "math_angle.h"
+#include "utf8.h"
+#include "vector_float4.h"
+#include "vector_int2.h"
 
-private:
-	EnumSoftBind() = delete;
-	EnumSoftBind(const EnumSoftBind&) = delete;
-	EnumSoftBind(EnumSoftBind&&) = delete;
-	EnumSoftBind& operator=(const EnumSoftBind&) = delete;
+#endif //#ifndef DSC_BFF_BUILD
 
-};

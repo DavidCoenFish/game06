@@ -1,4 +1,5 @@
 #pragma once
+#include "dsc_windows.h"
 #include <dsc_common/dsc_common.h>
 
 namespace DscWindows

@@ -14,6 +14,8 @@
     <CustomBuild Include="dsc.bff" />
     <CustomBuild Include="dsc_common\dsc_common.cpp" />
     <CustomBuild Include="dsc_common\dsc_common.h" />
+    <CustomBuild Include="dsc_common\enum_soft_bind.cpp" />
+    <CustomBuild Include="dsc_common\enum_soft_bind.h" />
     <CustomBuild Include="dsc_common\file_overlay_local.cpp" />
     <CustomBuild Include="dsc_common\file_overlay_local.h" />
     <CustomBuild Include="dsc_common\file_system.cpp" />
@@ -36,6 +38,8 @@
     <CustomBuild Include="dsc_common\utf8.h" />
     <CustomBuild Include="dsc_common\vector_float4.cpp" />
     <CustomBuild Include="dsc_common\vector_float4.h" />
+    <CustomBuild Include="dsc_common\vector_int2.cpp" />
+    <CustomBuild Include="dsc_common\vector_int2.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

@@ -1,3 +1,4 @@
+#include "..\unit_test.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/log_system.h>
 #include <dsc_common/i_log_consumer.h>
