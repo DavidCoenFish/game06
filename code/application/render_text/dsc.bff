@@ -22,6 +22,8 @@
 
     .AdditionalStaicLibPaths = {"$RootPath$/../build/free_type", "$RootPath$/../build/harf_buzz"}
     .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include", "$RootPath$/sdk/harf_buzz/Include"}
+    .DataCopyPath = {"$RootPath$/../data/font"}
+    .DoDataCopy = true
 ]
 
 DscVsprojectWindowExe("render_text" .WindowExeParam)
