@@ -75,6 +75,12 @@
     <CustomBuild Include="dsc_common\utf8.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_float2.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_float2.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
     <CustomBuild Include="dsc_common\vector_float4.cpp">
       <Filter>dsc_common</Filter>
     </CustomBuild>
@@ -85,6 +91,12 @@
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\vector_int2.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_int4.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_int4.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
   </ItemGroup>

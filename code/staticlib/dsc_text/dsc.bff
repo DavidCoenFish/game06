@@ -11,8 +11,16 @@
     ^SolutionItemArray + .temp
 }
 
-.LibraryDependencyArray = {"dsc_common"}
-DscVsprojectStaticLib("dsc_text" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
+.LibraryParam = [
+    .RootPath = ^_WORKING_DIR_
+    .RelativePath = ^_CURRENT_BFF_DIR_
+    .ConfigurationArray = ^ConfigurationArray
+    .VisualStudioSettings = ^VisualStudioSettings
+    .CommonVcproject = ^CommonVcproject
+    .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_locale"}
+    .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include", "$RootPath$/sdk/harf_buzz/Include"}
+]
+DscVsprojectStaticLib("dsc_text" .LibraryParam)
 
 .SolutionProjects + "dsc_text_project"
 .SolutionItemsStaticLibProject + "dsc_text_project"

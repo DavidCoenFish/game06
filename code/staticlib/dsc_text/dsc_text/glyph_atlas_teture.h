@@ -1,4 +1,5 @@
 #pragma once
+#include "dsc_text.h"
 #include <dsc_common/dsc_common.h>
 
 namespace DscRender
@@ -9,7 +10,7 @@ namespace DscRender
 
 namespace DscRenderResource
 {
-	class ShaderResource;
+	class ShaderResourcePartialUpload;
 }
 
 namespace DscText
@@ -29,9 +30,11 @@ namespace DscText
 
 		std::unique_ptr<Glyph> AddIcon(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_4b);
 		std::unique_ptr<Glyph> AddGlyph(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_1b);
+
+		void ClearAllIconUsage();
 		void ClearAllGlyphUsage();
 
-		// get reference to 
+		// get reference to the backing texture
 		std::shared_ptr<DscRender::HeapWrapperItem> GetHeapWrapperItem() const;
 
 		//void UploadTexture(DrawSystem);

@@ -1,4 +1,5 @@
 #pragma once
+#include "dsc_render.h"
 #include <dsc_common/dsc_common.h>
 #include "render_target_format_data.h"
 #include "render_target_depth_data.h"

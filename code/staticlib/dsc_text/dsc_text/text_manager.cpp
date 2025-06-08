@@ -1,3 +1,3 @@
-#include <dsc_text/dsc_text.h>
+#include "text_manager.h"
 
 

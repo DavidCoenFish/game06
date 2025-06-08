@@ -19,6 +19,7 @@ public:
 	//static std::unique_ptr<IFileOverlay>&& FactoryOverlayLocal();
 	static std::unique_ptr<IFileOverlay> FactoryOverlayLocal();
 
+	// todo: provide an object to manage how overlay are handled, do we run them all? bail after first success?
 	FileSystem(std::vector<std::unique_ptr<IFileOverlay>>&& in_consumerArray);
 	FileSystem(std::unique_ptr<IFileOverlay>&& in_overlay = FactoryOverlayLocal());
 
@@ -30,6 +31,9 @@ public:
 	const bool SaveFile(const std::vector<uint8>& in_data, const std::string& in_filePath);
 	const bool SaveFileOverlay(const std::vector<uint8>& in_data, const std::string& in_filePath, const int32 in_overlayId);
 
+#ifdef DeleteFile
+#undef DeleteFile
+#endif
 	const bool DeleteFile(const std::string& in_filePath);
 	const bool DeleteFileOverlay(const std::string& in_filePath, const int32 in_overlayId);
 

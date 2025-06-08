@@ -1,57 +1,34 @@
 #pragma once
+#include "dsc_text.h"
 #include <dsc_common/dsc_common.h>
-
-namespace DscRender
-{
-	class DrawSystem;
-	class HeapWrapperItem;
-}
-
-namespace DscRenderResource
-{
-	class ShaderResource;
-}
 
 namespace DscText
 {
-	class Glyph;
-	class GlyphAtlasRow;
-
-	//no, don't reset, icons have longer lifespan, move GlyphCell ownership to TextFont
-	//rather than a reset method, just destroy and recreate, but then what about icon.
-	// motivation, want a way to reset all text glyph usage on locale change
-	class GlyphAtlasTexture
+	class GlyphAtlasRow
 	{
 	public:
-		GlyphAtlasTexture() = delete;
-		GlyphAtlasTexture& operator=(const GlyphAtlasTexture&) = delete;
-		GlyphAtlasTexture(const GlyphAtlasTexture&) = delete;
+		GlyphAtlasRow() = delete;
+		GlyphAtlasRow& operator=(const GlyphAtlasRow&) = delete;
+		GlyphAtlasRow(const GlyphAtlasRow&) = delete;
 
-		std::unique_ptr<Glyph> AddIcon(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_4b);
-		std::unique_ptr<Glyph> AddGlyph(const int32 in_width, const int32 in_height, const std::vector<uint8>& in_data_1b);
-		void ClearAllGlyphUsage();
+	public:
+		GlyphAtlasRow(
+			const int in_mask_index,
+			const int in_height,
+			const int in_texture_pos_y
+		);
 
-		// get reference to 
-		std::shared_ptr<DscRender::HeapWrapperItem> GetHeapWrapperItem() const;
-
-		//void UploadTexture(DrawSystem);
+		const int GetMaskIndex() const { return _mask_index; }
+		const int GetHeight() const { return _height; }
+		const int GetTexturePosY() const { return _texture_pos_y; }
+		const int GetTextureHighestX() const { return _texture_highest_x; }
+		void IncrementTextureHighestX(const int in_add_x);
 
 	private:
-		// TODO, make a DscRenderResource::ShaderResourcePartialUpload
-		std::unique_ptr<DscRenderResource::ShaderResource> _texture = {};
-		// move into ShaderResourcePartialUpload?
-		//bool _dirty = false;
-		//int32 _dirty_height_low = 0;
-		//int32 _dirty_height_high = 0;
-
-		std::vector<std::unique_ptr<GlyphAtlasRow>> _array_glyph_row;
-		// No, you would still need to visit _array_glyph_row_full to get the highest line in each 
-		std::vector<std::unique_ptr<GlyphAtlasRow>> _array_glyph_row_full;
-		int _highest_pos_y[4];
-
-		std::vector<std::unique_ptr<GlyphAtlasRow>> _array_icon_row;
-		std::vector<std::unique_ptr<GlyphAtlasRow>> _array_icon_row_full;
-		int _icon_max_pos_y;
+		int _mask_index;
+		int _height;
+		int _texture_pos_y;
+		int _texture_highest_x;
 
 	};
 }

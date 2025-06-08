@@ -3,6 +3,14 @@
 
 #define LOG_TOPIC_DSC_LOCALE "DSC_LOCALE"
 
+// allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
+// added DSC_BFF_BUILD to fastbuild defines
+#ifndef DSC_BFF_BUILD
+
+#include "..\..\dsc_common\dsc_common\dsc_common.h"
+
+#endif //#ifndef DSC_BFF_BUILD
+
 namespace DscLocale
 {
 // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes

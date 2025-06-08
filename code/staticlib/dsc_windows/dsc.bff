@@ -11,8 +11,15 @@
     ^SolutionItemArray + .temp
 }
 
-.LibraryDependencyArray = {"dsc_common"}
-DscVsprojectStaticLib("dsc_windows" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
+.LibraryParam = [
+    .RootPath = ^_WORKING_DIR_
+    .RelativePath = ^_CURRENT_BFF_DIR_
+    .ConfigurationArray = ^ConfigurationArray
+    .VisualStudioSettings = ^VisualStudioSettings
+    .CommonVcproject = ^CommonVcproject
+    .LibraryBaseNameDependency = {"dsc_common"}
+]
+DscVsprojectStaticLib("dsc_windows" .LibraryParam)
 
 .SolutionProjects + "dsc_windows_project"
 .SolutionItemsStaticLibProject + "dsc_windows_project"

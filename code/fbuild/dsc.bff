@@ -108,10 +108,19 @@
 #endif
 ]
 
-// todo dependencies
-function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryBaseNameDependency)
+function DscVsprojectStaticLib( .ProjectName .Param)
 {
-    ForEach( .ConfigIter in .ParamConfigurationArray )
+    .RootPath = ""
+    .RelativePath = ""
+    .ConfigurationArray = []
+    .VisualStudioSettings = []
+    .CommonVcproject = {}
+    .LibraryBaseNameDependency = {}
+    .AdditionalIncludePaths = {}
+
+    Using (.Param)
+
+    ForEach( .ConfigIter in .ConfigurationArray )
     {
         Using( .ConfigIter )
 
@@ -130,6 +139,10 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
             {
                 ^CompilerOptions + ' /I"$RootPath$\staticlib\$LibraryName$"'
             }
+            ForEach( .Path in .AdditionalIncludePaths )
+            {
+                ^CompilerOptions + ' /I"$Path$"'
+            }
             //Print("$ProjectName$_$Config$_$Platform$")
             //Print(.CompilerOptions)
         }
@@ -146,7 +159,7 @@ function DscVsprojectStaticLib( .ProjectName .RootPath .RelativePath .ParamConfi
     VCXProject( "$ProjectName$_project" )
     {
         .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
-        .ProjectConfigs = .ParamConfigurationArray
+        .ProjectConfigs = .ConfigurationArray
         .ProjectInputPaths = "$RelativePath$/"
         .ProjectBasePath = '$RelativePath$/'
         .ProjectFiles = "$RelativePath$/dsc.bff"

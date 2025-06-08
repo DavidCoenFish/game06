@@ -1,8 +1,6 @@
 #pragma once
 #include "dsc_common.h"
 
-#include <dsc_common\dsc_common.h>
-
 namespace DscCommon
 {
 	class VectorInt2

@@ -1,5 +1,4 @@
 #include "vector_int2.h"
-#include <dsc_common\vector_int2.h>
 
 const DscCommon::VectorInt2 DscCommon::VectorInt2::s_zero(0, 0);
 

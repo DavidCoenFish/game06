@@ -1,27 +1,12 @@
 #pragma once
+#include "dsc_text.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/vector_float4.h>
 #include <dsc_common/vector_int2.h>
 
-namespace DscRender
-{
-	class DrawSystem;
-	class HeapWrapperItem;
-}
-
-namespace DscRenderResource
-{
-	class ShaderResource;
-}
-
 namespace DscText
 {
-	class Glyph;
-	class GlyphAtlasRow;
-
-	//no, don't reset, icons have longer lifespan, move GlyphCell ownership to TextFont
-	//rather than a reset method, just destroy and recreate, but then what about icon.
-	// motivation, want a way to reset all text glyph usage on locale change
+	// Glyph is an area on the backing glyph atlas texture that that could be text (1 channel) or icon (4 channel)
 	class Glyph
 	{
 	public:
@@ -30,9 +15,9 @@ namespace DscText
 		Glyph(const Glyph&) = delete;
 
 		Glyph(
-			const VectorInt2& in_width_height,
-			const VectorInt2& in_bearing,
-			const VectorFloat4& in_uv,
+			const DscCommon::VectorInt2& in_width_height,
+			const DscCommon::VectorInt2& in_bearing,
+			const DscCommon::VectorFloat4& in_uv,
 			const int in_mask
 		);
 

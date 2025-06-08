@@ -1,4 +1,4 @@
-#include <dsc_locale/dsc_locale.h>
+#include "dsc_locale.h"
 
 namespace
 {
@@ -234,7 +234,7 @@ namespace
 }
 
 template <>
-const DscLocale::LocaleISO_639_1 EnumSoftBind<DscLocale::LocaleISO_639_1>::EnumFromString(const std::string& in_locale)
+const DscLocale::LocaleISO_639_1 DscCommon::EnumSoftBind<DscLocale::LocaleISO_639_1>::EnumFromString(const std::string& in_locale)
 {
 	const auto& map = GetStringEnumMap();
 	auto found = map.find(in_locale);
@@ -246,7 +246,7 @@ const DscLocale::LocaleISO_639_1 EnumSoftBind<DscLocale::LocaleISO_639_1>::EnumF
 }
 
 template <>
-const std::string EnumSoftBind<DscLocale::LocaleISO_639_1>::EnumToString(const DscLocale::LocaleISO_639_1 in_locale)
+const std::string DscCommon::EnumSoftBind<DscLocale::LocaleISO_639_1>::EnumToString(const DscLocale::LocaleISO_639_1 in_locale)
 {
 	const auto& map = GetEnumStringMap();
 	auto found = map.find(in_locale);

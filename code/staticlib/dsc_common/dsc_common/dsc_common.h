@@ -89,8 +89,8 @@ typedef unsigned __int64 uint64;
 
 #define ARRAY_LITERAL_SIZE(DATA) (sizeof(DATA)/sizeof(DATA[0]))
 
-// trying to get visual studio IDE/ intelisense see settings/ includes without bothering fastbuild
-// add DSC_BFF_BUILD to fastbuild defines
+// allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
+// added DSC_BFF_BUILD to fastbuild defines
 #ifndef DSC_BFF_BUILD
 #ifndef _UNICODE
 #define _UNICODE
@@ -110,8 +110,10 @@ typedef unsigned __int64 uint64;
 #include "math.h"
 #include "math_angle.h"
 #include "utf8.h"
+#include "vector_float2.h"
 #include "vector_float4.h"
 #include "vector_int2.h"
+#include "vector_int4.h"
 
 #endif //#ifndef DSC_BFF_BUILD
 
