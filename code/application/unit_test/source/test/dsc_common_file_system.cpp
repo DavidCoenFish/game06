@@ -2,7 +2,7 @@
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/file_system.h>
 #include <dsc_common/file_overlay_local.h>
-
+#include "test_util.h"
 
 namespace
 {

@@ -1,7 +1,6 @@
-#include "..\unit_test.h"
+#include "dsc_common_utf8.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/utf8.h>
-#include "dsc_common_utf8.h"
 #include "test_util.h"
 
 namespace
