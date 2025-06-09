@@ -18,6 +18,7 @@ namespace DscRender
 namespace DscRenderResource
 {
 	class Shader;
+	class Frame;
 }
 
 namespace DscText
@@ -46,14 +47,11 @@ namespace DscText
 		// Find or make a new text face
 		GlyphCollectionText* LoadFont(DscCommon::FileSystem& in_file_system, const std::string& in_font_path);
 
-
-		//TextFont* const GetTextFont(
-		//	const std::filesystem::path& in_font_rel_path
-		//);
-
-		//// An Icon is a small 4 channel image
-		//IconFont* const GetIconFont();
-
+		// also call texture upload, and set texture as shader param
+		void SetShader(
+			DscRender::DrawSystem* const in_draw_system,
+			DscRenderResource::Frame* const in_draw_system_frame
+			);
 
 	private:
 		FT_Library _library;
@@ -63,7 +61,7 @@ namespace DscText
 		std::map<uint32_t, std::unique_ptr<Glyph>> _map_icon_cell;
 		std::unique_ptr<GlyphCollectionIcon> _icon_font;
 
-		std::unique_ptr<DscRenderResource::Shader> _shader;
+		std::shared_ptr<DscRenderResource::Shader> _shader;
 		std::unique_ptr<GlyphAtlasTexture> _texture;
 
 	};

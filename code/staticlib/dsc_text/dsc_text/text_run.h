@@ -5,9 +5,15 @@
 #include <dsc_common/vector_float4.h>
 #include <dsc_text/i_text_run.h>
 
+namespace DscRender
+{
+	class DrawSystem;
+}
+
 namespace DscRenderResource
 {
 	class GeometryGeneric;
+	class Frame;
 }
 
 namespace DscText
@@ -22,7 +28,7 @@ namespace DscText
 	public:
 		static std::unique_ptr<ITextRun> MakeTextRunDataString(
 			const std::string& in_string_utf8 = std::string(""),
-			TextLocale* const in_locale_token = nullptr,
+			const TextLocale* const in_locale_token = nullptr,
 			GlyphCollectionText* const in_text_font = nullptr,
 			const int in_font_size = 0,
 			const float in_new_line_gap_ratio = 0.0f,
@@ -52,6 +58,12 @@ namespace DscText
 		);
 
 		~TextRun();
+
+		// build geoemtry if needed
+		const std::shared_ptr<DscRenderResource::GeometryGeneric>& GetGeometry(
+			DscRender::DrawSystem* const in_draw_system,
+			DscRenderResource::Frame* const in_draw_system_frame
+			);
 
 		// Get the natural size required by the text using current width limit if enabled
 		DscCommon::VectorInt2 GetTextBounds();
@@ -108,7 +120,7 @@ namespace DscText
 		std::unique_ptr<TextPreVertex> _pre_vertex_data;
 		DscCommon::VectorInt2 _text_bounds;
 		bool _geometry_dirty;
-		std::unique_ptr<DscRenderResource::GeometryGeneric> _geometry;
+		std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry;
 
 	};
 }

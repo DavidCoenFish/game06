@@ -3,12 +3,16 @@
 #include "text_run_icon.h"
 #include "text_run_text.h"
 #include "text_pre_vertex.h"
+#include "text_enum.h"
+#include "text_manager.h"
+#include <dsc_render\draw_system.h>
+#include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\geometry_generic.h>
 
 
 std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 	const std::string& in_string_utf8,
-	TextLocale* const in_locale_token,
+	const TextLocale* const in_locale_token,
 	GlyphCollectionText* const in_text_font,
 	const int in_font_size,
 	const float in_new_line_gap_ratio,
@@ -69,6 +73,58 @@ DscText::TextRun::TextRun(
 DscText::TextRun::~TextRun()
 {
 	//nop
+}
+
+const std::shared_ptr<DscRenderResource::GeometryGeneric>& DscText::TextRun::GetGeometry(
+	DscRender::DrawSystem* const in_draw_system,
+	DscRenderResource::Frame* const in_draw_system_frame
+	)
+{
+	GetTextBounds();
+
+	if (true == _geometry_dirty)
+	{
+		_geometry_dirty = false;
+
+		std::vector<uint8_t> vertex_raw_data;
+		_pre_vertex_data->BuildVertexData(
+			vertex_raw_data,
+			_container_size,
+			THorizontalAlignment::TNone,
+			false,
+			_em_size
+		);
+
+		// the problem with resizing an existing geometry, is what if that geometry is still on a command list
+		// we can modify the data, as that just pokes different data onto the command list, but resize can end up being destructive, so better is to destroy and recreate the geometry if size changes
+		// again, found by fps text doing something like "0.0" => "59.9"
+		if ((nullptr != _geometry) && (vertex_raw_data.size() != _geometry->GetVertexDataByteSize()))
+		{
+			// note, the DrawSystem may still be holding a reference to the shared pointer if the geometry is still on an in use command list
+			_geometry.reset();
+		}
+
+		if (nullptr == _geometry)
+		{
+			_geometry = std::make_shared<DscRenderResource::GeometryGeneric>(
+				in_draw_system,
+				D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+				TextManager::GetInputElementDesc(),
+				vertex_raw_data,
+				6
+			);
+		}
+		else
+		{
+			_geometry->UpdateVertexData(
+				in_draw_system,
+				in_draw_system_frame->GetCommandList(),
+				in_draw_system->GetD3dDevice(),
+				vertex_raw_data
+				);
+		}
+	}
+	return _geometry;
 }
 
 // Get the natural size required by the text using current width limit if enabled

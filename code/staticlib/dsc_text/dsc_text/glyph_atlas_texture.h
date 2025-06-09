@@ -8,6 +8,7 @@ namespace DscRender
 {
 	class DrawSystem;
 	class HeapWrapperItem;
+	class IResource;
 }
 
 namespace DscRenderResource
@@ -45,6 +46,8 @@ namespace DscText
 		// get reference to the backing texture
 		std::shared_ptr<DscRender::HeapWrapperItem> GetHeapWrapperItem() const;
 
+		std::shared_ptr<DscRender::IResource> GetResource();
+
 		void UploadTexture(
 			DscRender::DrawSystem* const in_draw_system,
 			ID3D12GraphicsCommandList* const in_command_list
@@ -52,7 +55,7 @@ namespace DscText
 
 	private:
 		const int32 _texture_dimention;
-		std::unique_ptr<DscRenderResource::ShaderResourcePartialUpload> _texture = {};
+		std::shared_ptr<DscRenderResource::ShaderResourcePartialUpload> _texture = {};
 
 		std::vector<std::unique_ptr<GlyphAtlasRow>> _array_glyph_row;
 		// No, you would still need to visit _array_glyph_row_full to get the highest line in each 

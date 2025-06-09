@@ -272,6 +272,11 @@ std::shared_ptr<DscRender::HeapWrapperItem> DscText::GlyphAtlasTexture::GetHeapW
     return nullptr;
 }
 
+std::shared_ptr<DscRender::IResource> DscText::GlyphAtlasTexture::GetResource()
+{
+	return _texture;
+}
+
 void DscText::GlyphAtlasTexture::UploadTexture(
     DscRender::DrawSystem* const in_draw_system,
     ID3D12GraphicsCommandList* const in_command_list

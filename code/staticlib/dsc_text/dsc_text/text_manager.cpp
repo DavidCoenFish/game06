@@ -9,6 +9,7 @@
 #include <dsc_common\file_system.h>
 #include <dsc_common\log_system.h>
 #include <dsc_render\draw_system.h>
+#include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\shader.h>
 #include <dsc_render_resource\shader_resource_info.h>
 #include <dsc_locale\dsc_locale.h>
@@ -136,7 +137,7 @@ DscText::TextManager::TextManager(DscRender::DrawSystem& draw_system, DscCommon:
 				D3D12_SHADER_VISIBILITY_PIXEL
 			)
 		);
-		_shader = std::make_unique<DscRenderResource::Shader>(
+		_shader = std::make_shared<DscRenderResource::Shader>(
 			&draw_system,
 			shader_pipeline_state_data,
 			vertex_shader_data,
@@ -178,3 +179,17 @@ DscText::GlyphCollectionText* DscText::TextManager::LoadFont(DscCommon::FileSyst
 
 	return glyph_collection_text;
 }
+
+void DscText::TextManager::SetShader(
+	DscRender::DrawSystem* const in_draw_system,
+	DscRenderResource::Frame* const in_draw_system_frame
+	)
+{
+	_texture->UploadTexture(in_draw_system, in_draw_system_frame->GetCommandList());
+	in_draw_system_frame->AddFrameResource(_texture->GetResource());
+	_shader->SetShaderResourceViewHandle(0, _texture->GetHeapWrapperItem());
+	in_draw_system_frame->SetShader(_shader);
+
+	return;
+}
+

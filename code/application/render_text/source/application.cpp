@@ -33,18 +33,21 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf"));
         std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
         DscCommon::VectorInt2 container_size;
+        const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
 
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "hello world",
+            pLocale,
+            font,
+            128,
+            0.5f,
+            DscCommon::VectorFloat4::s_white
+            ));
 
         _resources->_text_run = std::make_unique<DscText::TextRun>(
             std::move(text_run_array),
-            container_size,
-            font
+            container_size
             );
-    }
-
-
-    if (nullptr != _resources->_text_manager)
-    {
     }
 
     return;
@@ -68,6 +71,9 @@ const bool Application::Update()
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
 
+        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
+        _resources->_text_manager->SetShader(_draw_system.get(), frame.get());
+        frame->Draw(_resources->_text_run->GetGeometry(_draw_system.get(), frame.get()));
     }
     
     return true;
