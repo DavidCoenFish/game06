@@ -23,7 +23,7 @@
         "$RootPath$/sdk/harf_buzz/Source"
     }
     .LinkerAdditionalDependency = {
-        "harf_buzz.lib"
+        //"harf_buzz.lib"
         }
     .AdditionalStaicLibPaths = {
         "$RootPath$/../build/harf_buzz"
