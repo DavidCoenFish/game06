@@ -1,6 +1,8 @@
 #once
 //https://www.fastbuild.org/docs/documentation.html
 
+#define DEVELOPMENT_BUILD_CMD
+
 .SolutionItemArray = {}
 {
     .temp =  [

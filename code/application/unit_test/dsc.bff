@@ -11,8 +11,16 @@
     ^SolutionItemArray + .temp
 }
 
-.LibraryDependencyArray = {"dsc_common", "dsc_dag"}
-DscVsprojectConsoleExe("unit_test" ._WORKING_DIR_ ._CURRENT_BFF_DIR_ .ConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryDependencyArray)
+.Param = [
+    .RootPath = ^_WORKING_DIR_
+    .RelativePath = ^_CURRENT_BFF_DIR_
+    .ConfigurationArray = ^ConfigurationArray
+    .VisualStudioSettings = ^VisualStudioSettings
+    .CommonVcproject = ^CommonVcproject
+    .LibraryBaseNameDependency = {"dsc_common", "dsc_dag"}
+    .AdditionalIncludePaths = {}
+]
+DscVsprojectConsoleExe("unit_test" .Param)
 
 .SolutionProjects + "unit_test_project"
 .SolutionItemsApplicationProject + "unit_test_project"

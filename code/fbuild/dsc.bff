@@ -96,7 +96,6 @@
 
 .CommonVcproject = [
         .ProjectInputPathsRecurse   = true
-//#define DEVELOPMENT_BUILD_CMD
 #if DEVELOPMENT_BUILD_CMD
         .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
         .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
@@ -336,9 +335,21 @@ function DscVsprojectWindowExe( .ProjectName .Param )
     }
 }
 
-function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConfigurationArray .VisualStudioSettings .CommonVcproject .LibraryBaseNameDependency)
+function DscVsprojectConsoleExe( .ProjectName .Param)
 {
-    ForEach( .ConfigIter in .ParamConfigurationArray )
+    .RootPath = ""
+    .RelativePath = ""
+    .ConfigurationArray = []
+    .VisualStudioSettings = []
+    .CommonVcproject = {}
+    .LibraryBaseNameDependency = {}
+    .AdditionalIncludePaths = {}
+    .LinkerAdditionalDependency = {}
+    .AdditionalStaicLibPaths = {}
+
+    Using (.Param)
+
+    ForEach( .ConfigIter in .ConfigurationArray )
     {
         Using( .ConfigIter )
 
@@ -354,10 +365,23 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
             {
                 ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
             }
+            ForEach( .Path in .AdditionalIncludePaths )
+            {
+                ^CompilerOptions + ' /I"$Path$"'
+            }
         }
 
         .LinkerOptions + ' /PDB:"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/$ProjectName$.pdb"'
                        + ' /SUBSYSTEM:CONSOLE'
+        ForEach( .lib in .LinkerAdditionalDependency )
+        {
+            ^LinkerOptions + ' "$lib$"'
+        }
+        ForEach( .StaicLibPath in .AdditionalStaicLibPaths )
+        {
+            ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$/$Platform$/$Config$/output"'
+        }
+
         Executable( "$ProjectName$_$Config$_$Platform$" )
         {
             .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"
@@ -382,7 +406,7 @@ function DscVsprojectConsoleExe( .ProjectName .RootPath .RelativePath .ParamConf
     VCXProject( "$ProjectName$_project" )
     {
         .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
-        .ProjectConfigs = .ParamConfigurationArray
+        .ProjectConfigs = .ConfigurationArray
         .ProjectInputPaths  = "$RelativePath$/"
         .ProjectBasePath = '$RelativePath$/'
         .ProjectFiles = "$RelativePath$/dsc.bff"
