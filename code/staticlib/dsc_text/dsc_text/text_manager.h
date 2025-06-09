@@ -38,10 +38,15 @@ namespace DscText
 		TextManager(const TextManager&) = delete;
 
 
-		TextManager(DscRender::DrawSystem& drawSystem, DscCommon::FileSystem& fileSystem);
+		TextManager(DscRender::DrawSystem& drawSystem, DscCommon::FileSystem& in_file_system);
 		~TextManager();
 
+		const TextLocale* const GetLocaleToken(const DscLocale::LocaleISO_639_1 in_locale) const;
+
 		// Find or make a new text face
+		GlyphCollectionText* LoadFont(DscCommon::FileSystem& in_file_system, const std::string& in_font_path);
+
+
 		//TextFont* const GetTextFont(
 		//	const std::filesystem::path& in_font_rel_path
 		//);
@@ -49,7 +54,6 @@ namespace DscText
 		//// An Icon is a small 4 channel image
 		//IconFont* const GetIconFont();
 
-		const TextLocale* const GetLocaleToken(const DscLocale::LocaleISO_639_1 in_locale) const;
 
 	private:
 		FT_Library _library;

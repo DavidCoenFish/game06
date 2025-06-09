@@ -31,7 +31,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     int error = FT_Init_FreeType(&library);
     if (error)
     {
-        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "Freetype init error\n");
+        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "Freetype init error:%d\n", error);
         return;
     }
 

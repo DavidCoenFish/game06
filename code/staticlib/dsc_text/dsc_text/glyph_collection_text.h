@@ -4,6 +4,11 @@
 #include <dsc_common/vector_int2.h>
 
 typedef struct FT_LibraryRec_* FT_Library;
+typedef struct FT_FaceRec_* FT_Face;
+typedef struct FT_GlyphSlotRec_* FT_GlyphSlot;
+struct hb_font_t;
+struct hb_buffer_t;
+typedef uint32_t hb_codepoint_t;
 
 namespace DscCommon
 {
@@ -14,6 +19,7 @@ namespace DscText
 {
 	class Glyph;
 	class GlyphAtlasRow;
+	class GlyphAtlasTexture;
 	class TextLocale;
 	class TextPreVertex;
 
@@ -23,12 +29,17 @@ namespace DscText
 	class GlyphCollectionText
 	{
 	public:
+		typedef std::map<uint32_t, std::unique_ptr<Glyph>> TMapCodepointGlyph;
+
 		GlyphCollectionText(
 			FT_Library in_library,
-			DscCommon::FileSystem& fileSystem,
+			GlyphAtlasTexture* in_texture,
+			DscCommon::FileSystem& in_file_system,
 			const std::string& in_font_file_path
 		);
 		~GlyphCollectionText();
+
+		void ClearAllGlyphUsage();
 
 		void BuildPreVertexData(
 			TextPreVertex& in_out_text_pre_vertex,
@@ -42,17 +53,50 @@ namespace DscText
 			const DscCommon::VectorFloat4& in_colour = DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
 		);
 
-		/// Draw a glyph to a pixel blob, made to match the target size
-		void DrawToPixels(
-			std::vector<uint8_t>& out_data,
-			const int in_target_width,
-			const int in_target_height,
+		///// Draw a glyph to a pixel blob, made to match the target size
+		//void DrawToPixels(
+		//	std::vector<uint8_t>& out_data,
+		//	const int in_target_width,
+		//	const int in_target_height,
+		//	const std::string& in_string_utf8,
+		//	const TextLocale* const in_locale_token,
+		//	const int in_font_size,
+		//	const int in_offset_x = 0,
+		//	const int in_offset_y = 0
+		//);
+
+	private:
+		TMapCodepointGlyph* const FindMapCodepointGlyph(const int in_glyph_size);
+		void SetScale(const int32 in_glyph_size);
+		void ShapeText(
+			DscText::TextPreVertex& in_out_text_pre_vertex,
+			DscCommon::VectorInt2& in_out_cursor, // allow multiple fonts to append pre vertex data
 			const std::string& in_string_utf8,
-			const TextLocale* const in_locale_token,
-			const int in_font_size,
-			const int in_offset_x = 0,
-			const int in_offset_y = 0
+			hb_buffer_t* in_buffer,
+			DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
+			const bool in_width_limit_enabled,
+			const int in_width_limit,
+			const int in_width_limit_new_line_height,
+			const DscCommon::VectorFloat4& in_colour
 		);
+		Glyph* FindCell(
+			hb_codepoint_t in_codepoint,
+			TMapCodepointGlyph& in_out_map_glyph_cell
+		);
+		Glyph* MakeGlyph(
+			hb_codepoint_t in_codepoint,
+			FT_GlyphSlot in_slot,
+			TMapCodepointGlyph& in_out_map_glyph_cell
+		);
+
+	private:
+		FT_Face _face;
+		hb_font_t* _harf_buzz_font;
+
+		// For each font size, have a map of codepoints to glyph
+		std::map<uint32_t, std::unique_ptr<TMapCodepointGlyph>> _map_size_glyph_cell;
+
+		GlyphAtlasTexture* _texture;
 	};
 }
 

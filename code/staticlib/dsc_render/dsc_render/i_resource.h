@@ -2,6 +2,10 @@
 #include <dsc_common/dsc_common.h>
 
 //#define DRAW_SYSTEM_RESOURCE_ALIVE_COUNT
+namespace DscCommon
+{
+	class VectorInt2;
+}
 
 namespace DscRender
 {
@@ -19,8 +23,7 @@ namespace DscRender
 		virtual void OnResize(
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,
-			const int32 in_size_width,
-			const int32 in_size_height
+			const DscCommon::VectorInt2& in_size
 		);
 		virtual void OnResourceBarrier(
 			ID3D12GraphicsCommandList* const in_command_list,

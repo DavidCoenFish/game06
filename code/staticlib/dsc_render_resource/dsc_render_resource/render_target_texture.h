@@ -2,6 +2,7 @@
 #include "dsc_render_resource.h"
 
 #include <dsc_common/dsc_common.h>
+#include <dsc_common/vector_int2.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render/i_resource.h>
 
@@ -46,8 +47,7 @@ namespace DscRenderResource
 			DscRender::DrawSystem* const in_draw_system,
 			const std::vector < DscRender::RenderTargetFormatData >& in_target_format_data_array,
 			const DscRender::RenderTargetDepthData& in_target_depth_data,
-			const int32 in_size_width,
-			const int32 in_size_height,
+			const DscCommon::VectorInt2& in_size,
 			const bool in_resize_with_screen = false
 		);
 		virtual ~RenderTargetTexture();
@@ -57,8 +57,7 @@ namespace DscRenderResource
 		void Resize(
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,
-			const int32 in_size_width,
-			const int32 in_size_height
+			const DscCommon::VectorInt2& in_size
 		);
 
 	private:
@@ -73,8 +72,7 @@ namespace DscRenderResource
 		virtual void OnResize(
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,
-			const int32 in_size_width,
-			const int32 in_size_height
+			const DscCommon::VectorInt2& in_size
 		) override;
 		virtual void StartRender(ID3D12GraphicsCommandList* const in_command_list, const bool in_allow_clear) override;
 		virtual void EndRender(ID3D12GraphicsCommandList* const in_command_list) override;
@@ -91,8 +89,7 @@ namespace DscRenderResource
 			int& in_render_target_view_format_count,
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const override;
-		virtual const int32 GetWidth() const override;
-		virtual const int32 GetHeight() const override;
+		virtual const DscCommon::VectorInt2 GetSize() const override;
 
 	public:
 		std::vector < std::shared_ptr < Resource > > _target_resource_array;
@@ -105,8 +102,7 @@ namespace DscRenderResource
 		D3D12_RESOURCE_STATES _current_state_depth_resource;
 
 	private:
-		int32 _size_width;
-		int32 _size_height;
+		DscCommon::VectorInt2 _size;
 		bool _resize_with_screen;
 		std::vector < DXGI_FORMAT > _target_format_array;
 		int _id;

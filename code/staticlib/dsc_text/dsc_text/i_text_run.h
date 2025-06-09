@@ -19,7 +19,7 @@ namespace DscText
 			const bool in_width_limit_enabled,
 			const int in_width_limit,
 			const float in_ui_scale
-		) const = 0;
+		) = 0;
 
 	};
 }

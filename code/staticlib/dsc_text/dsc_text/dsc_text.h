@@ -11,6 +11,9 @@
 #include "..\..\..\sdk\free_type\Include\ft2build.h"
 #include "..\..\..\sdk\free_type\Include\FreeType\config\ftheader.h"
 #include "..\..\..\sdk\harf_buzz\Include\hb.h"
+// Was not in the include folder, is this safe to use?
+#include "..\..\..\sdk\harf_buzz\Source\hb-ft.h"
+
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 #include "..\..\dsc_render\dsc_render\dsc_render.h"
 #include "..\..\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"

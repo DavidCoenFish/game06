@@ -103,6 +103,7 @@ typedef unsigned __int64 uint64;
 #define DSC_LOG
 //#endif
 
+#include "data_helper.h"
 #include "enum_soft_bind.h"
 #include "file_overlay_local.h"
 #include "file_system.h"

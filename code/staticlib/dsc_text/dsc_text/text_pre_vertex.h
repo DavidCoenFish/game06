@@ -8,15 +8,20 @@
 namespace DscText
 {
 	class Glyph;
+	enum class THorizontalAlignment;
 
+	/*
+	collect data about a text run before converting it to verted data for the cpu
+	*/
 	class TextPreVertex
 	{
+	public:
 		struct PreVertexData
 		{
 			DscCommon::VectorInt4 _pos_low_high;
 			DscCommon::VectorFloat4 _uv_low_high;
-			int _mask;
-			int _colour;
+			DscCommon::VectorFloat4 _mask;
+			DscCommon::VectorFloat4 _colour;
 			int _line_index;
 		};
 
@@ -32,7 +37,7 @@ namespace DscText
 			const int in_pos_x,
 			const int in_pos_y,
 			const float in_new_line_gap_ratio,
-			const int in_colour,
+			const DscCommon::VectorFloat4& in_colour,
 			const float in_ui_scale
 		);
 
@@ -41,36 +46,35 @@ namespace DscText
 			const int in_pos_x,
 			const int in_pos_y,
 			const int in_line_height,
-			const int in_colour
+			const DscCommon::VectorFloat4& in_colour
 		);
 
 		void AddPreVertex(
 			const DscCommon::VectorInt2& in_width_height,
 			const DscCommon::VectorInt2& in_bearing,
 			const DscCommon::VectorFloat4& in_uv,
-			const int in_mask,
+			const DscCommon::VectorFloat4& in_mask,
 			const int in_pos_x,
 			const int in_pos_y,
 			const int in_line_height,
-			const int in_colour
+			const DscCommon::VectorFloat4& in_colour
 		);
 
 		void AddCursor(
-			const int in_pos_x,
-			const int in_pos_y
+			const int in_pos_x
 		);
 
 		void StartNewLine(
 			DscCommon::VectorInt2& in_out_cursor
 		);
 
-		const DscCommon::VectorInt2 GetBounds(); // const TextEnum::VerticalBlockAlignment in_vertical_block_alignment);
+		const DscCommon::VectorInt2 GetBounds(const bool in_use_em_height);
 
 		void BuildVertexData(
 			std::vector<uint8_t>& out_vertex_raw_data,
 			const DscCommon::VectorInt2& in_container_size,
-			//const TextEnum::HorizontalLineAlignment in_horizontal_line_alignment,
-			//const TextEnum::VerticalBlockAlignment in_vertical_block_alignment,
+			THorizontalAlignment in_horizontal_line_alignment,
+			const bool in_use_em_height,
 			const int in_em_size // Used for alignments MiddleEM, TopEM, BottomEM
 		);
 

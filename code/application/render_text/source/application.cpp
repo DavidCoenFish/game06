@@ -6,10 +6,19 @@
 #include <dsc_render/draw_system.h>
 #include <dsc_render_resource/frame.h>
 #include <dsc_text/text_manager.h>
+#include <dsc_text/text_run.h>
+#include <dsc_text/text_run_text.h>
+#include <dsc_text/glyph_collection_text.h>
 
 namespace
 {
 }
+
+Application::Resources::Resources() 
+{
+    //nop
+}
+
 
 Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)
     : DscWindows::IWindowApplication(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight)
@@ -20,8 +29,25 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     _resources = std::make_unique<Resources>();
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
-        _resources->_text_manager = std::make_shared<DscText::TextManager>(*_draw_system, *_file_system);
+        _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
+        DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf"));
+        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+        DscCommon::VectorInt2 container_size;
+
+
+        _resources->_text_run = std::make_unique<DscText::TextRun>(
+            std::move(text_run_array),
+            container_size,
+            font
+            );
     }
+
+
+    if (nullptr != _resources->_text_manager)
+    {
+    }
+
+    return;
 }
 
 Application::~Application()

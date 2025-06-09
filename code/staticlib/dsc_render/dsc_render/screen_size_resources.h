@@ -1,5 +1,6 @@
 #pragma once
 #include <dsc_common/dsc_common.h>
+#include <dsc_common/vector_int2.h>
 
 namespace DscRender
 {
@@ -24,8 +25,7 @@ namespace DscRender
 			const HWND in_hwnd,
 			const UINT64 in_fence_value,
 			const unsigned int in_back_buffer_count,
-			const int32 in_width,
-			const int32 in_height,
+			const DscCommon::VectorInt2& in_size,
 			const bool in_allow_tearing,
 			const RenderTargetFormatData& in_target_format_data,
 			const RenderTargetDepthData& in_target_depth_data
@@ -47,13 +47,9 @@ namespace DscRender
 			return _back_buffer_index;
 		}
 
-		const int32 GetSizeWidth() const
+		const DscCommon::VectorInt2 GetSize() const
 		{
-			return _size_width;
-		}
-		const int32 GetSizeHeight() const
-		{
-			return _size_height;
+			return _size;
 		}
 
 		void WaitForGpu(const Microsoft::WRL::ComPtr < ID3D12CommandQueue >& in_command_queue) noexcept;
@@ -61,8 +57,7 @@ namespace DscRender
 
 	private:
 		static const size_t MAX_BACK_BUFFER_COUNT = 3;
-		int32 _size_width;
-		int32 _size_height;
+		DscCommon::VectorInt2 _size;
 		bool _allow_tearing;
 		int _back_buffer_count;
 		int _back_buffer_index;

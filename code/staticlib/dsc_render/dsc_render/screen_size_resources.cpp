@@ -32,14 +32,12 @@ DscRender::ScreenSizeResources::ScreenSizeResources(
 	const HWND in_hwnd,
 	const UINT64 in_fence_value,
 	const unsigned int in_back_buffer_count,
-	const int32 in_width,
-	const int32 in_height,
+	const DscCommon::VectorInt2& in_size,
 	const bool in_allow_tearing,
 	const RenderTargetFormatData& in_target_format_data,
 	const RenderTargetDepthData& in_target_depth_data
 	) 
-	: _size_width(std::max(in_width, 1))
-	, _size_height(std::max(in_height, 1))
+	: _size(std::max(in_size.GetX(), 1), std::max(in_size.GetY(), 1))
 	, _allow_tearing(in_allow_tearing)
 	, _back_buffer_count(in_back_buffer_count)
 	, _back_buffer_index(0)
@@ -89,8 +87,8 @@ DscRender::ScreenSizeResources::ScreenSizeResources(
 	{
 		// Create a descriptor for the swap chain.
 		DXGI_SWAP_CHAIN_DESC1 swap_chain_desc = {};
-		swap_chain_desc.Width = _size_width;
-		swap_chain_desc.Height = _size_height;
+		swap_chain_desc.Width = _size.GetX();
+		swap_chain_desc.Height = _size.GetY();
 		swap_chain_desc.Format = back_buffer_format;
 		swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swap_chain_desc.BufferCount = _back_buffer_count;
@@ -135,8 +133,7 @@ DscRender::ScreenSizeResources::ScreenSizeResources(
 			in_target_format_data,
 			in_target_depth_data,
 			_swap_chain.Get(),
-			in_width,
-			in_height
+			in_size
 			);
 	}
 	// Reset the index to the current back buffer.

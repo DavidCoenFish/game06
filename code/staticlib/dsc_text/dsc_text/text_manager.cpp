@@ -90,9 +90,13 @@ namespace
 			HB_SCRIPT_CYRILLIC,
 			hb_language_from_string("ru", -1)
 		)},
-		});
-}
+	});
+} // namespace
 
+const std::vector<D3D12_INPUT_ELEMENT_DESC>& DscText::TextManager::GetInputElementDesc()
+{
+	return s_input_element_desc_array;
+}
 
 DscText::TextManager::TextManager(DscRender::DrawSystem& draw_system, DscCommon::FileSystem& file_system)
 {
@@ -149,3 +153,28 @@ DscText::TextManager::~TextManager()
 	FT_Done_FreeType(_library);
 }
 
+const DscText::TextLocale* const DscText::TextManager::GetLocaleToken(const DscLocale::LocaleISO_639_1 in_locale) const
+{
+	const auto found = s_map_text_locale.find(in_locale);
+	if (found != s_map_text_locale.end())
+	{
+		return found->second.get();
+	}
+	return s_locale_en.get();
+}
+
+// Find or make a new text face
+DscText::GlyphCollectionText* DscText::TextManager::LoadFont(DscCommon::FileSystem& in_file_system, const std::string& in_font_path)
+{
+	auto found = _map_path_font.find(in_font_path);
+	if (found != _map_path_font.end())
+	{
+		return found->second.get();
+	}
+
+	auto font = std::make_unique<GlyphCollectionText>(_library, _texture.get(), in_file_system, in_font_path);
+	DscText::GlyphCollectionText* glyph_collection_text = font.get();
+	_map_path_font.insert(std::make_pair(in_font_path, std::move(font)));
+
+	return glyph_collection_text;
+}

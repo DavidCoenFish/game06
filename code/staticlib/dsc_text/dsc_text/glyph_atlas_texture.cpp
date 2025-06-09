@@ -110,14 +110,12 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const int32 
 		(float)found_row->GetTexturePosY() / (float)_texture_dimention
 	);
 
-	int mask = 0xffffffff;
-
 	// add cell to end of row
 	auto cell = std::make_unique<Glyph>(
 		DscCommon::VectorInt2(in_width, in_height),
 		DscCommon::VectorInt2(),
 		uv,
-		mask
+		DscCommon::VectorFloat4::s_white
 		);
 
 	auto& dest_data = _texture->GetData(true, found_row->GetTexturePosY(), found_row->GetTexturePosY() + desired_height);
@@ -221,9 +219,9 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32
 		(float)found_row->GetTexturePosY() / (float)_texture_dimention
 	);
 
-	//VectorFloat4 mask;
-	//mask[found_row->GetMaskIndex()] = 1.0f;
-	const int mask = 0xff << (found_row->GetMaskIndex() * 8);
+	DscCommon::VectorFloat4 mask;
+	mask[found_row->GetMaskIndex()] = 1.0f;
+	//const int mask = 0xff << (found_row->GetMaskIndex() * 8);
 
 	// add cell to end of row
 	auto cell = std::make_unique<Glyph>(

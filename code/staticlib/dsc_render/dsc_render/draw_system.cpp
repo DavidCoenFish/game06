@@ -7,6 +7,7 @@
 #include "dsc_render.h"
 #include "resource_list.h"
 #include <dsc_common/log_system.h>
+#include <dsc_common/vector_int2.h>
 
 std::unique_ptr<DscRender::DrawSystem> DscRender::DrawSystem::Factory(
 	const HWND in_hwnd
@@ -293,15 +294,13 @@ void DscRender::DrawSystem::WaitForGpu() noexcept
 void DscRender::DrawSystem::OnResize()
 {
 	bool resized = false;
-	int32 size_width = 0;
-	int32 size_height = 0;
+	DscCommon::VectorInt2 size;
 	if (_device_resources)
 	{
 		resized = _device_resources->OnResize(
 			this,
 			_hwnd,
-			size_width,
-			size_height
+			size
 			);
 	}
 	if ((true == resized) && (0 < _list_resource.size()))
@@ -312,8 +311,7 @@ void DscRender::DrawSystem::OnResize()
 			iter->OnResize(
 				command_list,
 				_device_resources->GetD3dDevice(),
-				size_width,
-				size_height
+				size
 				);
 		}
 		CommandListFinish(command_list);

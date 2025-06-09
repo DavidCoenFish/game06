@@ -9,6 +9,11 @@ namespace DirectX
 	class GraphicsResource;
 } // DirectX
 
+namespace DscCommon
+{
+	class VectorInt2;
+}
+
 namespace DscRender
 {
 	class DrawSystem;
@@ -35,8 +40,7 @@ public:
 	const bool OnResize(
 		DrawSystem* const in_draw_system,
 		const HWND in_hwnd,
-		int32& out_width,
-		int32& out_Height
+		DscCommon::VectorInt2& out_size
 		);
 	const int GetBackBufferIndex() const;
 	DirectX::GraphicsResource AllocateUpload(
@@ -61,8 +65,7 @@ public:
 	const bool CreateWindowSizeDependentResources(
 		DrawSystem* const in_draw_system,
 		const HWND in_hwnd,
-		int32* out_width = nullptr,
-		int32* out_height = nullptr
+		DscCommon::VectorInt2* out_size = nullptr
 		);
 
 	void ForceRestore(

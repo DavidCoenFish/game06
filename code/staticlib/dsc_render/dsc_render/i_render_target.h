@@ -1,11 +1,15 @@
 #pragma once
 #include <dsc_common/dsc_common.h>
 
+namespace DscCommon
+{
+	class VectorInt2;
+}
+
 namespace DscRender
 {
 	// #include "Common/DrawSystem/IResource.h"
 	class IRenderTarget // : public IResource
-
 	{
 	public:
 		IRenderTarget();
@@ -20,7 +24,6 @@ namespace DscRender
 			int& in_render_target_view_format_count,
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const = 0;
-		virtual const int32 GetWidth() const = 0;
-		virtual const int32 GetHeight() const = 0;
+		virtual const DscCommon::VectorInt2 GetSize() const = 0;
 	};
 }//namespace DscRender

@@ -33,8 +33,7 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 	DscRender::DrawSystem* const in_draw_system,
 	const std::vector < DscRender::RenderTargetFormatData >&in_target_format_data_array,
 	const DscRender::RenderTargetDepthData& in_target_depth_data,
-	const int32 in_size_width,
-	const int32 in_size_height,
+	const DscCommon::VectorInt2& in_size,
 	const bool in_resize_with_screen
 	) 
 	: IRenderTarget()
@@ -42,15 +41,14 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 	, _screen_viewport{ 
 		0.0f, 
 		0.0f,
-		static_cast<float>(in_size_width),
-		static_cast<float>(in_size_height),
+		static_cast<float>(in_size.GetX()),
+		static_cast<float>(in_size.GetY()),
 		D3D12_MIN_DEPTH, 
 		D3D12_MAX_DEPTH}
-	, _scissor_rect{ 0, 0, in_size_width, in_size_height}
+	, _scissor_rect{ 0, 0, in_size.GetX(), in_size.GetY() }
 	, _current_state_render_target(D3D12_RESOURCE_STATE_COMMON)
 	, _current_state_depth_resource(D3D12_RESOURCE_STATE_COMMON)
-	, _size_width(in_size_width)
-	, _size_height(in_size_height)
+	, _size(in_size)
 	, _resize_with_screen(in_resize_with_screen)
 	, _target_format_array()
 	, _id(s_id++)
@@ -128,36 +126,28 @@ std::shared_ptr < DscRender::HeapWrapperItem > DscRenderResource::RenderTargetTe
 void DscRenderResource::RenderTargetTexture::Resize(
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device,
-	const int32 in_size_width,
-	const int32 in_size_height
-	)
+	const DscCommon::VectorInt2& in_size
+)
 {
-	if ((_size_width == in_size_width) &&
-		(_size_height == in_size_height))
+	if (_size == in_size)
 	{
 		return;
 	}
 	OnDeviceLost();
-	_size_width = in_size_width;
-	_size_height = in_size_height;
-	_scissor_rect.right = in_size_width;
-	_scissor_rect.bottom = in_size_height;
-	_screen_viewport.Width = static_cast<float>(in_size_width);
-	_screen_viewport.Height = static_cast<float>(in_size_height);
+	_size = in_size;
+	_scissor_rect.right = in_size.GetX();
+	_scissor_rect.bottom = in_size.GetY();
+	_screen_viewport.Width = static_cast<float>(in_size.GetX());
+	_screen_viewport.Height = static_cast<float>(in_size.GetY());
 	OnDeviceRestored(
 		in_command_list,
 		in_device
 		);
 }
 
-const int32 DscRenderResource::RenderTargetTexture::GetWidth() const
+const DscCommon::VectorInt2 DscRenderResource::RenderTargetTexture::GetSize() const
 {
-	return _size_width;
-}
-
-const int32 DscRenderResource::RenderTargetTexture::GetHeight() const
-{
-	return _size_height;
+	return _size;
 }
 
 void DscRenderResource::RenderTargetTexture::OnDeviceLost()
@@ -193,8 +183,8 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 	{
 		D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Tex2D(
 			iter->_format,
-			static_cast<UINT64>(_size_width),
-			static_cast<UINT>(_size_height),
+			static_cast<UINT64>(_size.GetX()),
+			static_cast<UINT>(_size.GetY()),
 			1,
 			1,
 			1,
@@ -230,8 +220,8 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 	{
 		D3D12_RESOURCE_DESC depth_stencil_desc = CD3DX12_RESOURCE_DESC::Tex2D(
 			_depth_resource->_format,
-			_size_width,
-			_size_height,
+			static_cast<UINT64>(_size.GetX()),
+			static_cast<UINT>(_size.GetY()),
 			1,
 			// This depth stencil view has only one texture.
 			1,
@@ -280,9 +270,8 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 void DscRenderResource::RenderTargetTexture::OnResize(
 	ID3D12GraphicsCommandList* const in_command_list,
 	ID3D12Device2* const in_device,
-	const int32 in_size_width,
-	const int32 in_size_height
-	)
+	const DscCommon::VectorInt2& in_size
+)
 {
 	if (false == _resize_with_screen)
 	{
@@ -291,8 +280,7 @@ void DscRenderResource::RenderTargetTexture::OnResize(
 	Resize(
 		in_command_list,
 		in_device,
-		in_size_width,
-		in_size_height
+		in_size
 		);
 	return;
 }

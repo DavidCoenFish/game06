@@ -326,15 +326,13 @@ void DscRender::DeviceResources::WaitForCustomCommand()// Make sure any outstand
 const bool DscRender::DeviceResources::OnResize(
 	DrawSystem* const in_draw_system,
 	const HWND in_hwnd,
-	int32& out_width,
-	int32& out_Height
+	DscCommon::VectorInt2& out_size
 	)
 {
 	return CreateWindowSizeDependentResources(
 		in_draw_system,
 		in_hwnd,
-		&out_width,
-		&out_Height
+		&out_size
 		);
 }
 
@@ -435,8 +433,7 @@ void DscRender::DeviceResources::GetAdapter(
 const bool DscRender::DeviceResources::CreateWindowSizeDependentResources(
 	DrawSystem* const in_draw_system,
 	const HWND in_hwnd,
-	int32* const out_width,
-	int32* const out_height
+	DscCommon::VectorInt2* out_size
 	)
 {
 	RECT rc;
@@ -444,22 +441,16 @@ const bool DscRender::DeviceResources::CreateWindowSizeDependentResources(
 		in_hwnd,
 		&rc
 		);
-	const int32 width = rc.right - rc.left;
-	const int32 height = rc.bottom - rc.top;
+	DscCommon::VectorInt2 size(rc.right - rc.left, rc.bottom - rc.top);
 
-	if (nullptr != out_width)
+	if (out_size)
 	{
-		*out_width = width;
-	}
-	if (nullptr != out_height)
-	{
-		*out_height = height;
+		*out_size = size;
 	}
 
 	// If we don't need to resize, then don't
 	if ((nullptr != _screen_size_resources) && 
-		(width == _screen_size_resources->GetSizeWidth()) && 
-		(height == _screen_size_resources->GetSizeHeight()))
+		(size == _screen_size_resources->GetSize()))
 	{
 		return false;
 	}
@@ -479,8 +470,7 @@ const bool DscRender::DeviceResources::CreateWindowSizeDependentResources(
 		in_hwnd,
 		fence_value,
 		_back_buffer_count,
-		width,
-		height,
+		size,
 		swap_flag, //bool
 		_target_format_data,
 		_target_depth_data

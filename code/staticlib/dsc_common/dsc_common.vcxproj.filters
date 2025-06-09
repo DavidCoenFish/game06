@@ -3,6 +3,12 @@
   <ItemGroup>
     <CustomBuild Include="dsc.bff">
     </CustomBuild>
+    <CustomBuild Include="dsc_common\data_helper.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\data_helper.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
     <CustomBuild Include="dsc_common\dsc_common.cpp">
       <Filter>dsc_common</Filter>
     </CustomBuild>

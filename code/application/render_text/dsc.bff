@@ -33,8 +33,15 @@
         "free_type.lib", 
         "harf_buzz.lib"
         }
-    .AdditionalStaicLibPaths = {"$RootPath$/../build/free_type", "$RootPath$/../build/harf_buzz"}
-    .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include", "$RootPath$/sdk/harf_buzz/Include"}
+    .AdditionalStaicLibPaths = {
+        "$RootPath$/../build/free_type", 
+        "$RootPath$/../build/harf_buzz"
+        }
+    .AdditionalIncludePaths = {
+        //"$RootPath$/sdk/free_type/Include", 
+        //"$RootPath$/sdk/harf_buzz/Include", 
+        //"$RootPath$/sdk/harf_buzz/Source"
+        }
     .DataCopyPath = {"$RootPath$/../data/font"}
     .DoDataCopy = true
 ]

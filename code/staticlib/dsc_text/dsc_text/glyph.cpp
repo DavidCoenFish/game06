@@ -4,7 +4,7 @@ DscText::Glyph::Glyph(
 	const DscCommon::VectorInt2& in_width_height,
 	const DscCommon::VectorInt2& in_bearing,
 	const DscCommon::VectorFloat4& in_uv,
-	const int in_mask
+	const DscCommon::VectorFloat4& in_mask
 )
 	: _width_height(in_width_height)
 	, _bearing(in_bearing)

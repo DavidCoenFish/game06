@@ -11,6 +11,7 @@ namespace DscCommon
 
 namespace DscText
 {
+	class GlyphCollectionText;
 	class TextLocale;
 	class TextPreVertex;
 
@@ -23,6 +24,7 @@ namespace DscText
 
 		explicit TextRunText(
 			const std::string& in_string_utf8 = std::string(""),
+			GlyphCollectionText* const in_font = nullptr,
 			const TextLocale* const in_locale_token = nullptr,
 			const int in_font_size = 0,
 			const float in_new_line_gap_ratio = 0.0f,
@@ -36,13 +38,14 @@ namespace DscText
 			const bool in_width_limit_enabled,
 			const int in_width_limit,
 			const float in_ui_scale
-		) const override;
+		) override;
 
 	private:
-		std::string _string_utf8;
-		const TextLocale* const _locale_token;
-		int _font_size;
-		float _new_line_gap_ratio;
-		DscCommon::VectorFloat4 _colour;
+		const std::string _string_utf8 = {};
+		GlyphCollectionText* const _font = nullptr;
+		const TextLocale* const _locale_token = nullptr;
+		const int _font_size = 0;
+		const float _new_line_gap_ratio = 0;
+		const DscCommon::VectorFloat4 _colour;
 	};
 }

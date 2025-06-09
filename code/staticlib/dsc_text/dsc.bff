@@ -17,8 +17,17 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_render_resource", "dsc_locale"}
-    .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include", "$RootPath$/sdk/harf_buzz/Include"}
+    .LibraryBaseNameDependency = {
+        "dsc_common", 
+        "dsc_render", 
+        "dsc_render_resource", 
+        "dsc_locale",
+        }
+    .AdditionalIncludePaths = {
+        "$RootPath$/sdk/free_type/Include", 
+        "$RootPath$/sdk/harf_buzz/Include",
+        "$RootPath$/sdk/harf_buzz/Source",
+        }
 ]
 DscVsprojectStaticLib("dsc_text" .LibraryParam)
 

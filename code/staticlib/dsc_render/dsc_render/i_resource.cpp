@@ -36,8 +36,7 @@ DscRender::IResource::~IResource()
 void DscRender::IResource::OnResize(
 	ID3D12GraphicsCommandList* const,
 	ID3D12Device2* const,
-	const int32,
-	const int32
+	const DscCommon::VectorInt2&
 	)
 {
 	return;
