@@ -25,8 +25,12 @@ namespace DscRenderResource
 		);
 		std::shared_ptr<DscRender::HeapWrapperItem> GetHeapWrapperItem() const;
 
-		std::vector<uint8_t>& GetData() { return _data; }
-		void UploadData(
+		std::vector<uint8_t>& GetData(
+			const bool in_mark_dirty,
+			const int32 in_dirty_y_low,
+			const int32 in_dirty_y_high
+		);
+		void UploadDataIfDirty(
 			DscRender::DrawSystem* const in_draw_system,
 			ID3D12GraphicsCommandList* const in_command_list
 		);
@@ -39,11 +43,6 @@ namespace DscRenderResource
 			const size_t in_data_size,
 			void* in_data
 		);
-
-		// or do we make a ShaderResourceDirtyUpload
-		//void UploadIfDirty()
-		//void SetDirty()
-		//void SetRegionDirty(const int32 in_height_low, const int32 in_height_high);
 
 	private:
 		virtual void OnDeviceLost() override;

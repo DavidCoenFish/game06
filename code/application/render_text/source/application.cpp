@@ -18,7 +18,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     _draw_system = DscRender::DrawSystem::Factory(in_hwnd);
 
     _resources = std::make_unique<Resources>();
-    _resources->_text_manager = std::make_shared<DscText::TextManager>(*_draw_system);
+    if ((nullptr != _file_system) && (nullptr != _draw_system))
+    {
+        _resources->_text_manager = std::make_shared<DscText::TextManager>(*_draw_system, *_file_system);
+    }
 }
 
 Application::~Application()

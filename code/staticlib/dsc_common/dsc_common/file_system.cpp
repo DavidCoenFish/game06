@@ -1,5 +1,5 @@
-#include <dsc_common\dsc_common.h>
 #include "file_system.h"
+#include <dsc_common\dsc_common.h>
 #include "file_overlay_local.h"
 
 namespace
@@ -18,6 +18,16 @@ const std::string DscCommon::FileSystem::GetTempFilePath()
 const std::string DscCommon::FileSystem::JoinPath(const std::string& in_lhs, const std::string& in_rhs)
 {
 	return (std::filesystem::path(in_lhs) / in_rhs).string(); //.u8string();
+}
+
+const std::string DscCommon::FileSystem::JoinPath(const std::string& in_a, const std::string& in_b, const std::string& in_c)
+{
+	return (std::filesystem::path(in_a) / in_b / in_c).string(); //.u8string();
+}
+
+const std::string DscCommon::FileSystem::JoinPath(const std::string& in_a, const std::string& in_b, const std::string& in_c, const std::string& in_d)
+{
+	return (std::filesystem::path(in_a) / in_b / in_c / in_d).string(); //.u8string();
 }
 
 std::unique_ptr<DscCommon::IFileOverlay> DscCommon::FileSystem::FactoryOverlayLocal()

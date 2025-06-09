@@ -17,9 +17,22 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings 
     .CommonVcproject = ^CommonVcproject 
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource", "dsc_text", "dsc_locale"}
-    .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "free_type.lib", "harf_buzz.lib"}
-
+    .LibraryBaseNameDependency = {
+        "dsc_common", 
+        "dsc_windows", 
+        "dsc_render", 
+        "dsc_render_resource", 
+        "dsc_text", 
+        "dsc_locale"
+        }
+    .LinkerAdditionalDependency = {
+        "user32.lib", 
+        "D3d12.lib", 
+        "DXGI.lib", 
+        "dxguid.lib", 
+        "free_type.lib", 
+        "harf_buzz.lib"
+        }
     .AdditionalStaicLibPaths = {"$RootPath$/../build/free_type", "$RootPath$/../build/harf_buzz"}
     .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include", "$RootPath$/sdk/harf_buzz/Include"}
     .DataCopyPath = {"$RootPath$/../data/font"}

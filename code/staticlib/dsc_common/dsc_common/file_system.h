@@ -16,10 +16,12 @@ public:
 	//example C:\Users\DavidC\AppData\Local\Temp\ 
 	static const std::string GetTempFilePath();
 	static const std::string JoinPath(const std::string& in_lhs, const std::string& in_rhs);
+	static const std::string JoinPath(const std::string& in_a, const std::string& in_b, const std::string& in_c);
+	static const std::string JoinPath(const std::string& in_a, const std::string& in_b, const std::string& in_c, const std::string& in_d);
 	//static std::unique_ptr<IFileOverlay>&& FactoryOverlayLocal();
 	static std::unique_ptr<IFileOverlay> FactoryOverlayLocal();
 
-	// todo: provide an object to manage how overlay are handled, do we run them all? bail after first success?
+	// todo: provide an object to manage how overlay are handled? do we run them all? bail after first success?
 	FileSystem(std::vector<std::unique_ptr<IFileOverlay>>&& in_consumerArray);
 	FileSystem(std::unique_ptr<IFileOverlay>&& in_overlay = FactoryOverlayLocal());
 
@@ -52,7 +54,7 @@ public:
 #if 0 //todo
 	const int32 RequestAsyncLoad(const std::string& in_key, const int32 in_overlayId);
 	void HasAsyncLoadFinished(const int32 in_id);
-	void HasAllAsyncLoadFinished(const int32 in_id);
+	void HaveAllAsyncLoadFinished();
 #endif
 private:
 	std::vector<std::unique_ptr<IFileOverlay>> mOverlayArray = {};

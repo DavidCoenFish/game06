@@ -13,6 +13,7 @@
 #include "..\..\..\sdk\harf_buzz\Include\hb.h"
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 #include "..\..\dsc_render\dsc_render\dsc_render.h"
+#include "..\..\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
 #include "..\..\dsc_locale\dsc_locale\dsc_locale.h"
 
 #include "glyph.h"
@@ -21,9 +22,11 @@
 #include "glyph_collection_icon.h"
 #include "glyph_collection_text.h"
 #include "i_text_run.h"
+#include "text_enum.h"
 #include "text_locale.h"
 #include "text_manager.h"
 #include "text_pre_vertex.h"
+#include "text_run.h"
 #include "text_run_icon.h"
 #include "text_run_text.h"
 

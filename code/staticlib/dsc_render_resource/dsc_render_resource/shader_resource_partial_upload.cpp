@@ -39,25 +39,47 @@ std::shared_ptr < DscRender::HeapWrapperItem > DscRenderResource::ShaderResource
 	return _shader_resource;
 }
 
-void DscRenderResource::ShaderResourcePartialUpload::UploadData(
+std::vector<uint8_t>& DscRenderResource::ShaderResourcePartialUpload::GetData(
+	const bool in_mark_dirty,
+	const int32 in_dirty_y_low,
+	const int32 in_dirty_y_high
+	)
+{
+	if (true == in_mark_dirty)
+	{
+		_dirty = true;
+		_dirty_height_low = std::min(_dirty_height_low, in_dirty_y_low);
+		_dirty_height_high = std::max(_dirty_height_high, in_dirty_y_high);
+	}
+	return _data;
+}
+
+void DscRenderResource::ShaderResourcePartialUpload::UploadDataIfDirty(
 	DscRender::DrawSystem* const in_draw_system,
 	ID3D12GraphicsCommandList* const in_command_list
 	)
 {
-	OnResourceBarrier(in_command_list, D3D12_RESOURCE_STATE_COPY_DEST);
+	if (_dirty)
+	{
+		_dirty = false;
+		//TODO: actually fo a partial upload, rather than a full upload
+		_dirty_height_low = _desc.Height;
+		_dirty_height_high = 0;
 
-	UploadResource(
-		in_draw_system,
-		in_command_list,
-		_resource,
-		_desc,
-		_data.size(),
-		_data.size() ? _data.data() : nullptr
-		);
+		OnResourceBarrier(in_command_list, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	OnResourceBarrier(in_command_list, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		UploadResource(
+			in_draw_system,
+			in_command_list,
+			_resource,
+			_desc,
+			_data.size(),
+			_data.size() ? _data.data() : nullptr
+			);
+
+		OnResourceBarrier(in_command_list, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	}
 }
-
 
 void DscRenderResource::ShaderResourcePartialUpload::UploadResource(
 	DscRender::DrawSystem* const in_draw_system,

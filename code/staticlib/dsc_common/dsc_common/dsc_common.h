@@ -14,7 +14,6 @@ typedef unsigned __int64 uint64;
 
 #define LOG_TOPIC_DSC_COMMON "DSC_COMMON"
 
-
 // Windows
 #include <winsdkver.h>
 #define _WIN32_WINNT 0x0A00
@@ -47,7 +46,6 @@ typedef unsigned __int64 uint64;
 #include <mutex>
 #include <set>
 #include <string>
-//#include <typeinfo>
 #include <vector>
 
 //D3DX12
@@ -89,6 +87,7 @@ typedef unsigned __int64 uint64;
 
 #define ARRAY_LITERAL_SIZE(DATA) (sizeof(DATA)/sizeof(DATA[0]))
 
+//FastBuild nmake workaround
 // allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
 // added DSC_BFF_BUILD to fastbuild defines
 #ifndef DSC_BFF_BUILD
@@ -98,6 +97,11 @@ typedef unsigned __int64 uint64;
 #ifndef UNICODE
 #define UNICODE
 #endif
+
+//#ifdef _DEBUG
+#define _DEBUG
+#define DSC_LOG
+//#endif
 
 #include "enum_soft_bind.h"
 #include "file_overlay_local.h"

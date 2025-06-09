@@ -4,9 +4,15 @@
 
 typedef struct FT_LibraryRec_* FT_Library;
 
+namespace DscCommon
+{
+	class FileSystem;
+}
+
 namespace DscRender
 {
 	class DrawSystem;
+	class FileSystem;
 }
 
 namespace DscRenderResource
@@ -32,7 +38,7 @@ namespace DscText
 		TextManager(const TextManager&) = delete;
 
 
-		TextManager(DscRender::DrawSystem& drawSystem);
+		TextManager(DscRender::DrawSystem& drawSystem, DscCommon::FileSystem& fileSystem);
 		~TextManager();
 
 		// Find or make a new text face
