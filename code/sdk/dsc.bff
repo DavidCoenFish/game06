@@ -27,14 +27,18 @@
     ^SolutionItemsSdkProject + "free_type_project"
     //^SolutionBuildProject = "free_type_project"
 
-    VSProjectExternal( "harf_buzz_project" )
-    {
-      .ExternalProjectPath            = "sdk\harf_buzz\harf_buzz.vcxproj"
-      .ProjectGuid = "{92518a37-172c-4526-920f-ab1fa10f9f07}"
-      .ProjectTypeGuid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
-    }
-    ^SolutionProjects + "harf_buzz_project"
-    ^SolutionItemsSdkProject + "harf_buzz_project"
-    ^SolutionBuildProject = "harf_buzz_project"
+    //VSProjectExternal( "harf_buzz_project" )
+    //{
+    //  .ExternalProjectPath            = "sdk\harf_buzz\harf_buzz.vcxproj"
+    //  .ProjectGuid = "{92518a37-172c-4526-920f-ab1fa10f9f07}"
+    //  .ProjectTypeGuid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+    //}
+    //^SolutionProjects + "harf_buzz_project"
+    //^SolutionItemsSdkProject + "harf_buzz_project"
+    //^SolutionBuildProject = "harf_buzz_project"
 
 }
+
+#include "harf_buzz\dsc.bff"
+
+

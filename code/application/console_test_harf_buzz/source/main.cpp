@@ -6,6 +6,8 @@
 #include <iostream>
 #pragma warning(pop)
 
+//https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
+
 //int main(int argc, char* argv[], char* envp[])
 int main(int, char*, char*)
 {
