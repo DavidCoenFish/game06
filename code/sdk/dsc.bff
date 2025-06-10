@@ -20,7 +20,7 @@
     VSProjectExternal( "free_type_project" )
     {
       .ExternalProjectPath            = "sdk\free_type\free_type.vcxproj"
-      .ProjectGuid = "{e571e6af-77d1-47a4-988b-365af9c5b2bc}"
+      .ProjectGuid = "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
       .ProjectTypeGuid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
     }
     ^SolutionProjects + "free_type_project"

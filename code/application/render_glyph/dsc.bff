@@ -21,11 +21,13 @@
     .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "free_type.lib"}
     .AdditionalStaicLibPaths = {"$RootPath$/../build/free_type"}
     .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include"}
+    .DataCopyPath = {"$RootPath$/../data/font"}
+    .DoDataCopy = true
 ]
 
 DscVsprojectWindowExe("render_glyph" .WindowExeParam)
 
 .SolutionProjects + "render_glyph_project"
 .SolutionItemsApplicationProject + "render_glyph_project"
-//.SolutionBuildProject = "render_glyph_project"
+.SolutionBuildProject = "render_glyph_project"
 
