@@ -17,21 +17,25 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {}
+    .LibraryBaseNameDependency = {"dsc_common"}
     .AdditionalIncludePaths = {
-        "$RootPath$/sdk/harf_buzz/Include", 
-        "$RootPath$/sdk/harf_buzz/Source"
+        "$RootPath$/sdk/free_type/Include",
+        "$RootPath$/sdk/harf_buzz/src"
     }
     .LinkerAdditionalDependency = {
-        //"harf_buzz.lib"
+        "free_type.lib",
+        "harf_buzz.lib"
         }
     .AdditionalStaicLibPaths = {
+        "$RootPath$/../build/free_type",
         "$RootPath$/../build/harf_buzz"
         }
+    .DataCopyPath = {"$RootPath$/../data/font"}
+    .DoDataCopy = true
 ]
 DscVsprojectConsoleExe("console_test_harf_buzz" .Param)
 
 .SolutionProjects + "console_test_harf_buzz_project"
 .SolutionItemsApplicationProject + "console_test_harf_buzz_project"
-//.SolutionBuildProject = "console_test_harf_buzz_project"
+.SolutionBuildProject = "console_test_harf_buzz_project"
 

@@ -18,8 +18,12 @@
         Using( .ConfigIter )
         .CompilerOptions
             + ' /bigobj'
+            + ' /D HB_TINY'
             + ' /D _CRT_SECURE_NO_WARNINGS'
+            + ' /wd4505'
             + ' /wd4127'
+            + ' /wd4189'
+            + ' /wd4065'
             + ' /wd4242'
             + ' /wd4244'
             + ' /wd4456'
@@ -66,4 +70,4 @@
 
 .SolutionProjects + "harf_buzz_project"
 .SolutionItemsSdkProject + "harf_buzz_project"
-.SolutionBuildProject = "harf_buzz_project"
+//.SolutionBuildProject = "harf_buzz_project"
