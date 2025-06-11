@@ -112,8 +112,9 @@ DscText::GlyphCollectionText::GlyphCollectionText(
 
 	_harf_buzz_font = hb_ft_font_create_referenced(_face);
 
-	_features.push_back(LigatureOff);
-	//_features.push_back(LigatureOn);
+	// i don't seem to be able to effect change
+	//_features.push_back(LigatureOff);
+	//_features.push_back(LigatureOn); //when a and e are stuck together, utf8 "\xC3" "\xA6"
 	//_features.push_back(KerningOff);
 	//_features.push_back(KerningOn);
 	//_features.push_back(CligOff);
