@@ -43,12 +43,12 @@ int main(int, char*, char*)
         return -1;
     }
 
-    error = FT_Set_Char_Size(ft_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
-    if (error)
-    {
-        DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_Set_Char_Size error:%d\n", error);
-        return -1;
-    }
+    //error = FT_Set_Char_Size(ft_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
+    //if (error)
+    //{
+    //    DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_Set_Char_Size error:%d\n", error);
+    //    return -1;
+    //}
 
     /* Create hb-ft font. */
     hb_font_t* hb_font;

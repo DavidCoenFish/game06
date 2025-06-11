@@ -16,6 +16,17 @@
 
 namespace
 {
+	const hb_tag_t KernTag = HB_TAG('k', 'e', 'r', 'n'); // kerning operations
+	const hb_tag_t LigaTag = HB_TAG('l', 'i', 'g', 'a'); // standard ligature substitution
+	const hb_tag_t CligTag = HB_TAG('c', 'l', 'i', 'g'); // contextual ligature substitution
+
+	static hb_feature_t LigatureOff = { LigaTag, 0, 0, std::numeric_limits<unsigned int>::max() };
+	static hb_feature_t LigatureOn = { LigaTag, 1, 0, std::numeric_limits<unsigned int>::max() };
+	static hb_feature_t KerningOff = { KernTag, 0, 0, std::numeric_limits<unsigned int>::max() };
+	static hb_feature_t KerningOn = { KernTag, 1, 0, std::numeric_limits<unsigned int>::max() };
+	static hb_feature_t CligOff = { CligTag, 0, 0, std::numeric_limits<unsigned int>::max() };
+	static hb_feature_t CligOn = { CligTag, 1, 0, std::numeric_limits<unsigned int>::max() };
+
 	// hb_buffer_destroy(buffer);
 	hb_buffer_t* MakeBuffer(
 		const std::string& in_string_utf8,
@@ -82,12 +93,31 @@ DscText::GlyphCollectionText::GlyphCollectionText(
 		return;
 	}
 
+	//https://github.com/tangrams/harfbuzz-example/blob/master/src/freetypelib.cpp
+	for (int i = 0; i < _face->num_charmaps; i++)
+	{
+		if (((_face->charmaps[i]->platform_id == 0)
+			&& (_face->charmaps[i]->encoding_id == 3))
+			|| ((_face->charmaps[i]->platform_id == 3)
+				&& (_face->charmaps[i]->encoding_id == 1)))
+		{
+			FT_Set_Charmap(_face, _face->charmaps[i]);
+		}
+	}
+
 	const int32 face_count = _face->num_faces;
 	const int32 instances_count = _face->style_flags >> 16;
 
 	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_TEXT, "font face count:%d instances count:%d path:%s\n", face_count, instances_count, in_font_file_path.c_str());
 
 	_harf_buzz_font = hb_ft_font_create_referenced(_face);
+
+	_features.push_back(LigatureOff);
+	//_features.push_back(LigatureOn);
+	_features.push_back(KerningOff);
+	//_features.push_back(KerningOn);
+	_features.push_back(CligOff);
+	//_features.push_back(CligOn);
 }
 
 DscText::GlyphCollectionText::~GlyphCollectionText()
@@ -157,8 +187,8 @@ DscText::GlyphCollectionText::TMapCodepointGlyph* const DscText::GlyphCollection
 
 void DscText::GlyphCollectionText::SetScale(const int32 in_glyph_size)
 {
-	FT_Set_Char_Size(_face, in_glyph_size * 64, in_glyph_size * 64, 0, 0);
-	//FT_Set_Pixel_Sizes(_face, in_glyph_size, in_glyph_size);
+	//FT_Set_Char_Size(_face, in_glyph_size * 64, in_glyph_size * 64, 0, 0);
+	FT_Set_Pixel_Sizes(_face, in_glyph_size, in_glyph_size);
 	return;
 }
 
@@ -174,7 +204,7 @@ void DscText::GlyphCollectionText::ShapeText(
 	const int32 in_colour
 )
 {
-	hb_shape(_harf_buzz_font, in_buffer, NULL, 0);
+	hb_shape(_harf_buzz_font, in_buffer, _features.empty() ? NULL : _features.data(), static_cast<unsigned int>(_features.size()));
 
 	unsigned int glyph_count = 0;
 	hb_glyph_info_t* glyph_info = hb_buffer_get_glyph_infos(in_buffer, &glyph_count);
@@ -286,8 +316,11 @@ void DscText::GlyphCollectionText::ShapeText(
 				in_colour
 			);
 		}
-		const int x_advance = slot->advance.x / 64;
-		const int y_advance = slot->advance.y / 64;
+		//const int x_advance = slot->advance.x / 64;
+		//const int delta = (slot->lsb_delta - slot->rsb_delta) / 64;
+		//const int y_advance = slot->advance.y / 64;
+		const int x_advance = glyph_pos[i].x_advance / 64;
+		const int y_advance = glyph_pos[i].y_advance / 64;
 
 		in_out_cursor[0] += x_advance;
 		in_out_cursor[1] += y_advance;

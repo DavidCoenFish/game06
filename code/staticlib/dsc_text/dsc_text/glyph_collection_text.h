@@ -8,6 +8,7 @@ typedef struct FT_FaceRec_* FT_Face;
 typedef struct FT_GlyphSlotRec_* FT_GlyphSlot;
 struct hb_font_t;
 struct hb_buffer_t;
+struct hb_feature_t;
 typedef uint32_t hb_codepoint_t;
 
 namespace DscCommon
@@ -102,6 +103,8 @@ namespace DscText
 		GlyphAtlasTexture* _texture = {};
 		// WARNING: font file data needs to be kept around, u.Tag references memory in the file?
 		std::vector<uint8> _font_data = {};
+
+		std::vector<hb_feature_t> _features = {};
 
 	};
 }

@@ -127,7 +127,7 @@ void DscText::TextPreVertex::StartNewLine(
 {
 	FinishLine();
 	in_out_cursor[0] = 0;
-	if (0 != _line_index)
+	//if (0 != _line_index)
 	{
 		in_out_cursor[1] -= _current_line_height;
 	}
@@ -171,13 +171,12 @@ void DscText::TextPreVertex::BuildVertexData(
 	std::vector<uint8_t>& out_vertex_raw_data,
 	const DscCommon::VectorInt2& in_container_size,
 	THorizontalAlignment in_horizontal_line_alignment,
-	const bool in_use_em_height,
-	const int in_em_size // Used for alignments MiddleEM, TopEM, BottomEM
+	const bool,// in_use_em_height,
+	const int//in_em_size // Used for alignments MiddleEM, TopEM, BottomEM
 )
 {
 	FinishLine();
 
-	int vertical_delta = 0;
 	const int line_count = static_cast<int>(_horizontal_bounds.size());
 	std::vector<int> horizontal_line_delta(line_count);
 	for (int index = 0; index < line_count; ++index)
@@ -195,10 +194,13 @@ void DscText::TextPreVertex::BuildVertexData(
 			break;
 		}
 	}
-	if (in_use_em_height)
-	{
-		vertical_delta = in_em_size / 2;
-	}
+
+	int vertical_delta = in_container_size.GetY();
+	//if (in_use_em_height)
+	//{
+	//	vertical_delta -= in_em_size;
+	//}
+
 
 	for (const auto& item : _pre_vertex_data)
 	{
@@ -271,7 +273,7 @@ void DscText::TextPreVertex::FinishLine()
 
 	_line_dirty = false;
 
-	if (0 != _line_index)
+	//if (0 != _line_index)
 	{
 		// use the default line height. this could be caused by an empty line. otherwise use max line height from things on line
 		if (0 == _current_line_height)
