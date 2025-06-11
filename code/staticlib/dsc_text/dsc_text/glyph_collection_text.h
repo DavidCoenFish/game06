@@ -24,6 +24,7 @@ namespace DscText
 	class TextLocale;
 	class TextPreVertex;
 
+	// rename as Font? TextFont?
 	//no, don't reset, icons have longer lifespan, move GlyphCell ownership to TextFont
 	//rather than a reset method, just destroy and recreate, but then what about icon.
 	// motivation, want a way to reset all text glyph usage on locale change

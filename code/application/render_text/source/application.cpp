@@ -34,14 +34,15 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
-        DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf"));
+        DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
 
         std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
         DscCommon::VectorInt2 container_size = _draw_system->GetRenderTargetBackBuffer()->GetSize();
         const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
 
+        //https://r12a.github.io/app-conversion/
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "yo momma\nis so happy",
+            "non fixed width layout\nligature " "\xC3" "\xA6" "\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
             pLocale,
             font,
             64,

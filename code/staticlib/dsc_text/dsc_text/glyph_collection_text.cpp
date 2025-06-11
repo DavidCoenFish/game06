@@ -114,9 +114,9 @@ DscText::GlyphCollectionText::GlyphCollectionText(
 
 	_features.push_back(LigatureOff);
 	//_features.push_back(LigatureOn);
-	_features.push_back(KerningOff);
+	//_features.push_back(KerningOff);
 	//_features.push_back(KerningOn);
-	_features.push_back(CligOff);
+	//_features.push_back(CligOff);
 	//_features.push_back(CligOn);
 }
 

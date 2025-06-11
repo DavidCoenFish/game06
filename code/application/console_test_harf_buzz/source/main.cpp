@@ -16,6 +16,20 @@
 #pragma warning(pop)
 
 //https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
+//https://github.com/tangrams/harfbuzz-example/blob/master/src/freetypelib.cpp
+namespace
+{
+    const hb_tag_t KernTag = HB_TAG('k', 'e', 'r', 'n'); // kerning operations
+    const hb_tag_t LigaTag = HB_TAG('l', 'i', 'g', 'a'); // standard ligature substitution
+    const hb_tag_t CligTag = HB_TAG('c', 'l', 'i', 'g'); // contextual ligature substitution
+
+    static hb_feature_t LigatureOff = { LigaTag, 0, 0, std::numeric_limits<unsigned int>::max() };
+    static hb_feature_t LigatureOn = { LigaTag, 1, 0, std::numeric_limits<unsigned int>::max() };
+    static hb_feature_t KerningOff = { KernTag, 0, 0, std::numeric_limits<unsigned int>::max() };
+    static hb_feature_t KerningOn = { KernTag, 1, 0, std::numeric_limits<unsigned int>::max() };
+    static hb_feature_t CligOff = { CligTag, 0, 0, std::numeric_limits<unsigned int>::max() };
+    static hb_feature_t CligOn = { CligTag, 1, 0, std::numeric_limits<unsigned int>::max() };
+}
 
 //int main(int argc, char* argv[], char* envp[])
 int main(int, char*, char*)
@@ -26,8 +40,9 @@ int main(int, char*, char*)
 
     FT_Library ft_library = {};
     FT_Face ft_face = {};
-    FT_F26Dot6 FONT_SIZE = 128;
+    FT_F26Dot6 FONT_SIZE = 256;
     FT_Error error = 0;
+    FT_UInt deviceHDPI = 256;
 
     error = FT_Init_FreeType(&ft_library);
     if (error)
@@ -36,12 +51,33 @@ int main(int, char*, char*)
         return -1;
     }
 
-    error = FT_New_Face(ft_library, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf").c_str(), 0, &ft_face);
+    error = FT_New_Face(ft_library, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf").c_str(), 0, &ft_face);
     if (error)
     {
         DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_New_Face error:%d [%s]\n", error, FT_Error_String(error));
         return -1;
     }
+
+    DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "num_faces:%d face_index:%d\n", ft_face->num_faces, ft_face->face_index);
+
+    FT_Bool fixed_size = FT_HAS_FIXED_SIZES(ft_face);
+    FT_Bool fixed_width = FT_IS_FIXED_WIDTH(ft_face);
+    FT_Bool use_kerning = FT_HAS_KERNING(ft_face);
+    DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "fixed_size:%d fixed_width:%d use_kerning:%d flag:%d\n", fixed_size, fixed_width, use_kerning, ft_face->face_flags);
+
+    for (int i = 0; i < ft_face->num_charmaps; i++) {
+        if (((ft_face->charmaps[i]->platform_id == 0)
+            && (ft_face->charmaps[i]->encoding_id == 3))
+            || ((ft_face->charmaps[i]->platform_id == 3)
+                && (ft_face->charmaps[i]->encoding_id == 1))) {
+            error = FT_Set_Charmap(ft_face, ft_face->charmaps[i]);
+            if (error)
+            {
+                DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_Set_Charmap error:%d [%s]\n", error, FT_Error_String(error));
+            }
+        }
+    }
+    FT_Set_Char_Size(ft_face, 0, FONT_SIZE, deviceHDPI, deviceHDPI);
 
     //error = FT_Set_Char_Size(ft_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
     //if (error)
@@ -61,8 +97,16 @@ int main(int, char*, char*)
     hb_buffer_add_utf8(hb_buffer, "yo momma", -1, 0, -1);
     hb_buffer_guess_segment_properties(hb_buffer);
 
+    std::vector<hb_feature_t> _features = {};
+    //_features.push_back(LigatureOff);
+    //_features.push_back(LigatureOn);
+    //_features.push_back(KerningOff);
+    //_features.push_back(KerningOn);
+    //_features.push_back(CligOff);
+    _features.push_back(CligOn);
+
     /* Shape it! */
-    hb_shape(hb_font, hb_buffer, NULL, 0);
+    hb_shape(hb_font, hb_buffer, _features.empty() ? NULL : _features.data(), static_cast<unsigned int>(_features.size()));
 
     /* Get glyph information and positions out of the buffer. */
     unsigned int len = hb_buffer_get_length(hb_buffer);

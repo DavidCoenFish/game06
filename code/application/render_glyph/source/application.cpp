@@ -37,7 +37,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     FT_Face face;
     error = FT_New_Face(library,
-        DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf").c_str(),
+        DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf").c_str(),
         0,
         &face);
     if (error)
