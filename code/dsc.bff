@@ -1,8 +1,8 @@
 #once
 //https://www.fastbuild.org/docs/documentation.html
 
-#define DEVELOPMENT_BUILD_CMD
-#define DEBUG_SDK
+//#define DEVELOPMENT_BUILD_CMD
+//#define DEBUG_SDK
 
 .SolutionItemArray = {}
 {
@@ -35,8 +35,10 @@
 .SolutionProjects = {}
 .SolutionBuildProject = ""
 
+// sdk folder populated by
+//vcpkg install harfbuzz
+
 #include "fbuild\dsc.bff"
-//#include "sdk\dsc.bff"
 #include "staticlib\dsc.bff"
 #include "application\dsc.bff"
 

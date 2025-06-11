@@ -68,5 +68,5 @@ DscVsprojectConsoleExe("console_test_harf_buzz" .Param)
 
 .SolutionProjects + "console_test_harf_buzz_project"
 .SolutionItemsApplicationProject + "console_test_harf_buzz_project"
-.SolutionBuildProject = "console_test_harf_buzz_project"
+//.SolutionBuildProject = "console_test_harf_buzz_project"
 
