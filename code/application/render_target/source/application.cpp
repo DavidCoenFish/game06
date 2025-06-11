@@ -238,12 +238,9 @@ const bool Application::Update()
     
     return true;
 }
-void Application::OnWindowSizeChanged(const int in_width, const int in_height)
+void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size)
 {
-    BaseType::OnWindowSizeChanged(
-        in_width,
-        in_height
-    );
+    BaseType::OnWindowSizeChanged(in_size);
     if (_draw_system)
     {
         _draw_system->OnResize();

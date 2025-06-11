@@ -30,14 +30,14 @@ namespace DscText
 			const std::string& in_string_utf8 = std::string(""),
 			const TextLocale* const in_locale_token = nullptr,
 			GlyphCollectionText* const in_text_font = nullptr,
-			const int in_font_size = 0,
+			const int32 in_font_size = 0,
 			const float in_new_line_gap_ratio = 0.0f,
-			const DscCommon::VectorFloat4& in_colour = DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+			const int32 in_colour = 0xff000000
 		);
 		static std::unique_ptr<ITextRun> MakeTextRunDataIcon(
 			const int in_icon_id = 0,
 			GlyphCollectionIcon* const in_icon_font = nullptr,
-			const DscCommon::VectorFloat4& in_colour_tint = DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+			const int32 in_colour = 0xff000000,
 			const float in_new_line_gap_ratio = 0.0f
 		);
 

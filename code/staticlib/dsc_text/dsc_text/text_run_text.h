@@ -26,9 +26,9 @@ namespace DscText
 			const std::string& in_string_utf8 = std::string(""),
 			GlyphCollectionText* const in_font = nullptr,
 			const TextLocale* const in_locale_token = nullptr,
-			const int in_font_size = 0,
+			const int32 in_font_size = 0,
 			const float in_new_line_gap_ratio = 0.0f,
-			const DscCommon::VectorFloat4& in_colour = DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+			const int32 in_colour = 0xff000000
 		);
 
 	private:
@@ -36,7 +36,7 @@ namespace DscText
 			TextPreVertex& in_out_pre_vertex_data,
 			DscCommon::VectorInt2& in_out_cursor,
 			const bool in_width_limit_enabled,
-			const int in_width_limit,
+			const int32 in_width_limit,
 			const float in_ui_scale
 		) override;
 
@@ -44,8 +44,8 @@ namespace DscText
 		const std::string _string_utf8 = {};
 		GlyphCollectionText* const _font = nullptr;
 		const TextLocale* const _locale_token = nullptr;
-		const int _font_size = 0;
+		const int32 _font_size = 0;
 		const float _new_line_gap_ratio = 0;
-		const DscCommon::VectorFloat4 _colour;
+		const int32 _colour;
 	};
 }

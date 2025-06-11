@@ -2,9 +2,9 @@
 #include "glyph_collection_icon.h"
 
 DscText::TextRunIcon::TextRunIcon(
-	const int in_icon_id,
+	const int32 in_icon_id,
 	GlyphCollectionIcon* const in_icon_font,
-	const DscCommon::VectorFloat4& in_colour_tint,
+	const int32 in_colour_tint,
 	const float in_new_line_gap_ratio
 )
 	: _icon_id(in_icon_id)
@@ -19,7 +19,7 @@ void DscText::TextRunIcon::BuildPreVertexData(
 	TextPreVertex& in_out_pre_vertex_data,
 	DscCommon::VectorInt2& in_out_cursor,
 	const bool in_width_limit_enabled,
-	const int in_width_limit,
+	const int32 in_width_limit,
 	const float in_ui_scale
 )
 {

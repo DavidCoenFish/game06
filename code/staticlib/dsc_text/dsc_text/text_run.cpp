@@ -14,9 +14,9 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 	const std::string& in_string_utf8,
 	const TextLocale* const in_locale_token,
 	GlyphCollectionText* const in_text_font,
-	const int in_font_size,
+	const int32 in_font_size,
 	const float in_new_line_gap_ratio,
-	const DscCommon::VectorFloat4& in_colour
+	const int32 in_colour
 )
 {
 	return std::make_unique<DscText::TextRunText>(
@@ -30,9 +30,9 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 }
 
 std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataIcon(
-	const int in_icon_id,
+	const int32 in_icon_id,
 	GlyphCollectionIcon* const in_icon_font,
-	const DscCommon::VectorFloat4& in_colour_tint,
+	const int32 in_colour_tint,
 	const float in_new_line_gap_ratio
 )
 {

@@ -3,8 +3,10 @@
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/file_system.h>
 #include <dsc_common/log_system.h>
+#include <dsc_common/math.h>
 #include <dsc_common/i_file_overlay.h>
 #include <dsc_render/draw_system.h>
+#include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_text/text_run.h>
@@ -35,16 +37,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf"));
 
         std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
-        DscCommon::VectorInt2 container_size;
+        DscCommon::VectorInt2 container_size = _draw_system->GetRenderTargetBackBuffer()->GetSize();
         const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
 
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "yo momma",
+            "yo momma\nis so happy",
             pLocale,
             font,
-            128,
+            64,
             0.5f,
-            DscCommon::VectorFloat4::s_white
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
             ));
 
         _resources->_text_run = std::make_unique<DscText::TextRun>(
@@ -74,24 +76,29 @@ const bool Application::Update()
     if (_draw_system && _resources && (false == GetMinimized()))
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
-
         frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
+
+        auto geometry = _resources->_text_run->GetGeometry(_draw_system.get(), frame.get());
         _resources->_text_manager->SetShader(_draw_system.get(), frame.get());
-        frame->Draw(_resources->_text_run->GetGeometry(_draw_system.get(), frame.get()));
+
+        frame->Draw(geometry);
     }
     
     return true;
 }
-void Application::OnWindowSizeChanged(const int in_width, const int in_height)
+void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size)
 {
-    BaseType::OnWindowSizeChanged(
-        in_width,
-        in_height
-    );
+    BaseType::OnWindowSizeChanged(in_size);
     if (_draw_system)
     {
         _draw_system->OnResize();
     }
+
+    if (_resources && _resources->_text_run)
+    {
+        _resources->_text_run->SetTextContainerSize(in_size);
+    }
+
     return;
 }
 

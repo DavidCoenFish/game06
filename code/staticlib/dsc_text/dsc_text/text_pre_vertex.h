@@ -11,7 +11,7 @@ namespace DscText
 	enum class THorizontalAlignment;
 
 	/*
-	collect data about a text run before converting it to verted data for the cpu
+	collect data about a text run before converting it to vertex data for the gpu
 	*/
 	class TextPreVertex
 	{
@@ -20,8 +20,8 @@ namespace DscText
 		{
 			DscCommon::VectorInt4 _pos_low_high;
 			DscCommon::VectorFloat4 _uv_low_high;
-			DscCommon::VectorFloat4 _mask;
-			DscCommon::VectorFloat4 _colour;
+			int32 _mask;//DscCommon::VectorFloat4 _mask;
+			int32 _colour; // DscCommon::VectorFloat4 _colour;
 			int _line_index;
 		};
 
@@ -34,30 +34,30 @@ namespace DscText
 
 		void AddPreVertexScale(
 			const Glyph& in_cell,
-			const int in_pos_x,
-			const int in_pos_y,
+			const int32 in_pos_x,
+			const int32 in_pos_y,
 			const float in_new_line_gap_ratio,
-			const DscCommon::VectorFloat4& in_colour,
+			const int32 in_colour, // DscCommon::VectorFloat4& in_colour,
 			const float in_ui_scale
 		);
 
 		void AddPreVertex(
 			const Glyph& in_cell,
-			const int in_pos_x,
-			const int in_pos_y,
-			const int in_line_height,
-			const DscCommon::VectorFloat4& in_colour
+			const int32 in_pos_x,
+			const int32 in_pos_y,
+			const int32 in_line_height,
+			const int32 in_colour // in_colour
 		);
 
 		void AddPreVertex(
 			const DscCommon::VectorInt2& in_width_height,
 			const DscCommon::VectorInt2& in_bearing,
 			const DscCommon::VectorFloat4& in_uv,
-			const DscCommon::VectorFloat4& in_mask,
-			const int in_pos_x,
-			const int in_pos_y,
-			const int in_line_height,
-			const DscCommon::VectorFloat4& in_colour
+			const int32 in_mask,
+			const int32 in_pos_x,
+			const int32 in_pos_y,
+			const int32 in_line_height,
+			const int32 in_colour // const DscCommon::VectorFloat4& in_colour
 		);
 
 		void AddCursor(

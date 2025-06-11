@@ -50,7 +50,7 @@ namespace DscText
 			const bool in_width_limit_enabled = false,
 			const int in_width_limit = 0,
 			const int in_new_line_height = 0,
-			const DscCommon::VectorFloat4& in_colour = DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+			const int32 in_colour = 0xff000000
 		);
 
 		///// Draw a glyph to a pixel blob, made to match the target size
@@ -78,9 +78,9 @@ namespace DscText
 			hb_buffer_t* in_buffer,
 			DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
 			const bool in_width_limit_enabled,
-			const int in_width_limit,
-			const int in_width_limit_new_line_height,
-			const DscCommon::VectorFloat4& in_colour
+			const int32 in_width_limit,
+			const int32 in_width_limit_new_line_height,
+			const int32 in_colour
 		);
 		Glyph* FindCell(
 			hb_codepoint_t in_codepoint,

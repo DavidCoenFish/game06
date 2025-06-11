@@ -110,7 +110,7 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 	const bool in_width_limit_enabled,
 	const int in_width_limit,
 	const int in_new_line_height,
-	const DscCommon::VectorFloat4& in_colour
+	const int32 in_colour
 )
 {
 	auto map_codepoint_glyph = FindMapCodepointGlyph(in_font_size);
@@ -120,6 +120,8 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 		in_string_utf8,
 		in_locale_token
 	);
+
+	//const int32 colour = DscCommon::Math::ConvertColourToInt(in_colour);
 
 	ShapeText(
 		in_out_text_pre_vertex,
@@ -167,9 +169,9 @@ void DscText::GlyphCollectionText::ShapeText(
 	hb_buffer_t* in_buffer,
 	DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
 	const bool in_width_limit_enabled,
-	const int in_width_limit,
-	const int in_width_limit_new_line_height,
-	const DscCommon::VectorFloat4& in_colour
+	const int32 in_width_limit,
+	const int32 in_width_limit_new_line_height,
+	const int32 in_colour
 )
 {
 	hb_shape(_harf_buzz_font, in_buffer, NULL, 0);

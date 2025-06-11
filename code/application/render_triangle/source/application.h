@@ -32,7 +32,7 @@ public:
 
 private:
     virtual const bool Update() override;
-    virtual void OnWindowSizeChanged(const int in_width, const int in_height) override;
+    virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size) override;
 
 private:
     typedef DscWindows::IWindowApplication BaseType;

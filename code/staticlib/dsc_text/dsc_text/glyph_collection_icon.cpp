@@ -29,7 +29,7 @@ void DscText::GlyphCollectionIcon::BuildPreVertexData(
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
 	const float in_ui_scale,
-	const DscCommon::VectorFloat4& in_colour_tint
+	const int32 in_colour_tint
 	)
 {
 	auto found = _map_icon_cell.find(in_icon_id);

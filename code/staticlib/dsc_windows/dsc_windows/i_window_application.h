@@ -4,6 +4,10 @@
 
 class WindowApplicationParam;
 class TaskWindow;
+namespace DscCommon
+{
+	class VectorInt2;
+}
 
 namespace DscWindows
 {
@@ -19,7 +23,7 @@ namespace DscWindows
 
 		virtual const bool Update();
 		virtual void OnWindowMoved();
-		virtual void OnWindowSizeChanged(const int in_width, const int in_height);
+		virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size);
 		virtual void OnActivated();
 		virtual void OnDeactivated();
 		virtual void OnSuspending();

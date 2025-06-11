@@ -1,4 +1,5 @@
 #include <dsc_common/dsc_common.h>
+#include <dsc_common/vector_int2.h>
 #include <dsc_common/utf8.h>
 #include "window_helper.h"
 #include "i_window_application.h"
@@ -98,7 +99,8 @@ namespace
 				}
 				else if (false == application->GetInSizemove())
 				{
-					application->OnWindowSizeChanged(LOWORD(in_lparam), HIWORD(in_lparam));
+					const DscCommon::VectorInt2 size(LOWORD(in_lparam), HIWORD(in_lparam));
+					application->OnWindowSizeChanged(size);
 				}
 			}
 			break;
@@ -116,7 +118,8 @@ namespace
 				application->SetInSizemove(false);
 				RECT rc;
 				GetClientRect(in_hwnd, &rc);
-				application->OnWindowSizeChanged(rc.right - rc.left, rc.bottom - rc.top);
+				const DscCommon::VectorInt2 size(rc.right - rc.left, rc.bottom - rc.top);
+				application->OnWindowSizeChanged(size);
 			}
 			break;
 

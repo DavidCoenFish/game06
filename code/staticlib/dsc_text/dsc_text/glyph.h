@@ -18,7 +18,7 @@ namespace DscText
 			const DscCommon::VectorInt2& in_width_height,
 			const DscCommon::VectorInt2& in_bearing,
 			const DscCommon::VectorFloat4& in_uv,
-			const DscCommon::VectorFloat4& in_mask
+			const int32 in_mask
 		);
 
 		const DscCommon::VectorInt2& GetWidthHeightRef() const { return _width_height; }
@@ -26,14 +26,13 @@ namespace DscText
 		const DscCommon::VectorInt2& GetBearingRef() const { return _bearing; }
 		const DscCommon::VectorInt2 GetBearing(const float in_ui_scale) const;
 		const DscCommon::VectorFloat4& GetUVRef() const { return _uv; }
-		const DscCommon::VectorFloat4& GetMask() const { return _mask; }
+		const int32 GetMask() const { return _mask; }
 
 	private:
 		DscCommon::VectorInt2 _width_height;
 		DscCommon::VectorInt2 _bearing;
 		DscCommon::VectorFloat4 _uv;
-		DscCommon::VectorFloat4 _mask;
-
+		int32 _mask;
 	};
 }
 

@@ -34,7 +34,7 @@ namespace DscText
 			const bool in_width_limit_enabled = false,
 			const int32 in_width_limit = 0,
 			const float in_ui_scale = 1.0f,
-			const DscCommon::VectorFloat4& in_colour_tint = DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
+			const int32 in_colour = 0xffffffff
 		);
 
 
