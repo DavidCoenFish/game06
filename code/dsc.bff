@@ -46,6 +46,8 @@ VSSolution("solution")
 {
     .SolutionOutput = "solution.sln"
     .SolutionConfigs = {}
+    .SolutionBuildProject = ^SolutionBuildProject
+    .SolutionDeployProjects = ^SolutionBuildProject
     ForEach( .Config in .ConfigurationArray )
     {            
         ^SolutionConfigs + .Config
