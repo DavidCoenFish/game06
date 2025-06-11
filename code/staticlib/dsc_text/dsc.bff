@@ -24,9 +24,8 @@
         "dsc_locale",
         }
     .AdditionalIncludePaths = {
-        "$RootPath$/sdk/free_type/Include", 
-        "$RootPath$/sdk/harf_buzz/Include",
-        "$RootPath$/sdk/harf_buzz/Source",
+        "$RootPath$/sdk/freetype_x64-windows/include",
+        "$RootPath$/sdk/harfbuzz_x64-windows/include",
         }
 ]
 DscVsprojectStaticLib("dsc_text" .LibraryParam)

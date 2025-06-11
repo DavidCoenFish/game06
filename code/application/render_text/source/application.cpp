@@ -2,6 +2,7 @@
 #include "application.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/file_system.h>
+#include <dsc_common/log_system.h>
 #include <dsc_common/i_file_overlay.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render_resource/frame.h>
@@ -9,6 +10,8 @@
 #include <dsc_text/text_run.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
+
+#include <harfbuzz/hb-ft.h>
 
 namespace
 {
@@ -19,24 +22,24 @@ Application::Resources::Resources()
     //nop
 }
 
-
 Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)
     : DscWindows::IWindowApplication(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight)
 {
     _file_system = std::make_unique<DscCommon::FileSystem>();
-    _draw_system = DscRender::DrawSystem::Factory(in_hwnd);
+    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.0f));
 
     _resources = std::make_unique<Resources>();
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
         DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf"));
+
         std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
         DscCommon::VectorInt2 container_size;
         const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
 
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "hello world",
+            "yo momma",
             pLocale,
             font,
             128,
@@ -59,6 +62,7 @@ Application::~Application()
     {
         _draw_system->WaitForGpu();
     }
+
     _resources.reset();
     _draw_system.reset();
     _file_system.reset();
@@ -67,7 +71,7 @@ Application::~Application()
 const bool Application::Update()
 {
     BaseType::Update();
-    if (_draw_system && (false == GetMinimized()))
+    if (_draw_system && _resources && (false == GetMinimized()))
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
 

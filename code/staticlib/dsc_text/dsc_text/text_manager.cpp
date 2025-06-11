@@ -109,6 +109,17 @@ DscText::TextManager::TextManager(DscRender::DrawSystem& draw_system, DscCommon:
 		return;
 	}
 
+#if defined(DSC_LOG)
+	FT_Int major = 0;
+	FT_Int minor = 0;
+	FT_Int patch = 0;
+	FT_Library_Version(_library,
+		&major,
+		&minor,
+		&patch);
+	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_TEXT, "Freetype FT_Library_Version major:%d minor:%d patch:%d\n", major, minor, patch);
+#endif // log
+
 	_texture = std::make_unique<GlyphAtlasTexture>(draw_system);
 
 	//shader
@@ -156,6 +167,8 @@ DscText::TextManager::TextManager(DscRender::DrawSystem& draw_system, DscCommon:
 
 DscText::TextManager::~TextManager()
 {
+	_map_path_font.clear();
+
 	FT_Done_FreeType(_library);
 }
 

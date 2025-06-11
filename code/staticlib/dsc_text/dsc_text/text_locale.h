@@ -1,7 +1,7 @@
 #pragma once
 #include "dsc_text.h"
 #include <dsc_common/dsc_common.h>
-#include <hb.h>
+#include <harfbuzz\hb.h>
 
 namespace DscText
 {

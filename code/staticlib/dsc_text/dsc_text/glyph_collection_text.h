@@ -65,6 +65,9 @@ namespace DscText
 		//	const int in_offset_y = 0
 		//);
 
+		hb_font_t* DebugGetFont() { return _harf_buzz_font; }
+
+
 	private:
 		TMapCodepointGlyph* const FindMapCodepointGlyph(const int in_glyph_size);
 		void SetScale(const int32 in_glyph_size);
@@ -90,13 +93,16 @@ namespace DscText
 		);
 
 	private:
-		FT_Face _face;
-		hb_font_t* _harf_buzz_font;
+		FT_Face _face = {};
+		hb_font_t* _harf_buzz_font = {};
 
 		// For each font size, have a map of codepoints to glyph
-		std::map<uint32_t, std::unique_ptr<TMapCodepointGlyph>> _map_size_glyph_cell;
+		std::map<uint32_t, std::unique_ptr<TMapCodepointGlyph>> _map_size_glyph_cell = {};
 
-		GlyphAtlasTexture* _texture;
+		GlyphAtlasTexture* _texture = {};
+		// WARNING: font file data needs to be kept around, u.Tag references memory in the file?
+		std::vector<uint8> _font_data = {};
+
 	};
 }
 

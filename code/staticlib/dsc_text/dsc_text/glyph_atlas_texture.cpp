@@ -200,6 +200,8 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32
 		auto temp = std::make_unique<GlyphAtlasRow>(mask_index, desired_height, _text_highest_pos_y[mask_index]);
 		_text_highest_pos_y[mask_index] += desired_height;
 
+		found_row = temp.get();
+
 		if ((int)in_width == _texture_dimention)
 		{
 			_array_glyph_row_full.push_back(std::move(temp));
@@ -208,8 +210,6 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32
 		{
 			_array_glyph_row.push_back(std::move(temp));
 		}
-
-		found_row = temp.get();
 	}
 
 	DscCommon::VectorFloat4 uv = DscCommon::VectorFloat4(

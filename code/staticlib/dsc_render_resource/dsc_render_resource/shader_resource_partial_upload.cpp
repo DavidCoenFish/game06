@@ -26,6 +26,12 @@ DscRenderResource::ShaderResourcePartialUpload::ShaderResourcePartialUpload(
 
 	in_draw_system->CommandListFinish(command_list);
 
+	// wait till after initial upload (which should skip zero memory) till populating backing memory
+	if (0 == _data.size())
+	{
+		_data.resize(_desc.Width * _desc.Height * 4);
+	}
+
 	return;
 }
 

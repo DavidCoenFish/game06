@@ -29,6 +29,10 @@ namespace DscRender
 		static std::unique_ptr<DrawSystem> Factory(
 			const HWND in_hwnd
 		);
+		static std::unique_ptr<DrawSystem> FactoryClearColour(
+			const HWND in_hwnd,
+			const DscCommon::VectorFloat4& in_clear_color
+		);
 
 		DrawSystem(
 			const HWND in_hwnd,

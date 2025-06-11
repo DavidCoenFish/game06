@@ -10,10 +10,9 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <hb.h>
-// Was not in the include folder, is this safe to use?
-//G:\development\game06\code\sdk\harf_buzz\Source\hb-ft.h
-#include <hb-ft.h>
+#include <harfbuzz\hb.h>
+#include <harfbuzz\hb-ft.h>
+
 
 namespace
 {
@@ -25,6 +24,7 @@ namespace
 	{
 		hb_buffer_t* buffer = hb_buffer_create();
 		hb_buffer_add_utf8(buffer, in_string_utf8.c_str(), -1, 0, -1);
+
 		//set script, language, direction
 		if (nullptr != in_locale_token)
 		{
@@ -38,6 +38,9 @@ namespace
 			hb_buffer_set_script(buffer, HB_SCRIPT_LATIN);
 			hb_buffer_set_language(buffer, hb_language_from_string("en", -1));
 		}
+
+		hb_buffer_guess_segment_properties(buffer);
+
 		return buffer;
 	}
 }
@@ -52,8 +55,8 @@ DscText::GlyphCollectionText::GlyphCollectionText(
 	: _texture(in_texture)
 {
 	FT_Error error = 0;
-	std::vector<uint8> font_data = {};
-	if (false == in_file_system.LoadFile(font_data, in_font_file_path))
+
+	if (false == in_file_system.LoadFile(_font_data, in_font_file_path))
 	{
 		DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "failed to load font data:%s\n", in_font_file_path.c_str());
 		return;
@@ -61,8 +64,8 @@ DscText::GlyphCollectionText::GlyphCollectionText(
 
 	error = FT_New_Memory_Face(
 		in_library,
-		font_data.data(),
-		static_cast<FT_Long>(font_data.size()),
+		_font_data.data(),
+		static_cast<FT_Long>(_font_data.size()),
 		0,
 		&_face);
     if (error)
@@ -71,24 +74,20 @@ DscText::GlyphCollectionText::GlyphCollectionText(
         return;
     }
 
+	FT_F26Dot6 FONT_SIZE = 128;
+	error = FT_Set_Char_Size(_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
+	if (error)
+	{
+		DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "Freetype FT_Set_Char_Size error:%d\n", error);
+		return;
+	}
+
 	const int32 face_count = _face->num_faces;
 	const int32 instances_count = _face->style_flags >> 16;
 
 	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_TEXT, "font face count:%d instances count:%d path:%s\n", face_count, instances_count, in_font_file_path.c_str());
 
-	//https://github.com/tangrams/harfbuzz-example/blob/master/src/freetypelib.cpp
-	for (int i = 0; i < _face->num_charmaps; i++)
-	{
-		if (((_face->charmaps[i]->platform_id == 0)
-			&& (_face->charmaps[i]->encoding_id == 3))
-			|| ((_face->charmaps[i]->platform_id == 3)
-				&& (_face->charmaps[i]->encoding_id == 1)))
-		{
-			FT_Set_Charmap(_face, _face->charmaps[i]);
-		}
-	}
-
-	_harf_buzz_font = hb_ft_font_create(_face, NULL);
+	_harf_buzz_font = hb_ft_font_create_referenced(_face);
 }
 
 DscText::GlyphCollectionText::~GlyphCollectionText()
@@ -156,8 +155,8 @@ DscText::GlyphCollectionText::TMapCodepointGlyph* const DscText::GlyphCollection
 
 void DscText::GlyphCollectionText::SetScale(const int32 in_glyph_size)
 {
-	//FT_Set_Char_Size(_face, in_glyph_size * 64, in_glyph_size * 64, 72, 72);
-	FT_Set_Pixel_Sizes(_face, in_glyph_size, in_glyph_size);
+	FT_Set_Char_Size(_face, in_glyph_size * 64, in_glyph_size * 64, 0, 0);
+	//FT_Set_Pixel_Sizes(_face, in_glyph_size, in_glyph_size);
 	return;
 }
 
@@ -257,8 +256,6 @@ void DscText::GlyphCollectionText::ShapeText(
 
 		const int x_offset = glyph_pos[i].x_offset / 64;
 		const int y_offset = glyph_pos[i].y_offset / 64;
-		//float x_advance = (float)glyph_pos[i].x_advance / 64.0f;
-		//float y_advance = (float)glyph_pos[i].y_advance / 64.0f;
 
 		FT_Error error = FT_Load_Glyph(_face, codepoint, FT_LOAD_DEFAULT);
 		if (error)

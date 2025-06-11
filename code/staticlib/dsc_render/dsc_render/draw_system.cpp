@@ -18,6 +18,22 @@ std::unique_ptr<DscRender::DrawSystem> DscRender::DrawSystem::Factory(
 		);
 }
 
+std::unique_ptr<DscRender::DrawSystem> DscRender::DrawSystem::FactoryClearColour(
+	const HWND in_hwnd,
+	const DscCommon::VectorFloat4& in_clear_color
+	)
+{
+	RenderTargetFormatData target_format_data = RenderTargetFormatData(DXGI_FORMAT_B8G8R8A8_UNORM, true, in_clear_color);
+
+	return std::make_unique<DrawSystem>(
+		in_hwnd,
+		2,
+		D3D_FEATURE_LEVEL_11_0,
+		0,
+		target_format_data
+		);
+}
+
 DscRender::DrawSystem::DrawSystem(
 	const HWND in_hwnd,
 	const unsigned int in_back_buffer_count,
