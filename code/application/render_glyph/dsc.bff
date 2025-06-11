@@ -18,11 +18,19 @@
     .VisualStudioSettings = ^VisualStudioSettings 
     .CommonVcproject = ^CommonVcproject 
     .LibraryBaseNameDependency = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource"}
-    .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "free_type.lib"}
-    .AdditionalStaicLibPaths = {"$RootPath$/../build/free_type"}
-    .AdditionalIncludePaths = {"$RootPath$/sdk/free_type/Include"}
+    .LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "freetype.lib"}
+    .AdditionalStaicLibPaths = {"$RootPath$/sdk/freetype_x64-windows/lib"}
+    .AdditionalIncludePaths = {"$RootPath$/sdk/freetype_x64-windows/include"}
     .DataCopyPath = {"$RootPath$/../data/font"}
     .DoDataCopy = true
+    .RootCopyPath = {
+        "$RootPath$/sdk/brotli_x64-windows/bin",
+        "$RootPath$/sdk/bzip2_x64-windows/bin",
+        "$RootPath$/sdk/freetype_x64-windows/bin",
+        "$RootPath$/sdk/libpng_x64-windows/bin",
+        "$RootPath$/sdk/zlib_x64-windows/bin",
+        }
+    .DoRootCopy = true
 ]
 
 DscVsprojectWindowExe("render_glyph" .WindowExeParam)

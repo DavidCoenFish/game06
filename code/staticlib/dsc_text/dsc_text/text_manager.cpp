@@ -101,8 +101,13 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DscText::TextManager::GetInputEleme
 
 DscText::TextManager::TextManager(DscRender::DrawSystem& draw_system, DscCommon::FileSystem& file_system)
 {
-	FT_Error error;
+	FT_Error error = 0;
 	error = FT_Init_FreeType(&_library);
+	if (error)
+	{
+		DSC_LOG_ERROR(LOG_TOPIC_DSC_TEXT, "Freetype init error:%d\n", error);
+		return;
+	}
 
 	_texture = std::make_unique<GlyphAtlasTexture>(draw_system);
 

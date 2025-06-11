@@ -200,6 +200,8 @@ function DscVsprojectWindowExe( .ProjectName .Param )
     .AdditionalIncludePaths = {}
     .DataCopyPath = {}
     .DoDataCopy = false
+    .RootCopyPath = {}
+    .DoRootCopy = false
 
     Using (.Param)
 
@@ -274,7 +276,7 @@ function DscVsprojectWindowExe( .ProjectName .Param )
             .LinkerOptions = ^LinkerOptions
             ForEach( .StaicLibPath in .AdditionalStaicLibPaths )
             {
-                ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$/$Platform$/$Config$/output"'
+                ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$"'
             }
         }
         .ProjectTargets + "exe_$ProjectName$_$Config$_$Platform$"
@@ -287,6 +289,16 @@ function DscVsprojectWindowExe( .ProjectName .Param )
                 .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/data"
             }
             ^ProjectTargets + "copy_$ProjectName$_$Config$_$Platform$"
+        }
+
+        If (.DoRootCopy)
+        {
+            CopyDir( "copy_root_$ProjectName$_$Config$_$Platform$" )
+            {
+                .SourcePaths = .RootCopyPath
+                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output"
+            }
+            ^ProjectTargets + "copy_root_$ProjectName$_$Config$_$Platform$"
         }
 
         Alias( "$ProjectName$_$Config$_$Platform$" )
@@ -346,6 +358,10 @@ function DscVsprojectConsoleExe( .ProjectName .Param)
     .AdditionalIncludePaths = {}
     .LinkerAdditionalDependency = {}
     .AdditionalStaicLibPaths = {}
+    .DataCopyPath = {}
+    .DoDataCopy = false
+    .RootCopyPath = {}
+    .DoRootCopy = false
 
     Using (.Param)
 
@@ -379,10 +395,11 @@ function DscVsprojectConsoleExe( .ProjectName .Param)
         }
         ForEach( .StaicLibPath in .AdditionalStaicLibPaths )
         {
-            ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$/$Platform$/$Config$/output"'
+            ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$"'
         }
 
-        Executable( "$ProjectName$_$Config$_$Platform$" )
+        .ProjectTargets = {}
+        Executable( "exe_$ProjectName$_$Config$_$Platform$" )
         {
             .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"
             .Libraries = {"obj_$ProjectName$_$Config$_$Platform$"}
@@ -390,8 +407,33 @@ function DscVsprojectConsoleExe( .ProjectName .Param)
             {
                 .Temp = {"$LibraryName$_$Config$_$Platform$"}
                 ^Libraries + .Temp
-
             }
+            ^ProjectTargets + "exe_$ProjectName$_$Config$_$Platform$"
+        }
+
+        If (.DoDataCopy)
+        {
+            CopyDir( "copy_$ProjectName$_$Config$_$Platform$" )
+            {
+                .SourcePaths = .DataCopyPath
+                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/data"
+            }
+            ^ProjectTargets + "copy_$ProjectName$_$Config$_$Platform$"
+        }
+
+        If (.DoRootCopy)
+        {
+            CopyDir( "copy_root_$ProjectName$_$Config$_$Platform$" )
+            {
+                .SourcePaths = .RootCopyPath
+                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output"
+            }
+            ^ProjectTargets + "copy_root_$ProjectName$_$Config$_$Platform$"
+        }
+
+        Alias( "$ProjectName$_$Config$_$Platform$" )
+        {
+          .Targets = ^ProjectTargets 
         }
 
         RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )

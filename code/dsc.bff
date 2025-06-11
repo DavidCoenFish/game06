@@ -1,7 +1,8 @@
 #once
 //https://www.fastbuild.org/docs/documentation.html
 
-//#define DEVELOPMENT_BUILD_CMD
+#define DEVELOPMENT_BUILD_CMD
+#define DEBUG_SDK
 
 .SolutionItemArray = {}
 {
@@ -35,7 +36,7 @@
 .SolutionBuildProject = ""
 
 #include "fbuild\dsc.bff"
-#include "sdk\dsc.bff"
+//#include "sdk\dsc.bff"
 #include "staticlib\dsc.bff"
 #include "application\dsc.bff"
 

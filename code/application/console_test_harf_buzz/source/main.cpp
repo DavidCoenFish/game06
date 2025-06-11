@@ -1,13 +1,14 @@
 #include "main.h"
 
 #include <dsc_common/file_system.h>
+#include <dsc_common/log_system.h>
 
 //#include <ft2build.h>
 //#include FT_FREETYPE_H
 //
 //#include <hb.h>
 //#include <hb-ft.h>
-#include <hb-ft.h>
+#include <harfbuzz/hb-ft.h>
 
 #pragma warning(push) 
 #pragma warning(disable: 4668)
@@ -19,18 +20,35 @@
 //int main(int argc, char* argv[], char* envp[])
 int main(int, char*, char*)
 {
-	//https://harfbuzz.github.io/a-simple-shaping-example.html
+    DscCommon::LogSystem logSystem(DscCommon::LogLevel::Diagnostic);
 
-    FT_Library ft_library;
-    FT_Face ft_face;
+    //https://harfbuzz.github.io/a-simple-shaping-example.html
+
+    FT_Library ft_library = {};
+    FT_Face ft_face = {};
     FT_F26Dot6 FONT_SIZE = 128;
+    FT_Error error = 0;
 
-    if ((FT_Init_FreeType(&ft_library)))
-        abort();
-    if ((FT_New_Face(ft_library, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf").c_str(), 0, &ft_face)))
-        abort();
-    if ((FT_Set_Char_Size(ft_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0)))
-        abort();
+    error = FT_Init_FreeType(&ft_library);
+    if (error)
+    {
+        DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_Init_FreeType error:%d\n", error);
+        return -1;
+    }
+
+    error = FT_New_Face(ft_library, DscCommon::FileSystem::JoinPath("data", "font", "code2002.ttf").c_str(), 0, &ft_face);
+    if (error)
+    {
+        DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_New_Face error:%d [%s]\n", error, FT_Error_String(error));
+        return -1;
+    }
+
+    error = FT_Set_Char_Size(ft_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
+    if (error)
+    {
+        DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Freetype FT_Set_Char_Size error:%d\n", error);
+        return -1;
+    }
 
     /* Create hb-ft font. */
     hb_font_t* hb_font;
@@ -65,8 +83,7 @@ int main(int, char*, char*)
         char glyphname[32];
         hb_font_get_glyph_name(hb_font, gid, glyphname, sizeof(glyphname));
 
-        printf("glyph='%s'	cluster=%d	advance=(%g,%g)	offset=(%g,%g)\n",
-            glyphname, cluster, x_advance, y_advance, x_offset, y_offset);
+        DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "glyph='%s'	cluster=%d	advance=(%g,%g)	offset=(%g,%g)\n", glyphname, cluster, x_advance, y_advance, x_offset, y_offset);
     }
 
     printf("Converted to absolute positions:\n");
@@ -85,15 +102,12 @@ int main(int, char*, char*)
             char glyphname[32];
             hb_font_get_glyph_name(hb_font, gid, glyphname, sizeof(glyphname));
 
-            printf("glyph='%s'	cluster=%d	position=(%g,%g)\n",
-                glyphname, cluster, x_position, y_position);
+            DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "glyph='%s'	cluster=%d	position=(%g,%g)\n", glyphname, cluster, x_position, y_position);
 
             current_x += pos[i].x_advance / 64.;
             current_y += pos[i].y_advance / 64.;
         }
     }
-
-
 
 	hb_buffer_destroy(hb_buffer);
 	hb_font_destroy(hb_font);

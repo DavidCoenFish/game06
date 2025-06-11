@@ -18,20 +18,51 @@
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
     .LibraryBaseNameDependency = {"dsc_common"}
-    .AdditionalIncludePaths = {
-        "$RootPath$/sdk/free_type/Include",
-        "$RootPath$/sdk/harf_buzz/src"
-    }
+
     .LinkerAdditionalDependency = {
-        "free_type.lib",
-        "harf_buzz.lib"
+#if DEBUG_SDK
+        "freetyped.lib",
+        "harfbuzz.lib"
+#else
+        "freetype.lib", 
+        "harfbuzz.lib"
+#endif
         }
     .AdditionalStaicLibPaths = {
-        "$RootPath$/../build/free_type",
-        "$RootPath$/../build/harf_buzz"
+#if DEBUG_SDK
+        "$RootPath$/sdk/freetype_x64-windows/debug/lib",
+        "$RootPath$/sdk/harfbuzz_x64-windows/debug/lib",
+#else
+        "$RootPath$/sdk/freetype_x64-windows/lib",
+        "$RootPath$/sdk/harfbuzz_x64-windows/lib",
+#endif
         }
+    .AdditionalIncludePaths = {
+        "$RootPath$/sdk/freetype_x64-windows/include",
+        "$RootPath$/sdk/harfbuzz_x64-windows/include",
+        }
+
     .DataCopyPath = {"$RootPath$/../data/font"}
     .DoDataCopy = true
+
+    .RootCopyPath = {
+#if DEBUG_SDK
+        "$RootPath$/sdk/brotli_x64-windows/debug/bin",
+        "$RootPath$/sdk/bzip2_x64-windows/debug/bin",
+        "$RootPath$/sdk/freetype_x64-windows/debug/bin",
+        "$RootPath$/sdk/libpng_x64-windows/debug/bin",
+        "$RootPath$/sdk/zlib_x64-windows/debug/bin",
+        "$RootPath$/sdk/harfbuzz_x64-windows/debug/bin"
+#else
+        "$RootPath$/sdk/brotli_x64-windows/bin",
+        "$RootPath$/sdk/bzip2_x64-windows/bin",
+        "$RootPath$/sdk/freetype_x64-windows/bin",
+        "$RootPath$/sdk/libpng_x64-windows/bin",
+        "$RootPath$/sdk/zlib_x64-windows/bin",
+        "$RootPath$/sdk/harfbuzz_x64-windows/bin"
+#endif
+        }
+    .DoRootCopy = true
 ]
 DscVsprojectConsoleExe("console_test_harf_buzz" .Param)
 

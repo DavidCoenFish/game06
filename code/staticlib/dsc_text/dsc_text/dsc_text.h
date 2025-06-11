@@ -1,5 +1,4 @@
 #pragma once
-#include <dsc_common/dsc_common.h>
 
 #define LOG_TOPIC_DSC_TEXT "DSC_TEXT"
 
@@ -8,11 +7,11 @@
 #ifndef DSC_BFF_BUILD
 
 //G:\development\game06\code\staticlib\dsc_text\dsc_text\dsc_text.h
-#include "..\..\..\sdk\free_type\Include\ft2build.h"
-#include "..\..\..\sdk\free_type\Include\FreeType\config\ftheader.h"
-#include "..\..\..\sdk\harf_buzz\Include\hb.h"
-// Was not in the include folder, is this safe to use?
-#include "..\..\..\sdk\harf_buzz\Source\hb-ft.h"
+#include "..\..\..\sdk\freetype_x64-windows\include\ft2build.h"
+#include "..\..\..\sdk\freetype_x64-windows\include\freetype\freetype.h"
+#include "..\..\..\sdk\harfbuzz_x64-windows\include\harfbuzz\hb.h"
+#include "..\..\..\sdk\harfbuzz_x64-windows\include\harfbuzz\hb-ft.h"
+
 
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 #include "..\..\dsc_render\dsc_render\dsc_render.h"
@@ -34,3 +33,6 @@
 #include "text_run_text.h"
 
 #endif //#ifndef DSC_BFF_BUILD
+
+
+#include <dsc_common/dsc_common.h>
