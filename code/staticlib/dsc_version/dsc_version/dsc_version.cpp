@@ -2,19 +2,21 @@
 
 const char* const DscVersion::GetGitRevision()
 {
-	return 
+	return ""
 #include "git_revision.txt"
 		;
 }
 
-const char* const DscVersion::GetDate()
+const char* const DscVersion::GetTimestamp()
 {
-	return __TIMESTAMP__;
+	return ""
+#include "timestamp.txt"
+		;
 }
 
 const char* const DscVersion::GetVersionString()
 {
-	return
+	return ""
 #include "version_string.txt"
 		;
 }

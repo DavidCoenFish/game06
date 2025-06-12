@@ -3,13 +3,16 @@
 
 #define LOG_TOPIC_DSC_VERSION "DSC_VERSION"
 
+/*
+get the version nb of the last commit
+*/
 namespace DscVersion
 {
 	//git rev-parse HEAD
 	//78fb12afa2ff329078582eaa53edab0bc20aa0de
 	const char* const GetGitRevision();
-	//
-	const char* const GetDate();
+	//2025-06-12T19:02:13
+	const char* const GetTimestamp();
 	// 0.0.1.30791
 	const char* const GetVersionString();
 	const char* const GetPlatform();

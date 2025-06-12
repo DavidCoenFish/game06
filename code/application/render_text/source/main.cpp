@@ -12,7 +12,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
     _In_ int       in_nCmdShow)
 {
     DscCommon::LogSystem logSystem(DscCommon::LogLevel::Diagnostic);
-    DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "Build time:%s %s %s\n", DscVersion::GetDate(), DscVersion::GetVersionString(), DscVersion::GetGitRevision());
+    DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "Build time:%s %s %s %s %s\n", DscVersion::GetTimestamp(), DscVersion::GetVersionString(), DscVersion::GetGitRevision(), DscVersion::GetPlatform(), DscVersion::GetConfiguration());
 
     const HWND hwnd = DscWindows::WindowHelper(
         [](const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)->DscWindows::IWindowApplication*
