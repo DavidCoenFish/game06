@@ -59,16 +59,16 @@ namespace DscText
 			const int32 in_colour // const DscCommon::VectorFloat4& in_colour
 		);
 
-		void AddCursor(
+		void UpdateHorizontalBounds(
 			const int in_pos_x
 		);
 
 		void StartNewLine(
-			DscCommon::VectorInt2& in_out_cursor,
+			int32& in_out_cursor,
 			const int32 in_line_gap_pixels
 		);
 
-		const DscCommon::VectorInt2 GetBounds(const bool in_use_em_height);
+		const DscCommon::VectorInt2 GetBounds();
 
 		void BuildVertexData(
 			std::vector<uint8_t>& out_vertex_raw_data,
@@ -78,7 +78,7 @@ namespace DscText
 		);
 
 	private:
-		void FinishLine();
+		void FinishLine(const int32 in_line_gap_pixels);
 
 	private:
 		std::vector<PreVertexData> _pre_vertex_data;
@@ -91,8 +91,8 @@ namespace DscText
 
 		bool _line_dirty; // Pre vertex added to line, but not adjusted for max height on line
 		DscCommon::VectorInt2 _line_vertical_bounds;
-		int _default_line_height; // If nothing added to the line, use this height
 		int _current_line_height; // Allow for things added to the line to be taller
+		int32 _accumulate_line_height_offset = 0;
 
 	};
 }

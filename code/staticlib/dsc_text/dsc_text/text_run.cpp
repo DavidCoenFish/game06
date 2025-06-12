@@ -136,7 +136,7 @@ DscCommon::VectorInt2 DscText::TextRun::GetTextBounds()
 		_calculate_dirty = false;
 
 		_pre_vertex_data = std::make_unique<TextPreVertex>();
-		DscCommon::VectorInt2 cursor;
+		int32 cursor = 0;
 		for (const auto& item : _text_run_array)
 		{
 			item->BuildPreVertexData(
@@ -148,7 +148,7 @@ DscCommon::VectorInt2 DscText::TextRun::GetTextBounds()
 				_ui_scale
 			);
 		}
-		_text_bounds = _pre_vertex_data->GetBounds(false);
+		_text_bounds = _pre_vertex_data->GetBounds();
 	}
 
 	return _text_bounds;

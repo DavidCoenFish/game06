@@ -6,7 +6,10 @@
 
 DscText::TextPreVertex::TextPreVertex()
 {
-	//nop
+	while ((int)_horizontal_bounds.size() <= _line_index)
+	{
+		_horizontal_bounds.push_back(DscCommon::VectorInt2(std::numeric_limits<int>::max(), -std::numeric_limits<int>::max()));
+	}
 }
 
 DscText::TextPreVertex::~TextPreVertex()
@@ -109,7 +112,7 @@ void DscText::TextPreVertex::AddPreVertex(
 	return;
 }
 
-void DscText::TextPreVertex::AddCursor(
+void DscText::TextPreVertex::UpdateHorizontalBounds(
 	const int in_pos_x
 )
 {
@@ -120,25 +123,27 @@ void DscText::TextPreVertex::AddCursor(
 }
 
 void DscText::TextPreVertex::StartNewLine(
-	DscCommon::VectorInt2& in_out_cursor,
+	int32& in_out_cursor,
 	const int32 in_line_gap_pixels
 	)
 {
-	FinishLine();
-	in_out_cursor[0] = 0;
-	//if (0 != _line_index)
-	{
-		in_out_cursor[1] -= (_current_line_height + in_line_gap_pixels);
-	}
+	in_out_cursor = 0;
+	FinishLine(in_line_gap_pixels);
 
 	_line_index += 1;
 	_current_line_height = 0;
 	_line_vertical_bounds = DscCommon::VectorInt2(std::numeric_limits<int>::max(), -std::numeric_limits<int>::max());
+
+	while ((int)_horizontal_bounds.size() <= _line_index)
+	{
+		_horizontal_bounds.push_back(DscCommon::VectorInt2(std::numeric_limits<int>::max(), -std::numeric_limits<int>::max()));
+	}
+
 }
 
-const DscCommon::VectorInt2 DscText::TextPreVertex::GetBounds(const bool in_use_em_height)
+const DscCommon::VectorInt2 DscText::TextPreVertex::GetBounds()
 {
-	FinishLine();
+	FinishLine(0);
 
 	if (true == _bound_dirty)
 	{
@@ -156,14 +161,7 @@ const DscCommon::VectorInt2 DscText::TextPreVertex::GetBounds(const bool in_use_
 		_bounds[1] = _vertical_bounds[1] - _vertical_bounds[0];
 	}
 
-	DscCommon::VectorInt2 result = _bounds;
-	if (in_use_em_height)
-	{
-		result[1] = std::max(_default_line_height, _vertical_bounds[1]) - _vertical_bounds[0];
-		result[1] = std::max(result[1], _default_line_height);
-	}
-
-	return result;
+	return _bounds;
 }
 
 void DscText::TextPreVertex::BuildVertexData(
@@ -173,7 +171,7 @@ void DscText::TextPreVertex::BuildVertexData(
 	const TVerticalAlignment in_vertical_line_alignment
 )
 {
-	FinishLine();
+	FinishLine(0);
 
 	const int line_count = static_cast<int>(_horizontal_bounds.size());
 	std::vector<int> horizontal_line_delta(line_count);
@@ -184,25 +182,30 @@ void DscText::TextPreVertex::BuildVertexData(
 		{
 		default:
 			break;
-		case THorizontalAlignment::TForceMiddle:
+		case THorizontalAlignment::TMiddle:
 			horizontal_line_delta[index] = ((in_container_size[0] - width) / 2) - _horizontal_bounds[index][0];
 			break;
-		case THorizontalAlignment::TForceRight:
+		case THorizontalAlignment::TRight:
 			horizontal_line_delta[index] = (in_container_size[0] - _horizontal_bounds[index][1]);
 			break;
 		}
 	}
 
 	int vertical_delta = 0; // in_container_size.GetY();
-	switch (in_vertical_line_alignment)
 	{
-	default:
-		vertical_delta = in_container_size.GetY();
-		break;
-	case TVerticalAlignment::TMiddle:
-		break;
-	case TVerticalAlignment::TBottom:
-		break;
+		const int32 bounds_height = _vertical_bounds[1] - _vertical_bounds[0];
+		switch (in_vertical_line_alignment)
+		{
+		default:
+			vertical_delta = in_container_size.GetY();
+			break;
+		case TVerticalAlignment::TMiddle:
+			vertical_delta = ((in_container_size[1] - bounds_height) / 2) + bounds_height;
+			break;
+		case TVerticalAlignment::TBottom:
+			vertical_delta = bounds_height;
+			break;
+		}
 	}
 
 	for (const auto& item : _pre_vertex_data)
@@ -267,42 +270,36 @@ void DscText::TextPreVertex::BuildVertexData(
 	return;
 }
 
-void DscText::TextPreVertex::FinishLine()
+void DscText::TextPreVertex::FinishLine(const int32 in_line_gap_pixels)
 {
 	if (false == _line_dirty)
 	{
 		return;
 	}
 
+	_accumulate_line_height_offset += _current_line_height;
 	_line_dirty = false;
 
-	//if (0 != _line_index)
+	//move backward over _pre_vertex_data, items on _line_index
+	for (std::vector<PreVertexData>::reverse_iterator i = _pre_vertex_data.rbegin();
+		i != _pre_vertex_data.rend(); ++i)
 	{
-		// use the default line height. this could be caused by an empty line. otherwise use max line height from things on line
-		if (0 == _current_line_height)
+		PreVertexData& item = *i;
+		if (item._line_index != _line_index)
 		{
-			_current_line_height = _default_line_height;
+			break;
 		}
-
-		//move backward over _pre_vertex_data, items on _line_index
-		for (std::vector<PreVertexData>::reverse_iterator i = _pre_vertex_data.rbegin();
-			i != _pre_vertex_data.rend(); ++i)
-		{
-			PreVertexData& item = *i;
-			if (item._line_index != _line_index)
-			{
-				break;
-			}
-			item._pos_low_high[1] -= _current_line_height;
-			item._pos_low_high[3] -= _current_line_height;
-		}
-
-		_line_vertical_bounds[0] -= _current_line_height;
-		_line_vertical_bounds[1] -= _current_line_height;
+		item._pos_low_high[1] -= _accumulate_line_height_offset;
+		item._pos_low_high[3] -= _accumulate_line_height_offset;
 	}
+
+	_line_vertical_bounds[0] -= _accumulate_line_height_offset;
+	_line_vertical_bounds[1] -= _accumulate_line_height_offset;
 
 	_vertical_bounds[0] = std::min(_vertical_bounds[0], _line_vertical_bounds[0]);
 	_vertical_bounds[1] = std::max(_vertical_bounds[1], _line_vertical_bounds[1]);
+
+	_accumulate_line_height_offset += in_line_gap_pixels;
 
 	return;
 

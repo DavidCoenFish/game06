@@ -23,7 +23,7 @@ void DscText::GlyphCollectionIcon::AddIcon(
 
 void DscText::GlyphCollectionIcon::BuildPreVertexData(
 	TextPreVertex& in_out_text_pre_vertex,
-	DscCommon::VectorInt2& in_out_cursor, // Allow multiple fonts to append pre vertex data
+	int32& in_out_cursor,
 	const int32 in_icon_id,
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
@@ -42,20 +42,20 @@ void DscText::GlyphCollectionIcon::BuildPreVertexData(
 	const DscCommon::VectorInt2& cell_width_height = cell.GetWidthHeightRef();
 	const int width = static_cast<int>(round(static_cast<float>(cell_width_height.GetX()) * in_ui_scale));
 	if ((true == in_width_limit_enabled) &&
-		(in_width_limit < (in_out_cursor.GetX() + width)))
+		(in_width_limit < (in_out_cursor + width)))
 	{
 		in_out_text_pre_vertex.StartNewLine(in_out_cursor, in_line_gap_pixels);
 	}
 	in_out_text_pre_vertex.AddPreVertexScale(
 		cell,
-		in_out_cursor[0],
-		in_out_cursor[1],
+		in_out_cursor,
+		0,
 		in_line_minimum_height,
 		in_colour_tint,
 		in_ui_scale
 	);
 
-	in_out_cursor[0] += cell_width_height[0];
+	in_out_cursor += cell_width_height[0];
 
 	return;
 

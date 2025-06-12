@@ -8,9 +8,9 @@ namespace DscText
 	enum class THorizontalAlignment
 	{
 		TNone, // just follow input string, default horizontal align from locale?
-		TForceLeft,
-		TForceMiddle,
-		TForceRight,
+		TLeft,
+		TMiddle,
+		TRight,
 	};
 
 	// for position of entire textblock in container

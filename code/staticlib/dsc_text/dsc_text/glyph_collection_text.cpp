@@ -134,7 +134,7 @@ void DscText::GlyphCollectionText::ClearAllGlyphUsage()
 
 void DscText::GlyphCollectionText::BuildPreVertexData(
 	TextPreVertex& in_out_text_pre_vertex,
-	DscCommon::VectorInt2& in_out_cursor, // allow multiple fonts to append pre vertex data
+	int32& in_out_cursor, // allow multiple fonts to append pre vertex data
 	const std::string& in_string_utf8,
 	const TextLocale* const in_locale_token,
 	const int32 in_font_size,
@@ -197,7 +197,7 @@ void DscText::GlyphCollectionText::SetScale(const int32 in_glyph_size)
 
 void DscText::GlyphCollectionText::ShapeText(
 	DscText::TextPreVertex& in_out_text_pre_vertex,
-	DscCommon::VectorInt2& in_out_cursor, // allow multiple fonts to append pre vertex data
+	int32& in_out_cursor,
 	const std::string& in_string_utf8,
 	hb_buffer_t* in_buffer,
 	DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
@@ -220,50 +220,47 @@ void DscText::GlyphCollectionText::ShapeText(
 	std::vector<unsigned int> width_line_clusert_index;
 	if (true == in_width_limit_enabled)
 	{
-		int cursor_x = in_out_cursor.GetX();
+		int cursor_x = in_out_cursor;
 		// Work out what line each glpyh should be on
-		unsigned int current_cluster = std::numeric_limits<unsigned int>::max();// -1;
+		unsigned int current_cluster = std::numeric_limits<unsigned int>::max();
+		if ((0 != in_out_cursor) && (0 < glyph_count))
+		{
+			// have at lease one cluster per line, unless we already had something on this line (0 != in_out_cursor)
+			current_cluster = glyph_info[1].cluster;
+		}
 		for (unsigned int i = 0; i < glyph_count; i++)
 		{
 			hb_glyph_info_t& info = glyph_info[i];
-			bool start_new_line = false;
+			const int x_advance = glyph_pos[i].x_advance / 64;
 
-			// Have at least one cluster per line
-			if (std::numeric_limits<unsigned int>::max() == current_cluster)
+			bool start_new_line = false;
+			if (in_string_utf8[glyph_info[i].cluster] == '\n')
+			{
+				start_new_line = true;
+			}
+			else if (std::numeric_limits<unsigned int>::max() == current_cluster) // at least one cluster per line
 			{
 				current_cluster = info.cluster;
 			}
-			else if (info.cluster != current_cluster)
+			else if (info.cluster != current_cluster) // only break on change of cluster
 			{
-				int trace_x = cursor_x;
-				for (unsigned int ahead = i + 0; ahead < glyph_count; ahead++)
+				const hb_glyph_flags_t flag = hb_glyph_info_get_glyph_flags(&glyph_info[i]);
+				// if we go past the width limit and cluster can break, then start a new line
+				if ((in_width_limit < cursor_x + x_advance) &&
+					(0 == (flag & HB_GLYPH_FLAG_UNSAFE_TO_BREAK)))
 				{
-					const int x_advance = glyph_pos[ahead].x_advance / 64;
-					trace_x += x_advance;
-
-					// We want to break the line if cluster goes past in_width_limit, and we can break on the cluster
-					const hb_glyph_flags_t flag = hb_glyph_info_get_glyph_flags(&glyph_info[ahead]);
-					if ((in_width_limit < trace_x) &&
-						(0 == (flag & HB_GLYPH_FLAG_UNSAFE_TO_BREAK)))
-					{
-						// we don't set current_cluster to max (flag empty) as the new line is not empty, it will start with our "ahead" cluster
-						width_line_clusert_index.push_back(glyph_info[ahead].cluster);
-						i = ahead;
-						cursor_x = x_advance;
-						start_new_line = true;
-						break;
-					}
-				}
-				if (false == start_new_line)
-				{
-					// If we did not find a width limited new line, just break? no more work?
-					break;
+					width_line_clusert_index.push_back(info.cluster);
+					start_new_line = true;
 				}
 			}
 
-			if (false == start_new_line)
+			if (true == start_new_line)
 			{
-				const int x_advance = glyph_pos[i].x_advance / 64;
+				current_cluster = std::numeric_limits<unsigned int>::max();
+				cursor_x = 0;
+			}
+			else
+			{
 				cursor_x += x_advance;
 			}
 		}
@@ -314,8 +311,8 @@ void DscText::GlyphCollectionText::ShapeText(
 		{
 			in_out_text_pre_vertex.AddPreVertex(
 				*cell,
-				in_out_cursor[0] + x_offset,
-				in_out_cursor[1] + y_offset,
+				in_out_cursor + x_offset,
+				y_offset,
 				in_line_minimum_height,
 				in_colour
 			);
@@ -326,11 +323,12 @@ void DscText::GlyphCollectionText::ShapeText(
 		const int x_advance = glyph_pos[i].x_advance / 64;
 		const int y_advance = glyph_pos[i].y_advance / 64;
 
-		in_out_cursor[0] += x_advance;
-		in_out_cursor[1] += y_advance;
+		in_out_cursor += x_advance;
+		//in_out_cursor[1] += y_advance;
+		DSC_ASSERT(0 == y_advance, "can this happen");
 
-		in_out_text_pre_vertex.AddCursor(
-			in_out_cursor[0]
+		in_out_text_pre_vertex.UpdateHorizontalBounds(
+			in_out_cursor
 		);
 	}
 

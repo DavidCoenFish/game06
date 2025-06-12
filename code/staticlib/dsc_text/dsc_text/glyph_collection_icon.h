@@ -28,7 +28,7 @@ namespace DscText
 
 		void BuildPreVertexData(
 			TextPreVertex& in_out_text_pre_vertex,
-			DscCommon::VectorInt2& in_out_cursor, // Allow multiple fonts to append pre vertex data
+			int32& in_out_cursor, // Allow multiple fonts to append pre vertex data
 			const int32 in_icon_id,
 			const bool in_width_limit_enabled = false,
 			const int32 in_width_limit = 0,

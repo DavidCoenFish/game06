@@ -42,16 +42,19 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         //https://r12a.github.io/app-conversion/
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "non fixed width layout", //\nligature " "\xC3" "\xA6" "\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
+            "non fixed width layout\nligature " "\xC3" "\xA6" "\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
             pLocale,
             font,
             64,
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
             ));
 
+        const int32 current_width = _draw_system->GetRenderTargetBackBuffer()->GetSize().GetX();
         _resources->_text_run = std::make_unique<DscText::TextRun>(
             std::move(text_run_array),
-            container_size
+            container_size,
+            true,
+            current_width
             );
     }
 
@@ -96,6 +99,7 @@ void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size)
 
     if (_resources && _resources->_text_run)
     {
+        _resources->_text_run->SetWidthLimit(true, in_size.GetX());
         _resources->_text_run->SetTextContainerSize(in_size);
     }
 

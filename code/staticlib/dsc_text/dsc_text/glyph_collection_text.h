@@ -45,7 +45,7 @@ namespace DscText
 
 		void BuildPreVertexData(
 			TextPreVertex& in_out_text_pre_vertex,
-			DscCommon::VectorInt2& in_out_cursor, // allow multiple fonts to append pre vertex data
+			int32& in_out_cursor, // allow multiple fonts to append pre vertex data
 			const std::string& in_string_utf8,
 			const TextLocale* const in_locale_token,
 			const int in_font_size,
@@ -76,7 +76,7 @@ namespace DscText
 		void SetScale(const int32 in_glyph_size);
 		void ShapeText(
 			DscText::TextPreVertex& in_out_text_pre_vertex,
-			DscCommon::VectorInt2& in_out_cursor, // allow multiple fonts to append pre vertex data
+			int32& in_out_cursor,
 			const std::string& in_string_utf8,
 			hb_buffer_t* in_buffer,
 			DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,

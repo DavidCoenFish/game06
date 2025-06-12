@@ -17,7 +17,7 @@ DscText::TextRunIcon::TextRunIcon(
 
 void DscText::TextRunIcon::BuildPreVertexData(
 	TextPreVertex& in_out_pre_vertex_data,
-	DscCommon::VectorInt2& in_out_cursor,
+	int32& in_out_cursor,
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
 	const int32 in_new_line_gap_pixels,
