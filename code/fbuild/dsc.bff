@@ -64,6 +64,7 @@
                             + ' /Od'
                             + ' /JMC'
                             + ' /D "DSC_LOG"'
+                            + ' /D "DSC_DEBUG"'
         .EffectCompilerToolArgumentsVS = '/nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
         .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
     ]
@@ -83,6 +84,7 @@
                             + ' /Gy'
                             + ' /GL'
                             + ' /D "NDEBUG"'
+                            + ' /D "DSC_RELEASE"'
                             + ' /O2'
          .LibrarianOptions  + ' /LTCG'
          .LinkerOptions     + ' /OPT:REF'

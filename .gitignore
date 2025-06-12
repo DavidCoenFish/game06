@@ -23,3 +23,6 @@ __pycache__/
 
 # SDK
 code/sdk/
+
+# Version
+code/staticlib/dsc_version/dsc_version/*.txt

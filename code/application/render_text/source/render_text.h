@@ -5,6 +5,7 @@
 
 //G:\development\game06\code\application\render_glyph\source\render_glyph.h
 #include "..\..\..\staticlib\dsc_common\dsc_common\dsc_common.h"
+#include "..\..\..\staticlib\dsc_version\dsc_version\dsc_version.h"
 #include "..\..\..\staticlib\dsc_windows\dsc_windows\dsc_windows.h"
 #include "..\..\..\staticlib\dsc_render\dsc_render\dsc_render.h"
 #include "..\..\..\staticlib\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"

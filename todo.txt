@@ -1,1 +1,4 @@
-remove per new line ratio
+
+
+G:\development\game06\code\staticlib\dsc_version\dsc_version\git_revision.txt
+
