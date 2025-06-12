@@ -1,2 +1,11 @@
 interest in rpg is more so to allow people to make adventures for people to run through,
 ie, a publically currated automated campain collection
+
+// minimal release of rpg/ proof of concept
+	- character editor
+	- scenario editor
+		- dialog
+		- encounter
+		- map
+	- combat
+	- local network play/ p2p. one person hosts as dm? or let computer be dm?

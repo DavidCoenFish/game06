@@ -17,7 +17,14 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_render_resource"}
+    .LibraryBaseNameDependency = {
+        "dsc_common", 
+        "dsc_render", 
+        "dsc_render_resource", 
+        "dsc_version", 
+        "dsc_text",
+        "dsc_locale",
+        }
 ]
 DscVsprojectStaticLib("dsc_onscreen_version" .LibraryParam)
 

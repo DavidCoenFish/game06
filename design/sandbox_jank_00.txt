@@ -1,2 +1,3 @@
 just another mine craft clone, but with procedural character creation that needs mined world resources to customise character, and automation via social connections
 
+5 elements x 12 zodiack are the minerals mined and combine them to create/ upgrade character

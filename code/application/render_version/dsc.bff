@@ -24,7 +24,8 @@
         "dsc_render", 
         "dsc_render_resource", 
         "dsc_text", 
-        "dsc_locale"
+        "dsc_locale",
+        "dsc_onscreen_version",
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 

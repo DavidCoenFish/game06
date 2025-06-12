@@ -1,4 +1,5 @@
 #pragma once
+#include "render_version.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_windows/i_window_application.h>
 
@@ -25,7 +26,11 @@ namespace DscRenderResource
 namespace DscText
 {
     class TextManager;
-    class TextRun;
+}
+
+namespace DscOnscreenVersion
+{
+    class OnscreenVersion;
 }
 
 class Application : public DscWindows::IWindowApplication
@@ -54,7 +59,7 @@ private:
         Resources(const Resources&) = delete;
 
         std::unique_ptr<DscText::TextManager> _text_manager;
-        std::unique_ptr<DscText::TextRun> _text_run;
+        std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version;
     };
     std::unique_ptr<Resources> _resources;
 

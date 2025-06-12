@@ -28,6 +28,46 @@
     ]
     ^SolutionItemArray + .temp;
 }
+{
+    .temp = [
+        .Path           = "parent/design"
+        .Items = { 
+            "../design/rpg_legendary_quest_00.txt",
+            "../design/rpg_succubus_survival_00.txt",
+            "../design/rts_mold_00.txt",
+            "../design/sandbox_jank_00.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/script/hunts_goblins"
+        .Items = { 
+            "../script/hunts_goblins/draft00.txt",
+            "../script/hunts_goblins/draft01.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/script/trailer_bridge_archer"
+        .Items = { 
+            "../script/trailer_bridge_archer/draft00.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/script/trailer_explorer_loop"
+        .Items = { 
+            "../script/trailer_explorer_loop/draft00.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
 
 .SolutionItemsSdkProject = {}
 .SolutionItemsStaticLibProject = {}

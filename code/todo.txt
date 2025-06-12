@@ -3,10 +3,20 @@
 - ?dsc_dag
 - ?draw dag triangle (dont render unless input changed)
 - ?ui
+- ?partial upload
+- ?text icon test
 
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 
 //rts? legendary quest roman sandbox?
+// minimal release of rpg/ proof of concept
+	- character editor
+	- scenario editor
+		- dialog
+		- encounter
+		- map
+	- combat
+	- local network play/ p2p. one person hosts as dm? or let computer be dm?
 
 
 a locale system might get queried with a key and give back a DagValueString
