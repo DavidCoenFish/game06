@@ -1,5 +1,5 @@
-- text ()
-- ?version info
+- ?version info, dsc_render_build_info? dsc_render_stats (fps? draw info? memory?)? 
+- ?ui effect like stroke
 - ?dsc_dag
 - ?draw dag triangle (dont render unless input changed)
 - ?ui

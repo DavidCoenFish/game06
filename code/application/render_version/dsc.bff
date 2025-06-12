@@ -31,22 +31,13 @@
         "D3d12.lib", 
         "DXGI.lib", 
         "dxguid.lib", 
-#if DEBUG_SDK
-        "freetyped.lib",
-#else
         "freetype.lib", 
-#endif
         "harfbuzz.lib"
         }
 
     .AdditionalStaicLibPaths = {
-#if DEBUG_SDK
-        "$RootPath$/sdk/freetype_x64-windows/debug/lib",
-        "$RootPath$/sdk/harfbuzz_x64-windows/debug/lib",
-#else
         "$RootPath$/sdk/freetype_x64-windows/lib",
         "$RootPath$/sdk/harfbuzz_x64-windows/lib",
-#endif
         }
     .AdditionalIncludePaths = {
         "$RootPath$/sdk/freetype_x64-windows/include",
@@ -61,27 +52,18 @@
     .DoDataCopy = true
 
     .RootCopyPath = {
-#if DEBUG_SDK
-        "$RootPath$/sdk/brotli_x64-windows/debug/bin",
-        "$RootPath$/sdk/bzip2_x64-windows/debug/bin",
-        "$RootPath$/sdk/freetype_x64-windows/debug/bin",
-        "$RootPath$/sdk/libpng_x64-windows/debug/bin",
-        "$RootPath$/sdk/zlib_x64-windows/debug/bin",
-        "$RootPath$/sdk/harfbuzz_x64-windows/debug/bin"
-#else
         "$RootPath$/sdk/brotli_x64-windows/bin",
         "$RootPath$/sdk/bzip2_x64-windows/bin",
         "$RootPath$/sdk/freetype_x64-windows/bin",
         "$RootPath$/sdk/libpng_x64-windows/bin",
         "$RootPath$/sdk/zlib_x64-windows/bin",
         "$RootPath$/sdk/harfbuzz_x64-windows/bin"
-#endif
         }
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_text" .WindowExeParam)
+DscVsprojectWindowExe("render_version" .WindowExeParam)
 
-.SolutionProjects + "render_text_project"
-.SolutionItemsApplicationProject + "render_text_project"
-//.SolutionBuildProject = "render_text_project"
+.SolutionProjects + "render_version_project"
+.SolutionItemsApplicationProject + "render_version_project"
+.SolutionBuildProject = "render_version_project"

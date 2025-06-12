@@ -18,4 +18,5 @@
 #include "render_text\dsc.bff"
 #include "render_texture\dsc.bff"
 #include "render_triangle\dsc.bff"
+#include "render_version\dsc.bff"
 #include "unit_test\dsc.bff"

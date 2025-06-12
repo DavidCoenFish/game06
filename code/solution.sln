@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33214.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "console_test_harf_buzz", "application\console_test_harf_buzz\console_test_harf_buzz.vcxproj", "{F2637670-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
@@ -39,13 +39,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parent", "parent", "{3D8E604F-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
-		..\README.md = ..\README.md
-		..\Reset.cmd = ..\Reset.cmd
 		..\commit.cmd = ..\commit.cmd
 		..\launch_visual_studio_code.cmd = ..\launch_visual_studio_code.cmd
 		..\notes.txt = ..\notes.txt
+		..\README.md = ..\README.md
+		..\Reset.cmd = ..\Reset.cmd
 		..\sync.cmd = ..\sync.cmd
-		..\todo.txt = ..\todo.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdk", "sdk", "{72071968-6C94-4F93-BC2A-7F5284B7D434}"
@@ -251,5 +250,8 @@ Global
 		{92AE7F44-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{5E8AEDE3-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{0271BBBB-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4DC2CA54-305C-4562-AEFC-C4873CDBAFD2}
 	EndGlobalSection
 EndGlobal
