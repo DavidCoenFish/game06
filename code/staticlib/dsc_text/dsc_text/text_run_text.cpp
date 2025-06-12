@@ -7,15 +7,15 @@ DscText::TextRunText::TextRunText(
 	GlyphCollectionText* const in_font,
 	const TextLocale* const in_locale_token,
 	const int32 in_font_size,
-	const float in_new_line_gap_ratio,
-	const int32 in_colour
-	)
+	const int32 in_colour,
+	const int32 in_line_minimum_height
+)
 	: _string_utf8(in_string_utf8)
 	, _font(in_font)
 	, _locale_token(in_locale_token)
 	, _font_size(in_font_size)
-	, _new_line_gap_ratio(in_new_line_gap_ratio)
 	, _colour(in_colour)
+	, _line_minimum_height(in_line_minimum_height)
 {
 	//nop
 }
@@ -25,6 +25,7 @@ void DscText::TextRunText::BuildPreVertexData(
 	DscCommon::VectorInt2& in_out_cursor,
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
+	const int32 in_new_line_gap_pixels,
 	const float in_ui_scale
 )
 {
@@ -36,8 +37,9 @@ void DscText::TextRunText::BuildPreVertexData(
 		DscCommon::Math::ScaleInt(_font_size, in_ui_scale),
 		in_width_limit_enabled,
 		in_width_limit,
-		DscCommon::Math::ScaleInt(_font_size, (1.0f + _new_line_gap_ratio) * in_ui_scale),
-		_colour
+		_colour,
+		DscCommon::Math::ScaleInt(_line_minimum_height, in_ui_scale),
+		DscCommon::Math::ScaleInt(in_new_line_gap_pixels, in_ui_scale)
 	);
 
 }

@@ -137,11 +137,12 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 	DscCommon::VectorInt2& in_out_cursor, // allow multiple fonts to append pre vertex data
 	const std::string& in_string_utf8,
 	const TextLocale* const in_locale_token,
-	const int in_font_size,
+	const int32 in_font_size,
 	const bool in_width_limit_enabled,
-	const int in_width_limit,
-	const int in_new_line_height,
-	const int32 in_colour
+	const int32 in_width_limit,
+	const int32 in_colour,
+	const int32 in_line_minimum_height,
+	const int32 in_line_gap_pixel
 )
 {
 	auto map_codepoint_glyph = FindMapCodepointGlyph(in_font_size);
@@ -162,8 +163,9 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 		*map_codepoint_glyph,
 		in_width_limit_enabled,
 		in_width_limit,
-		in_new_line_height,
-		in_colour
+		in_line_minimum_height,
+		in_colour,
+		in_line_gap_pixel
 	);
 	hb_buffer_destroy(buffer);
 }
@@ -201,8 +203,9 @@ void DscText::GlyphCollectionText::ShapeText(
 	DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
-	const int32 in_width_limit_new_line_height,
-	const int32 in_colour
+	const int32 in_line_minimum_height,
+	const int32 in_colour,
+	const int32 in_line_gap_pixel
 )
 {
 	hb_shape(_harf_buzz_font, in_buffer, _features.empty() ? NULL : _features.data(), static_cast<unsigned int>(_features.size()));
@@ -273,7 +276,7 @@ void DscText::GlyphCollectionText::ShapeText(
 		const unsigned int current_cluster = glyph_info[i].cluster;
 		if (in_string_utf8[current_cluster] == '\n')
 		{
-			in_out_text_pre_vertex.StartNewLine(in_out_cursor);
+			in_out_text_pre_vertex.StartNewLine(in_out_cursor, in_line_gap_pixel);
 			continue;
 		}
 
@@ -282,7 +285,7 @@ void DscText::GlyphCollectionText::ShapeText(
 			(width_line_clusert_index[line_index] == current_cluster))
 		{
 			line_index += 1;
-			in_out_text_pre_vertex.StartNewLine(in_out_cursor);
+			in_out_text_pre_vertex.StartNewLine(in_out_cursor, in_line_gap_pixel);
 		}
 
 		hb_codepoint_t codepoint = glyph_info[i].codepoint;
@@ -313,7 +316,7 @@ void DscText::GlyphCollectionText::ShapeText(
 				*cell,
 				in_out_cursor[0] + x_offset,
 				in_out_cursor[1] + y_offset,
-				in_width_limit_new_line_height,
+				in_line_minimum_height,
 				in_colour
 			);
 		}

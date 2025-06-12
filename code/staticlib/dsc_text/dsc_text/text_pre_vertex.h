@@ -4,6 +4,7 @@
 #include <dsc_common/vector_int2.h>
 #include <dsc_common/vector_int4.h>
 #include <dsc_common/vector_float4.h>
+#include <dsc_text/text_enum.h>
 
 namespace DscText
 {
@@ -25,9 +26,7 @@ namespace DscText
 			int _line_index;
 		};
 
-		TextPreVertex(
-			const int _default_line_height
-		);
+		TextPreVertex();
 		~TextPreVertex();
 
 		void Reserve(const unsigned int glyph_count);
@@ -36,7 +35,7 @@ namespace DscText
 			const Glyph& in_cell,
 			const int32 in_pos_x,
 			const int32 in_pos_y,
-			const float in_new_line_gap_ratio,
+			const int32 in_line_minimum_height,
 			const int32 in_colour, // DscCommon::VectorFloat4& in_colour,
 			const float in_ui_scale
 		);
@@ -45,7 +44,7 @@ namespace DscText
 			const Glyph& in_cell,
 			const int32 in_pos_x,
 			const int32 in_pos_y,
-			const int32 in_line_height,
+			const int32 in_line_minimum_height,
 			const int32 in_colour // in_colour
 		);
 
@@ -56,7 +55,7 @@ namespace DscText
 			const int32 in_mask,
 			const int32 in_pos_x,
 			const int32 in_pos_y,
-			const int32 in_line_height,
+			const int32 in_line_minimum_height,
 			const int32 in_colour // const DscCommon::VectorFloat4& in_colour
 		);
 
@@ -65,7 +64,8 @@ namespace DscText
 		);
 
 		void StartNewLine(
-			DscCommon::VectorInt2& in_out_cursor
+			DscCommon::VectorInt2& in_out_cursor,
+			const int32 in_line_gap_pixels
 		);
 
 		const DscCommon::VectorInt2 GetBounds(const bool in_use_em_height);
@@ -73,9 +73,8 @@ namespace DscText
 		void BuildVertexData(
 			std::vector<uint8_t>& out_vertex_raw_data,
 			const DscCommon::VectorInt2& in_container_size,
-			THorizontalAlignment in_horizontal_line_alignment,
-			const bool in_use_em_height,
-			const int in_em_size // Used for alignments MiddleEM, TopEM, BottomEM
+			const THorizontalAlignment in_horizontal_line_alignment,
+			const TVerticalAlignment in_vertical_line_alignment
 		);
 
 	private:

@@ -2,11 +2,9 @@
 #include "glyph.h"
 #include "text_enum.h"
 #include <dsc_common\data_helper.h>
+#include <dsc_common\math.h>
 
-DscText::TextPreVertex::TextPreVertex(
-	const int in_default_line_height
-)
-	: _default_line_height(in_default_line_height)
+DscText::TextPreVertex::TextPreVertex()
 {
 	//nop
 }
@@ -25,14 +23,13 @@ void DscText::TextPreVertex::AddPreVertexScale(
 	const Glyph& in_cell,
 	const int32 in_pos_x,
 	const int32 in_pos_y,
-	const float in_new_line_gap_ratio,
+	const int32 in_line_minimum_height,
 	const int32 in_colour,
 	const float in_ui_scale
 	)
 {
 	const DscCommon::VectorInt2 width_height = in_cell.GetWidthHeight(in_ui_scale);
 	const DscCommon::VectorInt2 bearing = in_cell.GetBearing(in_ui_scale);
-	const int line_height = static_cast<int>(round(static_cast<float>(width_height.GetY()) * (1.0f + in_new_line_gap_ratio)));
 	AddPreVertex(
 		width_height,
 		bearing,
@@ -40,7 +37,7 @@ void DscText::TextPreVertex::AddPreVertexScale(
 		in_cell.GetMask(),
 		in_pos_x,
 		in_pos_y,
-		line_height,
+		DscCommon::Math::ScaleInt(in_line_minimum_height, in_ui_scale),
 		in_colour
 	);
 }
@@ -49,7 +46,7 @@ void DscText::TextPreVertex::AddPreVertex(
 	const Glyph& in_cell,
 	const int32 in_pos_x,
 	const int32 in_pos_y,
-	const int32 in_line_height,
+	const int32 in_line_minimum_height,
 	const int32 in_colour
 )
 {
@@ -60,7 +57,7 @@ void DscText::TextPreVertex::AddPreVertex(
 		in_cell.GetMask(),
 		in_pos_x,
 		in_pos_y,
-		in_line_height,
+		in_line_minimum_height,
 		in_colour
 	);
 }
@@ -72,13 +69,13 @@ void DscText::TextPreVertex::AddPreVertex(
 	const int32 in_mask,
 	const int32 in_pos_x,
 	const int32 in_pos_y,
-	const int32 in_line_height,
+	const int32 in_line_minimum_height,
 	const int32 in_colour
 )
 {
 	_line_dirty = true;
 	_bound_dirty = true;
-	_current_line_height = std::max(_current_line_height, in_line_height);
+	_current_line_height = std::max(_current_line_height, in_line_minimum_height);
 
 	const int pos_x = in_pos_x + in_bearing.GetX();
 	const int pos_y = in_pos_y - (in_width_height.GetY() - in_bearing.GetY());
@@ -88,6 +85,7 @@ void DscText::TextPreVertex::AddPreVertex(
 		pos_x + in_width_height.GetX(),
 		pos_y + in_width_height.GetY()
 	);
+	_current_line_height = std::max(_current_line_height, pos[3]);
 
 	_pre_vertex_data.push_back(PreVertexData({
 		pos,
@@ -122,14 +120,15 @@ void DscText::TextPreVertex::AddCursor(
 }
 
 void DscText::TextPreVertex::StartNewLine(
-	DscCommon::VectorInt2& in_out_cursor
-)
+	DscCommon::VectorInt2& in_out_cursor,
+	const int32 in_line_gap_pixels
+	)
 {
 	FinishLine();
 	in_out_cursor[0] = 0;
 	//if (0 != _line_index)
 	{
-		in_out_cursor[1] -= _current_line_height;
+		in_out_cursor[1] -= (_current_line_height + in_line_gap_pixels);
 	}
 
 	_line_index += 1;
@@ -170,9 +169,8 @@ const DscCommon::VectorInt2 DscText::TextPreVertex::GetBounds(const bool in_use_
 void DscText::TextPreVertex::BuildVertexData(
 	std::vector<uint8_t>& out_vertex_raw_data,
 	const DscCommon::VectorInt2& in_container_size,
-	THorizontalAlignment in_horizontal_line_alignment,
-	const bool,// in_use_em_height,
-	const int//in_em_size // Used for alignments MiddleEM, TopEM, BottomEM
+	const THorizontalAlignment in_horizontal_line_alignment,
+	const TVerticalAlignment in_vertical_line_alignment
 )
 {
 	FinishLine();
@@ -195,12 +193,17 @@ void DscText::TextPreVertex::BuildVertexData(
 		}
 	}
 
-	int vertical_delta = in_container_size.GetY();
-	//if (in_use_em_height)
-	//{
-	//	vertical_delta -= in_em_size;
-	//}
-
+	int vertical_delta = 0; // in_container_size.GetY();
+	switch (in_vertical_line_alignment)
+	{
+	default:
+		vertical_delta = in_container_size.GetY();
+		break;
+	case TVerticalAlignment::TMiddle:
+		break;
+	case TVerticalAlignment::TBottom:
+		break;
+	}
 
 	for (const auto& item : _pre_vertex_data)
 	{

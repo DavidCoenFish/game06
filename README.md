@@ -8,7 +8,7 @@ which also pulled in some zip, png packages. Also makes use of code2000.ttf  <ht
 to build the vcxproj, .sln<br>
 `.\code\dsc.cmd`<br>
 <br>
-inside the solution file, there are support static lib, sdl static libs [FreeType, HarfBuzz]<br>
+inside the solution file, there are support static lib and applications<br>
 `.\code\solution.sln`<br>
 <br>
 develop functionalty by making an exe to focus on each feature
@@ -19,8 +19,8 @@ develop functionalty by making an exe to focus on each feature
 * render_glyph // get bitmmap of a character out of a font via freetype and display on screen
 * console_test_harf_buzz // loads a font, looks at properties, tries to shape something/ testbed
 * render_text // draw some harfbuzz shapped text on screen
-* //todo render_version
-* //todo render_ui
+* //todo render_version // get verion, data, build type on screen
+* //todo render_ui // get fps son screen, basic ui
 <br>
 hint<br>
 setting SolutionBuildProject in .\code\dsc.bff (or under) effects what the visual studio solution is set to build by default, and in visual studio, setting the startup project controlles what is run

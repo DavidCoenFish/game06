@@ -27,8 +27,8 @@ namespace DscText
 			GlyphCollectionText* const in_font = nullptr,
 			const TextLocale* const in_locale_token = nullptr,
 			const int32 in_font_size = 0,
-			const float in_new_line_gap_ratio = 0.0f,
-			const int32 in_colour = 0xff000000
+			const int32 in_colour = 0xff000000,
+			const int32 in_line_minimum_height = 0
 		);
 
 	private:
@@ -37,6 +37,7 @@ namespace DscText
 			DscCommon::VectorInt2& in_out_cursor,
 			const bool in_width_limit_enabled,
 			const int32 in_width_limit,
+			const int32 in_new_line_gap_pixels,
 			const float in_ui_scale
 		) override;
 
@@ -45,7 +46,7 @@ namespace DscText
 		GlyphCollectionText* const _font = nullptr;
 		const TextLocale* const _locale_token = nullptr;
 		const int32 _font_size = 0;
-		const float _new_line_gap_ratio = 0;
 		const int32 _colour;
+		const int32 _line_minimum_height;
 	};
 }

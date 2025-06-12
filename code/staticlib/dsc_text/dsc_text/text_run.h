@@ -4,6 +4,7 @@
 #include <dsc_common/vector_int2.h>
 #include <dsc_common/vector_float4.h>
 #include <dsc_text/i_text_run.h>
+#include <dsc_text/text_enum.h>
 
 namespace DscRender
 {
@@ -31,14 +32,14 @@ namespace DscText
 			const TextLocale* const in_locale_token = nullptr,
 			GlyphCollectionText* const in_text_font = nullptr,
 			const int32 in_font_size = 0,
-			const float in_new_line_gap_ratio = 0.0f,
-			const int32 in_colour = 0xff000000
+			const int32 in_colour = 0xff000000,
+			const int32 in_line_minimum_height = 0
 		);
 		static std::unique_ptr<ITextRun> MakeTextRunDataIcon(
 			const int in_icon_id = 0,
 			GlyphCollectionIcon* const in_icon_font = nullptr,
 			const int32 in_colour = 0xff000000,
-			const float in_new_line_gap_ratio = 0.0f
+			const int32 in_line_minimum_height = 0
 		);
 
 		TextRun() = delete;
@@ -51,9 +52,9 @@ namespace DscText
 			const DscCommon::VectorInt2& in_container_size,
 			const bool in_width_limit_enabled = false,
 			const int in_width_limit = 0,
-			//const TextEnum::HorizontalLineAlignment in_horizontal_line_alignment = TextEnum::HorizontalLineAlignment::Left,
-			//const TextEnum::VerticalBlockAlignment in_vertical_block_alignment = TextEnum::VerticalBlockAlignment::Top,
-			const int in_em_size = 0,
+			const THorizontalAlignment in_horizontal_line_alignment = THorizontalAlignment::TNone,
+			const TVerticalAlignment in_vertical_block_alignment = TVerticalAlignment::TTop,
+			const int32 in_lineGapPixels = 0,
 			const float in_ui_scale = 1.0f
 		);
 
@@ -78,42 +79,27 @@ namespace DscText
 			const bool in_width_limit_enabled,
 			const int in_width_limit
 		);
-		//const bool SetHorizontalLineAlignment(
-		//	const TextEnum::HorizontalLineAlignment in_horizontal_line_alignment
-		//);
-		//const bool SetVerticalBlockAlignment(
-		//	const TextEnum::VerticalBlockAlignment in_vertical_block_alignment
-		//);
-		void SetEMSize(
-			const int in_em_size
+		void SetHorizontalLineAlignment(
+			const THorizontalAlignment in_horizontal_line_alignment
+		);
+		void SetVerticalBlockAlignment(
+			const TVerticalAlignment in_vertical_block_alignment
+		);
+		void SetLineGapPixels(
+			const int in_line_gap_pixels
 		);
 		void SetUIScale(
 			const float in_ui_scale
 		);
 
-		// Rather than a seperate Update function, that could be forgoten, have the update in the getter, results in out_geometry_dirty
-
-		//GeometryGeneric* const GetGeometryRef(
-		//std::shared_ptr<GeometryGeneric>& GetGeometryRef(
-		//	bool& out_geometry_dirty,
-		//	DrawSystem* const in_draw_system,
-		//	ID3D12GraphicsCommandList* const in_command_list
-		//	);
-		//void Draw(
-		//	DrawSystem* const in_draw_system,
-		//	DrawSystemFrame* const in_draw_system_frame,
-		//	std::shared_ptr<Shader>& in_shader,
-		//	TextTexture& in_text_texture
-		//);
-
 	private:
 		std::vector<std::unique_ptr<ITextRun>> _text_run_array;
 		DscCommon::VectorInt2 _container_size;
 		bool _width_limit_enabled;
-		int _width_limit;
-		//TextEnum::HorizontalLineAlignment _horizontal_line_alignment;
-		//TextEnum::VerticalBlockAlignment _vertical_block_alignment;
-		int _em_size; // Vertical alignment can use a EM size 
+		int32 _width_limit;
+		THorizontalAlignment _horizontal_line_alignment;
+		TVerticalAlignment _vertical_block_alignment;
+		int32 _line_gap_pixels;
 		float _ui_scale;
 
 		bool _calculate_dirty;

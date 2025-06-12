@@ -15,8 +15,8 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 	const TextLocale* const in_locale_token,
 	GlyphCollectionText* const in_text_font,
 	const int32 in_font_size,
-	const float in_new_line_gap_ratio,
-	const int32 in_colour
+	const int32 in_colour,
+	const int32 in_line_minimum_height
 )
 {
 	return std::make_unique<DscText::TextRunText>(
@@ -24,8 +24,8 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 		in_text_font,
 		in_locale_token,
 		in_font_size,
-		in_new_line_gap_ratio,
-		in_colour
+		in_colour,
+		in_line_minimum_height
 		);
 }
 
@@ -33,14 +33,14 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataIcon(
 	const int32 in_icon_id,
 	GlyphCollectionIcon* const in_icon_font,
 	const int32 in_colour_tint,
-	const float in_new_line_gap_ratio
+	const int32 in_line_minimum_height
 )
 {
 	return std::make_unique<DscText::TextRunIcon>(
 		in_icon_id,
 		in_icon_font,
 		in_colour_tint,
-		in_new_line_gap_ratio
+		in_line_minimum_height
 		);
 }
 
@@ -50,16 +50,18 @@ DscText::TextRun::TextRun(
 	const DscCommon::VectorInt2& in_container_size,
 	const bool in_width_limit_enabled,
 	const int in_width_limit,
-	//const TextEnum::HorizontalLineAlignment in_horizontal_line_alignment = TextEnum::HorizontalLineAlignment::Left,
-	//const TextEnum::VerticalBlockAlignment in_vertical_block_alignment = TextEnum::VerticalBlockAlignment::Top,
-	const int in_em_size,
+	const THorizontalAlignment in_horizontal_line_alignment,
+	const TVerticalAlignment in_vertical_block_alignment,
+	const int32 in_line_gap_pixels,
 	const float in_ui_scale
 )
 : _text_run_array(std::move(in_text_run_array))
 , _container_size(in_container_size)
 , _width_limit_enabled(in_width_limit_enabled)
 , _width_limit(in_width_limit)
-, _em_size(in_em_size)
+, _horizontal_line_alignment(in_horizontal_line_alignment)
+, _vertical_block_alignment(in_vertical_block_alignment)
+, _line_gap_pixels(in_line_gap_pixels)
 , _ui_scale(in_ui_scale)
 , _calculate_dirty(true)
 , _pre_vertex_data()
@@ -90,9 +92,8 @@ const std::shared_ptr<DscRenderResource::GeometryGeneric>& DscText::TextRun::Get
 		_pre_vertex_data->BuildVertexData(
 			vertex_raw_data,
 			_container_size,
-			THorizontalAlignment::TNone,
-			false,
-			_em_size
+			_horizontal_line_alignment,
+			_vertical_block_alignment
 		);
 
 		// the problem with resizing an existing geometry, is what if that geometry is still on a command list
@@ -134,7 +135,7 @@ DscCommon::VectorInt2 DscText::TextRun::GetTextBounds()
 	{
 		_calculate_dirty = false;
 
-		_pre_vertex_data = std::make_unique<TextPreVertex>(_em_size);
+		_pre_vertex_data = std::make_unique<TextPreVertex>();
 		DscCommon::VectorInt2 cursor;
 		for (const auto& item : _text_run_array)
 		{
@@ -143,6 +144,7 @@ DscCommon::VectorInt2 DscText::TextRun::GetTextBounds()
 				cursor,
 				_width_limit_enabled,
 				_width_limit,
+				_line_gap_pixels,
 				_ui_scale
 			);
 		}
@@ -194,20 +196,35 @@ void DscText::TextRun::SetWidthLimit(
 	}
 }
 
-//const bool SetHorizontalLineAlignment(
-//	const TextEnum::HorizontalLineAlignment in_horizontal_line_alignment
-//);
-//const bool SetVerticalBlockAlignment(
-//	const TextEnum::VerticalBlockAlignment in_vertical_block_alignment
-//);
-
-void DscText::TextRun::SetEMSize(
-	const int in_em_size
+void DscText::TextRun::SetHorizontalLineAlignment(
+	const THorizontalAlignment in_horizontal_line_alignment
 )
 {
-	if (_em_size != in_em_size)
+	if (_horizontal_line_alignment != in_horizontal_line_alignment)
 	{
-		_em_size = in_em_size;
+		_horizontal_line_alignment = in_horizontal_line_alignment;
+		_geometry_dirty = true;
+	}
+}
+
+void DscText::TextRun::SetVerticalBlockAlignment(
+	const TVerticalAlignment in_vertical_block_alignment
+)
+{
+	if (_vertical_block_alignment != in_vertical_block_alignment)
+	{
+		_vertical_block_alignment = in_vertical_block_alignment;
+		_geometry_dirty = true;
+	}
+}
+
+void DscText::TextRun::SetLineGapPixels(
+	const int in_line_gap_pixels
+)
+{
+	if (_line_gap_pixels != in_line_gap_pixels)
+	{
+		_line_gap_pixels = in_line_gap_pixels;
 		_calculate_dirty = true;
 		_geometry_dirty = true;
 	}

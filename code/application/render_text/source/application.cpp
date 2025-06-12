@@ -42,11 +42,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         //https://r12a.github.io/app-conversion/
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "non fixed width layout\nligature " "\xC3" "\xA6" "\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
+            "non fixed width layout", //\nligature " "\xC3" "\xA6" "\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
             pLocale,
             font,
             64,
-            0.5f,
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
             ));
 
