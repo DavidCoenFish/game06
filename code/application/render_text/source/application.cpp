@@ -42,7 +42,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         //https://r12a.github.io/app-conversion/
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "non fixed width layout\nligature " "\xC3" "\xA6" "\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
+            "Non fixed width layout.\nLigature " "\xC3" "\xA6" ".\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
             pLocale,
             font,
             64,
@@ -52,21 +52,21 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             "red",
             pLocale,
             font,
-            48,
+            80,
             DscCommon::Math::ConvertColourToInt(255, 0, 0, 255)
         ));
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
             "green",
             pLocale,
             font,
-            32,
+            64,
             DscCommon::Math::ConvertColourToInt(0, 255, 0, 255)
         ));
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "blue",
+            "blue.",
             pLocale,
             font,
-            16,
+            48,
             DscCommon::Math::ConvertColourToInt(0, 0, 255, 255)
         ));
 
@@ -77,7 +77,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(text_run_array),
             container_size,
             true,
-            current_width
+            current_width,
+            DscText::THorizontalAlignment::TNone,
+            DscText::TVerticalAlignment::TTop,
+            24
             );
     }
 
