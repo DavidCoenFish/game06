@@ -56,61 +56,19 @@ namespace
 	}
 }
 
-
 DscText::GlyphCollectionText::GlyphCollectionText(
 	FT_Library in_library,
 	GlyphAtlasTexture* in_texture,
 	DscCommon::FileSystem& in_file_system,
 	const std::string& in_font_file_path
 )
-	: _texture(in_texture)
+	: _library(in_library)
+	, _texture(in_texture)
 {
-	FT_Error error = 0;
-
 	if (false == in_file_system.LoadFile(_font_data, in_font_file_path))
 	{
-		DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "failed to load font data:%s\n", in_font_file_path.c_str());
-		return;
+		DSC_LOG_ERROR(LOG_TOPIC_DSC_TEXT, "failed to load font data:%s\n", in_font_file_path.c_str());
 	}
-
-	error = FT_New_Memory_Face(
-		in_library,
-		_font_data.data(),
-		static_cast<FT_Long>(_font_data.size()),
-		0,
-		&_face);
-    if (error)
-    {
-        DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "Freetype font face error:%d path:%s\n", error, in_font_file_path.c_str());
-        return;
-    }
-
-	FT_F26Dot6 FONT_SIZE = 128;
-	error = FT_Set_Char_Size(_face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
-	if (error)
-	{
-		DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "Freetype FT_Set_Char_Size error:%d\n", error);
-		return;
-	}
-
-	//https://github.com/tangrams/harfbuzz-example/blob/master/src/freetypelib.cpp
-	for (int i = 0; i < _face->num_charmaps; i++)
-	{
-		if (((_face->charmaps[i]->platform_id == 0)
-			&& (_face->charmaps[i]->encoding_id == 3))
-			|| ((_face->charmaps[i]->platform_id == 3)
-				&& (_face->charmaps[i]->encoding_id == 1)))
-		{
-			FT_Set_Charmap(_face, _face->charmaps[i]);
-		}
-	}
-
-	const int32 face_count = _face->num_faces;
-	const int32 instances_count = _face->style_flags >> 16;
-
-	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_TEXT, "font face count:%d instances count:%d path:%s\n", face_count, instances_count, in_font_file_path.c_str());
-
-	_harf_buzz_font = hb_ft_font_create_referenced(_face);
 
 	// i don't seem to be able to effect change
 	//_features.push_back(LigatureOff);
@@ -123,13 +81,20 @@ DscText::GlyphCollectionText::GlyphCollectionText(
 
 DscText::GlyphCollectionText::~GlyphCollectionText()
 {
-	hb_font_destroy(_harf_buzz_font);
-	FT_Done_Face(_face);
+	for (auto& item : _map_size_font_face)
+	{
+		hb_font_destroy(item.second->_harf_buzz_font);
+		FT_Done_Face(item.second->_face);
+	}
+	_map_size_font_face.clear();
 }
 
 void DscText::GlyphCollectionText::ClearAllGlyphUsage()
 {
-	_map_size_glyph_cell.clear();
+	for (auto& item : _map_size_font_face)
+	{
+		item.second->_map_codepoint_glyph.clear();
+	}
 }
 
 void DscText::GlyphCollectionText::BuildPreVertexData(
@@ -146,7 +111,6 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 )
 {
 	auto map_codepoint_glyph = FindMapCodepointGlyph(in_font_size);
-	SetScale(in_font_size);
 
 	hb_buffer_t* const buffer = MakeBuffer(
 		in_string_utf8,
@@ -170,15 +134,49 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 	hb_buffer_destroy(buffer);
 }
 
-DscText::GlyphCollectionText::TMapCodepointGlyph* const DscText::GlyphCollectionText::FindMapCodepointGlyph(const int in_glyph_size)
+DscText::GlyphCollectionText::FontFace* const DscText::GlyphCollectionText::FindMapCodepointGlyph(const int in_glyph_size)
 {
-	TMapCodepointGlyph* map_glyph_cell = nullptr;
-	auto found = _map_size_glyph_cell.find(in_glyph_size);
-	if (found == _map_size_glyph_cell.end())
+	FontFace* map_glyph_cell = nullptr;
+
+	auto found = _map_size_font_face.find(in_glyph_size);
+	if (found == _map_size_font_face.end())
 	{
-		auto temp = std::make_unique<TMapCodepointGlyph>();
+		auto temp = std::make_unique<FontFace>();
+
+		FT_Error error = 0;
+		error = FT_New_Memory_Face(
+			_library,
+			_font_data.data(),
+			static_cast<FT_Long>(_font_data.size()),
+			0,
+			&temp->_face);
+		if (error)
+		{
+			DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "Freetype font face error:%d\n", error);
+		}
+
+		error = FT_Set_Char_Size(temp->_face, in_glyph_size * 64, in_glyph_size * 64, 0, 0);
+		if (error)
+		{
+			DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "Freetype FT_Set_Char_Size error:%d\n", error);
+		}
+
+		//https://github.com/tangrams/harfbuzz-example/blob/master/src/freetypelib.cpp
+		for (int i = 0; i < temp->_face->num_charmaps; i++)
+		{
+			if (((temp->_face->charmaps[i]->platform_id == 0)
+				&& (temp->_face->charmaps[i]->encoding_id == 3))
+				|| ((temp->_face->charmaps[i]->platform_id == 3)
+					&& (temp->_face->charmaps[i]->encoding_id == 1)))
+			{
+				FT_Set_Charmap(temp->_face, temp->_face->charmaps[i]);
+			}
+		}
+
+		temp->_harf_buzz_font = hb_ft_font_create_referenced(temp->_face);
+
 		map_glyph_cell = temp.get();
-		_map_size_glyph_cell[in_glyph_size] = std::move(temp);
+		_map_size_font_face[in_glyph_size] = std::move(temp);
 	}
 	else
 	{
@@ -188,19 +186,12 @@ DscText::GlyphCollectionText::TMapCodepointGlyph* const DscText::GlyphCollection
 	return map_glyph_cell;
 }
 
-void DscText::GlyphCollectionText::SetScale(const int32 in_glyph_size)
-{
-	//FT_Set_Char_Size(_face, in_glyph_size * 64, in_glyph_size * 64, 0, 0);
-	FT_Set_Pixel_Sizes(_face, in_glyph_size, in_glyph_size);
-	return;
-}
-
 void DscText::GlyphCollectionText::ShapeText(
 	DscText::TextPreVertex& in_out_text_pre_vertex,
 	int32& in_out_cursor,
 	const std::string& in_string_utf8,
 	hb_buffer_t* in_buffer,
-	DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
+	FontFace& in_font_face,
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
 	const int32 in_line_minimum_height,
@@ -208,7 +199,7 @@ void DscText::GlyphCollectionText::ShapeText(
 	const int32 in_line_gap_pixel
 )
 {
-	hb_shape(_harf_buzz_font, in_buffer, _features.empty() ? NULL : _features.data(), static_cast<unsigned int>(_features.size()));
+	hb_shape(in_font_face._harf_buzz_font, in_buffer, _features.empty() ? NULL : _features.data(), static_cast<unsigned int>(_features.size()));
 
 	unsigned int glyph_count = 0;
 	hb_glyph_info_t* glyph_info = hb_buffer_get_glyph_infos(in_buffer, &glyph_count);
@@ -290,21 +281,21 @@ void DscText::GlyphCollectionText::ShapeText(
 		const int x_offset = glyph_pos[i].x_offset / 64;
 		const int y_offset = glyph_pos[i].y_offset / 64;
 
-		FT_Error error = FT_Load_Glyph(_face, codepoint, FT_LOAD_DEFAULT);
+		FT_Error error = FT_Load_Glyph(in_font_face._face, codepoint, FT_LOAD_DEFAULT);
 		if (error)
 		{
-			DSC_LOG_WARNING(LOG_TOPIC_DSC_TEXT, "Freetype loaf glyph error:%d codepoint:%d\n", error, codepoint);
-			return;
+			DSC_LOG_ERROR(LOG_TOPIC_DSC_TEXT, "Freetype load glyph error:%d codepoint:%d\n", error, codepoint);
+			continue;
 		}
 
-		FT_GlyphSlot slot = _face->glyph;
-		auto cell = FindCell(codepoint, in_out_map_glyph_cell);
+		FT_GlyphSlot slot = in_font_face._face->glyph;
+		auto cell = FindCell(codepoint, in_font_face._map_codepoint_glyph);
 		if (nullptr == cell)
 		{
 			// only ask to render the glyph to the slot->bitmap if we didn't find the cell, ie, don't have cell to re-use
 			FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
 
-			cell = MakeGlyph(codepoint, slot, in_out_map_glyph_cell);
+			cell = MakeGlyph(codepoint, slot, in_font_face._map_codepoint_glyph);
 		}
 
 		if (nullptr != cell)
@@ -317,14 +308,11 @@ void DscText::GlyphCollectionText::ShapeText(
 				in_colour
 			);
 		}
-		//const int x_advance = slot->advance.x / 64;
-		//const int delta = (slot->lsb_delta - slot->rsb_delta) / 64;
-		//const int y_advance = slot->advance.y / 64;
+
 		const int x_advance = glyph_pos[i].x_advance / 64;
 		const int y_advance = glyph_pos[i].y_advance / 64;
 
 		in_out_cursor += x_advance;
-		//in_out_cursor[1] += y_advance;
 		DSC_ASSERT(0 == y_advance, "can this happen");
 
 		in_out_text_pre_vertex.UpdateHorizontalBounds(

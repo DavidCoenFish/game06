@@ -68,18 +68,25 @@ namespace DscText
 		//	const int in_offset_y = 0
 		//);
 
-		hb_font_t* DebugGetFont() { return _harf_buzz_font; }
+		//hb_font_t* DebugGetFont() { return _harf_buzz_font; }
 
 
 	private:
-		TMapCodepointGlyph* const FindMapCodepointGlyph(const int in_glyph_size);
-		void SetScale(const int32 in_glyph_size);
+		struct FontFace
+		{
+			FT_Face _face = {};
+			hb_font_t* _harf_buzz_font = {};
+			TMapCodepointGlyph _map_codepoint_glyph = {};
+		};
+
+		FontFace* const FindMapCodepointGlyph(const int in_font_size);
+		//void SetScale(const int32 in_glyph_size);
 		void ShapeText(
 			DscText::TextPreVertex& in_out_text_pre_vertex,
 			int32& in_out_cursor,
 			const std::string& in_string_utf8,
 			hb_buffer_t* in_buffer,
-			DscText::GlyphCollectionText::TMapCodepointGlyph& in_out_map_glyph_cell,
+			FontFace& in_font_face,
 			const bool in_width_limit_enabled,
 			const int32 in_width_limit,
 			const int32 in_line_minimum_height,
@@ -97,11 +104,10 @@ namespace DscText
 		);
 
 	private:
-		FT_Face _face = {};
-		hb_font_t* _harf_buzz_font = {};
+		FT_Library _library;
 
 		// For each font size, have a map of codepoints to glyph
-		std::map<uint32_t, std::unique_ptr<TMapCodepointGlyph>> _map_size_glyph_cell = {};
+		std::map<uint32_t, std::unique_ptr<FontFace>> _map_size_font_face = {};
 
 		GlyphAtlasTexture* _texture = {};
 		// WARNING: font file data needs to be kept around, u.Tag references memory in the file?

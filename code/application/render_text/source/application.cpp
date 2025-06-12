@@ -48,6 +48,29 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             64,
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
             ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "red",
+            pLocale,
+            font,
+            48,
+            DscCommon::Math::ConvertColourToInt(255, 0, 0, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "green",
+            pLocale,
+            font,
+            32,
+            DscCommon::Math::ConvertColourToInt(0, 255, 0, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "blue",
+            pLocale,
+            font,
+            16,
+            DscCommon::Math::ConvertColourToInt(0, 0, 255, 255)
+        ));
+
+
 
         const int32 current_width = _draw_system->GetRenderTargetBackBuffer()->GetSize().GetX();
         _resources->_text_run = std::make_unique<DscText::TextRun>(
