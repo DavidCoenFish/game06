@@ -101,7 +101,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
         ));
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            " and ",
+            " (and",
             pLocale,
             font,
             64,
@@ -113,7 +113,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
         ));
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            " and now icons.",
+            ") and now icons.",
             pLocale,
             font,
             64,

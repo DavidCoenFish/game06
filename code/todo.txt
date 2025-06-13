@@ -1,5 +1,5 @@
-- ?text icon test
-- ?render target pool (nearest power 2? nearest 8 pixels?)
+- ?exe render_target_sub_viewport
+- ?shader screen quad checker plus
 - ?ui effect like stroke
 - ?ui
 - ?dsc_dag

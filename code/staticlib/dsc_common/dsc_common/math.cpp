@@ -6,6 +6,16 @@ const int32 DscCommon::Math::ScaleInt(const int32 in_value, const float in_scale
 	return static_cast<int>(round(static_cast<float>(in_value) * in_scale));
 }
 
+const uint32 DscCommon::Math::Ceiling(const uint32 in_value, const uint32 in_alignment)
+{
+	const uint32 pad = in_value % in_alignment;
+	if (0 == pad)
+	{
+		return in_value;
+	}
+	return in_value + (in_alignment - pad);
+}
+
 // top left pixel [[0,0] ... [screen width,height]] => render bottom left [[-1.0,-1.0] ... [1.0, 1.0]]
 const float DscCommon::Math::UIPixelsToRenderSpaceHorizontal(const int32 in_pixel, const int32 in_screen_width)
 {

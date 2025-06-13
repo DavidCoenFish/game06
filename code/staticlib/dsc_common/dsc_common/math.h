@@ -14,6 +14,7 @@ namespace DscCommon
 namespace Math
 {
 	const int32 ScaleInt(const int32 in_value, const float in_scale);
+	const uint32 Ceiling(const uint32 in_value, const uint32 in_alignment);
 
 	// top left pixel [[0,0] ... [screen width,height]] => render bottom left [[-1.0,-1.0] ... [1.0, 1.0]]
 	const float UIPixelsToRenderSpaceHorizontal(const int32 in_pixel, const int32 in_screen_width);

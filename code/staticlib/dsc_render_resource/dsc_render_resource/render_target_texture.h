@@ -49,6 +49,8 @@ namespace DscRenderResource
 			const DscRender::RenderTargetDepthData& in_target_depth_data,
 			const DscCommon::VectorInt2& in_size,
 			const bool in_resize_with_screen = false
+			//, const bool in_use_sub_size 
+			//, const DscCommon::VectorInt2& in_sub_size // allow reused of approximatly size render targets, allow the view and sizzor rect to be optionally set
 		);
 		virtual ~RenderTargetTexture();
 		std::shared_ptr<DscRender::HeapWrapperItem> GetShaderResourceHeapWrapperItem(const int in_index = 0) const;

@@ -174,8 +174,6 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 		ID3D12Device2* const in_device
 	)
 {
-	// So, is this a good idea, to allow Resize(), call OnDeviceLost
-	// OnDeviceLost();
 	_array_render_target_descriptors.clear();
 	_current_state_render_target = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	auto heap_properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
