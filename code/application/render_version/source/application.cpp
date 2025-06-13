@@ -32,9 +32,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
-        //DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
-
-        _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(_draw_system, _file_system, _resources->_text_manager);
+        _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
     }
 
     return;
@@ -61,7 +59,7 @@ const bool Application::Update()
 
         if (_resources->_onscreen_version)
         {
-            _resources->_onscreen_version->Update(*frame);
+            _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager, true);
         }
     }
     

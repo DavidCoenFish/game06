@@ -11,7 +11,9 @@ namespace DirectX
 
 namespace DscCommon
 {
-	class VectorInt2;
+	template <typename TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
 }
 
 namespace DscRender

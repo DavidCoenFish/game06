@@ -7,10 +7,17 @@
 
 namespace DscCommon
 {
-class VectorFloat4;
+	template <typename TYPE>
+	class Vector4;
+	typedef Vector4<float> VectorFloat4;
+
 namespace Math
 {
 	const int32 ScaleInt(const int32 in_value, const float in_scale);
+
+	// top left pixel [[0,0] ... [screen width,height]] => render bottom left [[-1.0,-1.0] ... [1.0, 1.0]]
+	const float UIPixelsToRenderSpaceHorizontal(const int32 in_pixel, const int32 in_screen_width);
+	const float UIPixelsToRenderSpaceVertical(const int32 in_pixel, const int32 in_screen_height);
 
 	constexpr int32 sWhite = 0xffffffff;
 	constexpr int32 sRed = 0xff0000ff;

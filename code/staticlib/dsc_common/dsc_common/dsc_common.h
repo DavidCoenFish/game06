@@ -115,6 +115,8 @@ typedef unsigned __int64 uint64;
 #include "math.h"
 #include "math_angle.h"
 #include "utf8.h"
+#include "vector_2.h"
+#include "vector_4.h"
 #include "vector_float2.h"
 #include "vector_float4.h"
 #include "vector_int2.h"

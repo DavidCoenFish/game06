@@ -1,4 +1,4 @@
-#include "present_interpolant.hlsli"
+#include "screen_quad_texture_interpolant.hlsli"
 
 struct Vertex
 {

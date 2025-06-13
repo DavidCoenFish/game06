@@ -10,6 +10,8 @@
 #include "..\..\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
 #include "..\..\dsc_version\dsc_version\dsc_version.h"
 #include "..\..\dsc_text\dsc_text\dsc_text.h"
+#include "..\..\dsc_ui\dsc_ui\dsc_ui.h"
+#include "..\..\dsc_locale\dsc_locale\dsc_locale.h"
 
 #include "onscreen_version.h"
 

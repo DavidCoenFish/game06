@@ -4,11 +4,6 @@
 #include <dsc_common/vector_float4.h>
 #include <dsc_text/i_text_run.h>
 
-namespace DscCommon
-{
-	class VectorInt2;
-}
-
 namespace DscText
 {
 	class GlyphCollectionText;

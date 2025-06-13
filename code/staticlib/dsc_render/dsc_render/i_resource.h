@@ -4,7 +4,9 @@
 //#define DRAW_SYSTEM_RESOURCE_ALIVE_COUNT
 namespace DscCommon
 {
-	class VectorInt2;
+	template <typename TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
 }
 
 namespace DscRender

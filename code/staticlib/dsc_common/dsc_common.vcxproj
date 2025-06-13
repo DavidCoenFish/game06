@@ -38,6 +38,8 @@
     <CustomBuild Include="dsc_common\math_angle.h" />
     <CustomBuild Include="dsc_common\utf8.cpp" />
     <CustomBuild Include="dsc_common\utf8.h" />
+    <CustomBuild Include="dsc_common\vector_2.h" />
+    <CustomBuild Include="dsc_common\vector_4.h" />
     <CustomBuild Include="dsc_common\vector_float2.cpp" />
     <CustomBuild Include="dsc_common\vector_float2.h" />
     <CustomBuild Include="dsc_common\vector_float4.cpp" />

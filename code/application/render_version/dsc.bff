@@ -26,6 +26,7 @@
         "dsc_text", 
         "dsc_locale",
         "dsc_onscreen_version",
+        "dsc_ui",
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 

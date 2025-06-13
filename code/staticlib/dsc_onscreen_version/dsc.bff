@@ -24,6 +24,7 @@
         "dsc_version", 
         "dsc_text",
         "dsc_locale",
+        "dsc_ui",
         }
 ]
 DscVsprojectStaticLib("dsc_onscreen_version" .LibraryParam)

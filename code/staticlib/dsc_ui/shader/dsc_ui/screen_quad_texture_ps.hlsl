@@ -1,4 +1,4 @@
-#include "present_interpolant.hlsli"
+#include "screen_quad_texture_interpolant.hlsli"
 
 Texture2D g_texture : register(t0);
 SamplerState g_sampler_state : register(s0);

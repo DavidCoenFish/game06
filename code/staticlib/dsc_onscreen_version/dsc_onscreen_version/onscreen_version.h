@@ -7,6 +7,11 @@ namespace DscCommon
 	class FileSystem;
 }
 
+namespace DscUi
+{
+	class ScreenQuad;
+}
+
 namespace DscText
 {
 	class TextManager;
@@ -33,13 +38,16 @@ namespace DscOnscreenVersion
 		OnscreenVersion(const OnscreenVersion&) = delete;
 
 		OnscreenVersion(
-			DscRender::DrawSystem* const in_draw_system,
-			DscCommon::FileSystem* const in_file_system,
-			DscText::TextManager* const in_text_manager
+			DscRender::DrawSystem& in_draw_system,
+			DscCommon::FileSystem& in_file_system,
+			DscText::TextManager& in_text_manager
 		);
 		void Update(
-			DscRenderResource::Frame& in_frame
-			);
+			DscRender::DrawSystem& in_draw_system,
+			DscRenderResource::Frame& in_frame,
+			DscText::TextManager& in_text_manager,
+			const bool in_allow_clear_backbuffer = false
+		);
 
 	private:
 		virtual void OnDeviceLost();
@@ -55,8 +63,8 @@ namespace DscOnscreenVersion
 	private:
 		std::unique_ptr<DscText::TextRun> _text_run;
 		std::shared_ptr<DscRenderResource::RenderTargetTexture> _render_target_texture;
-		std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_present;
-		std::shared_ptr<DscRenderResource::Shader> _shader_present;
+		std::shared_ptr<DscUi::ScreenQuad> _screen_quad;
+		std::shared_ptr<DscRenderResource::Shader> _screen_quad_shader;
 
 	};
 }
