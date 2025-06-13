@@ -23,7 +23,7 @@ const char* const DscVersion::GetVersionString()
 
 const char* const DscVersion::GetPlatform()
 {
-	return "x64";
+	return "PC";
 }
 
 const char* const DscVersion::GetConfiguration()

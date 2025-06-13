@@ -43,7 +43,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         DscVersion::GetGitRevision()
     );
 
-    const int32 text_colour = DscCommon::Math::ConvertColourToInt(127, 127, 127, 127);
+    const int32 text_colour = DscCommon::Math::ConvertColourToInt(200, 200, 200, 255);
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
         DscCommon::LogSystem::Printf("%s \n", DscVersion::GetVersionString()),
@@ -81,7 +81,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         );
 
     DscCommon::VectorInt2 text_size = _text_run->GetTextBounds();
-    text_size.Set(text_size.GetX() + 4, text_size.GetY() + 8);
+    text_size.Set(text_size.GetX() + 8, text_size.GetY() + 12);
     _text_run->SetTextContainerSize(text_size);
     // make a screen quad the size of the text, to the bottom right of the screen
     _screen_quad = std::make_unique<DscUi::ScreenQuad>(
@@ -97,7 +97,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
             DscRender::RenderTargetFormatData(
                 DXGI_FORMAT_B8G8R8A8_UNORM,
                 true,
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.125f)
             )
         );
 
@@ -128,7 +128,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         DXGI_FORMAT_UNKNOWN,
         // DXGI_FORMAT_D32_FLOAT,
         render_target_format,
-        CD3DX12_BLEND_DESC(D3D12_DEFAULT),
+        DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),  //CD3DX12_BLEND_DESC(D3D12_DEFAULT),
         CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
         CD3DX12_DEPTH_STENCIL_DESC()
     );
