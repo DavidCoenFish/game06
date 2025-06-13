@@ -63,7 +63,7 @@ int main(int, char*, char*)
     FT_Bool fixed_size = FT_HAS_FIXED_SIZES(ft_face);
     FT_Bool fixed_width = FT_IS_FIXED_WIDTH(ft_face);
     FT_Bool use_kerning = FT_HAS_KERNING(ft_face);
-    DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "fixed_size:%d fixed_width:%d use_kerning:%d flag:%d\n", fixed_size, fixed_width, use_kerning, ft_face->face_flags);
+    std::cout << "fixed_size:" << fixed_size << " fixed_width:" << fixed_width << " use_kerning:" << use_kerning << " ft_face->face_flags:" << ft_face->face_flags << std::endl;
 
     for (int i = 0; i < ft_face->num_charmaps; i++) {
         if (((ft_face->charmaps[i]->platform_id == 0)
@@ -103,7 +103,7 @@ int main(int, char*, char*)
     //_features.push_back(KerningOff);
     //_features.push_back(KerningOn);
     //_features.push_back(CligOff);
-    _features.push_back(CligOn);
+    //_features.push_back(CligOn);
 
     /* Shape it! */
     hb_shape(hb_font, hb_buffer, _features.empty() ? NULL : _features.data(), static_cast<unsigned int>(_features.size()));
@@ -126,8 +126,7 @@ int main(int, char*, char*)
 
         char glyphname[32];
         hb_font_get_glyph_name(hb_font, gid, glyphname, sizeof(glyphname));
-
-        DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "glyph='%s'	cluster=%d	advance=(%g,%g)	offset=(%g,%g)\n", glyphname, cluster, x_advance, y_advance, x_offset, y_offset);
+        std::cout << "glyph:" << glyphname << " cluster:" << cluster << " x_advance:" << x_advance << " y_advance:" << y_advance << "x_offset" << x_offset << "y_offset" << y_offset << std::endl;
     }
 
     printf("Converted to absolute positions:\n");
@@ -145,8 +144,7 @@ int main(int, char*, char*)
 
             char glyphname[32];
             hb_font_get_glyph_name(hb_font, gid, glyphname, sizeof(glyphname));
-
-            DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "glyph='%s'	cluster=%d	position=(%g,%g)\n", glyphname, cluster, x_position, y_position);
+            std::cout << "glyph:" << glyphname << " cluster:" << cluster << " x_position:" << x_position << " y_position:" << y_position << std::endl;
 
             current_x += pos[i].x_advance / 64.;
             current_y += pos[i].y_advance / 64.;

@@ -99,6 +99,8 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DscText::TextManager::GetInputEleme
 
 DscText::TextManager::TextManager(DscRender::DrawSystem& draw_system, DscCommon::FileSystem& file_system)
 {
+	_icon_font = std::make_unique<GlyphCollectionIcon>();
+
 	FT_Error error = 0;
 	error = FT_Init_FreeType(&_library);
 	if (error)
@@ -178,6 +180,20 @@ const DscText::TextLocale* const DscText::TextManager::GetLocaleToken(const DscL
 		return found->second.get();
 	}
 	return s_locale_en.get();
+}
+
+const int32 DscText::TextManager::AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b)
+{
+	if (_icon_font)
+	{
+		return _icon_font->AddIcon(*_texture, in_size, in_data_4b);
+	}
+	return -1;
+}
+
+DscText::GlyphCollectionIcon* const DscText::TextManager::GetIconFont() const
+{
+	return _icon_font.get();
 }
 
 // Find or make a new text face

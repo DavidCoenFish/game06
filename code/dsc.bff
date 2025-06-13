@@ -22,8 +22,7 @@
             "../notes.txt",
             "../README.md",
             "../Reset.cmd",
-            "../sync.cmd",
-            "../todo.txt"
+            "../sync.cmd"
             }
     ]
     ^SolutionItemArray + .temp;
@@ -94,13 +93,6 @@ VSSolution("solution")
     }
 
     .SolutionFolders = .SolutionItemArray;
-    {
-        .temp = [
-            .Path           = "sdk"
-            .Projects       = .SolutionItemsSdkProject
-        ]
-        ^SolutionFolders + .temp
-    }
 
     {
         .temp = [

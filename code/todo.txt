@@ -1,10 +1,10 @@
-- ?version info, dsc_render_build_info? dsc_render_stats (fps? draw info? memory?)? 
+- ?text icon test
+- ?render target pool (nearest power 2? nearest 8 pixels?)
 - ?ui effect like stroke
+- ?ui
 - ?dsc_dag
 - ?draw dag triangle (dont render unless input changed)
-- ?ui
 - ?partial upload
-- ?text icon test
 
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 

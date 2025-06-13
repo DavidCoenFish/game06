@@ -20,11 +20,9 @@ namespace DscText
 	class GlyphCollectionIcon
 	{
 	public:
-		void AddIcon(
+		const int32 AddIcon(
 			GlyphAtlasTexture& in_texture,
-			const int32 in_icon_id,
-			const int32 in_width,
-			const int32 in_height,
+			const DscCommon::VectorInt2& in_size,
 			const uint8_t* const in_buffer
 		);
 

@@ -45,25 +45,25 @@ DscText::GlyphAtlasTexture::~GlyphAtlasTexture()
 	// nop
 }
 
-std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const int32 in_width, const int32 in_height, const uint8_t* const in_data_4b)
+std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b)
 {
-	DSC_ASSERT((int)in_width <= _texture_dimention, "invalid param");
-	DSC_ASSERT((int)in_height <= _texture_dimention, "invalid param");
+	DSC_ASSERT(in_size.GetX() <= _texture_dimention, "invalid param");
+	DSC_ASSERT(in_size.GetY() <= _texture_dimention, "invalid param");
 
-	if ((0 == in_width) || (0 == in_height))
+	if ((0 == in_size.GetX()) || (0 == in_size.GetY()))
 	{
 		return nullptr;
 	}
 
 	GlyphAtlasRow* found_row = nullptr;
-	const int desired_height = in_height + (0 != (in_height & 0x03) ? 4 - (in_height & 0x03) : 0);
+	const int desired_height = in_size.GetY() + (0 != (in_size.GetY() & 0x03) ? 4 - (in_size.GetY() & 0x03) : 0);
 	for (auto iter = _array_icon_row.begin(); iter != _array_icon_row.end(); ++iter)
 	{
 		GlyphAtlasRow& row = **iter;
 		if ((desired_height == row.GetHeight()) &&
-			(row.GetTextureHighestX() + (int)in_width <= _texture_dimention))
+			(row.GetTextureHighestX() + (int)in_size.GetX() <= _texture_dimention))
 		{
-			if (row.GetTextureHighestX() + (int)in_width == _texture_dimention)
+			if (row.GetTextureHighestX() + (int)in_size.GetX() == _texture_dimention)
 			{
 				_array_glyph_row_full.push_back(std::move(*iter));
 				_array_glyph_row.erase(iter);
@@ -78,7 +78,7 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const int32 
 	if (nullptr == found_row)
 	{
 		// Check icon is not overlapping font
-		const int new_max_pos_y = _icon_lowest_pos_y - in_height;
+		const int new_max_pos_y = _icon_lowest_pos_y - desired_height;
 		if ((new_max_pos_y < _text_highest_pos_y[0]) ||
 			(new_max_pos_y < _text_highest_pos_y[1]) ||
 			(new_max_pos_y < _text_highest_pos_y[2]) ||
@@ -90,8 +90,9 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const int32 
 		_icon_lowest_pos_y = new_max_pos_y;
 
 		auto temp = std::make_unique<GlyphAtlasRow>(-1, desired_height, _icon_lowest_pos_y);
+		found_row = temp.get();
 
-		if ((int)in_width == _texture_dimention)
+		if (in_size.GetX() == _texture_dimention)
 		{
 			_array_icon_row_full.push_back(std::move(temp));
 		}
@@ -99,32 +100,30 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const int32 
 		{
 			_array_icon_row.push_back(std::move(temp));
 		}
-
-		found_row = temp.get();
 	}
 
 	DscCommon::VectorFloat4 uv = DscCommon::VectorFloat4(
 		(float)found_row->GetTextureHighestX() / (float)_texture_dimention,
-		(float)(found_row->GetTexturePosY() + in_height) / (float)_texture_dimention,
-		(float)(found_row->GetTextureHighestX() + in_width) / (float)_texture_dimention,
+		(float)(found_row->GetTexturePosY() + in_size.GetY()) / (float)_texture_dimention,
+		(float)(found_row->GetTextureHighestX() + in_size.GetX()) / (float)_texture_dimention,
 		(float)found_row->GetTexturePosY() / (float)_texture_dimention
 	);
 
 	// add cell to end of row
 	auto cell = std::make_unique<Glyph>(
-		DscCommon::VectorInt2(in_width, in_height),
-		DscCommon::VectorInt2(),
+		in_size,
+		DscCommon::VectorInt2(0, in_size.GetY()),
 		uv,
 		0xffffffff
 		);
 
 	auto& dest_data = _texture->GetData(true, found_row->GetTexturePosY(), found_row->GetTexturePosY() + desired_height);
-	for (int32 y = 0; y < in_height; ++y)
+	for (int32 y = 0; y < in_size.GetY(); ++y)
 	{
-		for (int32 x = 0; x < in_width; ++x)
+		for (int32 x = 0; x < in_size.GetX(); ++x)
 		{
 			const int dest_data_index = ((((found_row->GetTexturePosY() + y) * _texture_dimention) + (found_row->GetTextureHighestX() + x)) * 4);
-			const int buffer_index = (((y * in_width) + x) * 4);
+			const int buffer_index = (((y * in_size.GetX()) + x) * 4);
 			for (int32 b = 0; b < 4; ++b)
 			{
 				dest_data[dest_data_index + b] = in_data_4b[buffer_index + b];
@@ -132,32 +131,32 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const int32 
 		}
 	}
 
-	found_row->IncrementTextureHighestX(in_width);
+	found_row->IncrementTextureHighestX(in_size.GetX());
 	return cell;
 }
 
-std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32 in_width, const int32 in_height, 
+std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const DscCommon::VectorInt2& in_size,
 	const int32 in_bearing_x,
 	const int32 in_bearing_y,
 	const uint8_t* const in_data_1b)
 {
-	DSC_ASSERT((int)in_width <= _texture_dimention, "invalid param");
-	DSC_ASSERT((int)in_height <= _texture_dimention, "invalid param");
+	DSC_ASSERT(in_size.GetX() <= _texture_dimention, "invalid param");
+	DSC_ASSERT(in_size.GetY() <= _texture_dimention, "invalid param");
 
-	if ((0 == in_width) || (0 == in_height))
+	if ((0 == in_size.GetX()) || (0 == in_size.GetY()))
 	{
 		return nullptr;
 	}
 
 	GlyphAtlasRow* found_row = nullptr;
-	const int desired_height = in_height + (0 != (in_height & 0x03) ? 4 - (in_height & 0x03) : 0);
+	const int desired_height = in_size.GetY() + (0 != (in_size.GetY() & 0x03) ? 4 - (in_size.GetY() & 0x03) : 0);
 	for (auto iter = _array_glyph_row.begin(); iter != _array_glyph_row.end(); ++iter)
 	{
 		GlyphAtlasRow& row = **iter;
 		if ((desired_height == row.GetHeight()) &&
-			(row.GetTextureHighestX() + (int)in_width <= _texture_dimention))
+			(row.GetTextureHighestX() + (int)in_size.GetX() <= _texture_dimention))
 		{
-			if (row.GetTextureHighestX() + (int)in_width == _texture_dimention)
+			if (row.GetTextureHighestX() + (int)in_size.GetY() == _texture_dimention)
 			{
 				_array_glyph_row_full.push_back(std::move(*iter));
 				_array_glyph_row.erase(iter);
@@ -202,7 +201,7 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32
 
 		found_row = temp.get();
 
-		if ((int)in_width == _texture_dimention)
+		if (in_size.GetX() == _texture_dimention)
 		{
 			_array_glyph_row_full.push_back(std::move(temp));
 		}
@@ -214,8 +213,8 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32
 
 	DscCommon::VectorFloat4 uv = DscCommon::VectorFloat4(
 		(float)found_row->GetTextureHighestX() / (float)_texture_dimention,
-		(float)(found_row->GetTexturePosY() + in_height) / (float)_texture_dimention,
-		(float)(found_row->GetTextureHighestX() + in_width) / (float)_texture_dimention,
+		(float)(found_row->GetTexturePosY() + in_size.GetY()) / (float)_texture_dimention,
+		(float)(found_row->GetTextureHighestX() + in_size.GetX()) / (float)_texture_dimention,
 		(float)found_row->GetTexturePosY() / (float)_texture_dimention
 	);
 
@@ -223,24 +222,24 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddGlyph(const int32
 
 	// add cell to end of row
 	auto cell = std::make_unique<Glyph>(
-		DscCommon::VectorInt2(in_width, in_height),
+		in_size,
 		DscCommon::VectorInt2(in_bearing_x, in_bearing_y),
 		uv,
 		mask
 		);
 
 	auto& dest_data = _texture->GetData(true, found_row->GetTexturePosY(), found_row->GetTexturePosY() + desired_height);
-	for (int32 y = 0; y < in_height; ++y)
+	for (int32 y = 0; y < in_size.GetY(); ++y)
 	{
-		for (int32 x = 0; x < in_width; ++x)
+		for (int32 x = 0; x < in_size.GetX(); ++x)
 		{
 			const int dest_data_index = ((((found_row->GetTexturePosY() + y) * _texture_dimention) + (found_row->GetTextureHighestX() + x)) * 4) + found_row->GetMaskIndex();
-			const int buffer_index = ((y * in_width) + x);
+			const int buffer_index = ((y * in_size.GetX()) + x);
 			dest_data[dest_data_index] = in_data_1b[buffer_index];
 		}
 	}
 
-	found_row->IncrementTextureHighestX(in_width);
+	found_row->IncrementTextureHighestX(in_size.GetX());
 	return cell;
 }
 

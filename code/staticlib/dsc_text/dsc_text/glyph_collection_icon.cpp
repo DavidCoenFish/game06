@@ -4,21 +4,15 @@
 #include "glyph_atlas_texture.h"
 #include "text_pre_vertex.h"
 
-void DscText::GlyphCollectionIcon::AddIcon(
+const int32 DscText::GlyphCollectionIcon::AddIcon(
 	GlyphAtlasTexture& in_texture,
-	const int32 in_icon_id,
-	const int32 in_width,
-	const int32 in_height,
+	const DscCommon::VectorInt2& in_size,
 	const uint8_t* const in_buffer
 	)
 {
-	if (_map_icon_cell.find(in_icon_id) != _map_icon_cell.end())
-	{
-		DSC_ASSERT_ALWAYS("icon id duplication");
-		return;
-	}
-
-	_map_icon_cell.insert(std::make_pair(in_icon_id, in_texture.AddIcon(in_width, in_height, in_buffer)));
+	const int32 index = static_cast<int32>(_map_icon_cell.size());
+	_map_icon_cell.insert(std::make_pair(index, in_texture.AddIcon(in_size, in_buffer)));
+	return index;
 }
 
 void DscText::GlyphCollectionIcon::BuildPreVertexData(

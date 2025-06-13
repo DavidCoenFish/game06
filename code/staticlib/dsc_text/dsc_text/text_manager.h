@@ -7,6 +7,9 @@ typedef struct FT_LibraryRec_* FT_Library;
 namespace DscCommon
 {
 	class FileSystem;
+	template <typename TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
 }
 
 namespace DscRender
@@ -43,6 +46,9 @@ namespace DscText
 		~TextManager();
 
 		const TextLocale* const GetLocaleToken(const DscLocale::LocaleISO_639_1 in_locale) const;
+
+		const int32 AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b);
+		GlyphCollectionIcon* const GetIconFont() const;
 
 		// Find or make a new text face
 		GlyphCollectionText* LoadFont(DscCommon::FileSystem& in_file_system, const std::string& in_font_path);

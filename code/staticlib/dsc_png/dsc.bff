@@ -1,0 +1,30 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+.LibraryParam = [
+    .RootPath = ^_WORKING_DIR_
+    .RelativePath = ^_CURRENT_BFF_DIR_
+    .ConfigurationArray = ^ConfigurationArray
+    .VisualStudioSettings = ^VisualStudioSettings
+    .CommonVcproject = ^CommonVcproject
+    .LibraryBaseNameDependency = {"dsc_common"}
+    .AdditionalIncludePaths = {
+        "$RootPath$/sdk/libpng_x64-windows/include"
+        }
+
+]
+DscVsprojectStaticLib("dsc_png" .LibraryParam)
+
+.SolutionProjects + "dsc_png_project"
+.SolutionItemsStaticLibProject + "dsc_png_project"
+//.SolutionBuildProject = "dsc_png_project"

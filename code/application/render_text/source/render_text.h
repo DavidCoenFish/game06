@@ -11,6 +11,7 @@
 #include "..\..\..\staticlib\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
 #include "..\..\..\staticlib\dsc_text\dsc_text\dsc_text.h"
 #include "..\..\..\staticlib\dsc_locale\dsc_locale\dsc_locale.h"
+#include "..\..\..\staticlib\dsc_png\dsc_png\dsc_png.h"
 //#include "..\..\..\sdk\free_type\Include\ft2build.h"
 //#include "..\..\..\sdk\free_type\Include\FreeType\config\ftheader.h"
 

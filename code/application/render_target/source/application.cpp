@@ -123,8 +123,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             _draw_system.get(),
             target_format_data_array,
             DscRender::RenderTargetDepthData(),
-            64,
-            64
+            DscCommon::VectorInt2(64, 64)
             );
     }
 

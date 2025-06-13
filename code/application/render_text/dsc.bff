@@ -24,7 +24,8 @@
         "dsc_render", 
         "dsc_render_resource", 
         "dsc_text", 
-        "dsc_locale"
+        "dsc_locale",
+        "dsc_png",
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 
@@ -33,19 +34,23 @@
         "dxguid.lib", 
 #if DEBUG_SDK
         "freetyped.lib",
+        "libpng16d.lib",
 #else
         "freetype.lib", 
+        "libpng16.lib",
 #endif
-        "harfbuzz.lib"
+        "harfbuzz.lib",
         }
 
     .AdditionalStaicLibPaths = {
 #if DEBUG_SDK
         "$RootPath$/sdk/freetype_x64-windows/debug/lib",
         "$RootPath$/sdk/harfbuzz_x64-windows/debug/lib",
+        "$RootPath$/sdk/libpng_x64-windows/debug/lib",
 #else
         "$RootPath$/sdk/freetype_x64-windows/lib",
         "$RootPath$/sdk/harfbuzz_x64-windows/lib",
+        "$RootPath$/sdk/libpng_x64-windows/lib",
 #endif
         }
     .AdditionalIncludePaths = {
@@ -53,11 +58,10 @@
         "$RootPath$/sdk/harfbuzz_x64-windows/include",
         }
 
-    .DataCopyPath = {"$RootPath$/../data/font"}
-    .DoDataCopy = true
-
-
-    .DataCopyPath = {"$RootPath$/../data/font"}
+    .DataCopyPath = {
+        "$RootPath$/../data/font",
+        "$RootPath$/../data/sample_png",
+        }
     .DoDataCopy = true
 
     .RootCopyPath = {
@@ -84,4 +88,4 @@ DscVsprojectWindowExe("render_text" .WindowExeParam)
 
 .SolutionProjects + "render_text_project"
 .SolutionItemsApplicationProject + "render_text_project"
-//.SolutionBuildProject = "render_text_project"
+.SolutionBuildProject = "render_text_project"

@@ -7,6 +7,7 @@
 #include <dsc_common\file_system.h>
 #include <dsc_common\utf8.h>
 #include <dsc_common\log_system.h>
+#include <dsc_common\vector_int2.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -343,8 +344,8 @@ DscText::Glyph* DscText::GlyphCollectionText::MakeGlyph(
 )
 {
 	auto cell = _texture->AddGlyph(
-		in_slot->bitmap.width,
-		in_slot->bitmap.rows,
+		DscCommon::VectorInt2(in_slot->bitmap.width,
+		in_slot->bitmap.rows),
 		in_slot->bitmap_left,
 		in_slot->bitmap_top,
 		in_slot->bitmap.buffer

@@ -26,18 +26,14 @@ namespace DscDagRender
 		DagResource(
 			DscRender::DrawSystem* const in_draw_system,
 			DscDag::IDagNode* in_dag_node_restored,
-			DscDag::IDagNode* in_dag_node_screen_width,
-			DscDag::IDagNode* in_dag_node_screen_height
+			DscDag::IDagNode* in_dag_node_screen_size
 			);
 
 		DscDag::IDagNode* GetDagNodeRestored() const {
 			return _dag_node_restored;
 		}
-		DscDag::IDagNode* GetDagNodeScreenWidth() const {
-			return _dag_node_screen_width;
-		}
-		DscDag::IDagNode* GetDagNodeScreenHeight() const {
-			return _dag_node_screen_height;
+		DscDag::IDagNode* GetDagNodeScreenSize() const {
+			return _dag_node_screen_size;
 		}
 	private:
 		virtual void OnDeviceLost() override;
@@ -49,13 +45,11 @@ namespace DscDagRender
 		virtual void OnResize(
 			ID3D12GraphicsCommandList* const in_command_list,
 			ID3D12Device2* const in_device,
-			const int32 in_size_width,
-			const int32 in_size_height
+			const DscCommon::VectorInt2& in_size
 		) override;
 	private:
 		int32 _restore_count = 0;
 		DscDag::IDagNode* _dag_node_restored = nullptr;
-		DscDag::IDagNode* _dag_node_screen_width = nullptr;
-		DscDag::IDagNode* _dag_node_screen_height = nullptr;
+		DscDag::IDagNode* _dag_node_screen_size = nullptr;
 	};
 } //namespace DscDagRender

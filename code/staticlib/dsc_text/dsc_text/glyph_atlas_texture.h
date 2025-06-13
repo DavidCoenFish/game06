@@ -4,6 +4,13 @@
 
 struct ID3D12GraphicsCommandList;
 
+namespace DscCommon
+{
+	template <typename TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
+}
+
 namespace DscRender
 {
 	class DrawSystem;
@@ -34,8 +41,8 @@ namespace DscText
 		GlyphAtlasTexture(DscRender::DrawSystem& in_draw_system, const int32 in_texture_dimention = 2048);
 		~GlyphAtlasTexture();
 
-		std::unique_ptr<Glyph> AddIcon(const int32 in_width, const int32 in_height, const uint8_t* const in_data_4b);
-		std::unique_ptr<Glyph> AddGlyph(const int32 in_width, const int32 in_height, 
+		std::unique_ptr<Glyph> AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b);
+		std::unique_ptr<Glyph> AddGlyph(const DscCommon::VectorInt2& in_size,
 			const int32 in_bearing_x,
 			const int32 in_bearing_y,
 			const uint8_t* const in_data_1b);
