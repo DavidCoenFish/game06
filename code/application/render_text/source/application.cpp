@@ -18,7 +18,7 @@
 
 namespace
 {
-    const int32 AddIconToTextManager(DscText::TextManager& in_text_manager, DscCommon::FileSystem& in_file_system, const std::string& in_path)
+    const int32 AddIconToTextManager(DscText::TextManager& in_text_manager, DscCommon::FileSystem& in_file_system, const std::string& in_path, const int32 in_bearing)
     {
         std::vector<uint8_t> image_data = {};
         int32_t byte_per_pixel = 0;
@@ -38,7 +38,7 @@ namespace
             return -1;
         }
 
-        const int32 index = in_text_manager.AddIcon(image_size, image_data.data());
+        const int32 index = in_text_manager.AddIcon(image_size, in_bearing, image_data.data());
         return index;
     }
 }
@@ -58,8 +58,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
-        const int32 icon_a = AddIconToTextManager(*_resources->_text_manager, *_file_system, DscCommon::FileSystem::JoinPath("data", "sample_png", "a.png"));
-        const int32 icon_b = AddIconToTextManager(*_resources->_text_manager, *_file_system, DscCommon::FileSystem::JoinPath("data", "sample_png", "b.png"));
+        const int32 icon_a = AddIconToTextManager(*_resources->_text_manager, *_file_system, DscCommon::FileSystem::JoinPath("data", "sample_png", "a.png"), 54);
+        const int32 icon_b = AddIconToTextManager(*_resources->_text_manager, *_file_system, DscCommon::FileSystem::JoinPath("data", "sample_png", "b.png"), 54);
         DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
 
         std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;

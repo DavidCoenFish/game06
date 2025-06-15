@@ -45,7 +45,8 @@ DscText::GlyphAtlasTexture::~GlyphAtlasTexture()
 	// nop
 }
 
-std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b)
+std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const DscCommon::VectorInt2& in_size, const int32 in_bearing,
+	const uint8_t* const in_data_4b)
 {
 	DSC_ASSERT(in_size.GetX() <= _texture_dimention, "invalid param");
 	DSC_ASSERT(in_size.GetY() <= _texture_dimention, "invalid param");
@@ -112,7 +113,7 @@ std::unique_ptr<DscText::Glyph> DscText::GlyphAtlasTexture::AddIcon(const DscCom
 	// add cell to end of row
 	auto cell = std::make_unique<Glyph>(
 		in_size,
-		DscCommon::VectorInt2(0, in_size.GetY()),
+		DscCommon::VectorInt2(0, in_bearing),
 		uv,
 		0xffffffff
 		);

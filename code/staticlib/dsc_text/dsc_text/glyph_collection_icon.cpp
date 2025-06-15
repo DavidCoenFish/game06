@@ -6,12 +6,13 @@
 
 const int32 DscText::GlyphCollectionIcon::AddIcon(
 	GlyphAtlasTexture& in_texture,
-	const DscCommon::VectorInt2& in_size,
+	const DscCommon::VectorInt2& in_size, 
+	const int32 in_bearing,
 	const uint8_t* const in_buffer
 	)
 {
 	const int32 index = static_cast<int32>(_map_icon_cell.size());
-	_map_icon_cell.insert(std::make_pair(index, in_texture.AddIcon(in_size, in_buffer)));
+	_map_icon_cell.insert(std::make_pair(index, in_texture.AddIcon(in_size, in_bearing, in_buffer)));
 	return index;
 }
 

@@ -41,7 +41,8 @@ namespace DscText
 		GlyphAtlasTexture(DscRender::DrawSystem& in_draw_system, const int32 in_texture_dimention = 2048);
 		~GlyphAtlasTexture();
 
-		std::unique_ptr<Glyph> AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b);
+		std::unique_ptr<Glyph> AddIcon(const DscCommon::VectorInt2& in_size, const int32 in_bearing,
+			const uint8_t* const in_data_4b);
 		std::unique_ptr<Glyph> AddGlyph(const DscCommon::VectorInt2& in_size,
 			const int32 in_bearing_x,
 			const int32 in_bearing_y,

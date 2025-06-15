@@ -1,0 +1,33 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+.LibraryDependencyArray = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource" }
+.LinkerAdditionalDependency = {"user32.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib"}
+
+.WindowExeParam = [
+    .RootPath = ^_WORKING_DIR_
+    .RelativePath = ^_CURRENT_BFF_DIR_
+    .ConfigurationArray = ^ConfigurationArray
+    .VisualStudioSettings = ^VisualStudioSettings 
+    .CommonVcproject = ^CommonVcproject 
+    .LibraryBaseNameDependency = ^LibraryDependencyArray
+    .LinkerAdditionalDependency = ^LinkerAdditionalDependency
+]
+
+DscVsprojectWindowExe("render_target_viewport" .WindowExeParam)
+
+
+.SolutionProjects + "render_target_viewport_project"
+.SolutionItemsApplicationProject + "render_target_viewport_project"
+.SolutionBuildProject = "render_target_viewport_project"
+

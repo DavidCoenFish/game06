@@ -15,6 +15,7 @@
 #include "console_test_harf_buzz\dsc.bff"
 #include "render_glyph\dsc.bff"
 #include "render_target\dsc.bff"
+#include "render_target_viewport\dsc.bff"
 #include "render_text\dsc.bff"
 #include "render_texture\dsc.bff"
 #include "render_triangle\dsc.bff"

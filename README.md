@@ -16,11 +16,12 @@ develop functionalty by making an exe to focus on each feature
 * render_triangle // rgb triangle
 * render_texture // texture on a triangle
 * render_target // draw a moving triangle to a texture, draw texture to screen
+* render_target_viewport // draw to a smaller area of a render texture, confirming subsection rendering for rendertarget reuse via render target pool
 * render_glyph // get bitmmap of a character out of a font via freetype and display on screen
 * console_test_harf_buzz // loads a font, looks at properties, tries to shape something/ testbed
 * render_text // draw some harfbuzz shapped text on screen
-* //todo render_version // get verion, data, build type on screen
-* //todo render_ui // get fps son screen, basic ui
+* render_version // get verion, data, build type on screen
+* //todo render_ui // get fps on screen, basic ui
 <br>
 hint<br>
 setting SolutionBuildProject in .\code\dsc.bff (or under) effects what the visual studio solution is set to build by default, and in visual studio, setting the startup project controlles what is run

@@ -47,7 +47,7 @@ namespace DscText
 
 		const TextLocale* const GetLocaleToken(const DscLocale::LocaleISO_639_1 in_locale) const;
 
-		const int32 AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b);
+		const int32 AddIcon(const DscCommon::VectorInt2& in_size, const int32 in_bearing, const uint8_t* const in_data_4b);
 		GlyphCollectionIcon* const GetIconFont() const;
 
 		// Find or make a new text face

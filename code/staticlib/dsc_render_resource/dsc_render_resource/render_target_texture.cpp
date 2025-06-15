@@ -34,18 +34,26 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 	const std::vector < DscRender::RenderTargetFormatData >&in_target_format_data_array,
 	const DscRender::RenderTargetDepthData& in_target_depth_data,
 	const DscCommon::VectorInt2& in_size,
-	const bool in_resize_with_screen
+	const bool in_resize_with_screen,
+	const bool in_use_sub_size,
+	const DscCommon::VectorInt2& in_sub_size
 	) 
 	: IRenderTarget()
 	, IResource(in_draw_system)
 	, _screen_viewport{ 
 		0.0f, 
 		0.0f,
-		static_cast<float>(in_size.GetX()),
-		static_cast<float>(in_size.GetY()),
+		static_cast<float>(in_use_sub_size ? in_sub_size.GetX() : in_size.GetX()),
+		static_cast<float>(in_use_sub_size ? in_sub_size.GetY() : in_size.GetY()),
 		D3D12_MIN_DEPTH, 
-		D3D12_MAX_DEPTH}
-	, _scissor_rect{ 0, 0, in_size.GetX(), in_size.GetY() }
+		D3D12_MAX_DEPTH
+		}
+	, _scissor_rect{ 
+		0, 
+		0, 
+		in_use_sub_size ? in_sub_size.GetX() : in_size.GetX(),
+		in_use_sub_size ? in_sub_size.GetY() : in_size.GetY()
+		}
 	, _current_state_render_target(D3D12_RESOURCE_STATE_COMMON)
 	, _current_state_depth_resource(D3D12_RESOURCE_STATE_COMMON)
 	, _size(in_size)

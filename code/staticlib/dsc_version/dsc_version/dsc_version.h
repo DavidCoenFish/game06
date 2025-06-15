@@ -9,11 +9,11 @@ get the version nb of the last commit
 namespace DscVersion
 {
 	//git rev-parse HEAD
-	//78fb12afa2ff329078582eaa53edab0bc20aa0de
+	//78fb12afa2ff329078582eaa53edab0bc20aa0de (last commit hash)
 	const char* const GetGitRevision();
-	//2025-06-12T19:02:13
+	//2025-06-12T19:02:13 (timestamp of the last commit)
 	const char* const GetTimestamp();
-	// 0.0.1.30791
+	// 0.1.30791 (major, minor, patch) currently incrementing patch on each commit
 	const char* const GetVersionString();
 	const char* const GetPlatform();
 	const char* const GetConfiguration();

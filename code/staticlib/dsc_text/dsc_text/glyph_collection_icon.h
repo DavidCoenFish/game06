@@ -22,7 +22,8 @@ namespace DscText
 	public:
 		const int32 AddIcon(
 			GlyphAtlasTexture& in_texture,
-			const DscCommon::VectorInt2& in_size,
+			const DscCommon::VectorInt2& in_size, 
+			const int32 in_bearing,
 			const uint8_t* const in_buffer
 		);
 

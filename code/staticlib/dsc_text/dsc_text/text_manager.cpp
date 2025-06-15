@@ -182,11 +182,11 @@ const DscText::TextLocale* const DscText::TextManager::GetLocaleToken(const DscL
 	return s_locale_en.get();
 }
 
-const int32 DscText::TextManager::AddIcon(const DscCommon::VectorInt2& in_size, const uint8_t* const in_data_4b)
+const int32 DscText::TextManager::AddIcon(const DscCommon::VectorInt2& in_size, const int32 in_bearing, const uint8_t* const in_data_4b)
 {
 	if (_icon_font)
 	{
-		return _icon_font->AddIcon(*_texture, in_size, in_data_4b);
+		return _icon_font->AddIcon(*_texture, in_size, in_bearing, in_data_4b);
 	}
 	return -1;
 }
