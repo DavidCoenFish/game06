@@ -36,8 +36,8 @@ ui system
 	shrink to content is a flag on each node?
 
 	canvas (n children with pos)
-	stack ([horizontal, vertical] wrap on bounds, n children)
-	switch (n children but only one is visible)
+	stack ([horizontal, vertical] flag wrap on bounds, n children, flag manuel scroll on overflow)
+	switch (n children but only one is visible) <tab, checkbox>
 	text
 	image
 	fill
