@@ -40,20 +40,8 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 	) 
 	: IRenderTarget()
 	, IResource(in_draw_system)
-	, _screen_viewport{ 
-		0.0f, 
-		0.0f,
-		static_cast<float>(in_use_sub_size ? in_sub_size.GetX() : in_size.GetX()),
-		static_cast<float>(in_use_sub_size ? in_sub_size.GetY() : in_size.GetY()),
-		D3D12_MIN_DEPTH, 
-		D3D12_MAX_DEPTH
-		}
-	, _scissor_rect{ 
-		0, 
-		0, 
-		in_use_sub_size ? in_sub_size.GetX() : in_size.GetX(),
-		in_use_sub_size ? in_sub_size.GetY() : in_size.GetY()
-		}
+	, _screen_viewport{}
+	, _scissor_rect{}
 	, _current_state_render_target(D3D12_RESOURCE_STATE_COMMON)
 	, _current_state_depth_resource(D3D12_RESOURCE_STATE_COMMON)
 	, _size(in_size)
@@ -61,7 +49,7 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 	, _target_format_array()
 	, _id(s_id++)
 {
-	//LOG_MESSAGE_RENDER("RenderTargetTexture ctor %d %d %d", _id, _size[0], _size[1]);
+	SetSubSize(in_use_sub_size, in_sub_size);
 
 	for (const auto& iter : in_target_format_data_array)
 	{
@@ -152,6 +140,48 @@ void DscRenderResource::RenderTargetTexture::Resize(
 		in_device
 		);
 }
+
+void DscRenderResource::RenderTargetTexture::SetSubSize(
+	const bool in_use_sub_size,
+	const DscCommon::VectorInt2& in_sub_size
+)
+{
+	if (true == in_use_sub_size)
+	{
+		_screen_viewport = D3D12_VIEWPORT({
+			0.0f,
+			0.0f,
+			static_cast<float>(in_sub_size.GetX()),
+			static_cast<float>(in_sub_size.GetY()),
+			D3D12_MIN_DEPTH,
+			D3D12_MAX_DEPTH
+			});
+		_scissor_rect = D3D12_RECT({
+			   0,
+				0,
+				in_sub_size.GetX(),
+				in_sub_size.GetY()
+			});
+	}
+	else
+	{
+		_screen_viewport = D3D12_VIEWPORT({ 
+			0.0f,
+			0.0f,
+			static_cast<float>(_size.GetX()),
+			static_cast<float>(_size.GetY()),
+			D3D12_MIN_DEPTH,
+			D3D12_MAX_DEPTH
+		});
+		 _scissor_rect = D3D12_RECT({
+				0,
+				0,
+				_size.GetX(),
+				_size.GetY()
+				});
+	}
+}
+
 
 const DscCommon::VectorInt2 DscRenderResource::RenderTargetTexture::GetSize() const
 {

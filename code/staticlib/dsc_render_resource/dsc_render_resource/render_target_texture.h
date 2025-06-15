@@ -61,6 +61,10 @@ namespace DscRenderResource
 			ID3D12Device2* const in_device,
 			const DscCommon::VectorInt2& in_size
 		);
+		void SetSubSize(
+			const bool in_use_sub_size,
+			const DscCommon::VectorInt2& in_sub_size = DscCommon::VectorInt2::s_zero // allow reused of approximatly size render targets, allow the view and sizzor rect to be optionally set
+		);
 
 	private:
 		virtual void OnDeviceLost() override;

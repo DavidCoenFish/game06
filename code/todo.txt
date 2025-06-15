@@ -1,4 +1,3 @@
-- ?exe render_target_sub_viewport
 - ?shader screen quad checker plus
 - ?ui effect like stroke
 - ?ui
@@ -17,6 +16,34 @@ what is our target project, jank, 2d anime shirow anime draw, subuccus life, leg
 		- map
 	- combat
 	- local network play/ p2p. one person hosts as dm? or let computer be dm?
+
+slightly rounded main menu buttons in middle, middle stack, dull text, buttons with drop shadows
+on roll over, burn out the text to black from mouse pos, fade back if cursor leaves. on keyboard selection, a default rollover pos in the middle?
+full screen texture detecting full red pixels to simulate fire effect? (red -> fire then smoke, blue -> ice then mist, green to poision then rain)
+
+ui system
+	present geometry (), 
+		geometry for a given size and offset in a parent container size
+		texture from child, if bigger than our size, then a slow auto scroll unless manual control set
+
+	canvas, stack, flow, text, image, padding, <effect, get told rollover?>?, <toggle>?, <interactable, ie, button, has one child for visual, or n children for state>
+	are effects a thing in a node, or a unique node?
+	where do interactable/ buttons fit in? 
+	<effect rollover? pass to shader the relative mouse position and true/false for mouse over>
+	<interactable? have a child for each state and only draw when in that state, allow same child in multiple states
+		[default, mouse over, mouse down]
+
+	shrink to content is a flag on each node?
+
+	canvas (n children with pos)
+	stack ([horizontal, vertical] wrap on bounds, n children)
+	switch (n children but only one is visible)
+	text
+	image
+	fill
+	padding
+	effect (some effects may take mouse pos?)
+	interactable (n children for given input state)
 
 
 a locale system might get queried with a key and give back a DagValueString
