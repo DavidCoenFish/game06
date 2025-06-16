@@ -17,14 +17,17 @@ namespace DscRenderResource
 namespace DscUi
 {
 
-	///just generate some geometry to put something on screen, less features than a UiPanel
-	///vertex format [2 float pos, 2 float uv]
-	class ScreenQuad
+	///if content size is bigger than our calculated size, we auto scroll contents (unless auto scroll disabled)
+	/// was trying to have one ui shader (with time?) without recalculating all the auto scroll param, but with [on/off] off auto scroll, kind of easier to do it in the panel
+	///vertex format [2 float pos, 2 float uv 0, 2 float uv 1]
+	///shader constants [2 float uv set bias]
+	/// have a simpiler shader for "no need to auto scroll path"? but that would need a different vertex format... just use screen quad for that case?
+	class UiPanel
 	{
 	public:
 		static const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputElementDesc();
 
-		explicit ScreenQuad(
+		explicit UiPanel(
 			const VectorUiCoord2& in_quad_size,
 			const VectorUiCoord2& in_quad_pivot,
 			const VectorUiCoord2& in_parent_attach,

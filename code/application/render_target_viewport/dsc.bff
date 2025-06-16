@@ -29,5 +29,5 @@ DscVsprojectWindowExe("render_target_viewport" .WindowExeParam)
 
 .SolutionProjects + "render_target_viewport_project"
 .SolutionItemsApplicationProject + "render_target_viewport_project"
-.SolutionBuildProject = "render_target_viewport_project"
+//.SolutionBuildProject = "render_target_viewport_project"
 

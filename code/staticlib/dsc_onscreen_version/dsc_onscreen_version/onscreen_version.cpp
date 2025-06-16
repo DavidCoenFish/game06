@@ -155,15 +155,25 @@ void DscOnscreenVersion::OnscreenVersion::Update(
     const bool in_allow_clear_backbuffer
 )
 {
-    in_frame.SetRenderTarget(_render_target_texture.get());
-    auto geometry =_text_run->GetGeometry(&in_draw_system, &in_frame);
-    in_text_manager.SetShader(&in_draw_system, &in_frame);
-    in_frame.Draw(geometry);
+    // draw the version text to our render target
+    {
+        auto geometry =_text_run->GetGeometry(&in_draw_system, &in_frame);
+        auto shader = in_text_manager.GetShader(&in_draw_system, &in_frame);
 
-    // todo
-    in_frame.SetRenderTarget(in_draw_system.GetRenderTargetBackBuffer(), in_allow_clear_backbuffer);
-    in_frame.SetShader(_screen_quad_shader);
-    _screen_quad->Draw(in_draw_system, in_frame);
+        in_frame.SetRenderTarget(_render_target_texture.get());
+        in_frame.SetShader(shader);
+        in_frame.Draw(geometry);
+    }
+
+    // draw out render target texture to the backbuffer
+    {
+        auto geometry_version = _screen_quad->GetGeometry(in_draw_system, in_frame.GetCommandList());
+        in_frame.SetRenderTarget(in_draw_system.GetRenderTargetBackBuffer(), in_allow_clear_backbuffer);
+        in_frame.SetShader(_screen_quad_shader);
+        in_frame.Draw(geometry_version);
+    }
+
+    return;
 }
 
 void DscOnscreenVersion::OnscreenVersion::OnDeviceLost()

@@ -156,8 +156,8 @@ const bool Application::Update()
         frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
 
         auto geometry = _resources->_text_run->GetGeometry(_draw_system.get(), frame.get());
-        _resources->_text_manager->SetShader(_draw_system.get(), frame.get());
-
+        auto shader = _resources->_text_manager->GetShader(_draw_system.get(), frame.get());
+        frame->SetShader(shader);
         frame->Draw(geometry);
     }
     

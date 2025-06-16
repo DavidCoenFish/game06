@@ -212,7 +212,7 @@ DscText::GlyphCollectionText* DscText::TextManager::LoadFont(DscCommon::FileSyst
 	return glyph_collection_text;
 }
 
-void DscText::TextManager::SetShader(
+std::shared_ptr<DscRenderResource::Shader> DscText::TextManager::GetShader(
 	DscRender::DrawSystem* const in_draw_system,
 	DscRenderResource::Frame* const in_draw_system_frame
 	)
@@ -220,8 +220,7 @@ void DscText::TextManager::SetShader(
 	_texture->UploadTexture(in_draw_system, in_draw_system_frame->GetCommandList());
 	in_draw_system_frame->AddFrameResource(_texture->GetResource());
 	_shader->SetShaderResourceViewHandle(0, _texture->GetHeapWrapperItem());
-	in_draw_system_frame->SetShader(_shader);
 
-	return;
+	return _shader;
 }
 

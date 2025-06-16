@@ -1,4 +1,4 @@
-#include "screen_quad.h"
+#include "ui_panel.h"
 #include <dsc_common\data_helper.h>
 #include <dsc_common\math.h>
 #include <dsc_render\draw_system.h>
@@ -22,12 +22,12 @@ namespace
 
 } // namespace
 
-const std::vector<D3D12_INPUT_ELEMENT_DESC>& DscUi::ScreenQuad::GetInputElementDesc()
+const std::vector<D3D12_INPUT_ELEMENT_DESC>& DscUi::UiPanel::GetInputElementDesc()
 {
 	return s_input_element_desc_array;
 }
 
-DscUi::ScreenQuad::ScreenQuad(
+DscUi::UiPanel::UiPanel(
 	const VectorUiCoord2& in_quad_size,
 	const VectorUiCoord2& in_quad_pivot,
 	const VectorUiCoord2& in_parent_attach,
@@ -43,7 +43,7 @@ DscUi::ScreenQuad::ScreenQuad(
 	//nop
 }
 
-void DscUi::ScreenQuad::SetParentSize(
+void DscUi::UiPanel::SetParentSize(
 	const DscCommon::VectorInt2& in_parent_size
 )
 {
@@ -54,7 +54,7 @@ void DscUi::ScreenQuad::SetParentSize(
 	}
 }
 
-std::shared_ptr<DscRenderResource::GeometryGeneric> DscUi::ScreenQuad::GetGeometry(
+std::shared_ptr<DscRenderResource::GeometryGeneric> DscUi::UiPanel::GetGeometry(
 	DscRender::DrawSystem& in_draw_system,
 	ID3D12GraphicsCommandList* const in_command_list
 )
@@ -88,7 +88,7 @@ std::shared_ptr<DscRenderResource::GeometryGeneric> DscUi::ScreenQuad::GetGeomet
 	return _geometry_generic;
 }
 
-void DscUi::ScreenQuad::BuildVertexData(std::vector<uint8_t>& out_vertex_raw_data)
+void DscUi::UiPanel::BuildVertexData(std::vector<uint8_t>& out_vertex_raw_data)
 {
 	const DscCommon::VectorInt2 size = _quad_size.EvalueUICoord(_parent_size);
 	const DscCommon::VectorInt2 pivot = _quad_pivot.EvalueUICoord(size);

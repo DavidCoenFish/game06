@@ -54,7 +54,7 @@ namespace DscText
 		GlyphCollectionText* LoadFont(DscCommon::FileSystem& in_file_system, const std::string& in_font_path);
 
 		// also call texture upload, and set texture as shader param
-		void SetShader(
+		std::shared_ptr<DscRenderResource::Shader> GetShader(
 			DscRender::DrawSystem* const in_draw_system,
 			DscRenderResource::Frame* const in_draw_system_frame
 			);
