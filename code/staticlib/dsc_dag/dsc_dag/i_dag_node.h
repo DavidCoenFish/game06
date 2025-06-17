@@ -15,7 +15,7 @@ namespace DscDag
 		//assert on value node
 		virtual void MarkDirty();
 
-		virtual const bool GetHasNoLinks() const;
+		virtual const bool GetHasNoLinks() const = 0;
 
 		virtual void AddOutput(NodeToken in_nodeID);
 		virtual void RemoveOutput(NodeToken in_nodeID);

@@ -19,6 +19,7 @@
     .CommonVcproject = ^CommonVcproject 
     .LibraryBaseNameDependency = {
         "dsc_common", 
+        "dsc_dag", 
         "dsc_version", 
         "dsc_onscreen_version", 
         "dsc_windows", 

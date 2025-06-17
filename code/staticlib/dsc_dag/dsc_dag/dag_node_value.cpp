@@ -5,8 +5,8 @@ namespace
 }
 
 DscDag::DagNodeValue::DagNodeValue(const std::any& in_value, const TValueChangeCondition in_change_condition)
-	: _value(in_value)
-	, _change_condition(in_change_condition)
+ 	: _change_condition(in_change_condition)
+	, _value(in_value)
 {
 	// Nop
 }
@@ -45,6 +45,7 @@ void DscDag::DagNodeValue::SetValue(const std::any& in_value)
 	case TValueChangeCondition::TNever:
 		break;
 	case TValueChangeCondition::TOnValueChange:
+		set_dirty = true;
 		// bail out if value is already equal
 		if (_value.has_value() && in_value.has_value())
 		{

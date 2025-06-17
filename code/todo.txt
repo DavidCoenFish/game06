@@ -84,7 +84,7 @@ dag ui node
 -input stack: child dag ui node
 -output: used size, side effect draw to texture, used size
 
-IUIComponent // canvas, fill, text, image, 9 slice, 
+IUiComponent // canvas, fill, text, image, 9 slice, 
 
 
 
