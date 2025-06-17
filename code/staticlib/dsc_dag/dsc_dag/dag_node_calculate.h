@@ -23,6 +23,7 @@ namespace DscDag
 		virtual void AddInput(NodeToken in_nodeID) override;
 		virtual void RemoveInput(NodeToken in_nodeID) override;
 		virtual const std::any& GetValue() override;
+		virtual const bool GetHasNoLinks() const override;
 
 	private:
 		bool _dirty = true;

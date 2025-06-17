@@ -1,4 +1,4 @@
-#include <dsc_dag/dag_node_calculate.h>
+#include "dag_node_calculate.h"
 
 DscDag::DagNodeCalculate::DagNodeCalculate(const TCalculateFunction& in_calculateFunction)
 	: _calculateFunction(in_calculateFunction)
@@ -75,4 +75,24 @@ const std::any& DscDag::DagNodeCalculate::GetValue()
 	return _value;
 }
 
+
+const bool DscDag::DagNodeCalculate::GetHasNoLinks() const
+{
+	if (0 != _output.size())
+	{
+		return false;
+	}
+	if (0 != _input.size())
+	{
+		return false;
+	}
+	for (const auto& item : _indexInput)
+	{
+		if (nullptr != item)
+		{
+			return false;
+		}
+	}
+	return true;
+}
 

@@ -1,5 +1,4 @@
 #pragma once
-#include <dsc_common/dsc_common.h>
 
 #define LOG_TOPIC_DSC_DAG "DSC_DAG"
 
@@ -11,8 +10,11 @@
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 
 #include "dag_collection.h"
+#include "dag_enum.h"
 #include "dag_node_calculate.h"
 #include "dag_node_value.h"
 #include "i_dag_node.h"
 
 #endif //#ifndef DSC_BFF_BUILD
+
+#include <dsc_common/dsc_common.h>

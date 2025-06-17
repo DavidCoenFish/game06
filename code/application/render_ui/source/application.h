@@ -25,12 +25,21 @@ namespace DscRenderResource
 namespace DscText
 {
     class TextManager;
-    class TextRun;
 }
 
 namespace DscOnscreenVersion
 {
     class OnscreenVersion;
+}
+
+namespace DscDagRender
+{
+    class DagResource;
+}
+
+namespace DscUi
+{
+    class UiManager;
 }
 
 class Application : public DscWindows::IWindowApplication
@@ -58,8 +67,10 @@ private:
         Resources& operator=(const Resources&) = delete;
         Resources(const Resources&) = delete;
 
-        std::unique_ptr<DscText::TextManager> _text_manager;
-        std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version;
+        std::unique_ptr<DscText::TextManager> _text_manager = {};
+        std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
+        std::unique_ptr<DscUi::UiManager> _ui_manager = {};
+
     };
     std::unique_ptr<Resources> _resources;
 

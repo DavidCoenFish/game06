@@ -19,7 +19,7 @@ DscUi::VectorUiCoord2::VectorUiCoord2(
 	return;
 }
 
-const DscCommon::VectorInt2 DscUi::VectorUiCoord2::EvalueUICoord(const DscCommon::VectorInt2& in_parent_size)
+const DscCommon::VectorInt2 DscUi::VectorUiCoord2::EvalueUICoord(const DscCommon::VectorInt2& in_parent_size) const
 {
 	const DscCommon::VectorInt2 result(
 		_data[0].Evaluate(in_parent_size.GetX(), in_parent_size.GetY()),

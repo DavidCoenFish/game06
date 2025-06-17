@@ -14,6 +14,7 @@ namespace DscRender
 namespace DscRenderResource
 {
 	class RenderTargetTexture;
+	constexpr int32 s_default_pixel_alignment = 128;
 
 	class RenderTargetPool
 	{
@@ -22,7 +23,7 @@ namespace DscRenderResource
 		RenderTargetPool& operator=(const RenderTargetPool&) = delete;
 		RenderTargetPool(const RenderTargetPool&) = delete;
 
-		RenderTargetPool(const int32 in_pixel_alignment = 128);
+		explicit RenderTargetPool(const int32 in_pixel_alignment);
 
 		struct RenderTargetPoolTexture
 		{

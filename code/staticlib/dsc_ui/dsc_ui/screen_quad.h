@@ -35,6 +35,8 @@ namespace DscUi
 			const DscCommon::VectorInt2& in_parent_size
 			);
 
+		const DscCommon::VectorInt2 GetCalculatedSize() const;
+
 		/// <summary>
 		/// updates the geometry if inputs are dirty
 		/// </summary>

@@ -21,7 +21,10 @@ develop functionalty by making an exe to focus on each feature
 * console_test_harf_buzz // loads a font, looks at properties, tries to shape something/ testbed
 * render_text // draw some harfbuzz shapped text on screen
 * render_version // get verion, data, build type on screen
-* //todo render_ui // get fps on screen, basic ui
+* // todo render_ui // basic ui components
+* // todo render_ui_controls // text, checkbox, buttons, stack, scroll, canvas, combo box
+
+
 <br>
 hint<br>
 setting SolutionBuildProject in .\code\dsc.bff (or under) effects what the visual studio solution is set to build by default, and in visual studio, setting the startup project controlles what is run

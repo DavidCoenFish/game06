@@ -8,8 +8,11 @@
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
+#include <dsc_render_resource/shader.h>
+#include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
+#include <dsc_ui/ui_manager.h>
 
 namespace
 {

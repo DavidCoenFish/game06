@@ -19,7 +19,7 @@ namespace DscUi
 			const UiCoord& in_y = UiCoord(0, 0.0f)
 			);
 
-		const DscCommon::VectorInt2 EvalueUICoord(const DscCommon::VectorInt2& in_parent_size);
+		const DscCommon::VectorInt2 EvalueUICoord(const DscCommon::VectorInt2& in_parent_size) const;
 
 		UiCoord& operator[](const int in_index);
 		const UiCoord operator[](const int in_index) const;

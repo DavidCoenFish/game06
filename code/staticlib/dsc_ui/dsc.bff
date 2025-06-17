@@ -17,7 +17,7 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_render_resource"}
+    .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_render_resource", "dsc_dag"}
 ]
 DscVsprojectStaticLib("dsc_ui" .LibraryParam)
 

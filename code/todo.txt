@@ -36,16 +36,61 @@ ui system
 	shrink to content is a flag on each node?
 
 	canvas (n children with pos)
-	stack ([horizontal, vertical] flag wrap on bounds, n children, flag manuel scroll on overflow)
+	stack ([horizontal, vertical] flag wrap on bounds, n children, flag manuel scroll on overflow, gap)
 	switch (n children but only one is visible) <tab, checkbox>
 	text
 	image
 	fill
-	padding
-	effect (some effects may take mouse pos?)
-	interactable (n children for given input state)
+	padding (1 child, 4 padding ui coord)
+	effect (some effects may take mouse pos?, target size)
+	interactable (n children for given input state, time with rollover normalised, time since rollover normalised)
 
 
 a locale system might get queried with a key and give back a DagValueString
 a text renderer, on change of selected locale may be a good time to trigger a release of all the rendered glyphs
+
+
+ui hierarchy
+a screen quad can draw a texture or shader onto some geometry somewhere on the parent render target
+a ui panel does that same, but with auto scroll. 
+what are leaf nodes like? [fill colour, text, image?] leaf nodes either have theire own size, or just use the given size
+
+
+leaf (fill colour, png image, nine slice image, debug grid, empty) optional size, else use was is set by parent
+node (canvas, stack, switch, padding, effect, interactive, table)
+
+
+a child of a canvas want a pivot and attach param, but is that a figment of being a canvas child, else just get optional size
+
+
+size enum [use all of parent provided size, shrink to content, use own size]
+
+top level, get given a screen back buffer (with screen size) or a atbitary render target texture (with arbitaty size) to draw into
+
+node::GetDesiredSize(in_parent_size) => v2
+// say we are a screen wide table with 3 columns, 
+node::SetAvaliableSize(in_allowed_size) ? or is this our auto scroll when desired size is bigger than avaliable size
+
+
+what would a dag ui look like
+
+dag ui root node
+-inputs index: screen size/ target size, locale, ui scale, component for how to deal with children, command list to add drawing instructions to
+-input stack: child dag ui node
+-output of drawing to texture, avaliable size?
+
+dag ui node
+-inputs index: parent avaliable size, ui scale, locale, component, command list to add drawing instructions to
+-input stack: child dag ui node
+-output: used size, side effect draw to texture, used size
+
+IUIComponent // canvas, fill, text, image, 9 slice, 
+
+
+
+UiDagNodeValueComponent?
+
+
+
+
 

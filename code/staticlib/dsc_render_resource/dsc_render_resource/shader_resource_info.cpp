@@ -116,7 +116,7 @@ std::shared_ptr<DscRenderResource::ShaderResourceInfo> DscRenderResource::Shader
 
 DscRenderResource::ShaderResourceInfo::ShaderResourceInfo(
 	const std::shared_ptr<DscRender::HeapWrapperItem>& in_shader_resource_view_handle,
-	const D3D12_STATIC_SAMPLER_DESC&in_static_sampler_desc,
+	const D3D12_STATIC_SAMPLER_DESC& in_static_sampler_desc,
 	const bool in_use_sampler
 	) 
 	: _use_sampler(in_use_sampler)

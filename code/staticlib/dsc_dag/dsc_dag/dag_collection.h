@@ -1,4 +1,5 @@
 #pragma once
+#include "dsc_dag.h"
 #include <dsc_common\dsc_common.h>
 #include <dsc_dag\i_dag_node.h>
 
@@ -11,6 +12,10 @@ namespace DscDag
 	public:
 		NodeToken CreateValue(const std::any& in_value);
 		NodeToken CreateCalculate(const TCalculateFunction& in_calculate);
+		// was trying to shoe horn generic values into a std::any for CreateValue, but std::any can not hold a std::unique_ptr
+		NodeToken AddCustomNode(std::unique_ptr<IDagNode>&& in_node);
+		// should already have all links removed? assert if links still exisit?
+		void DeleteNode(NodeToken in_node);
 
 		static void LinkNodes(NodeToken in_input, NodeToken in_output);
 		static void LinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output);
@@ -45,6 +50,10 @@ namespace DscDag
 		}
 
 	private:
-		std::set<std::unique_ptr<IDagNode>> _nodes = {};
+		struct RawPtrComparator {
+			bool operator()(const std::unique_ptr<DscDag::IDagNode>& a, const std::unique_ptr<DscDag::IDagNode>& b) const;
+		};
+
+		std::set<std::unique_ptr<IDagNode>, RawPtrComparator> _nodes = {};
 	}; // IDagNode
 } //DscDag

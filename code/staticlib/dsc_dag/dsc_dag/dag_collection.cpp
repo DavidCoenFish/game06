@@ -1,6 +1,15 @@
-#include <dsc_dag/dag_collection.h>
-#include <dsc_dag/dag_node_value.h>
-#include <dsc_dag/dag_node_calculate.h>
+#include "dag_collection.h"
+#include "dag_node_value.h"
+#include "dag_node_calculate.h"
+
+namespace
+{
+}
+
+//code from google
+bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<DscDag::IDagNode>& a, const std::unique_ptr<DscDag::IDagNode>& b) const {
+	return a.get() < b.get();
+}
 
 DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value)
 {
@@ -17,6 +26,35 @@ DscDag::NodeToken DscDag::DagCollection::CreateCalculate(const TCalculateFunctio
 	_nodes.insert(std::move(node));
 	return nodeToken;
 }
+
+DscDag::NodeToken DscDag::DagCollection::AddCustomNode(std::unique_ptr<IDagNode>&& in_node)
+{
+	NodeToken nodeToken = in_node.get();
+	_nodes.insert(std::move(in_node));
+	return nodeToken;
+}
+
+// should already have all links removed? assert if links still exisit?
+void DscDag::DagCollection::DeleteNode(NodeToken in_node)
+{
+	DSC_ASSERT(nullptr != in_node, "invalid param");
+	DSC_ASSERT(true == in_node->GetHasNoLinks(), "invalid state");
+	//_nodes.find(in_node);
+	auto it = std::find_if(_nodes.begin(), _nodes.end(), [&](const std::unique_ptr<DscDag::IDagNode>& ptr) {
+		return ptr.get() == in_node;
+	});
+	if (it != _nodes.end())
+	{
+		_nodes.erase(it);
+	}
+	else
+	{
+		DSC_ASSERT_ALWAYS("attempt to delete a node which was not found");
+	}
+
+	return;
+}
+
 
 void DscDag::DagCollection::LinkNodes(NodeToken in_input, NodeToken in_output)
 {

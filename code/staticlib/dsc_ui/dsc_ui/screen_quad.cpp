@@ -88,17 +88,23 @@ std::shared_ptr<DscRenderResource::GeometryGeneric> DscUi::ScreenQuad::GetGeomet
 	return _geometry_generic;
 }
 
+const DscCommon::VectorInt2 DscUi::ScreenQuad::GetCalculatedSize() const
+{
+	return _quad_size.EvalueUICoord(_parent_size);
+}
+
+
 void DscUi::ScreenQuad::BuildVertexData(std::vector<uint8_t>& out_vertex_raw_data)
 {
-	const DscCommon::VectorInt2 size = _quad_size.EvalueUICoord(_parent_size);
-	const DscCommon::VectorInt2 pivot = _quad_pivot.EvalueUICoord(size);
+	const DscCommon::VectorInt2 calculated_size = GetCalculatedSize();
+	const DscCommon::VectorInt2 pivot = _quad_pivot.EvalueUICoord(calculated_size);
 	const DscCommon::VectorInt2 attach = _parent_attach.EvalueUICoord(_parent_size);
 
 	const DscCommon::VectorFloat4 pos(
 		DscCommon::Math::UIPixelsToRenderSpaceHorizontal(attach.GetX() - pivot.GetX(), _parent_size.GetX()),
 		DscCommon::Math::UIPixelsToRenderSpaceVertical(attach.GetY() - pivot.GetY(), _parent_size.GetY()),
-		DscCommon::Math::UIPixelsToRenderSpaceHorizontal(attach.GetX() - pivot.GetX() + size.GetX(), _parent_size.GetX()),
-		DscCommon::Math::UIPixelsToRenderSpaceVertical(attach.GetY() - pivot.GetY() + size.GetY(), _parent_size.GetY())
+		DscCommon::Math::UIPixelsToRenderSpaceHorizontal(attach.GetX() - pivot.GetX() + calculated_size.GetX(), _parent_size.GetX()),
+		DscCommon::Math::UIPixelsToRenderSpaceVertical(attach.GetY() - pivot.GetY() + calculated_size.GetY(), _parent_size.GetY())
 		);
 
 	//0.0f, 0.0f,
