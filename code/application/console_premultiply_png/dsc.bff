@@ -42,5 +42,5 @@ DscVsprojectConsoleExe("console_premultiply_png" .Param)
 
 .SolutionProjects + "console_premultiply_png_project"
 .SolutionItemsApplicationProject + "console_premultiply_png_project"
-.SolutionBuildProject = "console_premultiply_png_project"
+//.SolutionBuildProject = "console_premultiply_png_project"
 

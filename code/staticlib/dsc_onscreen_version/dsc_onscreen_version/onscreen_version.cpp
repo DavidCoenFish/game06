@@ -43,7 +43,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         DscVersion::GetGitRevision()
     );
 
-    const int32 text_colour = DscCommon::Math::ConvertColourToInt(200, 200, 200, 255);
+    const int32 text_colour = DscCommon::Math::ConvertColourToInt(192, 192, 192, 255);
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
         DscCommon::LogSystem::Printf("%s \n", DscVersion::GetVersionString()),
