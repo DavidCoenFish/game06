@@ -29,6 +29,7 @@
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 
+        "Shcore.lib",
         "D3d12.lib", 
         "DXGI.lib", 
         "dxguid.lib", 
@@ -42,7 +43,7 @@
         "harfbuzz.lib",
         }
 
-    .AdditionalStaicLibPaths = {
+    .AdditionalStaticLibPaths = {
 #if DEBUG_SDK
         "$RootPath$/sdk/freetype_x64-windows/debug/lib",
         "$RootPath$/sdk/harfbuzz_x64-windows/debug/lib",

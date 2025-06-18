@@ -198,7 +198,7 @@ function DscVsprojectWindowExe( .ProjectName .Param )
     .CommonVcproject = {}
     .LibraryBaseNameDependency = {}
     .LinkerAdditionalDependency = {}
-    .AdditionalStaicLibPaths = {}
+    .AdditionalStaticLibPaths = {}
     .AdditionalIncludePaths = {}
     .DataCopyPath = {}
     .DoDataCopy = false
@@ -276,7 +276,7 @@ function DscVsprojectWindowExe( .ProjectName .Param )
                 ^Libraries + .Temp
             }
             .LinkerOptions = ^LinkerOptions
-            ForEach( .StaicLibPath in .AdditionalStaicLibPaths )
+            ForEach( .StaicLibPath in .AdditionalStaticLibPaths )
             {
                 ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$"'
             }
@@ -359,7 +359,7 @@ function DscVsprojectConsoleExe( .ProjectName .Param)
     .LibraryBaseNameDependency = {}
     .AdditionalIncludePaths = {}
     .LinkerAdditionalDependency = {}
-    .AdditionalStaicLibPaths = {}
+    .AdditionalStaticLibPaths = {}
     .DataCopyPath = {}
     .DoDataCopy = false
     .RootCopyPath = {}
@@ -395,7 +395,7 @@ function DscVsprojectConsoleExe( .ProjectName .Param)
         {
             ^LinkerOptions + ' "$lib$"'
         }
-        ForEach( .StaicLibPath in .AdditionalStaicLibPaths )
+        ForEach( .StaicLibPath in .AdditionalStaticLibPaths )
         {
             ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$"'
         }

@@ -47,10 +47,16 @@ const int32 DscCommon::Math::ConvertColourToInt(const VectorFloat4& in_value)
 	return result;
 }
 
-const int32 DscCommon::Math::ConvertFloatToByte(const float in_value)
+const uint8 DscCommon::Math::ConvertFloatToByte(const float in_value)
 {
 	// mul by 256.0 and take the floor to get better mapping of range? 
 	//example: converting a coin toss as expressed as [0... 1.0], you would multiply by 2 and floor
-	const int32 result = std::max(0, std::min(255, static_cast<int>(floor(in_value * 256.0f))));
+	const uint8 result = static_cast<uint8>(std::max(0, std::min(255, static_cast<int>(floor(in_value * 256.0f)))));
+	return result;
+}
+
+const float DscCommon::Math::ConvertByteToFloat(const uint8 in_value)
+{
+	const float result = (static_cast<float>(in_value) / 256.0f);
 	return result;
 }

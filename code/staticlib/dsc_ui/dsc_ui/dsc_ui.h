@@ -11,6 +11,7 @@
 #include "..\..\dsc_render\dsc_render\dsc_render.h"
 #include "..\..\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
 #include "screen_quad.h"
+#include "ui_component_canvas.h"
 #include "ui_component_debug_fill.h"
 #include "ui_coord.h"
 #include "ui_dag_node_component.h"

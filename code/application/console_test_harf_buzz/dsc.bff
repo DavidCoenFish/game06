@@ -28,7 +28,7 @@
         "harfbuzz.lib"
 #endif
         }
-    .AdditionalStaicLibPaths = {
+    .AdditionalStaticLibPaths = {
 #if DEBUG_SDK
         "$RootPath$/sdk/freetype_x64-windows/debug/lib",
         "$RootPath$/sdk/harfbuzz_x64-windows/debug/lib",

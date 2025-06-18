@@ -91,13 +91,39 @@ namespace
 		delete[] rowData;
 	}
 
+	struct WriteDataStruct
+	{
+		std::vector<uint8> _data;
+	};
 
+	//https://stackoverflow.com/questions/1821806/how-to-encode-png-to-buffer-using-libpng
+	void PngWriteData(png_structp in_png_ptr, png_bytep in_data, png_size_t in_length)
+	{
+		WriteDataStruct* p = (struct WriteDataStruct*)png_get_io_ptr(in_png_ptr);
+
+		p->_data.reserve(p->_data.size() + in_length);
+
+		for (size_t index = 0; index < in_length; ++index)
+		{
+			p->_data.push_back(in_data[index]);
+		}
+	}
+
+	void PngFlush(png_structp)
+	{
+	}
+
+	void WritePngError(png_structp,
+		png_const_charp msg)
+	{
+		DSC_LOG_ERROR(LOG_TOPIC_DSC_PNG, "msg:%s\n", msg);
+	}
 }
 
 // failure logged, zero size data returned
 void DscPng::LoadPng(
-	std::vector<uint8_t>& out_data,
-	int32_t& out_byte_per_pixel,
+	std::vector<uint8>& out_data,
+	int32& out_byte_per_pixel,
 	DscCommon::VectorInt2& out_size,
 	DscCommon::FileSystem& in_file_system,
 	const std::string& in_file_path
@@ -202,19 +228,80 @@ void DscPng::LoadPng(
 	return;
 }
 
-#if 0
-void DscPng::SaveImage(
-	const std::vector<uint8_t>& in_data,
-	const int32_t in_byte_per_pixel,
-	DscCommon::VectorInt2& in_size,
+void DscPng::SavePng(
+	const std::vector<uint8>& in_data,
+	const int32 in_byte_per_pixel,
+	const DscCommon::VectorInt2& in_size,
 	DscCommon::FileSystem& in_file_system,
 	const std::string& in_file_path
 	)
 {
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	png_init_io(png_ptr, fp);
+	//png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	//png_init_io(png_ptr, fp);
+	//png_set_rows(png_ptr, info_ptr, row_pointers);
+	//png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+	//png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, WritePngError, NULL);
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+
+	WriteDataStruct write_data = {};
+	png_set_write_fn(png_ptr, &write_data, PngWriteData, PngFlush);
+
+	int32 color_type = 0;
+	switch (in_byte_per_pixel)
+	{
+	case 3:
+		color_type = PNG_COLOR_TYPE_RGB;
+		break;
+
+	case 4:
+		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+		break;
+
+	default:
+		DSC_LOG_ERROR(LOG_TOPIC_DSC_PNG, "bad byte_per_pixel, png:%s byte_per_pixel:%d\n", in_file_path.c_str(), in_byte_per_pixel);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		return;
+	}
+
+	png_set_IHDR(png_ptr,
+		info_ptr,
+		in_size.GetX(),
+		in_size.GetY(),
+		8,
+		color_type,
+		PNG_INTERLACE_NONE,
+		PNG_COMPRESSION_TYPE_DEFAULT,
+		PNG_FILTER_TYPE_DEFAULT);
+
+	int32 trace_source = 0;
+	png_uint_32 bytes_per_row = in_size.GetX() * in_byte_per_pixel;
+	png_byte** row_pointers = (png_byte * *)png_malloc(png_ptr, in_size.GetY() * sizeof(png_byte*));
+	for (int32 y = 0; y < in_size.GetY(); ++y) {
+		uint8_t* row = (uint8_t*)png_malloc(png_ptr, sizeof(uint8_t) * bytes_per_row);
+		int32 trace_dest = 0;
+		row_pointers[y] = (png_byte*)row;
+		for (int32 x = 0; x < in_size.GetX(); ++x) {
+			for (int32 j = 0; j < in_byte_per_pixel; ++j) {
+				row[trace_dest] = in_data[trace_source];
+				trace_dest += 1;
+				trace_source += 1;
+			}
+		}
+	}
+
 	png_set_rows(png_ptr, info_ptr, row_pointers);
 	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+
+	/* Cleanup. */
+	for (int32 y = 0; y < in_size.GetY(); y++) {
+		png_free(png_ptr, row_pointers[y]);
+	}
+	png_free(png_ptr, row_pointers);
+
+	/* Finish writing. */
 	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	in_file_system.SaveFile(write_data._data, in_file_path);
 }
-#endif

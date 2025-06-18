@@ -31,7 +31,9 @@ namespace Math
 	/// 0x000000ff r:1.0f
 	const int32 ConvertColourToInt(const VectorFloat4& in_value);
 	/// map [0.0f ... 1.0f] -> [0 ... 255]
-	const int32 ConvertFloatToByte(const float in_value);
+	const uint8 ConvertFloatToByte(const float in_value);
+	/// map [0 ... 255] -> [0.0f ... 1.0f]
+	const float ConvertByteToFloat(const uint8 in_value);
 
 }
 }

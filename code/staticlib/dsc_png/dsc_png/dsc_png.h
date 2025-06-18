@@ -17,8 +17,8 @@ namespace DscPng
 
 	/// failure logged, zero size data returned
 	void LoadPng(
-		std::vector<uint8_t>& out_data,
-		int32_t& out_byte_per_pixel,
+		std::vector<uint8>& out_data,
+		int32& out_byte_per_pixel,
 		DscCommon::VectorInt2& out_size,
 		DscCommon::FileSystem& in_file_system,
 		const std::string& in_file_path
@@ -26,8 +26,8 @@ namespace DscPng
 
 	/// failure logged
 	void SavePng(
-		const std::vector<uint8_t>& in_data,
-		const int32_t in_byte_per_pixel,
+		const std::vector<uint8>& in_data,
+		const int32 in_byte_per_pixel,
 		const DscCommon::VectorInt2& in_size,
 		DscCommon::FileSystem& in_file_system,
 		const std::string& in_file_path

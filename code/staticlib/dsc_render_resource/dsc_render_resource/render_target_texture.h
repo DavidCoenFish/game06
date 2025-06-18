@@ -96,6 +96,7 @@ namespace DscRenderResource
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const override;
 		virtual const DscCommon::VectorInt2 GetSize() const override;
+		virtual const DscCommon::VectorInt2 GetViewportSize() const override;
 
 	public:
 		std::vector < std::shared_ptr < Resource > > _target_resource_array;

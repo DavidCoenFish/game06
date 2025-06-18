@@ -461,3 +461,8 @@ void DscRenderResource::RenderTargetTexture::GetFormatData(
 	return;
 }
 
+const DscCommon::VectorInt2 DscRenderResource::RenderTargetTexture::GetViewportSize() const
+{
+	return DscCommon::VectorInt2(_scissor_rect.right, _scissor_rect.bottom);
+}
+
