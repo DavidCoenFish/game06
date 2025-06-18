@@ -1,5 +1,6 @@
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/vector_int2.h>
+#include <dsc_common/log_system.h>
 #include <dsc_common/utf8.h>
 #include "window_helper.h"
 #include "i_window_application.h"
@@ -19,13 +20,29 @@ namespace
 		return application;
 	}
 
+	const float GetMonitorScale(HWND in_hwnd)
+	{
+		HMONITOR mon = MonitorFromWindow(
+			in_hwnd,
+			MONITOR_DEFAULTTONEAREST
+		);
+
+		UINT dpiX = 0, dpiY = 0;
+		HRESULT result = GetDpiForMonitor(mon, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+		if (S_OK != result)
+		{
+			DSC_LOG_WARNING(LOG_TOPIC_DSC_WINDOWS, "GetDpiForMonitor FAILED %d\n", result);
+		}
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_WINDOWS, "GetDpiForMonitor %d %d\n", dpiX, dpiY);
+		const float scale = static_cast<float>(dpiX + dpiY) / (96.0f + 96.0f);
+		return scale;
+	}
+
 	// Windows procedure
 	LRESULT CALLBACK WndProc(HWND in_hwnd, UINT in_message, WPARAM in_wparam, LPARAM in_lparam)
 	{
 		// can be null before WM_CREATE
 		auto application = GetWindowApplication(in_hwnd);
-
-		//LOG_MESSAGE_DEBUG("WndProc message:%d in_wparam:%p in_lparam:%p application:%p", message, in_wparam, in_lparam, application);
 
 		switch (in_message)
 		{
@@ -61,17 +78,6 @@ namespace
 				(void)BeginPaint(in_hwnd, &ps);
 				EndPaint(in_hwnd, &ps);
 			}
-			//if ((nullptr != application) && (true == application->GetInSizemove()))
-			//{
-			//	application->Update();
-			//}
-			//else
-			//{
-			//	PAINTSTRUCT ps;
-			//	(void)BeginPaint(in_hwnd, &ps);
-			//	EndPaint(in_hwnd, &ps);
-			//}
-			// An application returns zero if it processes this message.
 			return 0;
 
 		case WM_MOVE:
@@ -100,7 +106,9 @@ namespace
 				else if (false == application->GetInSizemove())
 				{
 					const DscCommon::VectorInt2 size(LOWORD(in_lparam), HIWORD(in_lparam));
-					application->OnWindowSizeChanged(size);
+					const float monitor_scale = GetMonitorScale(in_hwnd);
+
+					application->OnWindowSizeChanged(size, monitor_scale);
 				}
 			}
 			break;
@@ -119,7 +127,9 @@ namespace
 				RECT rc;
 				GetClientRect(in_hwnd, &rc);
 				const DscCommon::VectorInt2 size(rc.right - rc.left, rc.bottom - rc.top);
-				application->OnWindowSizeChanged(size);
+				const float monitor_scale = GetMonitorScale(in_hwnd);
+
+				application->OnWindowSizeChanged(size, monitor_scale);
 			}
 			break;
 
@@ -134,7 +144,6 @@ namespace
 
 			// equivalent to WM_ACTIVATE
 		case WM_ACTIVATEAPP:
-			//LOG_MESSAGE_DEBUG("WndProc WM_ACTIVATEAPP:%d", in_wparam);
 			if (nullptr != application)
 			{
 				if (in_wparam)
@@ -276,6 +285,12 @@ const HWND DscWindows::WindowHelper(
 	const int in_cmd_show
 )
 {
+	BOOL result = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+	if (TRUE != result)
+	{
+		DSC_LOG_WARNING(LOG_TOPIC_DSC_WINDOWS, "SetProcessDpiAwarenessContext FAILED %d\n", result);
+	}
+
 	const std::wstring className(DscCommon::Utf8::Utf8ToUtf16(in_application_name + std::string("Class")));
 	const std::wstring name(DscCommon::Utf8::Utf8ToUtf16(in_application_name));
 

@@ -5,6 +5,7 @@
 #include <dsc_common/log_system.h>
 #include <dsc_common/math.h>
 #include <dsc_common/i_file_overlay.h>
+#include <dsc_common/vector_int2.h>
 #include <dsc_dag/dag_collection.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
@@ -90,9 +91,12 @@ const bool Application::Update()
     
     return true;
 }
-void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size)
+void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale)
 {
-    BaseType::OnWindowSizeChanged(in_size);
+    BaseType::OnWindowSizeChanged(in_size, in_monitor_scale);
+
+    DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "OnWindowSizeChanged size:%d %d scale:%f\n", in_size.GetX(), in_size.GetY(), in_monitor_scale);
+
     if (_draw_system)
     {
         _draw_system->OnResize();

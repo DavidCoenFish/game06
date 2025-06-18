@@ -25,7 +25,7 @@ namespace DscWindows
 
 		virtual const bool Update();
 		virtual void OnWindowMoved();
-		virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size);
+		virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale);
 		virtual void OnActivated();
 		virtual void OnDeactivated();
 		virtual void OnSuspending();

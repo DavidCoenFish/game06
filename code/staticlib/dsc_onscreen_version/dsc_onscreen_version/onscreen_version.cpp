@@ -97,7 +97,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
             DscRender::RenderTargetFormatData(
                 DXGI_FORMAT_B8G8R8A8_UNORM,
                 true,
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.125f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.25f)
             )
         );
 

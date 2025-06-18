@@ -160,9 +160,9 @@ const bool Application::Update()
     
     return true;
 }
-void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size)
+void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale)
 {
-    BaseType::OnWindowSizeChanged(in_size);
+    BaseType::OnWindowSizeChanged(in_size, in_monitor_scale);
     if (_draw_system)
     {
         _draw_system->OnResize();

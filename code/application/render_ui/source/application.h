@@ -61,7 +61,7 @@ public:
 
 private:
     virtual const bool Update() override;
-    virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size) override;
+    virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale) override;
 
 private:
     typedef DscWindows::IWindowApplication BaseType;

@@ -30,7 +30,7 @@ void DscWindows::IWindowApplication::OnWindowMoved()
    return;
 }
 
-void DscWindows::IWindowApplication::OnWindowSizeChanged(const DscCommon::VectorInt2&)
+void DscWindows::IWindowApplication::OnWindowSizeChanged(const DscCommon::VectorInt2&, const float)
 {
    return;
 }

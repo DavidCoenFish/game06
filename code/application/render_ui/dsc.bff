@@ -34,6 +34,7 @@
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 
+        "Shcore.lib",
         "D3d12.lib", 
         "DXGI.lib", 
         "dxguid.lib", 

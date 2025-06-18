@@ -20,19 +20,16 @@ Pixel main(Interpolant in_input)
         );
     
     float colour = 0.25;
-    //colour += step(((int)round(temp.x + temp.y)) % 2, 0) * 0.125;
-    colour += step(fmod(((int)round((temp.x) + (temp.y))), 2), 0) * (0.5 * 0.7);
-    
-    //colour += step(fmod(((int)round((temp.x * 0.25) + (temp.y * 0.25))), 2), 0) * (0.5 * 0.5);
-    //colour += step(fmod(((int)round((temp.x * 0.0625) + (temp.y * 0.0625))), 2), 0) * (0.5 * 0.3);
-    //colour += step(fmod(((int)round((temp.x * 0.015625) + (temp.y * 0.015625))), 2), 0) * (0.5 * 0.1);
-    
+    colour += step(fmod(temp.x + temp.y, 2), 0) * 0.03125;
+    colour += step(fmod((int)(temp.x * 0.25) + (int)(temp.y * 0.25), 2), 0) * 0.0625;
+    colour += step(fmod((int)(temp.x * 0.0625) + (int)(temp.y * 0.0625), 2), 0) * 0.125;
+    //colour += step(fmod((int)(temp.x * 0.015625) + (int)(temp.y * 0.015625), 2), 0) * 0.25;
+
     // grid lines on 64 pixel
     colour *= (1 - step(fmod(temp.x, 64), 0));
     colour *= (1 - step(fmod(temp.y, 64), 0));
 
     result._colour = float4(colour, colour, colour, 1.0);
-    //result._colour = float4(1.0, 0.0, 0.0, 1.0);
 
     return result;
 }
