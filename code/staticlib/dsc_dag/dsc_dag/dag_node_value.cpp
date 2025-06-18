@@ -1,4 +1,5 @@
-#include <dsc_dag/dag_node_value.h>
+#include "dag_node_value.h"
+#include <dsc_common/vector_int2.h>
 
 namespace
 {
@@ -93,7 +94,13 @@ void DscDag::DagNodeValue::SetValue(const std::any& in_value)
 						return;
 					}
 				}
-
+				else if (in_value.type() == typeid(DscCommon::VectorInt2))
+				{
+					if (std::any_cast<DscCommon::VectorInt2>(_value) == std::any_cast<DscCommon::VectorInt2>(in_value))
+					{
+						return;
+					}
+				}
 			}
 		}
 		break;

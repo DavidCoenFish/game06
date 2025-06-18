@@ -11,9 +11,9 @@ bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<D
 	return a.get() < b.get();
 }
 
-DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value)
+DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition)
 {
-	auto node = std::make_unique<DagNodeValue>(in_value);
+	auto node = std::make_unique<DagNodeValue>(in_value, in_change_condition);
 	NodeToken nodeToken = node.get();
 	_nodes.insert(std::move(node));
 	return nodeToken;

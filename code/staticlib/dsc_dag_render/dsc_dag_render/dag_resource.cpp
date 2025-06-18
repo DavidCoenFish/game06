@@ -1,4 +1,4 @@
-#include <dsc_dag_render/dag_resource.h>
+#include "dag_resource.h"
 #include <dsc_dag/dag_collection.h>
 #include <dsc_dag/i_dag_node.h>
 #include <dsc_render/draw_system.h>
@@ -11,7 +11,7 @@ std::unique_ptr<DscDagRender::DagResource> DscDagRender::DagResource::Factory(
 	DscDag::DagCollection* const in_dag_collection
 )
 {
-	auto dag_node_restored = in_dag_collection->CreateValue(std::any(0));
+	auto dag_node_restored = in_dag_collection->CreateValue(std::any(0), DscDag::TValueChangeCondition::TOnSet);
 	auto dag_node_screen_size = in_dag_collection->CreateValue(std::any(in_draw_system->GetRenderTargetBackBuffer()->GetSize()));
 
 	return std::make_unique<DscDagRender::DagResource>(
@@ -33,21 +33,19 @@ DscDagRender::DagResource::DagResource(
 	// nop
 }
 
-void DscDagRender::DagResource::OnDeviceLost() {
-	DscRender::IResource::OnDeviceLost();
+void DscDagRender::DagResource::OnDeviceLost() 
+{
+	//nop
 }
 
 
 void DscDagRender::DagResource::OnDeviceRestored(
-	ID3D12GraphicsCommandList* const in_command_list,
-	ID3D12Device2* const in_device
+	ID3D12GraphicsCommandList* const,// in_command_list,
+	ID3D12Device2* const //in_device
 	)
 {
-	DscRender::IResource::OnDeviceRestored(in_command_list, in_device);
-
 	DSC_ASSERT(nullptr != _dag_node_restored, "invalid state");
-	_restore_count += 1;
-	DscDag::DagCollection::SetValueType(_dag_node_restored, _restore_count);
+	DscDag::DagCollection::SetValueType<int32>(_dag_node_restored, 0);
 	return;
 }
 

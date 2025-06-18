@@ -16,16 +16,21 @@ namespace DscDag
 namespace DscRender
 {
 	class DrawSystem;
-	class Frame;
 	class IRenderTarget;
 }
 
 namespace DscRenderResource
 {
+	class Frame;
 	class GeometryGeneric;
 	class RenderTargetPool;
 	class Shader;
 	class ShaderConstantBuffer;
+}
+
+namespace DscDagRender
+{
+	class DagResource;
 }
 
 namespace DscUi
@@ -56,14 +61,15 @@ namespace DscUi
 
 		DscDag::NodeToken MakeUiRootNode(
 			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>& in_component
+			std::unique_ptr<IUiComponent>&& in_component
 			);
 			//DscDag::NodeToken MakeUiNode(std::unique_ptr<IUiComponent>, DscDag::NodeToken in_parent, DscDag::NodeToken in_root_node)
 		void DrawUiSystem(
 			DscRender::IRenderTarget* const in_render_target,
 			const bool in_always_draw, // if this render target is shared, need to at least redraw the top level ui
+			const bool in_clear_on_draw, // clear the top level render target before we draw to it
 			DscDag::NodeToken in_ui_root_node,
-			DscRender::Frame& in_frame
+			DscRenderResource::Frame& in_frame
 		);
 			//UiRootNode, commandList or Frame, time delta, current touch, array button presses)
 
@@ -76,6 +82,8 @@ namespace DscUi
 		//std::shared_ptr<DscRenderResource::ShaderConstantBuffer> MakeUiPanelShaderConstantBuffer(DscRender::DrawSystem& in_draw_system);
 
 	private:
+		std::unique_ptr < DscDagRender::DagResource> _dag_resource = {};
+		
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
 		//std::shared_ptr<DscRenderResource::Shader> _screen_quad_texture_shader = {};
 		//std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};

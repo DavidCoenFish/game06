@@ -9,6 +9,13 @@ namespace DscCommon
     class FileSystem;
 }
 
+namespace DscDag
+{
+    class DagCollection;
+    class IDagNode;
+    typedef IDagNode* NodeToken;
+}
+
 namespace DscRender
 {
     class DrawSystem;
@@ -69,8 +76,9 @@ private:
 
         std::unique_ptr<DscText::TextManager> _text_manager = {};
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
+        std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
-
+        DscDag::NodeToken _ui_root_node = nullptr;
     };
     std::unique_ptr<Resources> _resources;
 

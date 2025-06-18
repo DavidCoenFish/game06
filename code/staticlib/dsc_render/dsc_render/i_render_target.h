@@ -27,5 +27,6 @@ namespace DscRender
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const = 0;
 		virtual const DscCommon::VectorInt2 GetSize() const = 0;
+		virtual const DscCommon::VectorInt2 GetViewportSize() const;
 	};
 }//namespace DscRender

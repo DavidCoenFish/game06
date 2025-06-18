@@ -2,15 +2,17 @@
 #include "dsc_dag.h"
 #include <dsc_common\dsc_common.h>
 #include <dsc_dag\i_dag_node.h>
+#include <dsc_dag\dag_enum.h>
 
 namespace DscDag
 {
 	typedef std::function<void(std::any&, std::set<NodeToken>&, std::vector<NodeToken>&)> TCalculateFunction;
+	class IDagNode;
 
 	class DagCollection
 	{
 	public:
-		NodeToken CreateValue(const std::any& in_value);
+		NodeToken CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange);
 		NodeToken CreateCalculate(const TCalculateFunction& in_calculate);
 		// was trying to shoe horn generic values into a std::any for CreateValue, but std::any can not hold a std::unique_ptr
 		NodeToken AddCustomNode(std::unique_ptr<IDagNode>&& in_node);

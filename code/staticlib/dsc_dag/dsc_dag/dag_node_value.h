@@ -1,4 +1,5 @@
 #pragma once
+#include "dsc_dag.h"
 #include <dsc_common\dsc_common.h>
 #include <dsc_dag\dag_enum.h>
 #include <dsc_dag\i_dag_node.h>

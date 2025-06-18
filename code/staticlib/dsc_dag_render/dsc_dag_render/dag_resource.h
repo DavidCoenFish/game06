@@ -1,4 +1,5 @@
 #pragma once
+#include "dsc_dag_render.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_render/i_resource.h>
 
@@ -48,7 +49,6 @@ namespace DscDagRender
 			const DscCommon::VectorInt2& in_size
 		) override;
 	private:
-		int32 _restore_count = 0;
 		DscDag::IDagNode* _dag_node_restored = nullptr;
 		DscDag::IDagNode* _dag_node_screen_size = nullptr;
 	};

@@ -25,6 +25,7 @@
         "dsc_windows", 
         "dsc_render", 
         "dsc_render_resource", 
+        "dsc_dag_render", 
         "dsc_text", 
         "dsc_locale",
         "dsc_png",

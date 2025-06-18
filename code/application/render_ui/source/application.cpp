@@ -5,6 +5,7 @@
 #include <dsc_common/log_system.h>
 #include <dsc_common/math.h>
 #include <dsc_common/i_file_overlay.h>
+#include <dsc_dag/dag_collection.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
@@ -13,6 +14,7 @@
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
 #include <dsc_ui/ui_manager.h>
+#include <dsc_ui/i_ui_component.h>
 
 namespace
 {
@@ -34,6 +36,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
+        _resources->_dag_collection = std::make_unique<DscDag::DagCollection>();
+        _resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
+    }
+
+    {
+        auto ui_commponent = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
+        _resources->_ui_root_node = _resources->_ui_manager->MakeUiRootNode(
+            *_resources->_dag_collection,
+            std::move(ui_commponent)
+            );
     }
 
     return;
@@ -58,9 +70,21 @@ const bool Application::Update()
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
 
+        if (_resources->_ui_manager)
+        {
+            _resources->_ui_manager->DrawUiSystem(
+                _draw_system->GetRenderTargetBackBuffer(),
+                true,
+                true,
+                _resources->_ui_root_node,
+                *frame
+                );
+        }
+
+
         if (_resources->_onscreen_version)
         {
-            _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager, true);
+            _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
     }
     

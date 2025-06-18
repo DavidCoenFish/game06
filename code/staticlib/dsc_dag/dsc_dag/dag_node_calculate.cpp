@@ -51,6 +51,17 @@ void DscDag::DagNodeCalculate::SetIndexInput(const int32 in_index, NodeToken in_
 	MarkDirty();
 }
 
+DscDag::NodeToken DscDag::DagNodeCalculate::GetIndexInput(const int32 in_index) const
+{
+	DSC_ASSERT(0 <= in_index, "invalid param");
+	// null in_nodeID allowed
+	if ((0 <= in_index) && (in_index < static_cast<int32>(_indexInput.size())))
+	{
+		return _indexInput[in_index];
+	}
+	return nullptr;
+}
+
 void DscDag::DagNodeCalculate::AddInput(NodeToken in_nodeID)
 {
 	DSC_ASSERT(nullptr != in_nodeID, "invalid param");

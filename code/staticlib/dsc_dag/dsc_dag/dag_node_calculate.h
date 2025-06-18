@@ -20,6 +20,7 @@ namespace DscDag
 		virtual void AddOutput(NodeToken in_nodeID) override;
 		virtual void RemoveOutput(NodeToken in_nodeID) override;
 		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override;
+		virtual NodeToken GetIndexInput(const int32 in_index) const override;
 		virtual void AddInput(NodeToken in_nodeID) override;
 		virtual void RemoveInput(NodeToken in_nodeID) override;
 		virtual const std::any& GetValue() override;
