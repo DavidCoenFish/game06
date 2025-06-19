@@ -18,7 +18,11 @@ DscUi::UiComponentDebugFill::UiComponentDebugFill(
 	// nop
 }
 
-void DscUi::UiComponentDebugFill::Draw(DscRenderResource::Frame& in_frame, const DscCommon::VectorInt2& in_target_size)
+void DscUi::UiComponentDebugFill::Draw(
+	DscRenderResource::Frame& in_frame,
+	const DscCommon::VectorInt2& in_target_size//,
+	//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
+	)
 {
 	DSC_ASSERT(nullptr != _shader, "invalid state");
 	DSC_ASSERT(nullptr != _shader_constant_buffer, "invalid state");

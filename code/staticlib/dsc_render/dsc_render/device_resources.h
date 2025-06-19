@@ -70,10 +70,10 @@ public:
 		DscCommon::VectorInt2* out_size = nullptr
 		);
 
-	void ForceRestore(
-		ID3D12GraphicsCommandList* const in_command_list,
-		IResource* const in_resource
-		);
+	//void ForceRestore(
+	//	ID3D12GraphicsCommandList* const in_command_list,
+	//	IResource* const in_resource
+	//	);
 
 private:
 	void GetAdapter(

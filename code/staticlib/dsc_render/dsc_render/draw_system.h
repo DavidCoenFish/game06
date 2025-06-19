@@ -65,10 +65,10 @@ namespace DscRender
 			size_t in_alignment = 16
 		);
 
-		void ForceRestore(
-			ID3D12GraphicsCommandList* const in_command_list,
-			IResource* const in_resource
-		);
+		//void ForceRestore(
+		//	ID3D12GraphicsCommandList* const in_command_list,
+		//	IResource* const in_resource
+		//);
 		ID3D12Device2* const GetD3dDevice();
 
 		ID3D12GraphicsCommandList* CreateCommandList(

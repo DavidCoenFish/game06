@@ -9,11 +9,11 @@ namespace DscCommon
 	public:
 		static const Vector2 s_zero;
 
-		//Vector2() {}
+		Vector2() {}
 
 		explicit Vector2(
-			const TYPE in_x = 0,
-			const TYPE in_y = 0
+			const TYPE in_x,
+			const TYPE in_y
 		) : _data{ in_x, in_y }
 		{
 			return;
@@ -79,6 +79,23 @@ namespace DscCommon
 				_data[index] = in_rhs._data[index];
 			}
 			return (*this);
+		}
+
+		const bool operator<=(const Vector2& in_rhs) const
+		{
+			for (int index = 0; index < Index::Count; ++index)
+			{
+				if (_data[index] <= in_rhs._data[index])
+				{
+					continue;
+				}
+				else
+				{
+					return false;
+				}
+
+			}
+			return true;
 		}
 
 	private:

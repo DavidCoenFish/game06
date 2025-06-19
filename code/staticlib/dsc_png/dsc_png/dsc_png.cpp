@@ -116,6 +116,7 @@ namespace
 	void WritePngError(png_structp,
 		png_const_charp msg)
 	{
+		(void)msg;
 		DSC_LOG_ERROR(LOG_TOPIC_DSC_PNG, "msg:%s\n", msg);
 	}
 }

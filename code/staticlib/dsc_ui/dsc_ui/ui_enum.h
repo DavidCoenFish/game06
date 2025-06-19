@@ -3,7 +3,7 @@
 
 namespace DscUi
 {
-	enum UiRootNodeInputIndex
+	enum class UiRootNodeInputIndex
 	{
 		TFrame = 0,
 		TForceDraw,
@@ -14,5 +14,13 @@ namespace DscUi
 		TUiScale,
 		//TTimeAccumulation,
 		TUiComponent
+	};
+
+	enum class UiNodeInputIndex
+	{
+		TFrame = 0,
+		TUiScale,
+		TUiComponent,
+		TRenderTargetPoolTexture
 	};
 }

@@ -92,5 +92,18 @@ UiDagNodeValueComponent?
 
 
 
+root ui node, has a ui component, controls how child input is handled
+get output of root ui node generates draw instructions in command list/ frame object
+
+parent avaliable size allowed for each child
+trying to get to desired size (what the render target needs to be)
+parent determins size that can be draw, auto scroll (or manual scroll) if desired bigger than actual size
+
+node to hold/fetch render target from render target pool of desired size
+
+ui manual component owns geometry?
+child node owns render target
+
+use the dag hierarchy to trigger dirty, but not for the child order
 
 

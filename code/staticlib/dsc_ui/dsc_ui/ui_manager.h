@@ -4,6 +4,12 @@
 namespace DscCommon
 {
 	class FileSystem;
+	template <typename TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
+	template <typename TYPE>
+	class Vector4;
+	typedef Vector4<float> VectorFloat4;
 }
 
 namespace DscDag
@@ -63,7 +69,18 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component
 			);
-			//DscDag::NodeToken MakeUiNode(std::unique_ptr<IUiComponent>, DscDag::NodeToken in_parent, DscDag::NodeToken in_root_node)
+		DscDag::NodeToken MakeUiNode(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<IUiComponent>&& in_component,
+			IUiComponent& in_parent_component,
+			DscDag::NodeToken in_root_node,
+			const int32 in_parent_child_index = 0//,
+			// should this live here or in the IUiComponent
+			//const DscCommon::VectorFloat4& in_clear_colour //= DscCommon::VectorFloat4::s_zero
+			);
+		static IUiComponent& GetComponentFromUiRootNode(DscDag::NodeToken in_ui_root_node);
+		static IUiComponent& GetComponentFromUiNode(DscDag::NodeToken in_ui_node);
 		void DrawUiSystem(
 			DscRender::IRenderTarget* const in_render_target,
 			const bool in_always_draw, // if this render target is shared, need to at least redraw the top level ui
@@ -71,7 +88,6 @@ namespace DscUi
 			DscDag::NodeToken in_ui_root_node,
 			DscRenderResource::Frame& in_frame
 		);
-			//UiRootNode, commandList or Frame, time delta, current touch, array button presses)
 
 		//could be different per ui system? probably not however....
 		const float GetUiScale() const;

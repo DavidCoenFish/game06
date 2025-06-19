@@ -36,6 +36,9 @@ namespace DscRenderResource
 			std::shared_ptr<RenderTargetTexture> _render_target_texture;
 			DscCommon::VectorInt2 _requested_size;
 			// actual size should be in _render_target_texture?
+
+			// return true if we can accomidate the requested size
+			const bool AdjustForSize(const DscCommon::VectorInt2& in_requested_size);
 		};
 
 		std::shared_ptr<RenderTargetPoolTexture> MakeOrReuseRenderTarget(

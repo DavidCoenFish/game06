@@ -28,8 +28,11 @@ namespace DscUi
 			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad
 		);
 
-		virtual void Draw(DscRenderResource::Frame& in_frame, const DscCommon::VectorInt2& in_target_size) override;
-		//void Draw(DscRenderResource::Frame& in_frame, const DscCommon::VectorInt2& in_target_size);
+		virtual void Draw(
+			DscRenderResource::Frame& in_frame, 
+			const DscCommon::VectorInt2& in_target_size//,
+			//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
+			) override;
 
 	private:
 		std::shared_ptr<DscRenderResource::Shader> _shader = {};

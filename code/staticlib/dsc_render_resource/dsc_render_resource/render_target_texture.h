@@ -66,6 +66,9 @@ namespace DscRenderResource
 			const DscCommon::VectorInt2& in_sub_size = DscCommon::VectorInt2::s_zero // allow reused of approximatly size render targets, allow the view and sizzor rect to be optionally set
 		);
 
+		virtual const DscCommon::VectorInt2 GetSize() const override;
+		virtual const DscCommon::VectorInt2 GetViewportSize() const override;
+
 	private:
 		virtual void OnDeviceLost() override;
 		virtual void OnDeviceRestored(
@@ -95,8 +98,6 @@ namespace DscRenderResource
 			int& in_render_target_view_format_count,
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const override;
-		virtual const DscCommon::VectorInt2 GetSize() const override;
-		virtual const DscCommon::VectorInt2 GetViewportSize() const override;
 
 	public:
 		std::vector < std::shared_ptr < Resource > > _target_resource_array;

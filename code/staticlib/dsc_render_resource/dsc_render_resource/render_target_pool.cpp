@@ -71,6 +71,21 @@ struct std::hash<DscRender::RenderTargetDepthData>
 	}
 };
 
+const bool DscRenderResource::RenderTargetPool::RenderTargetPoolTexture::AdjustForSize(const DscCommon::VectorInt2& in_requested_size)
+{
+	if (_requested_size == in_requested_size)
+	{
+		return true;
+	}
+	if (in_requested_size <= _render_target_texture->GetSize())
+	{
+		_render_target_texture->SetSubSize(true, in_requested_size);
+		return true;
+	}
+	return false;
+}
+
+
 DscRenderResource::RenderTargetPool::RenderTargetPool(const int32 in_pixel_alignment)
 	: _pixel_alignment(in_pixel_alignment)
 {

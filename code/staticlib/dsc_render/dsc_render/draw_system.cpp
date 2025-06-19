@@ -135,7 +135,6 @@ void DscRender::DrawSystem::ResizeRenderTargetTexture(
 			);
 	}
 }
-*/
 void DscRender::DrawSystem::ForceRestore(
 	ID3D12GraphicsCommandList* const in_command_list,
 	IResource* const in_resource
@@ -149,6 +148,7 @@ void DscRender::DrawSystem::ForceRestore(
 			);
 	}
 }
+*/
 
 ID3D12Device2* const DscRender::DrawSystem::GetD3dDevice()
 {

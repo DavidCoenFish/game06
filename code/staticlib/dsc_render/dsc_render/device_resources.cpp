@@ -592,13 +592,13 @@ DscRender::IRenderTarget* DscRender::DeviceResources::GetRenderTargetBackBuffer(
 	return nullptr;
 }
 
-void DscRender::DeviceResources::ForceRestore(
-	ID3D12GraphicsCommandList* const in_command_list,
-	IResource* const in_resource
-	)
-{
-	in_resource->OnDeviceRestored(
-		in_command_list,
-		_device.Get()
-		);
-}
+//void DscRender::DeviceResources::ForceRestore(
+//	ID3D12GraphicsCommandList* const in_command_list,
+//	IResource* const in_resource
+//	)
+//{
+//	in_resource->OnDeviceRestored(
+//		in_command_list,
+//		_device.Get()
+//		);
+//}

@@ -14,6 +14,7 @@
 #include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\geometry_generic.h>
 #include <dsc_render_resource\render_target_pool.h>
+#include <dsc_render_resource\render_target_texture.h>
 #include <dsc_render_resource\shader.h>
 #include <dsc_render_resource\shader_constant_buffer.h>
 #include <dsc_render_resource\shader_pipeline_state_data.h>
@@ -21,6 +22,67 @@
 
 namespace
 {
+    //DscDag::NodeToken MakeChildAvaliableSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_parent_ui_component, const int32 in_child_index)
+    //{
+    //
+    //}
+
+    DscDag::NodeToken MakeNodeCalculateDesiredSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_avaliable_size)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
+            DscCommon::VectorInt2 avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+
+            value = ui_component->GetComponent().CalculateDesiredSize(avaliable_size);
+        });
+        DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, node);
+
+        return node;
+    }
+
+    DscDag::NodeToken MakeNodeCalculateRenderTarget(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_desired_size, const DscCommon::VectorFloat4& in_clear_colour, DscRenderResource::RenderTargetPool* in_render_target_pool, DscRender::DrawSystem* const in_draw_system)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate([in_render_target_pool, in_draw_system, in_clear_colour](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscCommon::VectorInt2 desired_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+
+            std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> pool_texture = {};
+            if (typeid(std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>) == value.type())
+            {
+                pool_texture = std::any_cast<std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>>(value);
+            }
+
+            if (nullptr != pool_texture)
+            {
+                if (true == pool_texture->AdjustForSize(desired_size))
+                {
+                    return;
+                }
+            }
+
+            std::vector<DscRender::RenderTargetFormatData> target_format_data_array = {};
+            target_format_data_array.push_back(
+                DscRender::RenderTargetFormatData(
+                    DXGI_FORMAT_B8G8R8A8_UNORM,
+                    true,
+                    in_clear_colour
+                )
+            );
+            pool_texture = in_render_target_pool->MakeOrReuseRenderTarget(
+                in_draw_system,
+                target_format_data_array,
+                DscRender::RenderTargetDepthData(),
+                desired_size
+                );
+
+            value = pool_texture;
+        });
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_desired_size, node);
+
+        return node;
+    }
+
 } // namespace
 
 DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
@@ -108,93 +170,6 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             array_shader_constants_info
             );
 	}
-    /*
-    // _screen_quad_texture_shader
-    {
-        std::vector<uint8> vertex_shader_data;
-        if (false == in_file_system->LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "screen_quad_texture_vs.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load triangle vertex shader\n");
-        }
-        std::vector<uint8> pixel_shader_data;
-        if (false == in_file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "screen_quad_texture_ps.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to triangle load pixel shader\n");
-        }
-
-        std::vector < DXGI_FORMAT > render_target_format;
-        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
-        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            ScreenQuad::GetInputElementDesc(),
-            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-            DXGI_FORMAT_UNKNOWN,
-            render_target_format,
-            CD3DX12_BLEND_DESC(D3D12_DEFAULT),
-            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource = {};
-        array_shader_resource.push_back(DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
-            nullptr,
-            D3D12_SHADER_VISIBILITY_PIXEL
-            ));
-        _screen_quad_grid_shader = std::make_unique<DscRenderResource::Shader>(
-            &in_draw_system,
-            shader_pipeline_state_data,
-            vertex_shader_data,
-            std::vector<uint8_t>(),
-            pixel_shader_data,
-            array_shader_resource
-            );
-    }
-
-    // _ui_panel_shader
-    {
-        std::vector<uint8> vertex_shader_data;
-        if (false == in_file_system->LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "ui_panel_vs.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load triangle vertex shader\n");
-        }
-        std::vector<uint8> pixel_shader_data;
-        if (false == in_file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "ui_panel_ps.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to triangle load pixel shader\n");
-        }
-
-        std::vector < DXGI_FORMAT > render_target_format;
-        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
-        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            ScreenQuad::GetInputElementDesc(),
-            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-            DXGI_FORMAT_UNKNOWN,
-            render_target_format,
-            CD3DX12_BLEND_DESC(D3D12_DEFAULT),
-            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
-        array_shader_constants_info.push_back(
-            DscRenderResource::ConstantBufferInfo::Factory(
-                TUiPanelShaderConstantBuffer(),
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource = {};
-        array_shader_resource.push_back(DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
-            nullptr,
-            D3D12_SHADER_VISIBILITY_PIXEL
-        ));
-        _screen_quad_grid_shader = std::make_unique<DscRenderResource::Shader>(
-            &in_draw_system,
-            shader_pipeline_state_data,
-            vertex_shader_data,
-            std::vector<uint8_t>(),
-            pixel_shader_data,
-            array_shader_resource,
-            array_shader_constants_info
-            );
-    }
-*/
 }
 
 DscUi::UiManager::~UiManager()
@@ -237,7 +212,7 @@ DscDag::NodeToken DscUi::UiManager::MakeUiRootNode(
         DscRender::IRenderTarget* render_target = DscDag::DagCollection::GetValueType<DscRender::IRenderTarget*>(in_input_array[static_cast<int32>(UiRootNodeInputIndex::TRenderTarget)]);
         UiDagNodeComponent* ui_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[static_cast<int32>(UiRootNodeInputIndex::TUiComponent)]);
 
-        // loop over in_input_set to ensure that they have rendered
+        // loop over in_input to ensure that they have rendered
         for (const auto& item : in_input_set)
         {
             item->GetValue();
@@ -247,7 +222,7 @@ DscDag::NodeToken DscUi::UiManager::MakeUiRootNode(
         frame->SetRenderTarget(render_target, clear_on_draw);
         if (nullptr != ui_component)
         {
-            ui_component->GetComponent().Draw(*frame, render_target->GetSize());
+            ui_component->GetComponent().Draw(*frame, render_target->GetViewportSize());
         }
     });
 
@@ -265,7 +240,67 @@ DscDag::NodeToken DscUi::UiManager::MakeUiRootNode(
     return master_ui_root_node;
 }
 
-//DscDag::NodeToken MakeUiNode(std::unique_ptr<IUiComponent>, DscDag::NodeToken in_parent, DscDag::NodeToken in_root_node)
+DscDag::NodeToken DscUi::UiManager::MakeUiNode(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    IUiComponent& in_parent_component,
+    DscDag::NodeToken in_root_node,
+    const int32 in_parent_child_index
+) 
+{
+    DscDag::NodeToken frame = in_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TFrame));
+
+    DscDag::NodeToken ui_component = nullptr;
+    {
+        auto node = std::make_unique<UiDagNodeComponent>(std::move(in_component));
+        ui_component = in_dag_collection.AddCustomNode(std::move(node));
+    }
+    DscDag::NodeToken avaliable_size = in_parent_component.GetChildAvalableSizeNode(in_parent_child_index);
+    DscDag::NodeToken desired_size = MakeNodeCalculateDesiredSize(in_dag_collection, ui_component, avaliable_size);
+    DscDag::NodeToken render_target_pool_texture = MakeNodeCalculateRenderTarget(in_dag_collection, desired_size, in_component->GetClearColour(), _render_target_pool.get(), &in_draw_system);
+
+    DscDag::NodeToken ui_node = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>& in_input_set, std::vector<DscDag::NodeToken>& in_input_array) {
+        DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[static_cast<int32>(UiNodeInputIndex::TFrame)]);
+        UiDagNodeComponent* ui_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[static_cast<int32>(UiNodeInputIndex::TUiComponent)]);
+        auto render_target_pool_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>>(in_input_array[static_cast<int32>(UiNodeInputIndex::TRenderTargetPoolTexture)]);
+        DscRender::IRenderTarget* render_target = render_target_pool_texture->_render_target_texture.get();
+
+        // loop over in_input to ensure that they have rendered
+        for (const auto& item : in_input_set)
+        {
+            item->GetValue();
+        }
+
+        // prep for ui component to draw
+        frame->SetRenderTarget(render_target, true);
+
+        if (nullptr != ui_component)
+        {
+            ui_component->GetComponent().Draw(*frame, render_target->GetViewportSize());
+        }
+    });
+
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiNodeInputIndex::TFrame), frame, ui_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiNodeInputIndex::TUiComponent), ui_component, ui_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiNodeInputIndex::TRenderTargetPoolTexture), render_target_pool_texture, ui_node);
+    
+
+    return ui_node;
+}
+
+DscUi::IUiComponent& DscUi::UiManager::GetComponentFromUiRootNode(DscDag::NodeToken in_ui_root_node) 
+{
+    UiDagNodeComponent* component = dynamic_cast<UiDagNodeComponent*>(in_ui_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TUiComponent)));
+    return component->GetComponent();
+}
+
+DscUi::IUiComponent& DscUi::UiManager::GetComponentFromUiNode(DscDag::NodeToken in_ui_node)
+{
+    UiDagNodeComponent* component = dynamic_cast<UiDagNodeComponent*>(in_ui_node->GetIndexInput(static_cast<int32>(UiNodeInputIndex::TUiComponent)));
+    return component->GetComponent();
+}
+
 void DscUi::UiManager::DrawUiSystem(
     DscRender::IRenderTarget* const in_render_target,
     const bool in_always_draw, // if this render target is shared, need to at least redraw the top level ui
