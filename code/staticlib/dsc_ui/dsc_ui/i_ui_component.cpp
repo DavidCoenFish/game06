@@ -12,12 +12,17 @@ const DscCommon::VectorFloat4& DscUi::IUiComponent::GetClearColour() const
 	return DscCommon::VectorFloat4::s_zero;
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::CalculateDesiredSize(const DscCommon::VectorInt2& in_avaliable_size) const
+const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size)
 {
 	return in_avaliable_size;
 }
 
-DscDag::NodeToken DscUi::IUiComponent::GetChildAvalableSizeNode(const int32) const
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildAvaliableSize(const DscCommon::VectorInt2& in_our_desired_size, const int32) const
 {
-	return nullptr;
+	return in_our_desired_size;
+}
+
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildOffset(const int32) const
+{
+	return DscCommon::VectorInt2::s_zero;
 }

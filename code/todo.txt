@@ -107,3 +107,64 @@ child node owns render target
 use the dag hierarchy to trigger dirty, but not for the child order
 
 
+//============================ (canvas with one child example)
+say we have a ui root node with a canvas component (N0)
+the canvas component has one child at a given location and size, defined via canvas slot. (N1)
+
+we request that (R0) draws, with an externally provided rendertarget of a given size (R0)
+need to work out the desired size for N1's and make the texture (R1)
+need to work out the avaliable size for N1 to draw to N0, and create geometry for that (G1)
+draw (R1) to (R0) wuing geomtrey (G1)
+
+
+canvas slot
+  size
+  pivot
+  parent pivot
+  ?geometry
+  ?render target
+  child ui_node
+
+using dag graph to express data change chains (if x changes, need to redraw y)
+
+(N0) ui root node
+  GetValue() should cause a render command list/ frame to be fill out with all the draw instructions needed to draw the ui
+  inputs []
+
+DrawUiSystem(in_ui_root_node(N0))
+	set TAvaliableSize from provided render target viewport
+	UiComponent (C0) converts avaliable size to desired size
+	UiComponent (C0) set desired size // or in node
+	UiComponent (C0) get child Avaliable size (index)
+	UiComponent (C1) converts avaliable size to desired size
+	UiComponent (C1) set desired size // or in node
+	// to make geometry (G1) we need to know parent size, parent pivot, our desired size, our actual size and our pivot
+	// then time accumulation for auto scroll, or current scroll pos for manual scroll
+
+
+UiComponent
+	VectorInt2 ConvertAvaliableSizeToDesiredSize(VectorInt2)
+	VectorInt2 GetChildAvaliableSize(our DesiredSize, child index)
+	VectorInt2 GetChildOffset(child index) // may need to fetch the desired size of all the children first, ie, for stack
+	int32 GetParentChildIndex(); // what index are we of out parent
+	//void SetParentChildIndex(int32 in_index);
+	//SetGet DesiredSize NodeToken?
+
+this is running multiple streams of information, Dag and data in UiComponent
+what happens if a child node index changes, or is that held in UiComponent and visible via dag
+
+UiRootNode
+	[] calculate [render command list] // draw ourself to the external render target
+		[AvaliableSize] value from external provided render target viewport size
+		[AvaliableSize, UiComponent] calculate [DesiredSize]
+
+UiNode
+	[] calculate [render command list] // draw ourself to the parent render target
+		[Parent.DesiredSize, Parent.UiComponent, index] -> [AvaliableSize]
+		[AvaliableSize, UiComponent] calculate [DesiredSize]
+		[DesiredSize, RenderTargetPool] calculate [RenderTargetPoolTexture]
+		[RenderTargetPoolTexture] calculate [IRenderTarget]
+		[Parent.DesiredSize, Parent.UiComponent, index] calculate [GeometryOffset]
+		[Parent.DesiredSize, Parent.UiComponent, index] calculate [GeometrySize]
+		[Parent.DesiredSize, DesiredSize, GeometryOffset, GeometrySize] calculate [Geometry] // the geometry to draw ourself to the parent
+

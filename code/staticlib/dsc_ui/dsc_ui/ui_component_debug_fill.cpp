@@ -7,11 +7,13 @@
 #include <dsc_render_resource\shader_constant_buffer.h>
 
 DscUi::UiComponentDebugFill::UiComponentDebugFill(
+	const int32 in_parent_child_index,
 	const std::shared_ptr<DscRenderResource::Shader>& in_shader,
 	const std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
 	const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad
 )
-	: _shader(in_shader)
+	: _parent_child_index(in_parent_child_index)
+	, _shader(in_shader)
 	, _shader_constant_buffer(in_shader_constant_buffer)
 	, _full_target_quad(in_full_target_quad)
 {
@@ -38,3 +40,7 @@ void DscUi::UiComponentDebugFill::Draw(
 	in_frame.Draw(_full_target_quad);
 }
 
+const int32 DscUi::UiComponentDebugFill::GetParentChildIndex() const
+{
+	return _parent_child_index;
+}

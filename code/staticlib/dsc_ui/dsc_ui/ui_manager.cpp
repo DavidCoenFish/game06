@@ -1,6 +1,8 @@
 #include "ui_manager.h"
 #include "screen_quad.h"
+#include "ui_component_canvas.h"
 #include "ui_component_debug_fill.h"
+#include "ui_component_fill.h"
 #include "ui_dag_node_component.h"
 #include "ui_enum.h"
 #include <dsc_common\data_helper.h>
@@ -22,21 +24,58 @@
 
 namespace
 {
-    //DscDag::NodeToken MakeChildAvaliableSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_parent_ui_component, const int32 in_child_index)
-    //{
-    //
-    //}
-
-    DscDag::NodeToken MakeNodeCalculateDesiredSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_avaliable_size)
+    DscDag::NodeToken MakeNodeConvertAvaliableSizeToDesiredSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_avaliable_size)
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
             DscCommon::VectorInt2 avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
 
-            value = ui_component->GetComponent().CalculateDesiredSize(avaliable_size);
+            value = ui_component->GetComponent().ConvertAvaliableSizeToDesiredSize(avaliable_size);
         });
         DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, node);
+
+        return node;
+    }
+
+    DscDag::NodeToken MakeNodeGetChildAvaliableSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_desired_size, DscDag::NodeToken in_child_index)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
+            DscCommon::VectorInt2 desired_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+            int32 child_index = DscDag::DagCollection::GetValueType<int32>(in_input_array[2]);
+
+            value = ui_component->GetComponent().GetChildAvaliableSize(desired_size, child_index);
+        });
+        DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_desired_size, node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_child_index, node);
+
+        return node;
+    }
+
+    DscDag::NodeToken MakeNodeGetChildOffset(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_child_index)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
+            int32 child_index = DscDag::DagCollection::GetValueType<int32>(in_input_array[1]);
+
+            value = ui_component->GetComponent().GetChildOffset(child_index);
+        });
+        DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_child_index, node);
+
+        return node;
+    }
+
+    DscDag::NodeToken MakeNodeGetParentChildIndex(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
+
+            value = ui_component->GetComponent().GetParentChildIndex();
+        });
+        DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
 
         return node;
     }
@@ -177,11 +216,12 @@ DscUi::UiManager::~UiManager()
     //nop
 }
 
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentDebugFill(DscRender::DrawSystem& in_draw_system)
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentDebugFill(DscRender::DrawSystem& in_draw_system, const int32 in_parent_child_index)
 {
     auto buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
 
     std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentDebugFill>(
+        in_parent_child_index,
         _debug_grid_shader,
         buffer,
         _full_target_quad
@@ -189,7 +229,30 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentDebugFill(Ds
     return result;
 }
 
-DscDag::NodeToken DscUi::UiManager::MakeUiRootNode(
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentFill(DscRender::DrawSystem& in_draw_system, const DscCommon::VectorFloat4& in_background_colour, const int32 in_parent_child_index)
+{
+    (void*)in_draw_system;
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentFill>(
+        in_parent_child_index,
+        in_background_colour
+        );
+    return result;
+}
+
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentCanvas(DscRender::DrawSystem& in_draw_system, const DscCommon::VectorFloat4& in_background_colour, const int32 in_parent_child_index)
+{
+    auto buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
+
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentCanvas>(
+        in_parent_child_index,
+        _ui_panel_shader,
+        buffer,
+        in_background_colour
+        );
+    return result;
+}
+
+ResultNodeData DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component
 )
@@ -204,7 +267,8 @@ DscDag::NodeToken DscUi::UiManager::MakeUiRootNode(
         auto node = std::make_unique<UiDagNodeComponent>(std::move(in_component));
         ui_component = in_dag_collection.AddCustomNode(std::move(node));
     }
-    DscDag::NodeToken target_size = in_dag_collection.CreateValue(std::any(DscCommon::VectorInt2(0, 0)));
+    DscDag::NodeToken avaliable_size = in_dag_collection.CreateValue(std::any(DscCommon::VectorInt2(0, 0)));
+    DscDag::NodeToken desired_size = MakeNodeConvertAvaliableSizeToDesiredSize(in_dag_collection, ui_component, avaliable_size);
 
     DscDag::NodeToken master_ui_root_node = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>& in_input_set, std::vector<DscDag::NodeToken>& in_input_array) {
         DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[static_cast<int32>(UiRootNodeInputIndex::TFrame)]);
@@ -226,28 +290,36 @@ DscDag::NodeToken DscUi::UiManager::MakeUiRootNode(
         }
     });
 
-    //
+    DSC_ASSERT(nullptr != _dag_resource, "invalid state");
+
     DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TFrame), frame, master_ui_root_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TRenderTarget), render_target, master_ui_root_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TAvaliableSize), avaliable_size, master_ui_root_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TDesiredSize), desired_size, master_ui_root_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TDeviceRestore), _dag_resource->GetDagNodeRestored(), master_ui_root_node);
+    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TUiScale), _dag_node_ui_scale, master_ui_root_node);
     DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TForceDraw), force_draw, master_ui_root_node);
     DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TClearOnDraw), clear_on_draw, master_ui_root_node);
-    DSC_ASSERT(nullptr != _dag_resource, "invalid state");
-    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TDeviceRestore), _dag_resource->GetDagNodeRestored(), master_ui_root_node);
-    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TRenderTarget), render_target, master_ui_root_node);
-    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TTargetSize), target_size, master_ui_root_node);
-    DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TUiScale), _dag_node_ui_scale, master_ui_root_node);
     DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiRootNodeInputIndex::TUiComponent), ui_component, master_ui_root_node);
 
-    return master_ui_root_node;
+    return ResultNodeData({
+        master_ui_root_node,
+        ui_component,
+        desired_size
+        });
 }
 
-DscDag::NodeToken DscUi::UiManager::MakeUiNode(
+ResultNodeData DscUi::UiManager::MakeUiNode(
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component,
-    IUiComponent& in_parent_component,
+
+    DscDag::NodeToken in_parent_ui_component,
+    DscDag::NodeToken in_parent_desired_size, // parent desired size not in directly in the parent UiComponent, and not of a know offset in the node [root?node?]
     DscDag::NodeToken in_root_node,
+
     const int32 in_parent_child_index
-) 
+)
 {
     DscDag::NodeToken frame = in_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TFrame));
 
@@ -285,21 +357,24 @@ DscDag::NodeToken DscUi::UiManager::MakeUiNode(
     DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiNodeInputIndex::TUiComponent), ui_component, ui_node);
     DscDag::DagCollection::LinkIndexNodes(static_cast<int32>(UiNodeInputIndex::TRenderTargetPoolTexture), render_target_pool_texture, ui_node);
     
-
-    return ui_node;
+    return ResultNodeData({
+        ui_node,
+        ui_component,
+        desired_size
+        });
 }
 
-DscUi::IUiComponent& DscUi::UiManager::GetComponentFromUiRootNode(DscDag::NodeToken in_ui_root_node) 
-{
-    UiDagNodeComponent* component = dynamic_cast<UiDagNodeComponent*>(in_ui_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TUiComponent)));
-    return component->GetComponent();
-}
-
-DscUi::IUiComponent& DscUi::UiManager::GetComponentFromUiNode(DscDag::NodeToken in_ui_node)
-{
-    UiDagNodeComponent* component = dynamic_cast<UiDagNodeComponent*>(in_ui_node->GetIndexInput(static_cast<int32>(UiNodeInputIndex::TUiComponent)));
-    return component->GetComponent();
-}
+//DscUi::IUiComponent& DscUi::UiManager::GetComponentFromUiRootNode(DscDag::NodeToken in_ui_root_node) 
+//{
+//    UiDagNodeComponent* component = dynamic_cast<UiDagNodeComponent*>(in_ui_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TUiComponent)));
+//    return component->GetComponent();
+//}
+//
+//DscUi::IUiComponent& DscUi::UiManager::GetComponentFromUiNode(DscDag::NodeToken in_ui_node)
+//{
+//    UiDagNodeComponent* component = dynamic_cast<UiDagNodeComponent*>(in_ui_node->GetIndexInput(static_cast<int32>(UiNodeInputIndex::TUiComponent)));
+//    return component->GetComponent();
+//}
 
 void DscUi::UiManager::DrawUiSystem(
     DscRender::IRenderTarget* const in_render_target,
@@ -329,7 +404,7 @@ void DscUi::UiManager::DrawUiSystem(
         DscDag::DagCollection::SetValueType<DscRender::IRenderTarget*>(node, in_render_target);
     }
     {
-        DscDag::NodeToken node = in_ui_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TTargetSize));
+        DscDag::NodeToken node = in_ui_root_node->GetIndexInput(static_cast<int32>(UiRootNodeInputIndex::TAvaliableSize));
         DscDag::DagCollection::SetValueType<DscCommon::VectorInt2>(node, in_render_target->GetSize());
     }
 

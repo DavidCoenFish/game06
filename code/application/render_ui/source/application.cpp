@@ -43,10 +43,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     {
         auto ui_commponent = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
-        _resources->_ui_root_node = _resources->_ui_manager->MakeUiRootNode(
+        auto node_result = _resources->_ui_manager->MakeUiRootNode(
             *_resources->_dag_collection,
             std::move(ui_commponent)
             );
+        _resources->_ui_root_node = node_result._ui_node;
     }
 
     return;
