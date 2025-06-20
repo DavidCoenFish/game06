@@ -22,7 +22,7 @@ const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildAvaliableSize(const Dsc
 	return in_our_desired_size;
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildOffset(const int32) const
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildOffset(const DscCommon::VectorInt2&, const int32) const
 {
 	return DscCommon::VectorInt2::s_zero;
 }

@@ -139,7 +139,21 @@ DrawUiSystem(in_ui_root_node(N0))
 	UiComponent (C1) converts avaliable size to desired size
 	UiComponent (C1) set desired size // or in node
 	// to make geometry (G1) we need to know parent size, parent pivot, our desired size, our actual size and our pivot
-	// then time accumulation for auto scroll, or current scroll pos for manual scroll
+	// then time accumulation for auto scroll, or current scroll pos for manual scroll, if a node makes geometry, and a node makes scroll amount, then 
+
+//ui stack example (N0) stack component (U0), (N1) text component (U1), (N2) text component (U2)
+so, how do we get the previous childs ActualSize back into the parent ui component so the latter child offset can be calculated?
+UiComponent::SetChildActualSizeNode(index, node_actual_size)?
+worried about order of operation and creating dependency loops.
+
+we have avaliable size
+ui component translates avaliable size into desired size (render target size)
+ui component translates desired size into actual size (geometry size on parent)
+maunal or auto scroll is moving the desired size/render target around on the actual size/geometry size of the parent
+a ui stack component would want to know all the actual size of the previous children to calculate the offset of a requested child
+a ui stack component to calculate it's desired size may want to calculate the actual size of every child
+
+
 
 
 UiComponent

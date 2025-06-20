@@ -46,7 +46,8 @@ namespace DscUi
 
 		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size);
 		virtual const DscCommon::VectorInt2 GetChildAvaliableSize(const DscCommon::VectorInt2& in_our_desired_size, const int32 in_child_index) const;
-		virtual const DscCommon::VectorInt2 GetChildOffset(const int32 in_child_index) const;// may need to fetch the desired size of all the children first, ie, for stack
+		virtual const DscCommon::VectorInt2 GetChildActualSize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const;// may need to fetch the desired size of all the children first, ie, for stack
+		virtual const DscCommon::VectorInt2 GetChildOffset(const DscCommon::VectorInt2& in_our_desired_size, const int32 in_child_index) const;// may need to fetch the desired size of all the children first, ie, for stack
 		virtual const int32 GetParentChildIndex() const = 0; // what child index are we of out parent
 
 	};

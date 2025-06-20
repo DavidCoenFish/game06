@@ -12,6 +12,15 @@ DscUi::UiComponentFill::UiComponentFill(
 	// nop
 }
 
+void DscUi::UiComponentFill::Draw(
+	DscRenderResource::Frame&, // in_frame,
+	const DscCommon::VectorInt2& // in_target_size//, 
+	//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
+)
+{
+	//nop
+}
+
 const DscCommon::VectorFloat4& DscUi::UiComponentFill::GetClearColour() const
 {
 	return _fill_colour;
