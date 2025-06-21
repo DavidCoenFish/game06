@@ -146,23 +146,40 @@ so, how do we get the previous childs ActualSize back into the parent ui compone
 UiComponent::SetChildActualSizeNode(index, node_actual_size)?
 worried about order of operation and creating dependency loops.
 
-we have avaliable size
+we have avaliable size (as ui root, this is externally provided, else we query the parent GetChildAvaliableSize)
 ui component translates avaliable size into desired size (render target size)
-ui component translates desired size into actual size (geometry size on parent)
-maunal or auto scroll is moving the desired size/render target around on the actual size/geometry size of the parent
-a ui stack component would want to know all the actual size of the previous children to calculate the offset of a requested child
-a ui stack component to calculate it's desired size may want to calculate the actual size of every child
+ui component translates desired size into geometry size (is this a parent function?)
+maunal or auto scroll is moving the desired size around on the geometry size of the parent
 
+//a ui stack component would want to know all the actual size of the previous children to calculate the offset of a requested child
+//a ui stack component to calculate it's desired size may want to calculate the actual size of every child
 
+say we have a node for uv_scroll, is this set directly from the UiComponent, with HasManal flag, or is it set from a dag node calculate chain
+if a chain, then we have a problem that every tick will dirty everything. having UvScroll 
+or do both, but nothing to drive the update
+is there some way of conditionals (if) in dag tree to not set both brances dirty? or is caching results a batter methodology
 
+Desired size == render target viewport size
 
 UiComponent
+	VectorInt2 GetChildAvaliableSize(our avaliable size, child index)
 	VectorInt2 ConvertAvaliableSizeToDesiredSize(VectorInt2)
-	VectorInt2 GetChildAvaliableSize(our DesiredSize, child index)
-	VectorInt2 GetChildOffset(child index) // may need to fetch the desired size of all the children first, ie, for stack
+
+	VectorInt2 GetChildGeometryOffset(our avaliable size, child index) // may need to fetch the desired size of all the children first, ie, for stack
+	VectorInt2 GetChildGeometrySize(our avaliable size, child index) // may need to fetch the desired size of all the children first, ie, for stack
+
 	int32 GetParentChildIndex(); // what index are we of out parent
 	//void SetParentChildIndex(int32 in_index);
 	//SetGet DesiredSize NodeToken?
+	void Update(const float in_time_delta)
+	void AddChildRef(UiComponent* in_ui_component)
+	void RemoveChild(UiComponent* in_ui_component)
+	SetScrollTraveralPixelDistance(VectorInt2)
+	SetSrollNode(DscDag::NodeToken)
+	SetChildGeometrySizeNode(DscDag::NodeToken, int32 child_index)
+	SetChildGeometryOffsetNode(DscDag::NodeToken, int32 child_index)
+
+
 
 this is running multiple streams of information, Dag and data in UiComponent
 what happens if a child node index changes, or is that held in UiComponent and visible via dag
@@ -171,14 +188,26 @@ UiRootNode
 	[] calculate [render command list] // draw ourself to the external render target
 		[AvaliableSize] value from external provided render target viewport size
 		[AvaliableSize, UiComponent] calculate [DesiredSize]
+		[AvaliableSize, DesiredSize] calculate [Geometry]
+		[UiScroll] calculate [ShaderConstantBuffer]
 
 UiNode
 	[] calculate [render command list] // draw ourself to the parent render target
-		[Parent.DesiredSize, Parent.UiComponent, index] -> [AvaliableSize]
+		[Parent.AvaliableSize, Parent.UiComponent, index] -> [AvaliableSize]
 		[AvaliableSize, UiComponent] calculate [DesiredSize]
 		[DesiredSize, RenderTargetPool] calculate [RenderTargetPoolTexture]
 		[RenderTargetPoolTexture] calculate [IRenderTarget]
-		[Parent.DesiredSize, Parent.UiComponent, index] calculate [GeometryOffset]
-		[Parent.DesiredSize, Parent.UiComponent, index] calculate [GeometrySize]
+
+		[Parent.AvaliableSize, Parent.UiComponent, index] calculate [GeometryOffset]
+		[Parent.AvaliableSize, Parent.UiComponent, index] calculate [GeometrySize]
 		[Parent.DesiredSize, DesiredSize, GeometryOffset, GeometrySize] calculate [Geometry] // the geometry to draw ourself to the parent
+		[UiScroll] calculate [ShaderConstantBuffer]
+
+
+who determins the geometry size, is that a function of the child or the parent, thinking the parent? or it it a know math function (choose min(avaliable size, desired size))?
+or is that something a parent stack ui component may want min, but a canvas text child may not want to auto shrink. stack may just use deired size of the child, canvas may use avaliable size, 
+
+a stack desired size is the total of all the child geometry size plus the stack gaps
+this means that the stack ui components needs access to all the child node calculate geometry size
+and a stack ui component needs the previous child geometry offset anad geometry size to specify the next one
 

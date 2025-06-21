@@ -26,3 +26,29 @@ const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildOffset(const DscCommon:
 {
 	return DscCommon::VectorInt2::s_zero;
 }
+
+void DscUi::IUiComponent::Update(const float)
+{
+	//nop
+}
+
+void DscUi::IUiComponent::AddChildRef(IUiComponent*)
+{
+	DSC_ASSERT_ALWAYS("unimplemented");
+}
+
+void DscUi::IUiComponent::RemoveChild(IUiComponent*)
+{
+	DSC_ASSERT_ALWAYS("unimplemented");
+}
+
+void DscUi::IUiComponent::SetScrollTraveralPixelDistance(const DscCommon::VectorInt2&)
+{
+	// nop
+}
+
+void DscUi::IUiComponent::SetSrollNode(DscDag::NodeToken)
+{
+	DSC_ASSERT_ALWAYS("unimplemented");
+}
+

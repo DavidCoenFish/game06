@@ -50,5 +50,11 @@ namespace DscUi
 		virtual const DscCommon::VectorInt2 GetChildOffset(const DscCommon::VectorInt2& in_our_desired_size, const int32 in_child_index) const;// may need to fetch the desired size of all the children first, ie, for stack
 		virtual const int32 GetParentChildIndex() const = 0; // what child index are we of out parent
 
+		virtual void Update(const float in_time_delta);
+		virtual void AddChildRef(IUiComponent* in_ui_component);
+		virtual void RemoveChild(IUiComponent* in_ui_component);
+		virtual void SetScrollTraveralPixelDistance(const DscCommon::VectorInt2& in_traveral_pixel_distance);
+		virtual void SetSrollNode(DscDag::NodeToken in_scroll_node);
+
 	};
 }
