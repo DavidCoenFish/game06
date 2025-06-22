@@ -3,6 +3,13 @@
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/vector_int2.h>
 
+namespace DscCommon
+{
+	template <typename TYPE>
+	class Vector4;
+	typedef Vector4<float> VectorFloat4;
+}
+
 namespace DscRender
 {
 	class DrawSystem;
@@ -35,11 +42,15 @@ namespace DscRenderResource
 			}
 			std::shared_ptr<RenderTargetTexture> _render_target_texture;
 			DscCommon::VectorInt2 _requested_size;
-			// actual size should be in _render_target_texture?
-
-			// return true if we can accomidate the requested size
-			const bool AdjustForSize(const DscCommon::VectorInt2& in_requested_size);
 		};
+
+		std::shared_ptr<RenderTargetPoolTexture> CheckOrMakeRenderTarget(
+			std::shared_ptr<RenderTargetPoolTexture>& in_pool_texture,
+			DscRender::DrawSystem* const in_draw_system,
+			const std::vector < DscRender::RenderTargetFormatData >& in_target_format_data_array,
+			const DscRender::RenderTargetDepthData& in_target_depth_data,
+			const DscCommon::VectorInt2& in_size
+		);
 
 		std::shared_ptr<RenderTargetPoolTexture> MakeOrReuseRenderTarget(
 			DscRender::DrawSystem* const in_draw_system,

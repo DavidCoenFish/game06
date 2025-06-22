@@ -3,6 +3,7 @@
 
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/vector_int2.h>
+#include <dsc_common/vector_float4.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render/i_resource.h>
 
@@ -68,6 +69,7 @@ namespace DscRenderResource
 
 		virtual const DscCommon::VectorInt2 GetSize() const override;
 		virtual const DscCommon::VectorInt2 GetViewportSize() const override;
+		virtual const DscCommon::VectorFloat4 GetClearColour() const override;
 
 	private:
 		virtual void OnDeviceLost() override;
@@ -114,6 +116,7 @@ namespace DscRenderResource
 		bool _resize_with_screen;
 		std::vector < DXGI_FORMAT > _target_format_array;
 		int _id;
+		DscCommon::VectorFloat4 _clear_colour;
 
 	};
 }//namespace DscRenderResource

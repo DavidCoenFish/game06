@@ -222,4 +222,12 @@ const DscCommon::VectorInt2 DscRender::RenderTargetBackBuffer::GetSize() const
 	return _back_buffer_size;
 }
 
+const DscCommon::VectorInt2 DscRender::RenderTargetBackBuffer::GetViewportSize() const
+{
+	return DscCommon::VectorInt2(_scissor_rect.right, _scissor_rect.bottom);
+}
 
+const DscCommon::VectorFloat4 DscRender::RenderTargetBackBuffer::GetClearColour() const
+{
+	return _target_format_data._clear_color;
+}

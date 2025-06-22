@@ -29,15 +29,6 @@ void DscUi::UiComponentCanvas::AddChild(const VectorUiCoord2& in_child_size, con
 	_child_slot_array[in_index] = ChildSlot({ in_child_size, in_child_pivot, in_attach_point });
 }
 
-void DscUi::UiComponentCanvas::Draw(
-	DscRenderResource::Frame& ,//in_frame,
-	const DscCommon::VectorInt2& //in_target_size//,
-	//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
-)
-{
-
-}
-
 const DscCommon::VectorFloat4& DscUi::UiComponentCanvas::GetClearColour() const
 {
 	return _fill_colour;

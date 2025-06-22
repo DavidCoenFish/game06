@@ -14,13 +14,15 @@ namespace DscUi
 			);
 
 	private:
-		virtual void Draw(
+		virtual const bool HasCustomGeometry() const override;
+
+		virtual void DrawCustomGeometry(
 			DscRenderResource::Frame& in_frame,
-			const DscCommon::VectorInt2& in_target_size//, 
-			//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
+			const DscCommon::VectorInt2& in_target_size
 		) override;
 
 		virtual const DscCommon::VectorFloat4& GetClearColour() const override;
+		virtual const bool SetClearColour(const DscCommon::VectorFloat4& in_colour) override;
 
 		virtual const int32 GetParentChildIndex() const override; // what child index are we of out parent
 

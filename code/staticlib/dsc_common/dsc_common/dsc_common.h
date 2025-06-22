@@ -81,13 +81,16 @@ typedef unsigned __int64 uint64;
 #if defined(_DEBUG)
    #define DSC_ASSERT(CONDITION, MESSAGE) assert(MESSAGE && (CONDITION))
    #define DSC_ASSERT_ALWAYS(MESSAGE) assert(MESSAGE && false)
+   #define DSC_DEBUG_ONLY(PAYLOAD) PAYLOAD
 #else
    #define DSC_ASSERT(CONDITION, MESSAGE) __noop
    #define DSC_ASSERT_ALWAYS(MESSAGE) __noop
+   #define DSC_DEBUG_ONLY(PAYLOAD)
 #endif
 #define DSC_TODO(MESSAGE, ...) DSC_ASSERT_ALWAYS(MESSAGE)
 
 #define ARRAY_LITERAL_SIZE(DATA) (sizeof(DATA)/sizeof(DATA[0]))
+#define DSC_COMMA ,
 
 //FastBuild nmake workaround
 // allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE

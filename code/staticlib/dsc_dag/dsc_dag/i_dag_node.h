@@ -1,5 +1,5 @@
 #pragma once
-#include <dsc_common\dsc_common.h>
+#include "dsc_dag.h"
 
 namespace DscDag
 {
@@ -10,6 +10,7 @@ namespace DscDag
 	class IDagNode
 	{
 	public:
+		IDagNode(DSC_DEBUG_ONLY(const std::string& in_debug_name));
 		virtual ~IDagNode();
 
 		//assert on value node
@@ -30,6 +31,9 @@ namespace DscDag
 		//not const as calculate may trigger state change
 		//assert on custom node
 		virtual const std::any& GetValue();
+
+	private:
+		DSC_DEBUG_ONLY(std::string _debug_name);
 
 	}; // IDagNode
 } //DscDag

@@ -32,6 +32,8 @@ namespace DscRender
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const override;
 		virtual const DscCommon::VectorInt2 GetSize() const override;
+		virtual const DscCommon::VectorInt2 GetViewportSize() const override;
+		virtual const DscCommon::VectorFloat4 GetClearColour() const override;
 
 	private:
 		int _buffer_index;

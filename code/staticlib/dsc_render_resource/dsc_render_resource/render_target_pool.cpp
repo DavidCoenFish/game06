@@ -13,6 +13,25 @@ namespace
 	{
 		return in_lhs ^ (in_rhs << 1);
 	}
+
+	const bool CheckCompatible(DscRenderResource::RenderTargetPool::RenderTargetPoolTexture &in_pool_texture, const DscCommon::VectorInt2& in_requested_size, const DscCommon::VectorFloat4& in_clear_colour)
+	{
+		if (in_clear_colour != in_pool_texture._render_target_texture->GetClearColour())
+		{
+			return false;
+		}
+
+		if (in_pool_texture._requested_size == in_requested_size)
+		{
+			return true;
+		}
+		if (in_requested_size <= in_pool_texture._render_target_texture->GetSize())
+		{
+			in_pool_texture._render_target_texture->SetSubSize(true, in_requested_size);
+			return true;
+		}
+		return false;
+	}
 }
 
 template<>
@@ -71,25 +90,42 @@ struct std::hash<DscRender::RenderTargetDepthData>
 	}
 };
 
-const bool DscRenderResource::RenderTargetPool::RenderTargetPoolTexture::AdjustForSize(const DscCommon::VectorInt2& in_requested_size)
-{
-	if (_requested_size == in_requested_size)
-	{
-		return true;
-	}
-	if (in_requested_size <= _render_target_texture->GetSize())
-	{
-		_render_target_texture->SetSubSize(true, in_requested_size);
-		return true;
-	}
-	return false;
-}
-
 
 DscRenderResource::RenderTargetPool::RenderTargetPool(const int32 in_pixel_alignment)
 	: _pixel_alignment(in_pixel_alignment)
 {
 	//nop
+}
+
+std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> DscRenderResource::RenderTargetPool::CheckOrMakeRenderTarget(
+	std::shared_ptr<RenderTargetPoolTexture>& in_pool_texture,
+	DscRender::DrawSystem* const in_draw_system,
+	const std::vector < DscRender::RenderTargetFormatData >& in_target_format_data_array,
+	const DscRender::RenderTargetDepthData& in_target_depth_data,
+	const DscCommon::VectorInt2& in_size
+)
+{
+	if (nullptr != in_pool_texture)
+	{
+		DscCommon::VectorFloat4 clear_colour;
+		if (0 < in_target_format_data_array.size())
+		{
+			clear_colour = in_target_format_data_array[0]._clear_color;
+		}
+		if (true == CheckCompatible(*in_pool_texture, in_size, clear_colour))
+		{
+			return in_pool_texture;
+		}
+
+		in_pool_texture = nullptr;
+	}
+
+	return MakeOrReuseRenderTarget(
+		in_draw_system,
+		in_target_format_data_array,
+		in_target_depth_data,
+		in_size
+	);
 }
 
 std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> DscRenderResource::RenderTargetPool::MakeOrReuseRenderTarget(

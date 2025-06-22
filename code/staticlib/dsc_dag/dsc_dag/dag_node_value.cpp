@@ -5,8 +5,9 @@ namespace
 {
 }
 
-DscDag::DagNodeValue::DagNodeValue(const std::any& in_value, const TValueChangeCondition in_change_condition)
- 	: _change_condition(in_change_condition)
+DscDag::DagNodeValue::DagNodeValue(const std::any& in_value, const TValueChangeCondition in_change_condition DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
+	: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
+	, _change_condition(in_change_condition)
 	, _value(in_value)
 {
 	// Nop

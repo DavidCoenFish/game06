@@ -1,5 +1,11 @@
 #include <dsc_dag/i_dag_node.h>
 
+DscDag::IDagNode::IDagNode(DSC_DEBUG_ONLY(const std::string& in_debug_name))
+DSC_DEBUG_ONLY(: _debug_name(in_debug_name))
+{
+	//nop
+}
+
 DscDag::IDagNode::~IDagNode() {}
 
 void DscDag::IDagNode::MarkDirty()

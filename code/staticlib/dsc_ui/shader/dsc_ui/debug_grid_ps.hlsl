@@ -5,7 +5,7 @@ struct Pixel
     float4 _colour : SV_TARGET0;
 };
 
-cbuffer ConstantBufferEffect : register(b0)
+cbuffer ConstantBuffer : register(b0)
 {
     float4 _width_height;
 };

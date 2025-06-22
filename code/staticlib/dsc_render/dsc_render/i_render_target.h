@@ -6,12 +6,15 @@ namespace DscCommon
 	template <typename TYPE>
 	class Vector2;
 	typedef Vector2<int32> VectorInt2;
+	template <typename TYPE>
+	class Vector4;
+	typedef Vector4<float> VectorFloat4;
 }
 
 namespace DscRender
 {
-	// #include "Common/DrawSystem/IResource.h"
-	class IRenderTarget // : public IResource
+	// not an IResource as had some fun with ownership/lifespan of the backbuffer
+	class IRenderTarget
 	{
 	public:
 		IRenderTarget();
@@ -28,5 +31,6 @@ namespace DscRender
 		) const = 0;
 		virtual const DscCommon::VectorInt2 GetSize() const = 0;
 		virtual const DscCommon::VectorInt2 GetViewportSize() const;
+		virtual const DscCommon::VectorFloat4 GetClearColour() const = 0;
 	};
 }//namespace DscRender

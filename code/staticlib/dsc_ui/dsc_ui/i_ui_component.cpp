@@ -7,9 +7,27 @@ DscUi::IUiComponent::~IUiComponent()
 	// nop
 }
 
+const bool DscUi::IUiComponent::HasCustomGeometry() const
+{
+	return false;
+}
+
+void DscUi::IUiComponent::DrawCustomGeometry(
+	DscRenderResource::Frame&,
+	const DscCommon::VectorInt2&
+)
+{
+	//nop
+}
+
 const DscCommon::VectorFloat4& DscUi::IUiComponent::GetClearColour() const
 {
 	return DscCommon::VectorFloat4::s_zero;
+}
+
+const bool DscUi::IUiComponent::SetClearColour(const DscCommon::VectorFloat4&)
+{
+	return false;
 }
 
 const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size)
@@ -22,7 +40,12 @@ const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildAvaliableSize(const Dsc
 	return in_our_desired_size;
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildOffset(const DscCommon::VectorInt2&, const int32) const
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildGeometrySize(const DscCommon::VectorInt2&, const DscCommon::VectorInt2& in_child_avaliable_size) const
+{
+	return in_child_avaliable_size;
+}
+
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildGeometryOffset(const DscCommon::VectorInt2&, const int32) const
 {
 	return DscCommon::VectorInt2::s_zero;
 }
@@ -47,7 +70,17 @@ void DscUi::IUiComponent::SetScrollTraveralPixelDistance(const DscCommon::Vector
 	// nop
 }
 
-void DscUi::IUiComponent::SetSrollNode(DscDag::NodeToken)
+void DscUi::IUiComponent::SetScrollNode(DscDag::NodeToken)
+{
+	//DSC_ASSERT_ALWAYS("unimplemented");
+}
+
+void DscUi::IUiComponent::SetChildGeometrySizeNode(DscDag::NodeToken, const int32)
+{
+	DSC_ASSERT_ALWAYS("unimplemented");
+}
+
+void DscUi::IUiComponent::SetChildGeometryOffsetNode(DscDag::NodeToken, const int32)
 {
 	DSC_ASSERT_ALWAYS("unimplemented");
 }

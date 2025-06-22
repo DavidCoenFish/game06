@@ -9,7 +9,7 @@ namespace DscDag
 	class DagNodeValue : public IDagNode
 	{
 	public:
-		DagNodeValue(const std::any& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange);
+		DagNodeValue(const std::any& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""));
 
 	private:
 		virtual void AddOutput(NodeToken in_nodeID) override;

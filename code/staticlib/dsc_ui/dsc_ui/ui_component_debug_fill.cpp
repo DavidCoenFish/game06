@@ -20,16 +20,20 @@ DscUi::UiComponentDebugFill::UiComponentDebugFill(
 	// nop
 }
 
-void DscUi::UiComponentDebugFill::Draw(
+const bool DscUi::UiComponentDebugFill::HasCustomGeometry() const
+{
+	return true;
+}
+
+void DscUi::UiComponentDebugFill::DrawCustomGeometry(
 	DscRenderResource::Frame& in_frame,
-	const DscCommon::VectorInt2& in_target_size//,
-	//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
-	)
+	const DscCommon::VectorInt2& in_target_size
+)
 {
 	DSC_ASSERT(nullptr != _shader, "invalid state");
 	DSC_ASSERT(nullptr != _shader_constant_buffer, "invalid state");
 	DSC_ASSERT(nullptr != _full_target_quad, "invalid state");
-
+	
 	{
 		DscUi::UiManager::TSizeShaderConstantBuffer& buffer = _shader_constant_buffer->GetConstant<DscUi::UiManager::TSizeShaderConstantBuffer>(0);
 		buffer._value[0] = static_cast<float>(in_target_size.GetX());

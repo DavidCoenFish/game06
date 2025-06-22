@@ -1,7 +1,8 @@
 #include "dag_node_calculate.h"
 
-DscDag::DagNodeCalculate::DagNodeCalculate(const TCalculateFunction& in_calculateFunction)
-	: _calculateFunction(in_calculateFunction)
+DscDag::DagNodeCalculate::DagNodeCalculate(const TCalculateFunction& in_calculateFunction DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
+	: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
+	, _calculateFunction(in_calculateFunction)
 {
 	// nop
 }

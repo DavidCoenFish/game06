@@ -51,6 +51,12 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 {
 	SetSubSize(in_use_sub_size, in_sub_size);
 
+	// if we are externally queried for what our clear colour was, return what was in the first item of the in_target_format_data_array
+	if (0 < in_target_format_data_array.size())
+	{
+		_clear_colour = in_target_format_data_array[0]._clear_color;
+	}
+
 	for (const auto& iter : in_target_format_data_array)
 	{
 		D3D12_CLEAR_VALUE clear_value = iter.MakeClearValue();
@@ -466,3 +472,7 @@ const DscCommon::VectorInt2 DscRenderResource::RenderTargetTexture::GetViewportS
 	return DscCommon::VectorInt2(_scissor_rect.right, _scissor_rect.bottom);
 }
 
+const DscCommon::VectorFloat4 DscRenderResource::RenderTargetTexture::GetClearColour() const
+{
+	return _clear_colour;
+}

@@ -1,5 +1,5 @@
 #pragma once
-#include <dsc_common\dsc_common.h>
+#include "dsc_dag.h"
 #include <dsc_dag\i_dag_node.h>
 
 namespace DscDag
@@ -13,7 +13,7 @@ namespace DscDag
 		DagNodeCalculate& operator=(const DagNodeCalculate&) = delete;
 		DagNodeCalculate(const DagNodeCalculate&) = delete;
 
-		DagNodeCalculate(const TCalculateFunction& in_calculateFunction);
+		DagNodeCalculate(const TCalculateFunction& in_calculateFunction DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
 
 	private:
 		virtual void MarkDirty() override;

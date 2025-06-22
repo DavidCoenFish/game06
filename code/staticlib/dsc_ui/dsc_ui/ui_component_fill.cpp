@@ -12,10 +12,14 @@ DscUi::UiComponentFill::UiComponentFill(
 	// nop
 }
 
-void DscUi::UiComponentFill::Draw(
-	DscRenderResource::Frame&, // in_frame,
-	const DscCommon::VectorInt2& // in_target_size//, 
-	//const std::vector<DscRender::IRenderTarget*>& in_child_render_target_array
+const bool DscUi::UiComponentFill::HasCustomGeometry() const
+{
+	return true;
+}
+
+void DscUi::UiComponentFill::DrawCustomGeometry(
+	DscRenderResource::Frame&,
+	const DscCommon::VectorInt2&
 )
 {
 	//nop
@@ -24,6 +28,17 @@ void DscUi::UiComponentFill::Draw(
 const DscCommon::VectorFloat4& DscUi::UiComponentFill::GetClearColour() const
 {
 	return _fill_colour;
+}
+
+const bool DscUi::UiComponentFill::SetClearColour(const DscCommon::VectorFloat4& in_colour)
+{
+	bool result = false;
+	if (in_colour != _fill_colour)
+	{
+		result = true;
+		_fill_colour = in_colour;
+	}
+	return result;
 }
 
 const int32 DscUi::UiComponentFill::GetParentChildIndex() const

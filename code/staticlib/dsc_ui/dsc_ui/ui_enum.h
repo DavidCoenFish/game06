@@ -13,7 +13,8 @@ namespace DscUi
 		TUiScale,
 		TForceDraw,
 		TClearOnDraw,
-		TUiComponent
+		TUiComponent,
+		TShaderConstantBuffer
 	};
 
 	enum class UiNodeInputIndex
@@ -25,7 +26,8 @@ namespace DscUi
 
 		TRenderTargetPoolTexture, // <= TDesiredSize <= TParentAvaliableSizeForThisChildNode
 
-		TGeometry
+		TShaderConstantBuffer
+		//TGeometry,
 
 		// reference
 		//TUiComponentParent, // 

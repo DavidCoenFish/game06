@@ -1,7 +1,8 @@
 #include "ui_dag_node_component.h"
 #include "i_ui_component.h"
 
-DscUi::UiDagNodeComponent::UiDagNodeComponent(std::unique_ptr<IUiComponent>&& in_component)
+DscUi::UiDagNodeComponent::UiDagNodeComponent(std::unique_ptr<IUiComponent>&& in_component DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
+	: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
 {
 	_ui_component = std::move(in_component);
 }
@@ -35,4 +36,12 @@ void DscUi::UiDagNodeComponent::RemoveOutput(DscDag::NodeToken in_nodeID)
 const bool DscUi::UiDagNodeComponent::GetHasNoLinks() const
 {
 	return (0 == _output.size());
+}
+
+void DscUi::UiDagNodeComponent::MarkDirty()
+{
+	for (auto& item : _output)
+	{
+		item->MarkDirty();
+	}
 }

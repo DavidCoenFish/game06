@@ -5,9 +5,5 @@ struct Interpolant
     float4 _position : SV_Position;
 
     // [0 ... 1]
-    float2 _uv_0 : TEXCOORD0;
-
-    // [0 ... 1]
-    float2 _uv_1 : TEXCOORD1;
-
+    float2 _uv : TEXCOORD0;
 };

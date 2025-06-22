@@ -9,11 +9,13 @@ namespace DscCommon
 	public:
 		static const Vector4 s_zero;
 
+		Vector4() {}
+
 		explicit Vector4(
-			const TYPE in_x = 0,
-			const TYPE in_y = 0,
-			const TYPE in_z = 0,
-			const TYPE in_w = 0
+			const TYPE in_x,
+			const TYPE in_y,
+			const TYPE in_z,
+			const TYPE in_w
 		) : _data{ in_x, in_y, in_z, in_w }
 		{
 			return;

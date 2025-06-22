@@ -44,6 +44,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto ui_commponent = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
         auto node_result = _resources->_ui_manager->MakeUiRootNode(
+            *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_commponent)
             );

@@ -175,7 +175,7 @@ UiComponent
 	void AddChildRef(UiComponent* in_ui_component)
 	void RemoveChild(UiComponent* in_ui_component)
 	SetScrollTraveralPixelDistance(VectorInt2)
-	SetSrollNode(DscDag::NodeToken)
+	SetScrollNode(DscDag::NodeToken)
 	SetChildGeometrySizeNode(DscDag::NodeToken, int32 child_index)
 	SetChildGeometryOffsetNode(DscDag::NodeToken, int32 child_index)
 
@@ -195,13 +195,15 @@ UiNode
 	[] calculate [render command list] // draw ourself to the parent render target
 		[Parent.AvaliableSize, Parent.UiComponent, index] -> [AvaliableSize]
 		[AvaliableSize, UiComponent] calculate [DesiredSize]
-		[DesiredSize, RenderTargetPool] calculate [RenderTargetPoolTexture]
-		[RenderTargetPoolTexture] calculate [IRenderTarget]
 
 		[Parent.AvaliableSize, Parent.UiComponent, index] calculate [GeometryOffset]
 		[Parent.AvaliableSize, Parent.UiComponent, index] calculate [GeometrySize]
-		[Parent.DesiredSize, DesiredSize, GeometryOffset, GeometrySize] calculate [Geometry] // the geometry to draw ourself to the parent
-		[UiScroll] calculate [ShaderConstantBuffer]
+		[GeometrySize, DesiredSize] Calculate [RenderSize]
+
+		[RenderSize, RenderTargetPool] calculate [RenderTargetPoolTexture]
+		[RenderTargetPoolTexture] calculate [IRenderTarget]
+
+		[UiScroll, Parent.RenderSize, RenderSize, GeometryOffset, GeometrySize] calculate [ShaderConstantBuffer]
 
 
 who determins the geometry size, is that a function of the child or the parent, thinking the parent? or it it a know math function (choose min(avaliable size, desired size))?

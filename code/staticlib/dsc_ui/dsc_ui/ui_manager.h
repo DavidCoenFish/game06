@@ -51,10 +51,12 @@ namespace DscUi
 		{
 			float _value[4]; // _width_height
 		};
-		//struct TUiPanelShaderConstantBuffer
-		//{
-		//	float _value[4]; // _scroll_x_y;
-		//};
+		struct TUiPanelShaderConstantBuffer
+		{
+			float _pos_size[4]; // _pos_x_y_size_width_height;
+			float _uv_size[4]; // _ui_x_y_size_width_height;
+			//float _tint_colour[4];
+		};
 
 		UiManager() = delete;
 		UiManager& operator=(const UiManager&) = delete;
@@ -72,10 +74,12 @@ namespace DscUi
 		{
 			DscDag::NodeToken _ui_node = {};
 			DscDag::NodeToken _ui_component_node = {};
-			DscDag::NodeToken _desired_size_node = {};
+			DscDag::NodeToken _avaliable_size_node = {};
+			DscDag::NodeToken _render_size_node = {};
 		};
 
 		ResultNodeData MakeUiRootNode(
+			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component
 			);
@@ -85,10 +89,11 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component,
 
-			DscDag::NodeToken in_parent_ui_component_node,
-			DscDag::NodeToken in_parent_desired_size_node, // parent desired size not in directly in the parent UiComponent, and not of a know offset in the node [root?node?]
-			DscDag::NodeToken in_ui_root_node
-			);
+			DscDag::NodeToken in_parent_ui_component,
+			DscDag::NodeToken in_parent_avaliable_size,
+			DscDag::NodeToken in_parent_render_size, // parent desired size not in directly in the parent UiComponent, and not of a know offset in the node [root?node?]
+			DscDag::NodeToken in_root_node
+		);
 
 		ResultNodeData MakeUiNodeCanvasChild(
 			DscRender::DrawSystem& in_draw_system,
@@ -128,10 +133,11 @@ namespace DscUi
 		std::unique_ptr < DscDagRender::DagResource> _dag_resource = {};
 		
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
-		//std::shared_ptr<DscRenderResource::Shader> _screen_quad_texture_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
+		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
+
 		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
 
 		DscDag::NodeToken _dag_node_ui_scale = {};
