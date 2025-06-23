@@ -129,11 +129,30 @@ const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildAvaliableSize(cons
 
 const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildGeometrySize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const
 {
-
+	// for canvas, the child gets the suggested avalaible size
+	(void*)&in_child_desired_size;
+	return in_child_avaliable_size;
 }
 
 const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildGeometryOffset(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index) const
 {
+	DscCommon::VectorInt2 result(in_parent_avaliable_size);
+	if ((0 <= in_child_index) && (in_child_index < static_cast<int32>(_child_slot_array.size())))
+	{
+		const DscCommon::VectorInt2 avaliable_size = _child_slot_array[in_child_index]._child_size.EvalueUICoord(in_parent_avaliable_size);
+		const DscCommon::VectorInt2 pivot_point = _child_slot_array[in_child_index]._child_pivot.EvalueUICoord(avaliable_size);
+		const DscCommon::VectorInt2 attach_point = _child_slot_array[in_child_index]._attach_point.EvalueUICoord(in_parent_avaliable_size);
+
+		result.Set(
+			attach_point.GetX() - pivot_point.GetX(),
+			attach_point.GetY() - pivot_point.GetY()
+			);
+	}
+	else
+	{
+		DSC_ASSERT_ALWAYS("invalid param");
+	}
+	return result;
 
 }
 

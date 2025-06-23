@@ -25,7 +25,18 @@ namespace
 		{
 			return true;
 		}
-		if (in_requested_size <= in_pool_texture._render_target_texture->GetSize())
+		const DscCommon::VectorInt2 render_target_texture_size = in_pool_texture._render_target_texture->GetSize();
+		// if we have shunk to under half the size of the texture, stop using it
+		if ((128 <= render_target_texture_size.GetX()) && (128 <= render_target_texture_size.GetY()))
+		{
+			if ((in_requested_size.GetX() < (render_target_texture_size.GetX() / 2)) ||
+				(in_requested_size.GetY() < (render_target_texture_size.GetY() / 2)))
+			{
+				return false;
+			}
+		}
+
+		if (in_requested_size <= render_target_texture_size)
 		{
 			in_pool_texture._render_target_texture->SetSubSize(true, in_requested_size);
 			return true;
@@ -136,7 +147,7 @@ std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> Ds
 )
 {
 	const DscCommon::VectorInt2 ceiling_size(DscCommon::Math::Ceiling(in_size.GetX(), _pixel_alignment), DscCommon::Math::Ceiling(in_size.GetY(), _pixel_alignment));
-	const uint32 size_hash = ((ceiling_size.GetX() & 0xffff) << 16) || (in_size.GetY() & 0xffff);
+	const uint32 size_hash = ((ceiling_size.GetX() & 0xffff) << 16) | (in_size.GetY() & 0xffff);
 	const std::size_t param_hash = MakeHash(in_target_format_data_array, in_target_depth_data);
 
 	TMapSizeRenderTargetTexture* pMap = FindCreateMapSizeRenderTargetTexture(param_hash);
