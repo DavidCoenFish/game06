@@ -14,9 +14,11 @@ namespace DscUi
 	class VectorUiCoord2
 	{
 	public:
+		VectorUiCoord2() {};
+
 		explicit VectorUiCoord2(
-			const UiCoord& in_x = UiCoord(0, 0.0f),
-			const UiCoord& in_y = UiCoord(0, 0.0f)
+			const UiCoord& in_x,
+			const UiCoord& in_y
 			);
 
 		const DscCommon::VectorInt2 EvalueUICoord(const DscCommon::VectorInt2& in_parent_size) const;
@@ -42,7 +44,7 @@ namespace DscUi
 		};
 
 	private:
-		UiCoord _data[Index::Count];
+		UiCoord _data[Index::Count] = {};
 	};
 
 

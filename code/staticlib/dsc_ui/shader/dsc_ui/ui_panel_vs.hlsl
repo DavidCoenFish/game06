@@ -2,9 +2,7 @@
 
 struct Vertex
 {
-    // [-1 ... 1]
     float2 _position : POSITION;
-    // [0 ... 1]
     float2 _uv : TEXCOORD0;
 };
 

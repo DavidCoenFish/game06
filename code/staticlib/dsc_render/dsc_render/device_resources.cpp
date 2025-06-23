@@ -242,7 +242,7 @@ DscRender::DeviceResources::DeviceResources(
 		sizeof (shader_model)
 		)) || (shader_model.HighestShaderModel < D3D_SHADER_MODEL_6_5))
 	{
-		DSC_LOG_WARNING(LOG_TOPIC_DSC_RENDER, "Shader Model 6.5 is not supported");
+		DSC_LOG_INFO(LOG_TOPIC_DSC_RENDER, "Shader Model 6.5 is not supported\n");
 	}
 	D3D12_FEATURE_DATA_D3D12_OPTIONS7 feature_options7 = {};
 	if (FAILED(_device->CheckFeatureSupport(
@@ -251,7 +251,7 @@ DscRender::DeviceResources::DeviceResources(
 		sizeof (feature_options7)
 		)) || (feature_options7.MeshShaderTier == D3D12_MESH_SHADER_TIER_NOT_SUPPORTED))
 	{
-		DSC_LOG_WARNING(LOG_TOPIC_DSC_RENDER, "Mesh Shaders aren't supported");
+		DSC_LOG_INFO(LOG_TOPIC_DSC_RENDER, "Mesh Shaders aren't supported\n");
 	}
 }
 

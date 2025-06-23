@@ -12,10 +12,11 @@ namespace DscUi
 			TMin, //((std::min(in_parent_primary, in_parent_secondary)* _ratio) + _pixels)
 			TMax, //((std::max(in_parent_primary, in_parent_secondary)* _ratio) + _pixels)
 		};
+		UiCoord() {}
 
 		explicit UiCoord(
-			const int32 in_pixels = 0,
-			const float in_ratio = 0.0f,
+			const int32 in_pixels,
+			const float in_ratio,
 			const TMethod in_method = TMethod::TPrimaryPoroportinal
 		);
 

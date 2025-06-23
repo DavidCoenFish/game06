@@ -82,6 +82,25 @@ const std::any& DscDag::DagNodeCalculate::GetValue()
 	if (true == _dirty)
 	{
 		_dirty = false;
+
+		// so, currently we could have input that is not used in the calculate, and would keep it's dirty flag. 
+		// if it was dirtied again, the mark dirty would be skipped as it is already dirty
+		// so, on each call to calculate, explicity GetValue on all inputs to flush the dirty state
+		for (auto& item : _input)
+		{
+			if (nullptr != item)
+			{
+				item->GetValue();
+			}
+		}
+		for (auto& item : _indexInput)
+		{
+			if (nullptr != item)
+			{
+				item->GetValue();
+			}
+		}
+
 		_calculateFunction(_value, _input, _indexInput);
 	}
 	return _value;

@@ -45,3 +45,9 @@ void DscUi::UiDagNodeComponent::MarkDirty()
 		item->MarkDirty();
 	}
 }
+
+const std::any& DscUi::UiDagNodeComponent::GetValue()
+{
+	static const std::any kDummy = {};
+	return kDummy;
+}

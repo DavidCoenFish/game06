@@ -29,8 +29,8 @@ namespace DscDag
 		virtual void SetValue(const std::any& in_value);
 
 		//not const as calculate may trigger state change
-		//assert on custom node
-		virtual const std::any& GetValue();
+		// even on custom nodes this needs to be implemented, as now Calculate trigger GetValue on input to purge the input dirty flag
+		virtual const std::any& GetValue() = 0;
 
 	private:
 		DSC_DEBUG_ONLY(std::string _debug_name);

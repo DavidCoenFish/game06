@@ -49,11 +49,11 @@ void DscDag::IDagNode::SetValue(const std::any&)
 	DSC_ASSERT_ALWAYS("invalid code path");
 }
 
-const std::any& DscDag::IDagNode::GetValue()
-{
-	DSC_ASSERT_ALWAYS("invalid code path");
-	static const std::any kDummy = {};
-	return kDummy;
-}
+//const std::any& DscDag::IDagNode::GetValue()
+//{
+//	DSC_ASSERT_ALWAYS("invalid code path");
+//	static const std::any kDummy = {};
+//	return kDummy;
+//}
 
 

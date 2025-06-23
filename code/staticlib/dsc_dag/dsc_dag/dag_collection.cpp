@@ -11,17 +11,17 @@ bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<D
 	return a.get() < b.get();
 }
 
-DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition)
+DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
 {
-	auto node = std::make_unique<DagNodeValue>(in_value, in_change_condition);
+	auto node = std::make_unique<DagNodeValue>(in_value, in_change_condition DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 	NodeToken nodeToken = node.get();
 	_nodes.insert(std::move(node));
 	return nodeToken;
 }
 
-DscDag::NodeToken DscDag::DagCollection::CreateCalculate(const TCalculateFunction& in_calculate)
+DscDag::NodeToken DscDag::DagCollection::CreateCalculate(const TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
 {
-	auto node = std::make_unique<DagNodeCalculate>(in_calculate);
+	auto node = std::make_unique<DagNodeCalculate>(in_calculate DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 	NodeToken nodeToken = node.get();
 	_nodes.insert(std::move(node));
 	return nodeToken;

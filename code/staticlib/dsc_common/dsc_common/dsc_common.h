@@ -14,6 +14,24 @@ typedef unsigned __int64 uint64;
 
 #define LOG_TOPIC_DSC_COMMON "DSC_COMMON"
 
+//FastBuild nmake workaround
+// allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
+// added DSC_BFF_BUILD to fastbuild defines
+#ifndef DSC_BFF_BUILD
+#ifndef _UNICODE
+#define _UNICODE
+#endif
+#ifndef UNICODE
+#define UNICODE
+#endif
+
+//#ifdef _DEBUG
+#define _DEBUG
+#define DSC_LOG
+//#endif
+
+#endif //#ifndef DSC_BFF_BUILD
+
 // Windows
 #include <winsdkver.h>
 #define _WIN32_WINNT 0x0A00
@@ -73,19 +91,18 @@ typedef unsigned __int64 uint64;
 //#include <pix.h>
 #pragma warning(pop)
 
-
 //Macro
 #define TOKEN_PAIR(TOKEN) TOKEN,#TOKEN
 #define ENUM_TOKEN_PAIR(ENUM, TOKEN) ENUM::TOKEN,#TOKEN
 #define DSC_CONDITION_THROW(CONDITION, MESSAGE) if (CONDITION) { throw std::exception(MESSAGE); }
 #if defined(_DEBUG)
-   #define DSC_ASSERT(CONDITION, MESSAGE) assert(MESSAGE && (CONDITION))
-   #define DSC_ASSERT_ALWAYS(MESSAGE) assert(MESSAGE && false)
-   #define DSC_DEBUG_ONLY(PAYLOAD) PAYLOAD
+#define DSC_ASSERT(CONDITION, MESSAGE) if (false == (CONDITION)){ __debugbreak(); } assert(MESSAGE && (CONDITION))
+#define DSC_ASSERT_ALWAYS(MESSAGE) __debugbreak(); assert(MESSAGE && false)
+#define DSC_DEBUG_ONLY(PAYLOAD) PAYLOAD
 #else
-   #define DSC_ASSERT(CONDITION, MESSAGE) __noop
-   #define DSC_ASSERT_ALWAYS(MESSAGE) __noop
-   #define DSC_DEBUG_ONLY(PAYLOAD)
+#define DSC_ASSERT(CONDITION, MESSAGE) __noop
+#define DSC_ASSERT_ALWAYS(MESSAGE) __noop
+#define DSC_DEBUG_ONLY(PAYLOAD)
 #endif
 #define DSC_TODO(MESSAGE, ...) DSC_ASSERT_ALWAYS(MESSAGE)
 
@@ -96,17 +113,6 @@ typedef unsigned __int64 uint64;
 // allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
 // added DSC_BFF_BUILD to fastbuild defines
 #ifndef DSC_BFF_BUILD
-#ifndef _UNICODE
-#define _UNICODE
-#endif
-#ifndef UNICODE
-#define UNICODE
-#endif
-
-//#ifdef _DEBUG
-#define _DEBUG
-#define DSC_LOG
-//#endif
 
 #include "data_helper.h"
 #include "enum_soft_bind.h"

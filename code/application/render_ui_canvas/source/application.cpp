@@ -13,8 +13,10 @@
 #include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
-#include <dsc_ui/ui_manager.h>
 #include <dsc_ui/i_ui_component.h>
+#include <dsc_ui/ui_manager.h>
+#include <dsc_ui/ui_coord.h>
+#include <dsc_ui/vector_ui_coord2.h>
 
 namespace
 {
@@ -41,13 +43,43 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     }
 
     {
-        auto ui_commponent = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
-        auto node_result = _resources->_ui_manager->MakeUiRootNode(
+        auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas(*_draw_system, DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f));
+        auto root_node_result = _resources->_ui_manager->MakeUiRootNode(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_commponent)
+            std::move(ui_canvas_commponent)
             );
-        _resources->_ui_root_node = node_result._ui_node;
+        _resources->_ui_root_node = root_node_result._ui_node;
+
+        auto ui_component_debug_fill = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
+        auto node_1_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_debug_fill),
+            root_node_result._ui_component_node,
+            root_node_result._avaliable_size_node,
+            root_node_result._render_size_node,
+            root_node_result._ui_node,
+
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(),
+            DscUi::VectorUiCoord2()
+        );
+
+        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill(*_draw_system, DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f), 1);
+        auto node_2_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_fill),
+            root_node_result._ui_component_node,
+            root_node_result._avaliable_size_node,
+            root_node_result._render_size_node,
+            root_node_result._ui_node,
+
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            );
     }
 
     return;
@@ -88,6 +120,8 @@ const bool Application::Update()
         {
             _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
+
+        frame.reset();
     }
     
     return true;

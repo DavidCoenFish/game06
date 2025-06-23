@@ -12,8 +12,8 @@ namespace DscDag
 	class DagCollection
 	{
 	public:
-		NodeToken CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange);
-		NodeToken CreateCalculate(const TCalculateFunction& in_calculate);
+		NodeToken CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange  DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""));
+		NodeToken CreateCalculate(const TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
 		// was trying to shoe horn generic values into a std::any for CreateValue, but std::any can not hold a std::unique_ptr
 		NodeToken AddCustomNode(std::unique_ptr<IDagNode>&& in_node);
 		// should already have all links removed? assert if links still exisit?

@@ -1,9 +1,9 @@
 #include "main.h"
-#include "application.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/log_system.h>
 #include <dsc_windows/window_helper.h>
 #include <dsc_version/dsc_version.h>
+#include "application.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
     _In_opt_ HINSTANCE,// in_hPrevInstance,
@@ -22,7 +22,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
         600,
         false,
         in_hInstance,
-        "RenderUi",
+        "RenderUiDebugFill",
         in_nCmdShow
     );
 

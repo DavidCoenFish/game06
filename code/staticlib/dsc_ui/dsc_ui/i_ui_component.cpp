@@ -7,14 +7,9 @@ DscUi::IUiComponent::~IUiComponent()
 	// nop
 }
 
-const bool DscUi::IUiComponent::HasCustomGeometry() const
-{
-	return false;
-}
-
-void DscUi::IUiComponent::DrawCustomGeometry(
+void DscUi::IUiComponent::Draw(
 	DscRenderResource::Frame&,
-	const DscCommon::VectorInt2&
+	DscRender::IRenderTarget&
 )
 {
 	//nop
@@ -55,33 +50,48 @@ void DscUi::IUiComponent::Update(const float)
 	//nop
 }
 
-void DscUi::IUiComponent::AddChildRef(IUiComponent*)
+//void DscUi::IUiComponent::AddChildRef(IUiComponent*)
+//{
+//	DSC_ASSERT_ALWAYS("unimplemented");
+//}
+//
+//void DscUi::IUiComponent::RemoveChild(IUiComponent*)
+//{
+//	DSC_ASSERT_ALWAYS("unimplemented");
+//}
+
+//void DscUi::IUiComponent::SetScrollTraveralPixelDistance(const DscCommon::VectorInt2&)
+//{
+//	// nop
+//}
+//
+//void DscUi::IUiComponent::SetScrollNode(DscDag::NodeToken)
+//{
+//	//DSC_ASSERT_ALWAYS("unimplemented");
+//}
+//
+//void DscUi::IUiComponent::SetChildGeometrySizeNode(DscDag::NodeToken, const int32)
+//{
+//	DSC_ASSERT_ALWAYS("unimplemented");
+//}
+//
+//void DscUi::IUiComponent::SetChildGeometryOffsetNode(DscDag::NodeToken, const int32)
+//{
+//	DSC_ASSERT_ALWAYS("unimplemented");
+//}
+
+void DscUi::IUiComponent::SetNode(DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken)
 {
 	DSC_ASSERT_ALWAYS("unimplemented");
 }
 
-void DscUi::IUiComponent::RemoveChild(IUiComponent*)
+void DscUi::IUiComponent::BuildUiPanelShaderConstant(TUiPanelShaderConstantBuffer&)
 {
 	DSC_ASSERT_ALWAYS("unimplemented");
 }
 
-void DscUi::IUiComponent::SetScrollTraveralPixelDistance(const DscCommon::VectorInt2&)
-{
-	// nop
-}
-
-void DscUi::IUiComponent::SetScrollNode(DscDag::NodeToken)
-{
-	//DSC_ASSERT_ALWAYS("unimplemented");
-}
-
-void DscUi::IUiComponent::SetChildGeometrySizeNode(DscDag::NodeToken, const int32)
+std::shared_ptr<DscRender::HeapWrapperItem> DscUi::IUiComponent::GetRenderTexture()
 {
 	DSC_ASSERT_ALWAYS("unimplemented");
+	return nullptr;
 }
-
-void DscUi::IUiComponent::SetChildGeometryOffsetNode(DscDag::NodeToken, const int32)
-{
-	DSC_ASSERT_ALWAYS("unimplemented");
-}
-

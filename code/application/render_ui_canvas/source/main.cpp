@@ -22,7 +22,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
         600,
         false,
         in_hInstance,
-        "RenderUi",
+        "RenderUiCanvas",
         in_nCmdShow
     );
 

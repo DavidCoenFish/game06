@@ -49,6 +49,8 @@ DscRenderResource::RenderTargetTexture::RenderTargetTexture(
 	, _target_format_array()
 	, _id(s_id++)
 {
+	DSC_ASSERT((0 < in_size.GetX()) && (0 < in_size.GetY()), "invalid param");
+
 	SetSubSize(in_use_sub_size, in_sub_size);
 
 	// if we are externally queried for what our clear colour was, return what was in the first item of the in_target_format_data_array

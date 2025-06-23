@@ -22,3 +22,38 @@
 #endif //#ifndef DSC_BFF_BUILD
 
 #include <dsc_common/dsc_common.h>
+
+namespace DscCommon
+{
+	template <typename TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
+	typedef Vector2<float> VectorFloat2;
+	template <typename TYPE>
+	class Vector4;
+	typedef Vector4<float> VectorFloat4;
+}
+
+namespace DscUi
+{
+	struct TSizeShaderConstantBuffer
+	{
+		float _value[4]; // _width_height
+	};
+
+	struct TUiPanelShaderConstantBuffer
+	{
+		float _pos_size[4]; // _pos_x_y_size_width_height;
+		float _uv_size[4]; // _ui_x_y_size_width_height;
+		//float _tint_colour[4];
+
+		//void Calculate(
+		//	const DscCommon::VectorInt2& in_parent_render_size,
+		//	const DscCommon::VectorInt2& in_geometry_offset,
+		//	const DscCommon::VectorInt2& in_geometry_size,
+		//	const DscCommon::VectorInt2& in_render_size,
+		//	const DscCommon::VectorFloat2& in_scroll_value
+		//);
+	};
+}
+

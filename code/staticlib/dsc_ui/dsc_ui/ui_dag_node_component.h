@@ -39,6 +39,7 @@ namespace DscUi
 		virtual void RemoveOutput(DscDag::NodeToken in_nodeID) override;
 		virtual const bool GetHasNoLinks() const override;
 		virtual void MarkDirty() override;
+		virtual const std::any& GetValue() override;
 
 	private:
 		std::set<DscDag::NodeToken> _output = {};

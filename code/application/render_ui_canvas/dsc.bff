@@ -66,8 +66,8 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_ui" .WindowExeParam)
+DscVsprojectWindowExe("render_ui_canvas" .WindowExeParam)
 
-.SolutionProjects + "render_ui_project"
-.SolutionItemsApplicationProject + "render_ui_project"
-//.SolutionBuildProject = "render_ui_project"
+.SolutionProjects + "render_ui_canvas_project"
+.SolutionItemsApplicationProject + "render_ui_canvas_project"
+.SolutionBuildProject = "render_ui_canvas_project"

@@ -6,41 +6,24 @@ namespace DscUi
 	enum class UiRootNodeInputIndex
 	{
 		TFrame = 0,
-		TRenderTarget,
-		TAvaliableSize,
-		TDesiredSize,
 		TDeviceRestore, // the d3dx12 device was reset and then restored, all gpu data was potentially invalidated
+		TRenderTarget,
+		TAvaliableSize, // can not be calculate from the render target as render target is st to never dirty, and we WANT to detect size changes
 		TUiScale,
-		TForceDraw,
-		TClearOnDraw,
 		TUiComponent,
-		TShaderConstantBuffer
+		TShaderConstant, // not used directly, but hooked into render to redraw on value change
+		TForceDraw,
+		TAllowClearOnDraw, // if we share the render target with another system drawing to it? then we don't clear the render target when we set it active
+
 	};
 
 	enum class UiNodeInputIndex
 	{
 		TFrame = 0,
 		TDeviceRestore,
+		TRenderTargetPoolTexture,
 		TUiScale,
 		TUiComponent,
-
-		TRenderTargetPoolTexture, // <= TDesiredSize <= TParentAvaliableSizeForThisChildNode
-
-		TShaderConstantBuffer
-		//TGeometry,
-
-		// reference
-		//TUiComponentParent, // 
-		//TChildIndex, // what index this child is of the parent
-
-		//TParentAvaliableSizeForThisChildNode, // how to reach this node, keep a reference in the UiNode?
-		//TDesiredSize,
+		TShaderConstant, // not used directly, but hooked into render to redraw on value change
 	};
-
-	/*
-	UiComponent
-		SetDesiredSize(vector2int)
-		GetAvaliableSizeForChild(index) // expect desired size to already be set
-	
-	*/
 }
