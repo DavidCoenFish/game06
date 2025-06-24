@@ -213,3 +213,53 @@ a stack desired size is the total of all the child geometry size plus the stack 
 this means that the stack ui components needs access to all the child node calculate geometry size
 and a stack ui component needs the previous child geometry offset anad geometry size to specify the next one
 
+
+
+//===============================================================
+//  UI version 2 (conditional dag)
+//===============================================================
+
+example: canvas, 2 children
+
+externally provided render target (R0)
+root ui node 0 (N0)
+	component (C0), canvas
+	avaliable size from render target (R0) viewport
+
+ui node 1 child (N1)
+	component (C1), debug fill?
+	render target of desired size (R1)
+	calculate node that draws to (R2) 
+
+ui node 2 child (N2)
+	component (C2), fill?
+	render target of desired size (R2)
+	calculate node that draws to (R2) 
+
+UiManager::Draw
+	set nodes, time delta node, avaliable size node, render frame node
+	invokes get value on (N0)
+		invokes get value on (N1)
+			draw (C1)
+				set render target (R1)
+				debug fill
+		invokes get value on (N2)
+			draw (C2)
+				set render target (R2)
+				fill
+		draw (C0)
+			set render target (R0)
+			use ui panel to draw texture R1 to R0
+			use ui panel to draw texture R2 to R0
+
+
+UiComponent::HasManualScroll() => bool
+UiComponent::GetManualScrollValue() => VectorFloat2
+UiComponent::SetManualScrollValue(VectorFloat2)
+UiComponent::SetManualScrollValueNode(NodeToken) // when input changes the manual scroll, we want it set into the node chains, else do we introduce the named nodes in a collection/ group?
+UiComponent::GetParentChildIndex() => int32 (what is our child index in our parent)
+UiComponent::GetChildAvaliableSize(int32 child_index, VectorInt2 our_avaliable_size) => VectorInt2 //, VectorInt2 our_avaliable_size) // pass in or not pass in? trying to move towards ui component writing to value nodes, but what abour reading from them?
+//UiComponent::SetAvaliableSizeNode(NodeToken) // root node, the external render taget viewport, non root node, the value fetched from the parent UiComponent::GetChildAvaliableSize
+UiComponent::GetChildGeometrySize(child index, child desired, child avaliable)
+UiComponent::GetChildGeometryOffset(child index)
+rule: we only need need to set a node into the UiComponent if the ui component is going to write a value into it, what about clear colour, if allowed to change at run time?

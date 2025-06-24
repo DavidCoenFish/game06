@@ -134,13 +134,13 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
 Application::~Application()
 {
-    _texture.reset();
-    _geometry_generic.reset();
-    _shader.reset();
     if (_draw_system)
     {
         _draw_system->WaitForGpu();
     }
+    _texture.reset();
+    _geometry_generic.reset();
+    _shader.reset();
     _draw_system.reset();
     _file_system.reset();
 }

@@ -30,6 +30,7 @@ namespace DscDag
 
 		//not const as calculate may trigger state change
 		// even on custom nodes this needs to be implemented, as now Calculate trigger GetValue on input to purge the input dirty flag
+		// this is starting to be used to trigger calculation/ evaluate condition, the returned std::any may actually just be empty for those cases
 		virtual const std::any& GetValue() = 0;
 
 	private:

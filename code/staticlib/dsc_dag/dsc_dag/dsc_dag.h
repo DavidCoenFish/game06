@@ -12,6 +12,7 @@
 #include "dag_collection.h"
 #include "dag_enum.h"
 #include "dag_node_calculate.h"
+#include "dag_node_condition.h"
 #include "dag_node_value.h"
 #include "i_dag_node.h"
 
