@@ -15,7 +15,7 @@ namespace DscDag
 	class DagGroup
 	{
 	public:
-		DagGroup(DagCollection* const in_dag_collection) : _dag_collection(in_dag_collection) {}
+		DagGroup(DagCollection* const in_dag_collection = nullptr) : _dag_collection(in_dag_collection) {}
 		DagGroup(DagCollection* const in_dag_collection, NodeToken const (&in_node_token_array)[SIZE])
 			: _dag_collection(in_dag_collection)
 		{
