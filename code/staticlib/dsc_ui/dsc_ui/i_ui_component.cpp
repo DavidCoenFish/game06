@@ -9,20 +9,11 @@ DscUi::IUiComponent::~IUiComponent()
 
 void DscUi::IUiComponent::Draw(
 	DscRenderResource::Frame&,
-	DscRender::IRenderTarget&
+	DscRender::IRenderTarget&,
+	const float
 )
 {
 	//nop
-}
-
-const DscCommon::VectorFloat4& DscUi::IUiComponent::GetClearColour() const
-{
-	return DscCommon::VectorFloat4::s_zero;
-}
-
-const bool DscUi::IUiComponent::SetClearColour(const DscCommon::VectorFloat4&)
-{
-	return false;
 }
 
 const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size)
@@ -45,53 +36,33 @@ const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildGeometryOffset(const Ds
 	return DscCommon::VectorInt2::s_zero;
 }
 
-void DscUi::IUiComponent::Update(const float)
+void DscUi::IUiComponent::SetClearColour(const DscCommon::VectorFloat4&)
 {
 	//nop
 }
 
-//void DscUi::IUiComponent::AddChildRef(IUiComponent*)
-//{
-//	DSC_ASSERT_ALWAYS("unimplemented");
-//}
-//
-//void DscUi::IUiComponent::RemoveChild(IUiComponent*)
-//{
-//	DSC_ASSERT_ALWAYS("unimplemented");
-//}
+const bool DscUi::IUiComponent::HasManualScrollX() const
+{
+	return false;
+}
 
-//void DscUi::IUiComponent::SetScrollTraveralPixelDistance(const DscCommon::VectorInt2&)
-//{
-//	// nop
-//}
-//
-//void DscUi::IUiComponent::SetScrollNode(DscDag::NodeToken)
-//{
-//	//DSC_ASSERT_ALWAYS("unimplemented");
-//}
-//
-//void DscUi::IUiComponent::SetChildGeometrySizeNode(DscDag::NodeToken, const int32)
-//{
-//	DSC_ASSERT_ALWAYS("unimplemented");
-//}
-//
-//void DscUi::IUiComponent::SetChildGeometryOffsetNode(DscDag::NodeToken, const int32)
-//{
-//	DSC_ASSERT_ALWAYS("unimplemented");
-//}
+const bool DscUi::IUiComponent::HasManualScrollY() const
+{
+	return false;
+}
 
-void DscUi::IUiComponent::SetNode(DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken)
+void DscUi::IUiComponent::SetManualScrollX(const float)
+{
+	//nop
+}
+
+void DscUi::IUiComponent::SetManualScrollY(const float)
+{
+	//nop
+}
+
+void DscUi::IUiComponent::SetNode(DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken)
 {
 	DSC_ASSERT_ALWAYS("unimplemented");
 }
 
-void DscUi::IUiComponent::BuildUiPanelShaderConstant(TUiPanelShaderConstantBuffer&)
-{
-	DSC_ASSERT_ALWAYS("unimplemented");
-}
-
-std::shared_ptr<DscRender::HeapWrapperItem> DscUi::IUiComponent::GetRenderTexture()
-{
-	DSC_ASSERT_ALWAYS("unimplemented");
-	return nullptr;
-}

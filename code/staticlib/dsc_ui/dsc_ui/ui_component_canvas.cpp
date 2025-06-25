@@ -9,40 +9,37 @@
 #include <dsc_render_resource\shader_constant_buffer.h>
 
 DscUi::UiComponentCanvas::UiComponentCanvas(
-	const int32 in_parent_child_index,
 	const std::shared_ptr<DscRenderResource::Shader>& in_ui_panel_shader,
-	const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_ui_panel_geometry,
-	const DscCommon::VectorFloat4& in_clear_colour
+	const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_ui_panel_geometry
 	)
-	: _parent_child_index(in_parent_child_index)
-	, _clear_colour(in_clear_colour)
-	, _ui_panel_shader(in_ui_panel_shader)
+	: _ui_panel_shader(in_ui_panel_shader)
 	, _ui_panel_geometry(in_ui_panel_geometry)
 {
 	// nop
 }
 
 void DscUi::UiComponentCanvas::AddChild(
+	IUiComponent* const in_child_component, // we don't keep a reference, we just set the parent child index
 	DscRender::DrawSystem& in_draw_system,
 	const VectorUiCoord2& in_child_size,
 	const VectorUiCoord2& in_child_pivot,
 	const VectorUiCoord2& in_attach_point,
-	IUiComponent* const in_ui_component
+	DscDag::NodeToken in_render_node,
+	DscDag::NodeToken in_ui_panel_shader_constant_node
 	)
 {
-	const int32 index = in_ui_component->GetParentChildIndex();
-	if (_child_slot_array.size() <= static_cast<size_t>(index))
-	{
-		_child_slot_array.resize(index + 1);
-	}
 	auto shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
-	_child_slot_array[index] = ChildSlot({
-		in_child_size, 
-		in_child_pivot, 
-		in_attach_point, 
-		in_ui_component,
+	const int32 index = static_cast<int32>(_child_slot_array.size());
+	in_child_component->SetParentChildIndex(index);
+	_child_slot_array.push_back(ChildSlot({
+		in_child_size,
+		in_child_pivot,
+		in_attach_point,
+		in_render_node,
+		in_ui_panel_shader_constant_node,
 		shader_constant_buffer
-		});
+		}));
+	return;
 }
 
 /*
@@ -79,23 +76,20 @@ UiManager::Draw
 
 void DscUi::UiComponentCanvas::Draw(
 	DscRenderResource::Frame& in_frame,
-	DscRender::IRenderTarget& in_render_target
+	DscRender::IRenderTarget& in_render_target,
+	const float
 	)
 {
 	const DscCommon::VectorInt2 viewport_size = in_render_target.GetViewportSize();
 
-	for (const auto& item : _child_slot_array)
-	{
-		item._ui_component->GetRenderTexture();
-	}
-
 	in_frame.SetRenderTarget(&in_render_target);
 	for (const auto& item : _child_slot_array)
 	{
-		_ui_panel_shader->SetShaderResourceViewHandle(0, item._ui_component->GetRenderTexture());
+		std::shared_ptr < DscRender::HeapWrapperItem > shader_resource = DscDag::DagCollection::GetValueType<std::shared_ptr < DscRender::HeapWrapperItem >>(item._render_node);
+		_ui_panel_shader->SetShaderResourceViewHandle(0, shader_resource);
+		
 		auto& constant_buffer = item._shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
-
-		item._ui_component->BuildUiPanelShaderConstant(constant_buffer);
+		constant_buffer = DscDag::DagCollection::GetValueType<TUiPanelShaderConstantBuffer>(item._ui_panel_shader_constant_node);
 
 		in_frame.SetShader(_ui_panel_shader, item._shader_constant_buffer);
 		in_frame.Draw(_ui_panel_geometry);
@@ -103,14 +97,32 @@ void DscUi::UiComponentCanvas::Draw(
 	in_frame.SetRenderTarget(nullptr);
 }
 
-const DscCommon::VectorFloat4& DscUi::UiComponentCanvas::GetClearColour() const
+void DscUi::UiComponentCanvas::SetClearColour(const DscCommon::VectorFloat4& in_colour)
 {
-	return _clear_colour;
+	DSC_ASSERT(nullptr != _clear_colour_node, "invalid state");
+	DscDag::DagCollection::SetValueType(_clear_colour_node, in_colour);
+	return;
 }
 
-const int32 DscUi::UiComponentCanvas::GetParentChildIndex() const
+void DscUi::UiComponentCanvas::SetParentChildIndex(const int32 in_parent_child_index)
 {
-	return _parent_child_index;
+	DSC_ASSERT(nullptr != _parent_child_index, "invalid state");
+	DscDag::DagCollection::SetValueType<int32>(_parent_child_index, in_parent_child_index);
+	return;
+}
+
+void DscUi::UiComponentCanvas::SetNode(
+	DscDag::NodeToken in_parent_child_index,
+	DscDag::NodeToken in_clear_colour_node,
+	DscDag::NodeToken in_manual_scroll_x,
+	DscDag::NodeToken in_manual_scroll_y
+)
+{
+	_parent_child_index = in_parent_child_index;
+	_clear_colour_node = in_clear_colour_node;
+	_manual_scroll_x = in_manual_scroll_x;
+	_manual_scroll_y = in_manual_scroll_y;
+	return;
 }
 
 const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index) const
@@ -153,46 +165,4 @@ const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildGeometryOffset(con
 		DSC_ASSERT_ALWAYS("invalid param");
 	}
 	return result;
-
 }
-
-void DscUi::UiComponentCanvas::Update(const float in_time_delta)
-{
-	const float delta = std::max(0.0f, std::min(0.1f, in_time_delta));
-	DscCommon::VectorInt2 pixel_range = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(_pixel_traversal_size_node);
-	DscCommon::VectorFloat2 scroll = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(_scroll_node);
-	float value_x = 0.0f;
-	if (0 < pixel_range.GetX())
-	{
-		value_x = scroll.GetX();
-		value_x += (64.0f * delta / static_cast<float>(pixel_range.GetX()));
-	}
-	float value_y = 0.0f;
-	if (0 < pixel_range.GetY())
-	{
-		value_y = scroll.GetY();
-		value_y += (64.0f * delta / static_cast<float>(pixel_range.GetY()));
-	}
-
-	DscDag::DagCollection::SetValueType<DscCommon::VectorFloat2>(_scroll_node, DscCommon::VectorFloat2(value_x, value_y));
-}
-
-void DscUi::UiComponentCanvas::SetNode(DscDag::NodeToken in_render_node, DscDag::NodeToken in_desired_size_node, DscDag::NodeToken in_pixel_traversal_size_node, DscDag::NodeToken in_scroll_node, DscDag::NodeToken in_ui_panel_shader_constant_node)
-{
-	_render_node = in_render_node;
-	_desired_size_node = in_desired_size_node;
-	_pixel_traversal_size_node = in_pixel_traversal_size_node;
-	_scroll_node = in_scroll_node;
-	_ui_panel_shader_constant_node = in_ui_panel_shader_constant_node;
-}
-
-void DscUi::UiComponentCanvas::BuildUiPanelShaderConstant(TUiPanelShaderConstantBuffer& out_shader_constant_buffer)
-{
-	out_shader_constant_buffer = DscDag::DagCollection::GetValueType<TUiPanelShaderConstantBuffer>(_ui_panel_shader_constant_node);
-}
-
-std::shared_ptr<DscRender::HeapWrapperItem> DscUi::UiComponentCanvas::GetRenderTexture()
-{
-	return DscDag::DagCollection::GetValueType<std::shared_ptr<DscRender::HeapWrapperItem>>(_render_node);
-}
-

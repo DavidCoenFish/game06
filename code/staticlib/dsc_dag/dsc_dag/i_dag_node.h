@@ -21,7 +21,7 @@ namespace DscDag
 		virtual void AddOutput(NodeToken in_nodeID);
 		virtual void RemoveOutput(NodeToken in_nodeID);
 		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
-		virtual NodeToken GetIndexInput(const int32 in_index) const;
+		//virtual NodeToken GetIndexInput(const int32 in_index) const;
 		virtual void AddInput(NodeToken in_nodeID);
 		virtual void RemoveInput(NodeToken in_nodeID);
 

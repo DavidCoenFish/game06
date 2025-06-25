@@ -39,7 +39,7 @@ namespace DscDag
 		virtual void MarkDirty();
 		virtual const bool GetHasNoLinks() const override;
 		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
-		virtual NodeToken GetIndexInput(const int32 in_index) const;
+		//virtual NodeToken GetIndexInput(const int32 in_index) const;
 
 	private:
 		DagCollection& _dag_collection;

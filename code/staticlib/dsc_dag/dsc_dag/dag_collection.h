@@ -27,7 +27,7 @@ namespace DscDag
 		void DeleteNode(NodeToken in_node);
 
 		void AddDirtyConditionNode(NodeToken in_dirty_condition_node);
-		// keep on resolving dirty condition nodes till there are no more
+		// keep on resolving dirty condition nodes till there are no more. currious about moving this into DagGroup::ResolveDirtyConditionNodes() and have it reference it's DagCollection
 		void ResolveDirtyConditionNodes();
 
 		void AddNodeName(NodeToken in_node, const std::string& in_name);

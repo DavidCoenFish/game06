@@ -5,6 +5,7 @@ DscUi::UiDagNodeComponent::UiDagNodeComponent(std::unique_ptr<IUiComponent>&& in
 	: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
 {
 	_ui_component = std::move(in_component);
+	_value = _ui_component.get();
 }
 
 DscUi::IUiComponent& DscUi::UiDagNodeComponent::GetComponent() const
@@ -48,6 +49,5 @@ void DscUi::UiDagNodeComponent::MarkDirty()
 
 const std::any& DscUi::UiDagNodeComponent::GetValue()
 {
-	static const std::any kDummy = {};
-	return kDummy;
+	return _value;
 }

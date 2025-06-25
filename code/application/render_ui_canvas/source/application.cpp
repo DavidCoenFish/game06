@@ -23,6 +23,7 @@ namespace
 }
 
 Application::Resources::Resources() 
+    : _ui_root_node_group(nullptr)
 {
     //nop
 }
@@ -43,39 +44,34 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     }
 
     {
-        auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas(*_draw_system, DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f));
-        auto root_node_result = _resources->_ui_manager->MakeUiRootNode(
-            *_draw_system,
+        auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas();
+        _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
             *_resources->_dag_collection,
             std::move(ui_canvas_commponent)
             );
-        _resources->_ui_root_node = root_node_result._ui_node;
+        auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
 
         auto ui_component_debug_fill = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
         auto node_1_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_component_debug_fill),
-            root_node_result._ui_component_node,
-            root_node_result._avaliable_size_node,
-            root_node_result._render_size_node,
-            root_node_result._ui_node,
-
+            DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f),
+            _resources->_ui_root_node_group,
+            parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(),
             DscUi::VectorUiCoord2()
         );
 
-        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill(*_draw_system, DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f), 1);
+        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
         auto node_2_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_component_fill),
-            root_node_result._ui_component_node,
-            root_node_result._avaliable_size_node,
-            root_node_result._render_size_node,
-            root_node_result._ui_node,
-
+            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
+            _resources->_ui_root_node_group,
+            parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
@@ -108,11 +104,11 @@ const bool Application::Update()
         {
             _resources->_ui_manager->DrawUiSystem(
                 _draw_system->GetRenderTargetBackBuffer(),
+                *frame,
                 true,
                 true,
-                _resources->_ui_root_node,
-                *frame
-                );
+                _resources->_ui_root_node_group
+            );
         }
 
 

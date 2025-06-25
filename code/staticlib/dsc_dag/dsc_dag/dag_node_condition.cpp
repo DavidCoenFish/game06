@@ -93,18 +93,18 @@ void DscDag::DagNodeCondition::SetIndexInput(const int32 in_index, NodeToken in_
 	return;
 }
 
-DscDag::NodeToken DscDag::DagNodeCondition::GetIndexInput(const int32 in_index) const
-{
-	switch (in_index)
-	{
-	default:
-		break;
-	case 0:
-		return _condition;
-	case 1:
-		return _true_source;
-	case 2:
-		return _false_source;
-	}
-	return nullptr;
-}
+//DscDag::NodeToken DscDag::DagNodeCondition::GetIndexInput(const int32 in_index) const
+//{
+//	switch (in_index)
+//	{
+//	default:
+//		break;
+//	case 0:
+//		return _condition;
+//	case 1:
+//		return _true_source;
+//	case 2:
+//		return _false_source;
+//	}
+//	return nullptr;
+//}

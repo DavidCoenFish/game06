@@ -10,7 +10,7 @@ namespace DscDag
 
 namespace DscUi
 {
-	enum class TUiRootNodeGroup
+	enum class TUiRootNodeGroup : uint8
 	{
 		TFrame = 0,
 		TDeviceRestore, // the d3dx12 device was reset and then restored, all gpu data was potentially invalidated
@@ -23,18 +23,25 @@ namespace DscUi
 		TTimeDelta,
 		TDrawRoot, // getting the value of this node will trigger the frame command list of what needs to be drawn to be populated
 
+		//TInputState // touch pos, keys down, gamepad...
+
 		TCount
 	};
 
 	typedef DscDag::DagGroup<TUiRootNodeGroup, static_cast<std::size_t>(TUiRootNodeGroup::TCount)> DagGroupUiRootNode;
 
-	//enum class UiNodeInputIndex
-	//{
-	//	TFrame = 0,
-	//	TDeviceRestore,
-	//	TRenderTargetPoolTexture,
-	//	TUiScale,
-	//	TUiComponent,
-	//	TShaderConstant, // not used directly, but hooked into render to redraw on value change
-	//};
+	enum class TUiParentNodeGroup : uint8
+	{
+		TUiComponent, // the ui dag node component
+		TUiAvaliableSize, // the avaliable size this node had avaliable to it, used for child geometry size and geometry offset
+		TUiRenderSize, // the eventually calculated viewport size of the render target. for stack components, this may need child geoemtry size and geometry offset to be calculated
+		TDraw, // returns the shader resource handel of the render target that this ui component draws to
+
+		TUiPanelShaderConstant, // kind of goes with TDraw (which returns the shader resrource/ render target texture for drawing
+
+		TCount
+	};
+
+	typedef DscDag::DagGroup<TUiParentNodeGroup, static_cast<std::size_t>(TUiParentNodeGroup::TCount)> DagGroupUiParentNode;
+
 }
