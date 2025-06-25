@@ -20,7 +20,8 @@ namespace
 {
 }
 
-Application::Resources::Resources() 
+Application::Resources::Resources()
+    : _ui_root_node_group(nullptr)
 {
     //nop
 }
@@ -42,12 +43,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     {
         auto ui_commponent = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
-        auto node_result = _resources->_ui_manager->MakeUiRootNode(
-            *_draw_system,
+        _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
             *_resources->_dag_collection,
             std::move(ui_commponent)
-            );
-        _resources->_ui_root_node = node_result._ui_node;
+        );
     }
 
     return;
@@ -76,20 +75,19 @@ const bool Application::Update()
         {
             _resources->_ui_manager->DrawUiSystem(
                 _draw_system->GetRenderTargetBackBuffer(),
-                true,
-                true,
-                _resources->_ui_root_node,
-                *frame
-                );
+                *frame,
+                true, //false,
+                false, //true,
+                _resources->_ui_root_node_group
+            );
         }
-
 
         if (_resources->_onscreen_version)
         {
             _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
     }
-    
+
     return true;
 }
 void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale)
