@@ -1,5 +1,6 @@
 #pragma once
 #include "dsc_ui.h"
+#include "ui_enum.h"
 
 namespace DscCommon
 {
@@ -127,45 +128,51 @@ namespace DscUi
 		std::unique_ptr<IUiComponent> MakeComponentFill(DscRender::DrawSystem& in_draw_system, const DscCommon::VectorFloat4& in_background_colour, const int32 in_parent_child_index = 0);
 		std::unique_ptr<IUiComponent> MakeComponentCanvas(DscRender::DrawSystem& in_draw_system, const DscCommon::VectorFloat4& in_background_colour, const int32 in_parent_child_index = 0);
 
-		struct ResultNodeData
-		{
-			DscDag::NodeToken _ui_node = {};
-			DscDag::NodeToken _ui_component_node = {};
-			DscDag::NodeToken _avaliable_size_node = {};
-			DscDag::NodeToken _render_size_node = {};
-		};
-
-		ResultNodeData MakeUiRootNode(
+		DagGroupUiRootNode MakeUiRootNode(
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component
-			);
-
-		ResultNodeData MakeUiNode(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-
-			DscDag::NodeToken in_parent_ui_component,
-			DscDag::NodeToken in_parent_avaliable_size,
-			DscDag::NodeToken in_parent_render_size,
-			DscDag::NodeToken in_root_node
 		);
 
-		ResultNodeData MakeUiNodeCanvasChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
+		//struct ResultNodeData
+		//{
+		//	DscDag::NodeToken _ui_node = {};
+		//	DscDag::NodeToken _ui_component_node = {};
+		//	DscDag::NodeToken _avaliable_size_node = {};
+		//	DscDag::NodeToken _render_size_node = {};
+		//};
 
-			DscDag::NodeToken in_parent_ui_component_node, // assert if not a UiComponentCanvas
-			DscDag::NodeToken in_parent_avaliable_size,
-			DscDag::NodeToken in_parent_render_size,
-			DscDag::NodeToken in_ui_root_node,
+		//ResultNodeData MakeUiRootNode(
+		//	DscRender::DrawSystem& in_draw_system,
+		//	DscDag::DagCollection& in_dag_collection,
+		//	std::unique_ptr<IUiComponent>&& in_component
+		//	);
 
-			const VectorUiCoord2& in_child_size, 
-			const VectorUiCoord2& in_child_pivot, 
-			const VectorUiCoord2& in_attach_point
-		);
+		//ResultNodeData MakeUiNode(
+		//	DscRender::DrawSystem& in_draw_system,
+		//	DscDag::DagCollection& in_dag_collection,
+		//	std::unique_ptr<IUiComponent>&& in_component,
+
+		//	DscDag::NodeToken in_parent_ui_component,
+		//	DscDag::NodeToken in_parent_avaliable_size,
+		//	DscDag::NodeToken in_parent_render_size,
+		//	DscDag::NodeToken in_root_node
+		//);
+
+		//ResultNodeData MakeUiNodeCanvasChild(
+		//	DscRender::DrawSystem& in_draw_system,
+		//	DscDag::DagCollection& in_dag_collection,
+		//	std::unique_ptr<IUiComponent>&& in_component,
+
+		//	DscDag::NodeToken in_parent_ui_component_node, // assert if not a UiComponentCanvas
+		//	DscDag::NodeToken in_parent_avaliable_size,
+		//	DscDag::NodeToken in_parent_render_size,
+		//	DscDag::NodeToken in_ui_root_node,
+
+		//	const VectorUiCoord2& in_child_size, 
+		//	const VectorUiCoord2& in_child_pivot, 
+		//	const VectorUiCoord2& in_attach_point
+		//);
 
 
 		//static IUiComponent& GetComponentFromUiRootNode(DscDag::NodeToken in_ui_root_node);

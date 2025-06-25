@@ -3,7 +3,99 @@
 
 namespace
 {
-}
+	const bool ValueFoundToBeEquavalent(const std::any& in_lhs_value, const std::any& in_rhs_value)
+	{
+		if ((false == in_lhs_value.has_value()) || (false == in_rhs_value.has_value()))
+		{
+			return false;
+		}
+		if (in_lhs_value.type() == in_rhs_value.type())
+		{
+			if (in_rhs_value.type() == typeid(bool))
+			{
+				if (std::any_cast<bool>(in_lhs_value) == std::any_cast<bool>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(char))
+			{
+				if (std::any_cast<char>(in_lhs_value) == std::any_cast<char>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(double))
+			{
+				if (std::any_cast<double>(in_lhs_value) == std::any_cast<double>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(float))
+			{
+				if (std::any_cast<float>(in_lhs_value) == std::any_cast<float>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(int))
+			{
+				if (std::any_cast<int>(in_lhs_value) == std::any_cast<int>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(std::string))
+			{
+				if (std::any_cast<std::string>(in_lhs_value) == std::any_cast<std::string>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(DscCommon::VectorInt2))
+			{
+				if (std::any_cast<DscCommon::VectorInt2>(in_lhs_value) == std::any_cast<DscCommon::VectorInt2>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	const bool ValueFoundToNotBeZero(const std::any& in_value)
+	{
+		if (false == in_value.has_value())
+		{
+			return false;
+		}
+		if (in_value.type() == typeid(bool))
+		{
+			if (true == std::any_cast<bool>(in_value))
+			{
+				return true;
+			}
+		}
+		else if (in_value.type() == typeid(int32))
+		{
+			if (0 != std::any_cast<int32>(in_value))
+			{
+				return true;
+			}
+		}
+		else if (in_value.type() == typeid(float))
+		{
+			if (0.0f != std::any_cast<float>(in_value))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+}// namespace
 
 DscDag::DagNodeValue::DagNodeValue(const std::any& in_value, const TValueChangeCondition in_change_condition DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
 	: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
@@ -47,65 +139,19 @@ void DscDag::DagNodeValue::SetValue(const std::any& in_value)
 	case TValueChangeCondition::TNever:
 		break;
 	case TValueChangeCondition::TOnValueChange:
-		set_dirty = true;
-		// bail out if value is already equal
-		if (_value.has_value() && in_value.has_value())
+		// bail out of SetValue without marking diry if value found to be equivalent
+		if (true == ValueFoundToBeEquavalent(_value, in_value))
 		{
-			if (_value.type() == in_value.type())
-			{
-				if (in_value.type() == typeid(bool))
-				{
-					if (std::any_cast<bool>(_value) == std::any_cast<bool>(in_value))
-					{
-						return;
-					}
-				}
-				else if (in_value.type() == typeid(char))
-				{
-					if (std::any_cast<char>(_value) == std::any_cast<char>(in_value))
-					{
-						return;
-					}
-				}
-				else if (in_value.type() == typeid(double))
-				{
-					if (std::any_cast<double>(_value) == std::any_cast<double>(in_value))
-					{
-						return;
-					}
-				}
-				else if (in_value.type() == typeid(float))
-				{
-					if (std::any_cast<float>(_value) == std::any_cast<float>(in_value))
-					{
-						return;
-					}
-				}
-				else if (in_value.type() == typeid(int))
-				{
-					if (std::any_cast<int>(_value) == std::any_cast<int>(in_value))
-					{
-						return;
-					}
-				}
-				else if (in_value.type() == typeid(std::string))
-				{
-					if (std::any_cast<std::string>(_value) == std::any_cast<std::string>(in_value))
-					{
-						return;
-					}
-				}
-				else if (in_value.type() == typeid(DscCommon::VectorInt2))
-				{
-					if (std::any_cast<DscCommon::VectorInt2>(_value) == std::any_cast<DscCommon::VectorInt2>(in_value))
-					{
-						return;
-					}
-				}
-			}
+			return;
+		}
+		set_dirty = true;
+		break;
+	case TValueChangeCondition::TNotZero:
+		if (true == ValueFoundToNotBeZero(in_value))
+		{
+			set_dirty = true;
 		}
 		break;
-
 	}
 
 	_value = in_value;
