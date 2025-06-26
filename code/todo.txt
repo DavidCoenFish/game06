@@ -1,5 +1,4 @@
 - ?ui
-	- UiComponentText
 	- UiComponentStack
 	- UiComponentSwitch (n states, only once active)
 	- UiComponentButton

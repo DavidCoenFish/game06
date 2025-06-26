@@ -10,6 +10,13 @@ namespace DscDag
 
 namespace DscUi
 {
+	enum class TUiFlow : uint8
+	{
+		THorizontal,
+		TVertical,
+		TCount
+	};
+
 	enum class TUiComponentBehaviour : uint32
 	{
 		TNone = 0,

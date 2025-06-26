@@ -24,6 +24,9 @@
         .Path           = "parent"
         .Items = { 
             "../.gitignore",
+            "../backup_copy_d_drive.cmd",
+            "../backup_copy_e_drive.cmd",
+            "../cmd_here.cmd",
             "../commit.cmd",
             "../launch_visual_studio_code.cmd",
             "../notes.txt",
