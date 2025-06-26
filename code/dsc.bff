@@ -13,6 +13,13 @@
     ^SolutionItemArray + .temp
 }
 {
+    .temp =  [
+        .Path           = "solution_items/notes"
+        .Items = { "notes/ui.txt" }
+    ]
+    ^SolutionItemArray + .temp
+}
+{
     .temp = [
         .Path           = "parent"
         .Items = { 

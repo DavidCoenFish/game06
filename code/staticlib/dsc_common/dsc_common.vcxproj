@@ -36,6 +36,8 @@
     <CustomBuild Include="dsc_common\math.h" />
     <CustomBuild Include="dsc_common\math_angle.cpp" />
     <CustomBuild Include="dsc_common\math_angle.h" />
+    <CustomBuild Include="dsc_common\timer.cpp" />
+    <CustomBuild Include="dsc_common\timer.h" />
     <CustomBuild Include="dsc_common\utf8.cpp" />
     <CustomBuild Include="dsc_common\utf8.h" />
     <CustomBuild Include="dsc_common\vector_2.h" />
