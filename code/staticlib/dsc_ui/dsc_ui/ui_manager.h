@@ -40,6 +40,12 @@ namespace DscDagRender
 	class DagResource;
 }
 
+namespace DscText
+{
+	class TextManager;
+	class TextRun;
+}
+
 /*
 * example: canvas, 2 children
 externally provided render target (R0)
@@ -92,7 +98,7 @@ to calculate geometry/ shader constant buffer [parent render size, geometry offs
 [parent ui component, parent child index, desired size] -> [geometry size]
 [parent.desired size, geometry size, geometry offset, desired size, scroll] -> [shader constants]
 [ui component] -> [clear colour]
-[desired size, render target pool, clear colour] -> [render target] 
+[desired size, geometry size, render target pool, clear colour] -> [render target]  // if desired size is smaller than geometry size, expand to geometry size
 [all the inputs via enum UiRootNodeInputIndex or UiNodeInputIndex] -> [Render target Shader Resource]
 
 // the UiComponent has logic for if scroll is automatic or manual, and only sets [Scroll] value appropriatly. 
@@ -127,6 +133,11 @@ namespace DscUi
 		std::unique_ptr<IUiComponent> MakeComponentDebugFill(DscRender::DrawSystem& in_draw_system);
 		std::unique_ptr<IUiComponent> MakeComponentFill();
 		std::unique_ptr<IUiComponent> MakeComponentCanvas();
+		std::unique_ptr<IUiComponent> MakeComponentText(
+			DscText::TextManager& in_text_manager,
+			std::unique_ptr<DscText::TextRun>&& in_text_run,
+			const TUiComponentBehaviour in_behaviour
+			);
 
 		DagGroupUiRootNode MakeUiRootNode(
 			DscDag::DagCollection& in_dag_collection,

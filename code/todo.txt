@@ -2,9 +2,11 @@
 	- UiComponentText
 	- UiComponentStack
 	- UiComponentSwitch (n states, only once active)
-	- UiComponentCrossFade? (n states with alpha)
 	- UiComponentButton
-- ?ui effect like stroke
+	- UiComponentCrossFade? (n states with alpha)
+	- UiComponentPadding
+	- UiComponentDropShadow
+	- UiComponentStroke
 - ?partial upload
 
 

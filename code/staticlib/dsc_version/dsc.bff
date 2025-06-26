@@ -10,6 +10,20 @@
     ]
     ^SolutionItemArray + .temp
 }
+{
+    .temp =  [
+        .Path = "solution_items\$_CURRENT_BFF_DIR_$\dsc_version"
+        .Items = { 
+            "$_CURRENT_BFF_DIR_$\dsc_version\git_revision.txt", 
+            "$_CURRENT_BFF_DIR_$\dsc_version\timestamp.txt", 
+            "$_CURRENT_BFF_DIR_$\dsc_version\version_major.txt", 
+            "$_CURRENT_BFF_DIR_$\dsc_version\version_minor.txt", 
+            "$_CURRENT_BFF_DIR_$\dsc_version\version_patch.txt", 
+            "$_CURRENT_BFF_DIR_$\dsc_version\version_string.txt"
+            }
+    ]
+    ^SolutionItemArray + .temp
+}
 
 .LibraryParam = [
     .RootPath = ^_WORKING_DIR_

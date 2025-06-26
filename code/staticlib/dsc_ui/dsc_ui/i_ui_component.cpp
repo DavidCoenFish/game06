@@ -16,7 +16,7 @@ void DscUi::IUiComponent::Draw(
 	//nop
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size)
+const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float)
 {
 	return in_avaliable_size;
 }

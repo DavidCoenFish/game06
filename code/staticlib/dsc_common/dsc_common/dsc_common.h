@@ -1,7 +1,7 @@
 #pragma once
 
 // Issue. Have paranoia about having all windows includes across translation units have the same defines/settings
-// Solution. Have the windows include in a common file, common.h
+// Solution. Have the windows include in a common file, dsc_common.h
 
 typedef __int8 int8;
 typedef unsigned __int8 uint8;
@@ -15,8 +15,7 @@ typedef unsigned __int64 uint64;
 #define LOG_TOPIC_DSC_COMMON "DSC_COMMON"
 
 //FastBuild nmake workaround
-// allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
-// added DSC_BFF_BUILD to fastbuild defines
+// allow the IDE to get definitions, otherwise the Fastbuild definitions are defined in scripts and used as cmd line param to compiler and linker...
 #ifndef DSC_BFF_BUILD
 #ifndef _UNICODE
 #define _UNICODE
@@ -25,10 +24,12 @@ typedef unsigned __int64 uint64;
 #define UNICODE
 #endif
 
-//#ifdef _DEBUG
+// reminder, this is just used in the IDE, otherwise defines are in the BFF script files for each platform configuration, see code\fbuild\dsc.bff
 #define _DEBUG
-#define DSC_LOG
-//#endif
+
+#ifdef _DEBUG
+	#define DSC_LOG
+#endif
 
 #endif //#ifndef DSC_BFF_BUILD
 
@@ -50,8 +51,9 @@ typedef unsigned __int64 uint64;
 #include <cassert>
 
 //std lib
-#include <array>
 #include <any>
+#include <array>
+#include <chrono>
 #include <cmath>
 #include <codecvt>
 #include <filesystem>
@@ -125,6 +127,7 @@ typedef unsigned __int64 uint64;
 #include "log_system.h"
 #include "math.h"
 #include "math_angle.h"
+#include "timer.h"
 #include "utf8.h"
 #include "vector_2.h"
 #include "vector_4.h"

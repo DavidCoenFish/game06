@@ -35,6 +35,10 @@ namespace DscUi
 	public:
 		virtual ~IUiComponent();
 
+		// so, components that want to have a desired size other than the avalaible size will not play nice with being top level ui components, that has the render viewport of the externaliily provided size
+		// workaround is to just nest in a canvas or other accomidating component (padding? stack?)
+		//virtual const bool IsAllowedToBeTopLevelUiComponent() = 0;
+
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
 			DscRender::IRenderTarget& in_render_target,
@@ -64,7 +68,7 @@ namespace DscUi
 			);
 
 		// so, a UiComponentText may do word wrap and have a desired size shrunk in the vertical (or longer in vertical), parent still has GetChildGeometrySize to deal with shrink
-		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size);
+		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale);
 
 		// following only needed if this is a component type that can have children
 		virtual const DscCommon::VectorInt2 GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const;

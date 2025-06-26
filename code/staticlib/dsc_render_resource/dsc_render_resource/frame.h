@@ -29,7 +29,11 @@ namespace DscRenderResource
 
 		Frame(DscRender::DrawSystem& in_draw_system);
 		~Frame();
+
 		ID3D12GraphicsCommandList* GetCommandList();
+
+		/// for convienience, ui system was just passing around a Frame, and text draw wants a DrawSystem
+		DscRender::DrawSystem& GetDrawSystem() { return _draw_system; }
 
 		const int GetBackBufferIndex();
 

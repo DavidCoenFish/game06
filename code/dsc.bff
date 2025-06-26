@@ -15,7 +15,7 @@
 {
     .temp =  [
         .Path           = "solution_items/notes"
-        .Items = { "notes/ui.txt" }
+        .Items = { "notes/ui.txt", "notes/notes.txt" }
     ]
     ^SolutionItemArray + .temp
 }

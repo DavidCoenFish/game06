@@ -13,6 +13,8 @@
 #include "screen_quad.h"
 #include "ui_component_canvas.h"
 #include "ui_component_debug_fill.h"
+#include "ui_component_fill.h"
+#include "ui_component_text.h"
 #include "ui_coord.h"
 #include "ui_dag_node_component.h"
 #include "ui_enum.h"

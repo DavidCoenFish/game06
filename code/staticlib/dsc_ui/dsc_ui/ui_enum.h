@@ -10,6 +10,14 @@ namespace DscDag
 
 namespace DscUi
 {
+	enum class TUiComponentBehaviour : uint32
+	{
+		TNone = 0,
+		//TVisible = 1 << 0, ? why have the node in the tree if it is invisible
+		THasManualScrollX = 1 << 0,
+		THasManualScrollY = 1 << 1,
+	};
+
 	enum class TUiRootNodeGroup : uint8
 	{
 		TFrame = 0,

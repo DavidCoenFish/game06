@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_ui_canvas", "applica
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_ui_debug_fill", "application\render_ui_debug_fill\render_ui_debug_fill.vcxproj", "{23F83BF6-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_ui_text", "application\render_ui_text\render_ui_text.vcxproj", "{114869F7-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render_version", "application\render_version\render_version.vcxproj", "{929FF9FA-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "application\unit_test\unit_test.vcxproj", "{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}"
@@ -158,6 +160,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_ui_debug_fill", "ren
 		application\render_ui_debug_fill\dsc.bff = application\render_ui_debug_fill\dsc.bff
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_ui_text", "render_ui_text", "{310DC43D-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		application\render_ui_text\dsc.bff = application\render_ui_text\dsc.bff
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "render_version", "render_version", "{225A495F-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		application\render_version\dsc.bff = application\render_version\dsc.bff
@@ -188,6 +195,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{4109
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notes", "notes", "{9BF93803-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
+		notes\notes.txt = notes\notes.txt
 		notes\ui.txt = notes\ui.txt
 	EndProjectSection
 EndProject
@@ -251,6 +259,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_version", "dsc_version"
 		staticlib\dsc_version\dsc.bff = staticlib\dsc_version\dsc.bff
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_version", "dsc_version", "{EC5266E1-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		staticlib\dsc_version\dsc_version\git_revision.txt = staticlib\dsc_version\dsc_version\git_revision.txt
+		staticlib\dsc_version\dsc_version\timestamp.txt = staticlib\dsc_version\dsc_version\timestamp.txt
+		staticlib\dsc_version\dsc_version\version_major.txt = staticlib\dsc_version\dsc_version\version_major.txt
+		staticlib\dsc_version\dsc_version\version_minor.txt = staticlib\dsc_version\dsc_version\version_minor.txt
+		staticlib\dsc_version\dsc_version\version_patch.txt = staticlib\dsc_version\dsc_version\version_patch.txt
+		staticlib\dsc_version\dsc_version\version_string.txt = staticlib\dsc_version\dsc_version\version_string.txt
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_windows", "dsc_windows", "{0271BBBB-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		staticlib\dsc_windows\dsc.bff = staticlib\dsc_windows\dsc.bff
@@ -283,13 +301,15 @@ Global
 		{71320AF4-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{71320AF4-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
-		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
-		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Deploy.0 = Debug|x64
 		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
-		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
-		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Deploy.0 = Release|x64
 		{23F83BF6-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{23F83BF6-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Deploy.0 = Debug|x64
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Deploy.0 = Release|x64
 		{929FF9FA-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{929FF9FA-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
@@ -334,6 +354,7 @@ Global
 		{71320AF4-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{23F83BF6-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
+		{114869F7-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{929FF9FA-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
@@ -365,6 +386,7 @@ Global
 		{E3DCFBFE-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{9F775F4B-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{D5673D5E-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
+		{310DC43D-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{225A495F-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{CEFCE296-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{6970340D-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
@@ -383,6 +405,7 @@ Global
 		{92AE7F44-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{587E10B3-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 		{5E8AEDE3-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
+		{EC5266E1-6C94-4F93-BC2A-7F5284B7D434} = {5E8AEDE3-6C94-4F93-BC2A-7F5284B7D434}
 		{0271BBBB-6C94-4F93-BC2A-7F5284B7D434} = {6F950BFE-6C94-4F93-BC2A-7F5284B7D434}
 	EndGlobalSection
 EndGlobal

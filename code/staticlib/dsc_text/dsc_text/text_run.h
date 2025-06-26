@@ -75,6 +75,7 @@ namespace DscText
 		void SetTextContainerSize(
 			const DscCommon::VectorInt2& in_size
 		);
+		const bool GetWidthLimitEnabled() const;
 		void SetWidthLimit(
 			const bool in_width_limit_enabled,
 			const int in_width_limit

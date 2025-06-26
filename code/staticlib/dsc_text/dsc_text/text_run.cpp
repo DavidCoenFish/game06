@@ -174,6 +174,11 @@ void DscText::TextRun::SetTextContainerSize(
 	}
 }
 
+const bool DscText::TextRun::GetWidthLimitEnabled() const
+{
+	return _width_limit_enabled;
+}
+
 void DscText::TextRun::SetWidthLimit(
 	const bool in_width_limit_enabled,
 	const int in_width_limit
