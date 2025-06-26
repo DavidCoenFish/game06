@@ -206,75 +206,16 @@ void DscText::GlyphCollectionText::ShapeText(
 	hb_glyph_info_t* glyph_info = hb_buffer_get_glyph_infos(in_buffer, &glyph_count);
 	hb_glyph_position_t* glyph_pos = hb_buffer_get_glyph_positions(in_buffer, &glyph_count);
 
-	in_out_text_pre_vertex.Reserve(glyph_count);
-
-	// start a new line each time you hit this cluster for the width limit
-	std::vector<unsigned int> width_line_clusert_index;
-	if (true == in_width_limit_enabled)
-	{
-		int cursor_x = in_out_cursor;
-		// Work out what line each glpyh should be on
-		unsigned int current_cluster = std::numeric_limits<unsigned int>::max();
-		if ((0 != in_out_cursor) && (0 < glyph_count))
-		{
-			// have at lease one cluster per line, unless we already had something on this line (0 != in_out_cursor)
-			current_cluster = glyph_info[1].cluster;
-		}
-		for (unsigned int i = 0; i < glyph_count; i++)
-		{
-			hb_glyph_info_t& info = glyph_info[i];
-			const int x_advance = glyph_pos[i].x_advance / 64;
-
-			bool start_new_line = false;
-			if (in_string_utf8[glyph_info[i].cluster] == '\n')
-			{
-				start_new_line = true;
-			}
-			else if (std::numeric_limits<unsigned int>::max() == current_cluster) // at least one cluster per line
-			{
-				current_cluster = info.cluster;
-			}
-			else if (info.cluster != current_cluster) // only break on change of cluster
-			{
-				const hb_glyph_flags_t flag = hb_glyph_info_get_glyph_flags(&glyph_info[i]);
-				// if we go past the width limit and cluster can break, then start a new line
-				if ((in_width_limit < cursor_x + x_advance) &&
-					(0 == (flag & HB_GLYPH_FLAG_UNSAFE_TO_BREAK)))
-				{
-					width_line_clusert_index.push_back(info.cluster);
-					start_new_line = true;
-				}
-			}
-
-			if (true == start_new_line)
-			{
-				current_cluster = std::numeric_limits<unsigned int>::max();
-				cursor_x = 0;
-			}
-			else
-			{
-				cursor_x += x_advance;
-			}
-		}
-	}
-	// Now place each glyph
-	int line_index = 0;
+	// this still isn't perfect, it can split glyphs of the same cluster up over a line break
+	// better would be to check that ALL the glyphs of a cluster fit on the line if needed, but this is non trivial and needing multiple lookups of ghyph cells...
 	for (unsigned int i = 0; i < glyph_count; i++)
 	{
 		// catch any new line characters from the input string
-		const unsigned int current_cluster = glyph_info[i].cluster;
-		if (in_string_utf8[current_cluster] == '\n')
+		int32 largest_written_pixel_x = 0;
+		if (in_string_utf8[glyph_info[i].cluster] == '\n')
 		{
 			in_out_text_pre_vertex.StartNewLine(in_out_cursor, in_line_gap_pixel);
 			continue;
-		}
-
-		// Start new line
-		if ((line_index < (int)width_line_clusert_index.size()) &&
-			(width_line_clusert_index[line_index] == current_cluster))
-		{
-			line_index += 1;
-			in_out_text_pre_vertex.StartNewLine(in_out_cursor, in_line_gap_pixel);
 		}
 
 		hb_codepoint_t codepoint = glyph_info[i].codepoint;
@@ -301,6 +242,19 @@ void DscText::GlyphCollectionText::ShapeText(
 
 		if (nullptr != cell)
 		{
+			largest_written_pixel_x = in_out_cursor + x_offset + cell->GetWidthHeightRef().GetX() + cell->GetBearingRef().GetX();
+			if (in_width_limit_enabled)
+			{
+				// the (in_out_cursor != 0) is an attempt to at least has something on the line
+				const hb_glyph_flags_t flag = hb_glyph_info_get_glyph_flags(&glyph_info[i]);
+				if ((in_width_limit < largest_written_pixel_x) &&
+					(0 == (flag & HB_GLYPH_FLAG_UNSAFE_TO_BREAK)) &&
+					(in_out_cursor != 0))
+				{
+					in_out_text_pre_vertex.StartNewLine(in_out_cursor, in_line_gap_pixel);
+					largest_written_pixel_x = in_out_cursor + x_offset + cell->GetWidthHeightRef().GetX() + cell->GetBearingRef().GetX();
+				}
+			}
 			in_out_text_pre_vertex.AddPreVertex(
 				*cell,
 				in_out_cursor + x_offset,
@@ -315,10 +269,6 @@ void DscText::GlyphCollectionText::ShapeText(
 
 		in_out_cursor += x_advance;
 		DSC_ASSERT(0 == y_advance, "can this happen");
-
-		in_out_text_pre_vertex.UpdateHorizontalBounds(
-			in_out_cursor
-		);
 	}
 
 	return;

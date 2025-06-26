@@ -195,8 +195,10 @@ namespace
             constant_buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
             constant_buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
             // atd::abs to allow ping point anim of scroll as it range [-1 ... 1] => [0 .. 1]
-            constant_buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * std::abs(scroll_value.GetX()) / static_cast<float>(render_target_size.GetX());
-            constant_buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * std::abs(scroll_value.GetY()) / static_cast<float>(render_target_size.GetY());
+            const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
+            constant_buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_target_size.GetX());
+            const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetY())));
+            constant_buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * scroll_y / static_cast<float>(render_target_size.GetY());
             constant_buffer._uv_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_target_size.GetX());
             constant_buffer._uv_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_target_size.GetY());
             value = constant_buffer;
@@ -233,7 +235,9 @@ namespace
         return node;
     }
 
-    constexpr float s_scroll_pixels_per_second = 64.0f;
+    constexpr float s_scroll_pixels_per_second = 32.0f;
+    constexpr float s_wrap_threashold = 1.0f; // was considering 1.25f for threashold and 2.5 for ping pong step, but only pauses at one end of the anim
+    constexpr float s_wrap_step_ping_pong = 2.0f;
     DscDag::NodeToken MakeNodeScrollValue(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_time_delta, DscDag::NodeToken in_pixel_traversal_size_node, DscDag::NodeToken in_manual_scroll_x, DscDag::NodeToken in_manual_scroll_y)
     {
         DscDag::NodeToken condition_x = in_dag_collection.CreateCalculate([](std::any& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
@@ -271,10 +275,11 @@ namespace
 
             if (0 < pixel_traversal)
             {
-                value += ((static_cast<float>(pixel_traversal) / s_scroll_pixels_per_second) * time_delta_clamped);
-                while (1.0f < value)
+                // the max of the divisor is to avoid things bouncing too quickly on small values of pixel_traversal
+                value += time_delta_clamped * s_scroll_pixels_per_second / std::max(s_scroll_pixels_per_second, static_cast<float>(pixel_traversal));
+                while (s_wrap_threashold < value)
                 {
-                    value -= 2.0f; // pingpong, consumer of the value applies std::abs
+                    value -= s_wrap_step_ping_pong; // pingpong, consumer of the value applies std::abs
                 }
             }
 
@@ -297,10 +302,11 @@ namespace
 
             if (0 < pixel_traversal)
             {
-                value += ((static_cast<float>(pixel_traversal) / s_scroll_pixels_per_second) * time_delta_clamped);
-                while (1.0f < value)
+                // the max of the divisor is to avoid things bouncing too quickly on small values of pixel_traversal
+                value += time_delta_clamped * s_scroll_pixels_per_second / std::max(s_scroll_pixels_per_second, static_cast<float>(pixel_traversal));
+                while (s_wrap_threashold < value)
                 {
-                    value -= 2.0f; // pingpong, consumer of the value applies std::abs
+                    value -= s_wrap_step_ping_pong; // pingpong, consumer of the value applies std::abs
                 }
             }
 
@@ -486,7 +492,8 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         );
         std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
         array_shader_resource_info.push_back(
-            DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
+            // Factory sampler for subpixel accuracy, if we are scrolling, allow possitioning on non pixel boundaries, FactoryDataSampler is goof to force pixel boundiries if needed
+            DscRenderResource::ShaderResourceInfo::FactorySampler(
                 nullptr,
                 D3D12_SHADER_VISIBILITY_PIXEL
             )
@@ -816,6 +823,20 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
         );
 
     return result;
+}
+
+void DscUi::UiManager::UpdateUiSystem(
+    DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
+    const float in_time_delta
+    // input state? keys down, touch pos, gamepad
+    )
+{
+    DSC_ASSERT(0.0f <= in_time_delta, "invalid param");
+
+    {
+        DscDag::NodeToken node = in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta);
+        DscDag::DagCollection::SetValueType(node, in_time_delta);
+    }
 }
 
 void DscUi::UiManager::DrawUiSystem(

@@ -46,7 +46,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
     const int32 text_colour = DscCommon::Math::ConvertColourToInt(192, 192, 192, 255);
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-        DscCommon::LogSystem::Printf("%s \n", DscVersion::GetVersionString()),
+        DscCommon::LogSystem::Printf("%s\n", DscVersion::GetVersionString()),
         pLocale,
         font,
         16,
@@ -54,7 +54,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
     ));
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-        DscCommon::LogSystem::Printf("%s %s \n", DscVersion::GetConfiguration(), DscVersion::GetPlatform()),
+        DscCommon::LogSystem::Printf("%s %s\n", DscVersion::GetConfiguration(), DscVersion::GetPlatform()),
         pLocale,
         font,
         18,
@@ -62,7 +62,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
     ));
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-        DscCommon::LogSystem::Printf("%s \n%s ", DscVersion::GetTimestamp(), DscVersion::GetGitRevision()),
+        DscCommon::LogSystem::Printf("%s\n%s", DscVersion::GetTimestamp(), DscVersion::GetGitRevision()),
         pLocale,
         font,
         16,
@@ -81,11 +81,12 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         );
 
     DscCommon::VectorInt2 text_size = _text_run->GetTextBounds();
-    text_size.Set(text_size.GetX() + 8, text_size.GetY() + 12);
-    _text_run->SetTextContainerSize(text_size);
+    DscCommon::VectorInt2 text_size_padded(text_size.GetX() + 16, text_size.GetY() + 12);
+    DscCommon::VectorInt2 text_size_half(text_size.GetX() + 8, text_size.GetY() + 6);
+    _text_run->SetTextContainerSize(text_size_half);
     // make a screen quad the size of the text, to the bottom right of the screen
     _screen_quad = std::make_unique<DscUi::ScreenQuad>(
-        DscUi::VectorUiCoord2(DscUi::UiCoord(text_size.GetX(), 0.0f), DscUi::UiCoord(text_size.GetY(), 0.0f)),
+        DscUi::VectorUiCoord2(DscUi::UiCoord(text_size_padded.GetX(), 0.0f), DscUi::UiCoord(text_size_padded.GetY(), 0.0f)),
         DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
         DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
         container_size
@@ -105,7 +106,10 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
             &in_draw_system,
             target_format_data_array,
             DscRender::RenderTargetDepthData(),
-            text_size
+            text_size_padded,
+            false,
+            true,
+            text_size_half
             );
     }
 

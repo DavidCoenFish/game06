@@ -10,6 +10,7 @@
 namespace DscCommon
 {
     class FileSystem;
+    class Timer;
 }
 
 namespace DscDag
@@ -77,6 +78,7 @@ private:
         Resources& operator=(const Resources&) = delete;
         Resources(const Resources&) = delete;
 
+        std::unique_ptr<DscCommon::Timer> _timer = {};
         std::unique_ptr<DscText::TextManager> _text_manager = {};
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};

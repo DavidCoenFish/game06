@@ -171,6 +171,13 @@ namespace DscUi
 			const VectorUiCoord2& in_attach_point
 			);
 
+		// could be combined with the DrawUiSystem, but doesn't need to be
+		void UpdateUiSystem(
+			DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
+			const float in_time_delta
+			// input state? keys down, touch pos, gamepad
+			);
+
 		void DrawUiSystem(
 			DscRender::IRenderTarget* const in_render_target,
 			DscRenderResource::Frame& in_frame,
