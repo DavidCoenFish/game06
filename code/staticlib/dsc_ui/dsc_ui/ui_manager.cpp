@@ -40,18 +40,20 @@ namespace
         }
         });
 
-    DscDag::NodeToken MakeNodeGetChildAvaliableSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_parent_ui_component, DscDag::NodeToken in_parent_avaliable_size, DscDag::NodeToken in_child_index)
+    DscDag::NodeToken MakeNodeGetChildAvaliableSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_parent_ui_component, DscDag::NodeToken in_parent_avaliable_size, DscDag::NodeToken in_child_index, DscDag::NodeToken in_ui_scale)
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
             DscCommon::VectorInt2 parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
-            int32 child_index = DscDag::DagCollection::GetValueType<int32>(in_input_array[2]);
+            const int32 child_index = DscDag::DagCollection::GetValueType<int32>(in_input_array[2]);
+            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
 
-            value = ui_component->GetComponent().GetChildAvaliableSize(parent_avaliable_size, child_index);
+            value = ui_component->GetComponent().GetChildAvaliableSize(parent_avaliable_size, child_index, ui_scale);
         });
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_parent_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_child_index, node);
+        DscDag::DagCollection::LinkIndexNodes(3, in_ui_scale, node);
         
         return node;
     }
@@ -86,18 +88,20 @@ namespace
         return node;
     }
 
-    DscDag::NodeToken MakeNodeGetChildGeometryOffset(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_parent_ui_component, DscDag::NodeToken in_parent_avaliable_size, DscDag::NodeToken in_parent_child_index)
+    DscDag::NodeToken MakeNodeGetChildGeometryOffset(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_parent_ui_component, DscDag::NodeToken in_parent_avaliable_size, DscDag::NodeToken in_parent_child_index, DscDag::NodeToken in_ui_scale)
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
-            DscCommon::VectorInt2 parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
-            int32 child_index = DscDag::DagCollection::GetValueType<int32>(in_input_array[2]);
+            DscUi::UiDagNodeComponent* const ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
+            const DscCommon::VectorInt2 parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+            const int32 child_index = DscDag::DagCollection::GetValueType<int32>(in_input_array[2]);
+            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
 
-            value = ui_component->GetComponent().GetChildGeometryOffset(parent_avaliable_size, child_index);
+            value = ui_component->GetComponent().GetChildGeometryOffset(parent_avaliable_size, child_index, ui_scale);
         });
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_parent_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_parent_child_index, node);
+        DscDag::DagCollection::LinkIndexNodes(3, in_ui_scale, node);
 
         return node;
     }
@@ -557,10 +561,11 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
         DSC_DEBUG_ONLY(DSC_COMMA "render target"));
     node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TRenderTarget)] = render_target;
 
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize)] = in_dag_collection.CreateValue(
+    DscDag::NodeToken render_target_viewport_size = in_dag_collection.CreateValue(
         std::any(DscCommon::VectorInt2()),
         DscDag::TValueChangeCondition::TOnValueChange
         DSC_DEBUG_ONLY(DSC_COMMA "render target viewport size"));
+    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize)] = render_target_viewport_size;
 
     DscDag::NodeToken ui_draw_scale = in_dag_collection.CreateValue(
         std::any(float(0.0f)),
@@ -604,6 +609,7 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
 
     // not directly consumed by the Calculate function, but used to mark it dirty
     DscDag::DagCollection::LinkIndexNodes(5, force_draw, draw_root);
+    DscDag::DagCollection::LinkIndexNodes(6, render_target_viewport_size, draw_root);
 
     DscUi::DagGroupUiRootNode result(&in_dag_collection, node_token_array);
     DSC_ASSERT(true == result.IsValid(), "invalid result");
@@ -658,7 +664,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         in_dag_collection, 
         in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent),
         in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiAvaliableSize),
-        parent_child_index
+        parent_child_index,
+        in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale)
         );
     result.SetNodeToken(TUiParentNodeGroup::TUiAvaliableSize, avaliable_size);
 
@@ -674,7 +681,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         in_dag_collection, 
         in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent),
         in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiAvaliableSize),
-        parent_child_index
+        parent_child_index,
+        in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale)
         );
     DscDag::NodeToken geometry_size = MakeNodeGetChildGeometrySize(
         in_dag_collection, 

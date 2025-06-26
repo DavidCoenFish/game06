@@ -19,11 +19,11 @@ DscUi::VectorUiCoord2::VectorUiCoord2(
 	return;
 }
 
-const DscCommon::VectorInt2 DscUi::VectorUiCoord2::EvalueUICoord(const DscCommon::VectorInt2& in_parent_size) const
+const DscCommon::VectorInt2 DscUi::VectorUiCoord2::EvalueUICoord(const DscCommon::VectorInt2& in_parent_size, const float in_ui_scale) const
 {
 	const DscCommon::VectorInt2 result(
-		_data[0].Evaluate(in_parent_size.GetX(), in_parent_size.GetY()),
-		_data[1].Evaluate(in_parent_size.GetY(), in_parent_size.GetX())
+		_data[0].Evaluate(in_parent_size.GetX(), in_parent_size.GetY(), in_ui_scale),
+		_data[1].Evaluate(in_parent_size.GetY(), in_parent_size.GetX(), in_ui_scale)
 	);
 	return result;
 }

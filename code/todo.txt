@@ -1,9 +1,8 @@
-- ?shader screen quad checker plus
-- ?ui effect like stroke
 - ?ui
+- ?ui effect like stroke
 - ?dsc_dag
-- ?draw dag triangle (dont render unless input changed)
 - ?partial upload
+- ?draw dag triangle (dont render unless input changed)
 
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 

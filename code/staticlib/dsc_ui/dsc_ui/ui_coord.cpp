@@ -1,4 +1,5 @@
 #include "ui_coord.h"
+#include <dsc_common\math.h>
 
 DscUi::UiCoord::UiCoord(
 	const int32 in_pixels,
@@ -40,17 +41,18 @@ DscUi::UiCoord& DscUi::UiCoord::operator=(const UiCoord& in_rhs)
 	return (*this);
 }
 
-const int32 DscUi::UiCoord::Evaluate(const int32 in_parent_primary, const int32 in_parent_secondary) const
+const int32 DscUi::UiCoord::Evaluate(const int32 in_parent_primary, const int32 in_parent_secondary, const float in_ui_scale) const
 {
 	switch (_method)
 	{
 	default:
 		break;
 	case TMethod::TMin:
-		return static_cast<int32>(round(static_cast<float>(std::min(in_parent_primary, in_parent_secondary)) * _ratio)) + _pixels;
+		return DscCommon::Math::ScaleInt(std::min(in_parent_primary, in_parent_secondary), _ratio) + DscCommon::Math::ScaleInt(_pixels, in_ui_scale);
 	case TMethod::TMax:
-		return static_cast<int32>(round(static_cast<float>(std::max(in_parent_primary, in_parent_secondary)) * _ratio)) + _pixels;
+		return DscCommon::Math::ScaleInt(std::max(in_parent_primary, in_parent_secondary), _ratio) + DscCommon::Math::ScaleInt(_pixels, in_ui_scale);
 	}
-	return static_cast<int32>(round(static_cast<float>(in_parent_primary) * _ratio)) + _pixels;
+
+	return DscCommon::Math::ScaleInt(in_parent_primary, _ratio) + DscCommon::Math::ScaleInt(_pixels, in_ui_scale);
 }
 

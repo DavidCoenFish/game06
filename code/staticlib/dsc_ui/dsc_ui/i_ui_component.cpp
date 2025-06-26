@@ -21,7 +21,7 @@ const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSi
 	return in_avaliable_size;
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildAvaliableSize(const DscCommon::VectorInt2& in_our_desired_size, const int32) const
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildAvaliableSize(const DscCommon::VectorInt2& in_our_desired_size, const int32, const float) const
 {
 	return in_our_desired_size;
 }
@@ -31,7 +31,7 @@ const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildGeometrySize(const DscC
 	return in_child_avaliable_size;
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildGeometryOffset(const DscCommon::VectorInt2&, const int32) const
+const DscCommon::VectorInt2 DscUi::IUiComponent::GetChildGeometryOffset(const DscCommon::VectorInt2&, const int32, const float) const
 {
 	return DscCommon::VectorInt2::s_zero;
 }

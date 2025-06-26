@@ -76,8 +76,8 @@ const bool Application::Update()
             _resources->_ui_manager->DrawUiSystem(
                 _draw_system->GetRenderTargetBackBuffer(),
                 *frame,
-                true, //false,
-                false, //true,
+                true,
+                false,
                 _resources->_ui_root_node_group
                 );
         }

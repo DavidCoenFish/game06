@@ -80,8 +80,6 @@ void DscUi::UiComponentCanvas::Draw(
 	const float
 	)
 {
-	const DscCommon::VectorInt2 viewport_size = in_render_target.GetViewportSize();
-
 	in_frame.SetRenderTarget(&in_render_target);
 	for (const auto& item : _child_slot_array)
 	{
@@ -125,12 +123,12 @@ void DscUi::UiComponentCanvas::SetNode(
 	return;
 }
 
-const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index) const
+const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const
 {
 	DscCommon::VectorInt2 result(in_parent_avaliable_size);
 	if ((0 <= in_child_index) && (in_child_index < static_cast<int32>(_child_slot_array.size())))
 	{
-		result = _child_slot_array[in_child_index]._child_size.EvalueUICoord(in_parent_avaliable_size);
+		result = _child_slot_array[in_child_index]._child_size.EvalueUICoord(in_parent_avaliable_size, in_ui_scale);
 	}
 	else
 	{
@@ -146,14 +144,14 @@ const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildGeometrySize(const
 	return in_child_avaliable_size;
 }
 
-const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildGeometryOffset(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index) const
+const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildGeometryOffset(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const
 {
 	DscCommon::VectorInt2 result(in_parent_avaliable_size);
 	if ((0 <= in_child_index) && (in_child_index < static_cast<int32>(_child_slot_array.size())))
 	{
-		const DscCommon::VectorInt2 avaliable_size = _child_slot_array[in_child_index]._child_size.EvalueUICoord(in_parent_avaliable_size);
-		const DscCommon::VectorInt2 pivot_point = _child_slot_array[in_child_index]._child_pivot.EvalueUICoord(avaliable_size);
-		const DscCommon::VectorInt2 attach_point = _child_slot_array[in_child_index]._attach_point.EvalueUICoord(in_parent_avaliable_size);
+		const DscCommon::VectorInt2 avaliable_size = _child_slot_array[in_child_index]._child_size.EvalueUICoord(in_parent_avaliable_size, in_ui_scale);
+		const DscCommon::VectorInt2 pivot_point = _child_slot_array[in_child_index]._child_pivot.EvalueUICoord(avaliable_size, in_ui_scale);
+		const DscCommon::VectorInt2 attach_point = _child_slot_array[in_child_index]._attach_point.EvalueUICoord(in_parent_avaliable_size, in_ui_scale);
 
 		result.Set(
 			attach_point.GetX() - pivot_point.GetX(),
