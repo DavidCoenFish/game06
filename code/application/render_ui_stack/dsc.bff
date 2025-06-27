@@ -30,7 +30,7 @@
         "dsc_locale",
         "dsc_png",
         "dsc_version",
-        "dsc_ui",
+        "dsc_ui"
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 

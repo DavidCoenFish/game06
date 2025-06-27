@@ -9,7 +9,8 @@ namespace DscDag
 
 	/// <summary>
 	/// Totally not a duck typed class / object that can be handed around to other people that agree with the set of nodes to be provided / interface
-	/// currently missing type safety of the node types however... which could require another array of the type ids?
+	/// currently missing type safety of the node types however... 
+	/// which could require another array of the type ids/ if empty allowed? and if allowed to set? and bring the GetValueType into method this class?
 	/// </summary>
 	template <typename ENUM, std::size_t SIZE>
 	class DagGroup

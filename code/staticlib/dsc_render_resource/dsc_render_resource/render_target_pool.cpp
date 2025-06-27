@@ -158,6 +158,7 @@ std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> Ds
 		{
 			if (1 == item.use_count())
 			{
+				item->SetSubSize(true, in_size);
 				return std::make_shared<RenderTargetPoolTexture>(item, in_size);
 			}
 		}
@@ -183,6 +184,7 @@ std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> Ds
 
 	pMap->insert(std::make_pair(size_hash, std::move(bucket)));
 
+	render_target_outer->SetSubSize(true, in_size);
 	auto texture = std::make_shared<RenderTargetPoolTexture>(render_target_outer, in_size);
 	return texture;
 }

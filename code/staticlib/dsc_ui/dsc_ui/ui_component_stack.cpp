@@ -132,18 +132,12 @@ const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildGeometryOffset(cons
 			default:
 				break;
 			case TUiFlow::THorizontal:
-				if (0 != index)
-				{
-					trace += _item_gap.Evaluate(in_parent_avaliable_size.GetX(), in_parent_avaliable_size.GetY(), in_ui_scale);
-				}
 				trace += geometry_size.GetX();
+				trace += _item_gap.Evaluate(in_parent_avaliable_size.GetX(), in_parent_avaliable_size.GetY(), in_ui_scale);
 				break;
 			case TUiFlow::TVertical:
-				if (0 != index)
-				{
-					trace += _item_gap.Evaluate(in_parent_avaliable_size.GetY(), in_parent_avaliable_size.GetX(), in_ui_scale);
-				}
 				trace += geometry_size.GetY();
+				trace += _item_gap.Evaluate(in_parent_avaliable_size.GetY(), in_parent_avaliable_size.GetX(), in_ui_scale);
 				break;
 			}
 		}

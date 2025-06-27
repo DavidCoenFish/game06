@@ -72,9 +72,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
             _resources->_ui_root_node_group,
             parent_node_group,
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            DscUi::VectorUiCoord2(DscUi::UiCoord(200, 0.0f), DscUi::UiCoord(100, 0.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(200, 0.0f), DscUi::UiCoord(100, 0.0f))
+            //DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            //DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            //DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             );
     }
 

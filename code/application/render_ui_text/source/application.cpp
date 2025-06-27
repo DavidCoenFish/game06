@@ -187,7 +187,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         auto text_run = MakeTextRun(*_resources->_text_manager, *_file_system);
 
-        auto ui_component_fill = _resources->_ui_manager->MakeComponentText(
+        auto ui_component_text = _resources->_ui_manager->MakeComponentText(
             *_resources->_text_manager,
             std::move(text_run),
             DscUi::TUiComponentBehaviour::TNone
@@ -195,7 +195,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto node_2_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_fill),
+            std::move(ui_component_text),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
             _resources->_ui_root_node_group,
             parent_node_group,

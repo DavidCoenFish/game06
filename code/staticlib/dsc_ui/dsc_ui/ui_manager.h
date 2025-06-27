@@ -117,6 +117,7 @@ IUiComponent::SetDrawNode(NodeToken) // for parent to get the render target shad
 namespace DscUi
 {
 	class IUiComponent;
+	class UiCoord;
 	class VectorUiCoord2;
 
 	class UiManager
@@ -138,6 +139,10 @@ namespace DscUi
 			std::unique_ptr<DscText::TextRun>&& in_text_run,
 			const TUiComponentBehaviour in_behaviour
 			);
+		std::unique_ptr<IUiComponent> MakeComponentStack(
+			const UiCoord& in_item_gap,
+			const TUiFlow in_ui_flow
+		);
 
 		DagGroupUiRootNode MakeUiRootNode(
 			DscDag::DagCollection& in_dag_collection,
@@ -146,6 +151,7 @@ namespace DscUi
 
 		static DagGroupUiParentNode ConvertUiRootNodeToParentNode(const DagGroupUiRootNode& in_ui_root_node_group);
 
+		// on adding a child to a parent is when it's clear colour is set...
 		DagGroupUiParentNode MakeUiNode(
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
@@ -156,7 +162,7 @@ namespace DscUi
 			const DagGroupUiParentNode& in_parent_node
 		);
 
-		// on adding a child to a parent is when the ui component gets its ParentChildIndex set?
+		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
 		DagGroupUiParentNode MakeUiNodeCanvasChild(
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
@@ -170,6 +176,18 @@ namespace DscUi
 			const VectorUiCoord2& in_child_pivot, 
 			const VectorUiCoord2& in_attach_point
 			);
+
+		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
+		DagGroupUiParentNode MakeUiNodeStackChild(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<IUiComponent>&& in_component,
+			const DscCommon::VectorFloat4& in_clear_colour,
+
+			const DagGroupUiRootNode& in_root_node,
+			const DagGroupUiParentNode& in_parent_node
+			);
+
 
 		// could be combined with the DrawUiSystem, but doesn't need to be
 		void UpdateUiSystem(

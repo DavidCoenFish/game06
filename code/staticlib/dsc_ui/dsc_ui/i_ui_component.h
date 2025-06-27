@@ -37,7 +37,7 @@ namespace DscUi
 
 		// so, components that want to have a desired size other than the avalaible size will not play nice with being top level ui components, that has the render viewport of the externaliily provided size
 		// workaround is to just nest in a canvas or other accomidating component (padding? stack?)
-		//virtual const bool IsAllowedToBeTopLevelUiComponent() = 0;
+		virtual const bool IsAllowedToBeTopLevelUiComponent() = 0;
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,

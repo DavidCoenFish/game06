@@ -25,6 +25,11 @@ namespace DscUi
 			);
 
 	private:
+		virtual const bool IsAllowedToBeTopLevelUiComponent() override
+		{
+			return false;
+		}
+
 		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale) override;
 
 		virtual void Draw(

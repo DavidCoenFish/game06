@@ -29,6 +29,11 @@ namespace DscUi
 		);
 
 	private:
+		virtual const bool IsAllowedToBeTopLevelUiComponent() override
+		{
+			return true;
+		}
+
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
 			DscRender::IRenderTarget& in_render_target,

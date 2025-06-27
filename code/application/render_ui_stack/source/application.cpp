@@ -4,14 +4,18 @@
 #include <dsc_common/log_system.h>
 #include <dsc_common/math.h>
 #include <dsc_common/i_file_overlay.h>
+#include <dsc_common/timer.h>
 #include <dsc_common/vector_int2.h>
 #include <dsc_dag/dag_collection.h>
+#include <dsc_locale/dsc_locale.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
 #include <dsc_render_resource/shader.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_text/text_manager.h>
+#include <dsc_text/text_run.h>
+#include <dsc_text/i_text_run.h>
 #include <dsc_onscreen_version/onscreen_version.h>
 #include <dsc_ui/i_ui_component.h>
 #include <dsc_ui/ui_manager.h>
@@ -20,6 +24,58 @@
 
 namespace
 {
+    void AddTextToNode(
+        DscCommon::FileSystem& in_file_system,
+        DscRender::DrawSystem& in_draw_system,
+        DscDag::DagCollection& in_dag_collection,
+        DscText::TextManager& in_text_manager,
+        DscUi::UiManager& in_ui_manager,
+        const DscUi::DagGroupUiRootNode& in_root_node,
+        const DscUi::DagGroupUiParentNode& in_parent_node,
+        const std::string& in_message)
+    {
+        DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+        const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            in_message,
+            pLocale,
+            font,
+            32,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            24
+        ));
+
+        DscCommon::VectorInt2 container_size = {};
+        const int32 current_width = 0;
+        auto text_run = std::make_unique<DscText::TextRun>(
+            std::move(text_run_array),
+            container_size,
+            true,
+            current_width,
+            DscText::THorizontalAlignment::TNone,
+            DscText::TVerticalAlignment::TTop,
+            12
+            );
+
+        auto ui_component_text = in_ui_manager.MakeComponentText(
+            in_text_manager,
+            std::move(text_run),
+            DscUi::TUiComponentBehaviour::TNone
+        );
+        in_ui_manager.MakeUiNodeStackChild(
+            in_draw_system,
+            in_dag_collection,
+            std::move(ui_component_text),
+            DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 0.5f),
+            in_root_node,
+            in_parent_node
+        );
+
+        return;
+    }
 }
 
 Application::Resources::Resources() 
@@ -35,6 +91,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.0f));
 
     _resources = std::make_unique<Resources>();
+
+    if (nullptr != _resources)
+    {
+        _resources->_timer = std::make_unique<DscCommon::Timer>();
+    }
+
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
@@ -64,18 +126,27 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2()
         );
 
-        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
-        auto node_2_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
+        auto ui_component_stack = _resources->_ui_manager->MakeComponentStack(
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::TUiFlow::TVertical
+            );
+        auto stack_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_fill),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
+            std::move(ui_component_stack),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 0.5f),
             _resources->_ui_root_node_group,
             parent_node_group,
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 0.75f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.0f))
             );
+
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "hello");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "world");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "some longer text that is very long");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "i ran out of things to say, so i will just keep on making noise");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "button");
     }
 
     return;
@@ -100,8 +171,19 @@ const bool Application::Update()
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
 
+        float time_delta = 0.0f;
+        if (_resources && _resources->_timer)
+        {
+            time_delta = _resources->_timer->GetDeltaSeconds();
+        }
+
         if (_resources->_ui_manager)
         {
+            _resources->_ui_manager->UpdateUiSystem(
+                _resources->_ui_root_node_group,
+                time_delta
+            );
+
             _resources->_ui_manager->DrawUiSystem(
                 _resources->_ui_root_node_group,
                 _draw_system->GetRenderTargetBackBuffer(),
@@ -110,7 +192,6 @@ const bool Application::Update()
                 true
             );
         }
-
 
         if (_resources->_onscreen_version)
         {

@@ -3,6 +3,7 @@
 #include "ui_component_canvas.h"
 #include "ui_component_debug_fill.h"
 #include "ui_component_fill.h"
+#include "ui_component_stack.h"
 #include "ui_component_text.h"
 #include "ui_dag_node_component.h"
 #include "ui_enum.h"
@@ -31,12 +32,6 @@ namespace
         D3D12_INPUT_ELEMENT_DESC
         {
             "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, \
-                D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 // UINT InstanceDataStepRate;
-        },
-        // can not just 
-        D3D12_INPUT_ELEMENT_DESC
-        {
-            "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, \
                 D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 // UINT InstanceDataStepRate;
         }
         });
@@ -130,7 +125,7 @@ namespace
                     clear_colour
                 )
             );
-            // desired size can not be smaller than the requested size
+            // desired size can not be smaller than the requested size, and this is why we now need to look at the viewport size of the render target rather than just pass down the desired size
             const DscCommon::VectorInt2 request_size(
                 std::max(desired_size.GetX(), geometry_size.GetX()), 
                 std::max(desired_size.GetY(), geometry_size.GetY()));
@@ -167,7 +162,19 @@ namespace
         DscDag::DagCollection::LinkIndexNodes(0, in_render_target_pool_texture, node);
 
         return node;
+    }
 
+    DscDag::NodeToken MakeNodeGetRenderTargetViewportSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_render_target_pool_texture)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            auto render_texture_pool_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>>(in_input_array[0]);
+
+            value = render_texture_pool_texture->_render_target_texture->GetViewportSize();
+        } DSC_DEBUG_ONLY(DSC_COMMA "Render target viewport size"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_render_target_pool_texture, node);
+
+        return node;
     }
 
     DscDag::NodeToken MakeNodeUiPanelShaderConstant(
@@ -189,11 +196,12 @@ namespace
             DscCommon::VectorFloat2 scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(in_input_array[5]);
 
             DscUi::TUiPanelShaderConstantBuffer constant_buffer = {};
-            // geometry is in range [-1 ... 1]
+            // geometry is in range [-1 ... 1], but we want the offset relative to top left
             constant_buffer._pos_size[0] = (static_cast<float>(geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
-            constant_buffer._pos_size[1] = (static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f) - 1.0f;
+            constant_buffer._pos_size[1] = ((1.0f - static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
             constant_buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
             constant_buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
+
             // atd::abs to allow ping point anim of scroll as it range [-1 ... 1] => [0 .. 1]
             const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
             constant_buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_target_size.GetX());
@@ -387,33 +395,25 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         //0.0f, 0.0f,
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
+
+        //0.0f, 1.0f,
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
 
         //1.0f, 0.0f,
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
-
-        //0.0f, 1.0f,
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
 
         //1.0f, 1.0f,
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 0.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
-        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
 
         _ui_panel_geometry = std::make_shared<DscRenderResource::GeometryGeneric>(
             &in_draw_system,
             D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
             s_input_element_desc_array,
             vertex_raw_data,
-            4
+            2
             );
     }
 
@@ -558,11 +558,28 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentText(
     return result;
 }
 
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentStack(
+    const UiCoord& in_item_gap,
+    const TUiFlow in_ui_flow
+)
+{
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentStack>(
+        _ui_panel_shader,
+        _ui_panel_geometry,
+        in_item_gap,
+        in_ui_flow
+        );
+    return result;
+}
+
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component
     )
 {
+    DSC_ASSERT(nullptr != in_component, "invalid param");
+    DSC_ASSERT(true == in_component->IsAllowedToBeTopLevelUiComponent(), "invalid state");
+
     DscDag::NodeToken node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TCount)] = {};
 
     DscDag::NodeToken frame = in_dag_collection.CreateValue(
@@ -654,6 +671,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::ConvertUiRootNodeToParentNode(cons
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiComponent, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TUiComponent));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiAvaliableSize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiRenderSize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiGeometrySize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TDraw, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawRoot));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiPanelShaderConstant, in_ui_root_node_group.GetDagCollection()->CreateValue(
         std::any(),
@@ -704,7 +722,6 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         avaliable_size,
         in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale)
         );
-    result.SetNodeToken(TUiParentNodeGroup::TUiRenderSize, desired_size);
 
     DscDag::NodeToken clear_colour_node = in_dag_collection.CreateValue(
         std::any(in_clear_colour),
@@ -724,6 +741,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         avaliable_size,
         desired_size
         );
+    result.SetNodeToken(TUiParentNodeGroup::TUiGeometrySize, geometry_size);
+
 
     DscDag::NodeToken pixel_traversal_size_node = MakeNodePixelTraversal(in_dag_collection, geometry_size, desired_size);
     DscDag::NodeToken manual_scroll_x = in_dag_collection.CreateValue(
@@ -741,12 +760,16 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     // reminder: render_target_pool_texture_size is the size of the full texture the render pool has given us, may be bigger than our render viewport/ desired size
     DscDag::NodeToken render_target_pool_texture_size = MakeNodeGetRenderTargetSize(in_dag_collection, render_target_pool_texture);
 
+    DscDag::NodeToken render_target_pool_texture_viewport_size = MakeNodeGetRenderTargetViewportSize(in_dag_collection, render_target_pool_texture);
+
+    result.SetNodeToken(TUiParentNodeGroup::TUiRenderSize, render_target_pool_texture_viewport_size);
+
     DscDag::NodeToken shader_constant_node = MakeNodeUiPanelShaderConstant(
         in_dag_collection, 
         in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiRenderSize),
         geometry_offset,
         geometry_size, 
-        desired_size, 
+        render_target_pool_texture_viewport_size,
         render_target_pool_texture_size, 
         scroll_value);
     result.SetNodeToken(TUiParentNodeGroup::TUiPanelShaderConstant, shader_constant_node);
@@ -826,6 +849,43 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
 
     return result;
 }
+
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    const DscCommon::VectorFloat4& in_clear_colour,
+
+    const DagGroupUiRootNode& in_root_node,
+    const DagGroupUiParentNode& in_parent_node
+)
+{
+    IUiComponent* ui_component_raw = in_component.get();
+
+    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
+    UiComponentStack* parent_stack = dynamic_cast<UiComponentStack*>(&ui_dag_node_component->GetComponent());
+
+    auto result = MakeUiNode(
+        in_draw_system,
+        in_dag_collection,
+        std::move(in_component),
+        in_clear_colour,
+        in_root_node,
+        in_parent_node
+    );
+
+    parent_stack->AddChild(
+        ui_component_raw,
+        in_draw_system,
+        result.GetNodeToken(TUiParentNodeGroup::TDraw),
+        result.GetNodeToken(TUiParentNodeGroup::TUiPanelShaderConstant),
+        result.GetNodeToken(TUiParentNodeGroup::TUiGeometrySize)
+    );
+
+    return result;
+
+}
+
 
 void DscUi::UiManager::UpdateUiSystem(
     DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
