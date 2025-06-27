@@ -179,11 +179,11 @@ namespace DscUi
 			);
 
 		void DrawUiSystem(
+			DagGroupUiRootNode& in_ui_root_node_group, // not const as resolve conditional nodes may change data...
 			DscRender::IRenderTarget* const in_render_target,
 			DscRenderResource::Frame& in_frame,
 			const bool in_force_top_level_draw, // if this render target is shared, need to at least redraw the top level ui
 			const bool in_clear_on_draw, // clear the top level render target before we draw to it
-			DagGroupUiRootNode& in_ui_root_node_group, // not const as resolve conditional nodes may change data...
 			const float in_ui_scale = 1.0f
 		);
 

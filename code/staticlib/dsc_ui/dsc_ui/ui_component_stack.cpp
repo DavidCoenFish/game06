@@ -6,6 +6,7 @@
 #include <dsc_render\i_render_target.h>
 #include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\geometry_generic.h>
+#include <dsc_render_resource\render_target_texture.h>
 #include <dsc_render_resource\shader.h>
 #include <dsc_render_resource\shader_constant_buffer.h>
 
@@ -52,8 +53,8 @@ void DscUi::UiComponentStack::Draw(
 	in_frame.SetRenderTarget(&in_render_target);
 	for (const auto& item : _child_slot_array)
 	{
-		std::shared_ptr < DscRender::HeapWrapperItem > shader_resource = DscDag::DagCollection::GetValueType<std::shared_ptr < DscRender::HeapWrapperItem >>(item._render_node);
-		_ui_panel_shader->SetShaderResourceViewHandle(0, shader_resource);
+		std::shared_ptr<DscRenderResource::RenderTargetTexture> render_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetTexture>>(item._render_node);
+		_ui_panel_shader->SetShaderResourceViewHandle(0, render_texture->GetShaderResourceHeapWrapperItem(0));
 		
 		auto& constant_buffer = item._shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
 		constant_buffer = DscDag::DagCollection::GetValueType<TUiPanelShaderConstantBuffer>(item._ui_panel_shader_constant_node);

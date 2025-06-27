@@ -241,11 +241,11 @@ const bool Application::Update()
                 );
 
             _resources->_ui_manager->DrawUiSystem(
+                _resources->_ui_root_node_group,
                 _draw_system->GetRenderTargetBackBuffer(),
                 *frame,
                 true,
-                true,
-                _resources->_ui_root_node_group
+                true
             );
         }
 

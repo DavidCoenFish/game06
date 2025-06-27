@@ -765,7 +765,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
             ui_dag_node_component->GetComponent().Draw(*frame, *render_target, ui_draw_scale);
         }
 
-        out_value = render_target_pool_texture->_render_target_texture->GetShaderResourceHeapWrapperItem(0);
+        //out_value = render_target_pool_texture->_render_target_texture->GetShaderResourceHeapWrapperItem(0);
+        // return a std::shared_ptr<DscRenderResource::RenderTargetTexture> rather than a heap wrapper so consumer can see the texture size, the viewport size And the shader resource
+        out_value = render_target_pool_texture->_render_target_texture;
     } DSC_DEBUG_ONLY(DSC_COMMA "draw node"));
 
     ui_component_raw->SetNode(parent_child_index, clear_colour_node, manual_scroll_x, manual_scroll_y);
@@ -840,11 +842,11 @@ void DscUi::UiManager::UpdateUiSystem(
 }
 
 void DscUi::UiManager::DrawUiSystem(
+    DagGroupUiRootNode& in_ui_root_node_group,
     DscRender::IRenderTarget* const in_render_target,
     DscRenderResource::Frame& in_frame,
     const bool in_force_top_level_draw, // if this render target is shared, need to at least redraw the top level ui
     const bool in_clear_on_draw, // clear the top level render target before we draw to it
-    DagGroupUiRootNode& in_ui_root_node_group,
     const float in_ui_scale
 )
 {
