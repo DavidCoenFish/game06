@@ -3,6 +3,7 @@
 #include "ui_component_canvas.h"
 #include "ui_component_debug_fill.h"
 #include "ui_component_fill.h"
+#include "ui_component_padding.h"
 #include "ui_component_stack.h"
 #include "ui_component_text.h"
 #include "ui_dag_node_component.h"
@@ -45,7 +46,9 @@ namespace
             const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
 
             value = ui_component->GetComponent().GetChildAvaliableSize(parent_avaliable_size, child_index, ui_scale);
-        });
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA "GetChildAvaliableSize"));
+
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_parent_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_child_index, node);
@@ -62,7 +65,8 @@ namespace
             const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
 
             value = ui_component->GetComponent().ConvertAvaliableSizeToDesiredSize(avaliable_size, ui_scale);
-        });
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA "ConvertAvaliableSizeToDesiredSize"));
         DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_ui_scale, node);
@@ -78,7 +82,9 @@ namespace
             DscCommon::VectorInt2 child_desired_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[2]);
 
             value = ui_component->GetComponent().GetChildGeometrySize(child_desired_size, child_avaliable_size);
-        });
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA "GetChildGeometrySize"));
+
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_child_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_child_desired_size, node);
@@ -95,7 +101,8 @@ namespace
             const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
 
             value = ui_component->GetComponent().GetChildGeometryOffset(parent_avaliable_size, child_index, ui_scale);
-        });
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA "GetChildGeometryOffset"));
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_ui_component, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_parent_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_parent_child_index, node);
@@ -212,7 +219,8 @@ namespace
             value = constant_buffer;
 
             //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "NodeUiPanelShaderConstant render_viewport_size:%d %d render_target_size:%d %d\n", render_viewport_size.GetX(), render_viewport_size.GetY(), render_target_size.GetX(), render_target_size.GetY());
-        });
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA "UiPanelShaderConstant"));
 
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_render_size, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_geometry_offset, node);
@@ -572,9 +580,29 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentStack(
     return result;
 }
 
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentPadding(
+    const UiCoord& in_left,
+    const UiCoord& in_top,
+    const UiCoord& in_right,
+    const UiCoord& in_bottom
+)
+{
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentPadding>(
+        _ui_panel_shader,
+        _ui_panel_geometry,
+        in_left,
+        in_top,
+        in_right,
+        in_bottom
+        );
+    return result;
+}
+
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
     )
 {
     DSC_ASSERT(nullptr != in_component, "invalid param");
@@ -622,7 +650,10 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
 
     DscDag::NodeToken ui_component = nullptr;
     {
-        auto node = std::make_unique<UiDagNodeComponent>(std::move(in_component));
+        auto node = std::make_unique<UiDagNodeComponent>(
+            std::move(in_component)
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+            );
         ui_component = in_dag_collection.AddCustomNode(std::move(node));
     }
     node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TUiComponent)] = ui_component;
@@ -690,6 +721,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
 
     const DagGroupUiRootNode& in_root_node,
     const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
     DscUi::DagGroupUiParentNode result(&in_dag_collection);
@@ -697,7 +730,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DscDag::NodeToken ui_component = nullptr;
     IUiComponent* const ui_component_raw = in_component.get();
     {
-        auto node = std::make_unique<UiDagNodeComponent>(std::move(in_component));
+        auto node = std::make_unique<UiDagNodeComponent>(std::move(in_component) 
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+            );
         ui_component = in_dag_collection.AddCustomNode(std::move(node));
     }
     result.SetNodeToken(TUiParentNodeGroup::TUiComponent, ui_component);
@@ -801,6 +836,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DscDag::DagCollection::LinkIndexNodes(2, in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale), draw_node);
     DscDag::DagCollection::LinkIndexNodes(3, ui_component, draw_node);
 
+    // not directly in the draw node calculate usage, but if it dirties, want the tree to dirty
+    DscDag::DagCollection::LinkIndexNodes(4, shader_constant_node, draw_node);
+
     // add our draw node as an input to the parent draw
     DscDag::DagCollection::LinkNodes(draw_node, in_parent_node.GetNodeToken(TUiParentNodeGroup::TDraw));
 
@@ -821,6 +859,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
     const VectorUiCoord2& in_child_size,
     const VectorUiCoord2& in_child_pivot,
     const VectorUiCoord2& in_attach_point
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
     IUiComponent* ui_component_raw = in_component.get();
@@ -835,6 +875,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
         in_clear_colour,
         in_root_node,
         in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
 
     parent_canvas->AddChild(
@@ -858,6 +900,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
 
     const DagGroupUiRootNode& in_root_node,
     const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
     IUiComponent* ui_component_raw = in_component.get();
@@ -872,6 +916,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
         in_clear_colour,
         in_root_node,
         in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
 
     parent_stack->AddChild(
@@ -883,9 +929,45 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
     );
 
     return result;
-
 }
 
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    const DscCommon::VectorFloat4& in_clear_colour,
+
+    const DagGroupUiRootNode& in_root_node,
+    const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+    IUiComponent* ui_component_raw = in_component.get();
+
+    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
+    UiComponentPadding* parent_stack = dynamic_cast<UiComponentPadding*>(&ui_dag_node_component->GetComponent());
+
+    auto result = MakeUiNode(
+        in_draw_system,
+        in_dag_collection,
+        std::move(in_component),
+        in_clear_colour,
+        in_root_node,
+        in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+    );
+
+    parent_stack->AddChild(
+        ui_component_raw,
+        in_draw_system,
+        result.GetNodeToken(TUiParentNodeGroup::TDraw),
+        result.GetNodeToken(TUiParentNodeGroup::TUiPanelShaderConstant)
+    );
+
+    return result;
+}
 
 void DscUi::UiManager::UpdateUiSystem(
     DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
@@ -899,6 +981,8 @@ void DscUi::UiManager::UpdateUiSystem(
         DscDag::NodeToken node = in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta);
         DscDag::DagCollection::SetValueType(node, in_time_delta);
     }
+
+    return;
 }
 
 void DscUi::UiManager::DrawUiSystem(

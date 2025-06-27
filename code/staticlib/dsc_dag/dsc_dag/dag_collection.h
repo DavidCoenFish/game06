@@ -66,6 +66,10 @@ namespace DscDag
 			SetValue(in_input, std::any(in_value));
 		}
 
+#if defined(_DEBUG)
+		void DebugDumpNode(NodeToken in_input);
+#endif //#if defined(_DEBUG)
+
 	private:
 		struct RawPtrComparator {
 			bool operator()(const std::unique_ptr<DscDag::IDagNode>& a, const std::unique_ptr<DscDag::IDagNode>& b) const;

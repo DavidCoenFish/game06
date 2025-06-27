@@ -188,3 +188,25 @@ void DscDag::DagCollection::SetValue(NodeToken in_input, const std::any& in_valu
 	return;
 }
 
+#if defined(_DEBUG)
+void DscDag::DagCollection::DebugDumpNode(NodeToken in_input)
+{
+	const std::string fullMessage = in_input->DebugPrint();
+	std::string line = {};
+	for (const auto c : fullMessage)
+	{
+		line += c;
+		if (c == '\n')
+		{
+			OutputDebugString(std::wstring(line.begin(), line.end()).c_str());
+			line = {};
+		}
+	}
+	if (false == line.empty())
+	{
+		OutputDebugString(std::wstring(line.begin(), line.end()).c_str());
+	}
+}
+#endif //#if defined(_DEBUG)
+
+

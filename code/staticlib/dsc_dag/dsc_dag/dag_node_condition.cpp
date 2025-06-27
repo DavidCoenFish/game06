@@ -21,6 +21,8 @@ DscDag::DagNodeCondition::DagNodeCondition(
 
 const std::any& DscDag::DagNodeCondition::GetValue()
 {
+	_dirty = false;
+
 	if (nullptr == _condition)
 	{
 		_value = {};
@@ -60,7 +62,11 @@ const std::any& DscDag::DagNodeCondition::GetValue()
 // reminder, we DO NOT set dirty our output (_true_destination, _false_destination) 
 void DscDag::DagNodeCondition::MarkDirty()
 {
-	_dag_collection.AddDirtyConditionNode(this);
+	if (false == _dirty)
+	{
+		_dirty = true;
+		_dag_collection.AddDirtyConditionNode(this);
+	}
 	return;
 }
 
@@ -93,18 +99,50 @@ void DscDag::DagNodeCondition::SetIndexInput(const int32 in_index, NodeToken in_
 	return;
 }
 
-//DscDag::NodeToken DscDag::DagNodeCondition::GetIndexInput(const int32 in_index) const
-//{
-//	switch (in_index)
-//	{
-//	default:
-//		break;
-//	case 0:
-//		return _condition;
-//	case 1:
-//		return _true_source;
-//	case 2:
-//		return _false_source;
-//	}
-//	return nullptr;
-//}
+#if defined(_DEBUG)
+const std::string DscDag::DagNodeCondition::DebugPrint(const int32 in_depth) const
+{
+	std::string result = {};
+	for (int32 index = 0; index < in_depth; ++index)
+	{
+		result += "    ";
+	}
+
+	result += "Condition:\"";
+	result += _debug_name;
+	result += "\" dirty:" + std::to_string(_dirty);
+	result += "\n";
+
+	if (nullptr != _condition)
+	{
+		for (int32 index = 0; index < in_depth + 1; ++index)
+		{
+			result += "    ";
+		}
+		result += "_condition:\n";
+		result += _condition->DebugPrint(in_depth + 2);
+	}
+
+	if (nullptr != _true_source)
+	{
+		for (int32 index = 0; index < in_depth + 1; ++index)
+		{
+			result += "    ";
+		}
+		result += "_true_source:\n";
+		result += _true_source->DebugPrint(in_depth + 2);
+	}
+
+	if (nullptr != _false_source)
+	{
+		for (int32 index = 0; index < in_depth + 1; ++index)
+		{
+			result += "    ";
+		}
+		result += "_false_source:\n";
+		result += _false_source->DebugPrint(in_depth + 2);
+	}
+
+	return result;
+}
+#endif //#if defined(_DEBUG)

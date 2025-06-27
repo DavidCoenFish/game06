@@ -33,7 +33,11 @@ namespace DscDag
 		// this is starting to be used to trigger calculation/ evaluate condition, the returned std::any may actually just be empty for those cases
 		virtual const std::any& GetValue() = 0;
 
-	private:
+#if defined(_DEBUG)
+		virtual const std::string DebugPrint(const int32 in_depth = 0) const = 0;
+#endif //#if defined(_DEBUG)
+
+	protected:
 		DSC_DEBUG_ONLY(std::string _debug_name);
 
 	}; // IDagNode

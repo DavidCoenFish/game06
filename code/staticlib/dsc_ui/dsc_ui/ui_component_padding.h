@@ -1,7 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
 #include "i_ui_component.h"
-#include "vector_ui_coord2.h"
+#include "ui_coord.h"
 
 namespace DscCommon
 {
@@ -25,20 +25,25 @@ namespace DscRenderResource
 
 namespace DscUi
 {
-	class UiComponentCanvas : public IUiComponent
+	/*
+	this is more of a margin than a padding class, it contracts the parents avaliable size
+	possibly a padding class should inflate the desired size
+	*/
+	class UiComponentPadding : public IUiComponent
 	{
 	public:
-		UiComponentCanvas(
+		UiComponentPadding(
 			const std::shared_ptr<DscRenderResource::Shader>& in_ui_panel_shader,
-			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_ui_panel_geometry
+			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_ui_panel_geometry,
+			const UiCoord& in_left,
+			const UiCoord& in_top,
+			const UiCoord& in_right,
+			const UiCoord& in_bottom
 		);
 
 		void AddChild(
 			IUiComponent* const in_child_component, // we don't keep a reference, we just set the parent child index
 			DscRender::DrawSystem& in_draw_system,
-			const VectorUiCoord2& in_child_size, 
-			const VectorUiCoord2& in_child_pivot, 
-			const VectorUiCoord2& in_attach_point, 
 			DscDag::NodeToken in_render_node, 
 			DscDag::NodeToken in_ui_panel_shader_constant_node
 			);
@@ -73,12 +78,13 @@ namespace DscUi
 	private:
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
+		UiCoord _left;
+		UiCoord _top;
+		UiCoord _right;
+		UiCoord _bottom;
 
 		struct ChildSlot
 		{
-			VectorUiCoord2 _child_size; 
-			VectorUiCoord2 _child_pivot;
-			VectorUiCoord2 _attach_point;
 			DscDag::NodeToken _render_node;
 			DscDag::NodeToken _ui_panel_shader_constant_node;
 			std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};

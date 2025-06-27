@@ -26,6 +26,10 @@ namespace DscDag
 		virtual const std::any& GetValue() override;
 		virtual const bool GetHasNoLinks() const override;
 
+#if defined(_DEBUG)
+		virtual const std::string DebugPrint(const int32 in_depth = 0) const override;
+#endif //#if defined(_DEBUG)
+
 	private:
 		bool _dirty = true;
 		const TCalculateFunction _calculateFunction = {};

@@ -125,11 +125,42 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2(),
             DscUi::VectorUiCoord2()
         );
+#if 1
+        auto ui_component_padding = _resources->_ui_manager->MakeComponentPadding(
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f)
+        );
+        auto ui_padding_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_padding),
+            DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 0.5f),
+            _resources->_ui_root_node_group,
+            parent_node_group,
+            DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+        );
 
         auto ui_component_stack = _resources->_ui_manager->MakeComponentStack(
             DscUi::UiCoord(16, 0.0f),
             DscUi::TUiFlow::TVertical
             );
+        auto stack_node = _resources->_ui_manager->MakeUiNodePaddingChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_stack),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.5f, 0.5f),
+            _resources->_ui_root_node_group,
+            ui_padding_node
+            );
+#else
+        auto ui_component_stack = _resources->_ui_manager->MakeComponentStack(
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::TUiFlow::TVertical
+        );
         auto stack_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
@@ -140,13 +171,13 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
-            );
-
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "world");
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "hello");
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "some longer text that is very long");
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "i ran out of things to say, so i will just keep on making noise");
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "button");
+        );
+#endif
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Hello");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "World");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Some longer text that is very long");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "I ran out of things to say, so i will just keep on making noise");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Not a button yet");
     }
 
     return;

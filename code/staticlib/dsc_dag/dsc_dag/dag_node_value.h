@@ -21,6 +21,10 @@ namespace DscDag
 
 		virtual const bool GetHasNoLinks() const override;
 
+#if defined(_DEBUG)
+		virtual const std::string DebugPrint(const int32 in_depth = 0) const override;
+#endif //#if defined(_DEBUG)
+
 	private:
 		TValueChangeCondition _change_condition = {};
 		std::any _value = {};

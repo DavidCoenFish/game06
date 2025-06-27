@@ -41,8 +41,13 @@ namespace DscDag
 		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
 		//virtual NodeToken GetIndexInput(const int32 in_index) const;
 
+#if defined(_DEBUG)
+		virtual const std::string DebugPrint(const int32 in_depth = 0) const override;
+#endif //#if defined(_DEBUG)
+
 	private:
 		DagCollection& _dag_collection;
+		bool _dirty = false;
 		NodeToken _condition = nullptr;
 		NodeToken _true_source = nullptr;
 		NodeToken _false_source = nullptr;

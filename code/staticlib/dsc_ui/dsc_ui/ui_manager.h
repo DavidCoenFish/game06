@@ -143,24 +143,21 @@ namespace DscUi
 			const UiCoord& in_item_gap,
 			const TUiFlow in_ui_flow
 		);
+		std::unique_ptr<IUiComponent> MakeComponentPadding(
+			const UiCoord& in_left,
+			const UiCoord& in_top,
+			const UiCoord& in_right,
+			const UiCoord& in_bottom
+		);
 
 		DagGroupUiRootNode MakeUiRootNode(
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component
+
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
 		static DagGroupUiParentNode ConvertUiRootNodeToParentNode(const DagGroupUiRootNode& in_ui_root_node_group);
-
-		// on adding a child to a parent is when it's clear colour is set...
-		DagGroupUiParentNode MakeUiNode(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
-		);
 
 		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
 		DagGroupUiParentNode MakeUiNodeCanvasChild(
@@ -175,7 +172,9 @@ namespace DscUi
 			const VectorUiCoord2& in_child_size, 
 			const VectorUiCoord2& in_child_pivot, 
 			const VectorUiCoord2& in_attach_point
-			);
+
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
 
 		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
 		DagGroupUiParentNode MakeUiNodeStackChild(
@@ -186,8 +185,22 @@ namespace DscUi
 
 			const DagGroupUiRootNode& in_root_node,
 			const DagGroupUiParentNode& in_parent_node
-			);
 
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
+
+		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
+		DagGroupUiParentNode MakeUiNodePaddingChild(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<IUiComponent>&& in_component,
+			const DscCommon::VectorFloat4& in_clear_colour,
+
+			const DagGroupUiRootNode& in_root_node,
+			const DagGroupUiParentNode& in_parent_node
+
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
 
 		// could be combined with the DrawUiSystem, but doesn't need to be
 		void UpdateUiSystem(
@@ -203,6 +216,21 @@ namespace DscUi
 			const bool in_force_top_level_draw, // if this render target is shared, need to at least redraw the top level ui
 			const bool in_clear_on_draw, // clear the top level render target before we draw to it
 			const float in_ui_scale = 1.0f
+		);
+
+	private:
+		// if this has a reason to be public, then lets make it puplic
+		// on adding a child to a parent is when it's clear colour is set...
+		DagGroupUiParentNode MakeUiNode(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<IUiComponent>&& in_component,
+			const DscCommon::VectorFloat4& in_clear_colour,
+
+			const DagGroupUiRootNode& in_root_node,
+			const DagGroupUiParentNode& in_parent_node
+
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 		);
 
 	private:

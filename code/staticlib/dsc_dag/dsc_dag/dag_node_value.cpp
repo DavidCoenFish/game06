@@ -1,5 +1,6 @@
 #include "dag_node_value.h"
 #include <dsc_common/vector_int2.h>
+#include <dsc_common/vector_float4.h>
 
 namespace
 {
@@ -56,6 +57,13 @@ namespace
 			else if (in_rhs_value.type() == typeid(DscCommon::VectorInt2))
 			{
 				if (std::any_cast<DscCommon::VectorInt2>(in_lhs_value) == std::any_cast<DscCommon::VectorInt2>(in_rhs_value))
+				{
+					return true;
+				}
+			}
+			else if (in_rhs_value.type() == typeid(DscCommon::VectorFloat4))
+			{
+				if (std::any_cast<DscCommon::VectorFloat4>(in_lhs_value) == std::any_cast<DscCommon::VectorFloat4>(in_rhs_value))
 				{
 					return true;
 				}
@@ -174,4 +182,53 @@ const bool DscDag::DagNodeValue::GetHasNoLinks() const
 	return (0 == _output.size());
 }
 
+#if defined(_DEBUG)
+const std::string DscDag::DagNodeValue::DebugPrint(const int32 in_depth) const
+{
+	std::string result = {};
+	for (int32 index = 0; index < in_depth; ++index)
+	{
+		result += "    ";
+	}
 
+	result += "Value:\"";
+	result += _debug_name;
+	result += "\"";
+	if (_value.has_value())
+	{
+		result += " type:";
+		result += _value.type().name();
+		if (_value.type() == typeid(bool))
+		{
+			result += " value:" + std::to_string(std::any_cast<bool>(_value));
+		}
+		else if (_value.type() == typeid(int32))
+		{
+			result += " value:" + std::to_string(std::any_cast<int32>(_value));
+		}
+		else if (_value.type() == typeid(float))
+		{
+			result += " value:" + std::to_string(std::any_cast<float>(_value));
+		}
+		else if (_value.type() == typeid(DscCommon::VectorInt2))
+		{
+			DscCommon::VectorInt2 value = std::any_cast<DscCommon::VectorInt2>(_value);
+			result += " value:[" + std::to_string(value.GetX());
+			result += ", " + std::to_string(value.GetY());
+			result += "]";
+		}
+		else if (_value.type() == typeid(DscCommon::VectorFloat4))
+		{
+			DscCommon::VectorFloat4 value = std::any_cast<DscCommon::VectorFloat4>(_value);
+			result += " value:[" + std::to_string(value.GetX());
+			result += ", " + std::to_string(value.GetY());
+			result += ", " + std::to_string(value.GetZ());
+			result += ", " + std::to_string(value.GetW());
+			result += "]";
+		}
+	}
+	result += "\n";
+
+	return result;
+}
+#endif //#if defined(_DEBUG)

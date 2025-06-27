@@ -51,3 +51,20 @@ const std::any& DscUi::UiDagNodeComponent::GetValue()
 {
 	return _value;
 }
+
+#if defined(_DEBUG)
+const std::string DscUi::UiDagNodeComponent::DebugPrint(const int32 in_depth) const
+{
+	std::string result = {};
+	for (int32 index = 0; index < in_depth; ++index)
+	{
+		result += "    ";
+	}
+
+	result += "UiDagNodeComponent:\"";
+	result += _debug_name;
+	result += "\"\n";
+
+	return result;
+}
+#endif //#if defined(_DEBUG)

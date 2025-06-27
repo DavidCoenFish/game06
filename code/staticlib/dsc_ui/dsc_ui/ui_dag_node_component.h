@@ -26,7 +26,10 @@ namespace DscUi
 		UiDagNodeComponent& operator=(const UiDagNodeComponent&) = delete;
 		UiDagNodeComponent(const UiDagNodeComponent&) = delete;
 
-		UiDagNodeComponent(std::unique_ptr<IUiComponent>&& in_component DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
+		UiDagNodeComponent(
+			std::unique_ptr<IUiComponent>&& in_component 
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
 
 		IUiComponent& GetComponent() const;
 
@@ -40,6 +43,10 @@ namespace DscUi
 		virtual const bool GetHasNoLinks() const override;
 		virtual void MarkDirty() override;
 		virtual const std::any& GetValue() override;
+
+#if defined(_DEBUG)
+		virtual const std::string DebugPrint(const int32 in_depth = 0) const override;
+#endif //#if defined(_DEBUG)
 
 	private:
 		std::set<DscDag::NodeToken> _output = {};

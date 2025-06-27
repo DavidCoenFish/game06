@@ -55,6 +55,7 @@ namespace DscUi
 		virtual void SetManualScrollX(const float in_x);
 		virtual void SetManualScrollY(const float in_y);
 
+		//so, next time this needs to be changed, just change it to a DagNodeGroup? in theory it is only the node the ui component writes to, but possibly need more coupling to read values as well, like parent avaliable size...
 		// in_shader_constant here feels like a bit of overkill, we dont srite to it, but saves collecting 10 or so bits of data to calculate it.. alternative is to have it higher in the UiComponent like UiComponentCanvas? UiComponentStack?
 		// not planning on this being called for top level ui root component?~ can not set the top level render target clear colour, parent index should never be set, 
 		// if we end up with a fixed size canvas, then that could allow the top level have desired size != avaliable size, also ui component stack? but that doesn't make sense, as we don't control the render viewport size of the top level render target...
@@ -63,8 +64,7 @@ namespace DscUi
 			DscDag::NodeToken in_parent_child_index,
 			DscDag::NodeToken in_clear_colour_node,
 			DscDag::NodeToken in_manual_scroll_x,
-			DscDag::NodeToken in_manual_scroll_y//,
-			//DscDag::NodeToken in_shader_constant // value is a DscUi::TUiPanelShaderConstantBuffer, ie, this is the data, not the buffer to hold the data in the draw system
+			DscDag::NodeToken in_manual_scroll_y
 			);
 
 		// so, a UiComponentText may do word wrap and have a desired size shrunk in the vertical (or longer in vertical), parent still has GetChildGeometrySize to deal with shrink
@@ -77,7 +77,6 @@ namespace DscUi
 		virtual const DscCommon::VectorInt2 GetChildGeometrySize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const;
 		// may need to fetch the desired size of all the children first, ie, for stack
 		virtual const DscCommon::VectorInt2 GetChildGeometryOffset(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const;
-
 
 	};
 }
