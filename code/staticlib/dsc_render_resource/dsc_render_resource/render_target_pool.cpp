@@ -23,6 +23,7 @@ namespace
 
 		if (in_pool_texture._requested_size == in_requested_size)
 		{
+			in_pool_texture._render_target_texture->SetSubSize(true, in_requested_size);
 			return true;
 		}
 		const DscCommon::VectorInt2 render_target_texture_size = in_pool_texture._render_target_texture->GetSize();
@@ -166,7 +167,10 @@ std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> Ds
 			in_draw_system,
 			in_target_format_data_array,
 			in_target_depth_data,
-			ceiling_size
+			ceiling_size,
+			false,
+			true,
+			in_size
 			);
 		found->second->push_back(render_target);
 		auto new_texture = std::make_shared<RenderTargetPoolTexture>(render_target, in_size);

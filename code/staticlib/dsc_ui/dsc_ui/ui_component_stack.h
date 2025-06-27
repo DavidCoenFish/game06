@@ -56,6 +56,8 @@ namespace DscUi
 			return false;
 		}
 
+		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale) override;
+
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
 			DscRender::IRenderTarget& in_render_target,

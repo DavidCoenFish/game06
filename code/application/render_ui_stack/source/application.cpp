@@ -44,7 +44,7 @@ namespace
             pLocale,
             font,
             32,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            DscCommon::Math::ConvertColourToInt(0, 0, 0, 255),
             24
         ));
 
@@ -55,7 +55,7 @@ namespace
             container_size,
             true,
             current_width,
-            DscText::THorizontalAlignment::TNone,
+            DscText::THorizontalAlignment::TMiddle,
             DscText::TVerticalAlignment::TTop,
             12
             );
@@ -69,7 +69,7 @@ namespace
             in_draw_system,
             in_dag_collection,
             std::move(ui_component_text),
-            DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 0.5f),
+            DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f),
             in_root_node,
             in_parent_node
         );
@@ -134,16 +134,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_component_stack),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 0.5f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.5f, 0.5f),
             _resources->_ui_root_node_group,
             parent_node_group,
-            DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 0.75f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.0f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.0f))
+            DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             );
 
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "hello");
         AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "world");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "hello");
         AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "some longer text that is very long");
         AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "i ran out of things to say, so i will just keep on making noise");
         AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "button");

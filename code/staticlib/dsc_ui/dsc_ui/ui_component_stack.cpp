@@ -44,6 +44,25 @@ void DscUi::UiComponentStack::AddChild(
 	return;
 }
 
+const DscCommon::VectorInt2 DscUi::UiComponentStack::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale)
+{
+	DscCommon::VectorInt2 result = {};
+
+	if (0 < _child_slot_array.size())
+	{
+		const DscCommon::VectorInt2 last_geometry_offset = GetChildGeometryOffset(in_avaliable_size, static_cast<int32>(_child_slot_array.size() - 1), in_ui_scale);
+		const DscCommon::VectorInt2 last_geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(_child_slot_array.back()._geometry_size);
+
+		// currently works for horizontal or vertical flow, if we center or right align, then this will need a switch statement
+		result.Set(
+			last_geometry_offset.GetX() + last_geometry_size.GetX(),
+			last_geometry_offset.GetY() + last_geometry_size.GetY()
+		);
+	}
+
+	return result;
+}
+
 void DscUi::UiComponentStack::Draw(
 	DscRenderResource::Frame& in_frame,
 	DscRender::IRenderTarget& in_render_target,
