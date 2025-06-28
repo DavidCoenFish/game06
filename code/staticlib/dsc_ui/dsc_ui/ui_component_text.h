@@ -30,10 +30,6 @@ namespace DscUi
 		{
 			return false;
 		}
-		virtual const bool CanScroll() override
-		{
-			return true;
-		}
 
 		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale) override;
 

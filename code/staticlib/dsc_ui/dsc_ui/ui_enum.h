@@ -49,6 +49,7 @@ namespace DscUi
 	{
 		TUiComponent, // the ui dag node component
 		TUiAvaliableSize, // the avaliable size this node had avaliable to it, used for child geometry size and geometry offset
+		TUiDesiredSize,
 		TUiRenderSize, // the eventually calculated viewport size of the render target. for stack components, this may need child geoemtry size and geometry offset to be calculated. 
 						// possibly remove TUiRenderSize and caculate it as the viewport size of the render target?
 						// no, it is needed to pass info to child

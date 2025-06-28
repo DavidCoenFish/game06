@@ -54,10 +54,6 @@ namespace DscUi
 		{
 			return true;
 		}
-		virtual const bool CanScroll() override
-		{
-			return false;
-		}
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,

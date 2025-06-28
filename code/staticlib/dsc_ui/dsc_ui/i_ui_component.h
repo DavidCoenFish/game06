@@ -46,8 +46,6 @@ namespace DscUi
 		// if we end up with a fixed size canvas, then that could allow the top level have desired size != avaliable size, also ui component stack? but that doesn't make sense, as we don't control the render viewport size of the top level render target...
 		// this may make ui component stack unable to be a top level component?
 		virtual const bool IsAllowedToBeTopLevelUiComponent() = 0;
-		// since we know that certain components wont scroll (ie, there desired size can not be bigger than the geometry size, then we can skip out on making a few nodes
-		virtual const bool CanScroll() = 0;
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,

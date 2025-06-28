@@ -34,6 +34,21 @@ namespace
         const DscUi::DagGroupUiParentNode& in_parent_node,
         const std::string& in_message)
     {
+        auto ui_padding = in_ui_manager.MakeComponentPadding(
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f)
+            );
+        auto padding_node = in_ui_manager.MakeUiNodeStackChild(
+            in_draw_system,
+            in_dag_collection,
+            std::move(ui_padding),
+            DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 0.5f),
+            in_root_node,
+            in_parent_node
+        );
+
         DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
 
         std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
@@ -65,13 +80,13 @@ namespace
             std::move(text_run),
             DscUi::TUiComponentBehaviour::TNone
         );
-        in_ui_manager.MakeUiNodeStackChild(
+        in_ui_manager.MakeUiNodePaddingChild(
             in_draw_system,
             in_dag_collection,
             std::move(ui_component_text),
             DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f),
             in_root_node,
-            in_parent_node
+            padding_node
         );
 
         return;
@@ -125,7 +140,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2(),
             DscUi::VectorUiCoord2()
         );
-#if 1
+#if 0
         auto ui_component_margin = _resources->_ui_manager->MakeComponentMargin(
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),

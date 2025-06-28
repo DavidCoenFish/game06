@@ -4,6 +4,7 @@
 #include "ui_component_debug_fill.h"
 #include "ui_component_fill.h"
 #include "ui_component_margin.h"
+#include "ui_component_padding.h"
 #include "ui_component_stack.h"
 #include "ui_component_text.h"
 #include "ui_dag_node_component.h"
@@ -600,6 +601,25 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentMargin(
     return result;
 }
 
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentPadding(
+    const UiCoord& in_left,
+    const UiCoord& in_top,
+    const UiCoord& in_right,
+    const UiCoord& in_bottom
+    )
+{
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentPadding>(
+        _ui_panel_shader,
+        _ui_panel_geometry,
+        in_left,
+        in_top,
+        in_right,
+        in_bottom
+        );
+    return result;
+}
+
+
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component
@@ -703,6 +723,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::ConvertUiRootNodeToParentNode(cons
     DscUi::DagGroupUiParentNode result(in_ui_root_node_group.GetDagCollection());
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiComponent, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TUiComponent));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiAvaliableSize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiDesiredSize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiRenderSize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TUiGeometrySize, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(DscUi::TUiParentNodeGroup::TDraw, in_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawRoot));
@@ -760,6 +781,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         avaliable_size,
         in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale)
         );
+    result.SetNodeToken(TUiParentNodeGroup::TUiDesiredSize, desired_size);
 
     DscDag::NodeToken clear_colour_node = in_dag_collection.CreateValue(
         std::any(in_clear_colour),
@@ -977,6 +999,46 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeMarginChild(
 
     return result;
 }
+
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    const DscCommon::VectorFloat4& in_clear_colour,
+
+    const DagGroupUiRootNode& in_root_node,
+    const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+    IUiComponent* ui_component_raw = in_component.get();
+
+    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
+    UiComponentPadding* parent_padding = dynamic_cast<UiComponentPadding*>(&ui_dag_node_component->GetComponent());
+
+    auto result = MakeUiNode(
+        in_draw_system,
+        in_dag_collection,
+        std::move(in_component),
+        in_clear_colour,
+        in_root_node,
+        in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+    );
+
+    parent_padding->AddChild(
+        ui_component_raw,
+        in_draw_system,
+        result.GetNodeToken(TUiParentNodeGroup::TDraw),
+        result.GetNodeToken(TUiParentNodeGroup::TUiPanelShaderConstant),
+        result.GetNodeToken(TUiParentNodeGroup::TUiDesiredSize)
+    );
+
+    return result;
+}
+
 
 void DscUi::UiManager::UpdateUiSystem(
     DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
