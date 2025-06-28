@@ -2,6 +2,7 @@
 #include "ui_manager.h"
 #include <dsc_common\vector_int2.h>
 #include <dsc_dag\dag_collection.h>
+#include <dsc_dag\dag_group.h>
 #include <dsc_render\i_render_target.h>
 #include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\geometry_generic.h>
@@ -98,29 +99,19 @@ void DscUi::UiComponentCanvas::Draw(
 
 void DscUi::UiComponentCanvas::SetClearColour(const DscCommon::VectorFloat4& in_colour)
 {
-	DSC_ASSERT(nullptr != _clear_colour_node, "invalid state");
-	DscDag::DagCollection::SetValueType(_clear_colour_node, in_colour);
+	DscDag::DagCollection::SetValueType(_ui_component_group.GetNodeToken(TUiComponentGroup::TClearColourNode), in_colour);
 	return;
 }
 
 void DscUi::UiComponentCanvas::SetParentChildIndex(const int32 in_parent_child_index)
 {
-	DSC_ASSERT(nullptr != _parent_child_index, "invalid state");
-	DscDag::DagCollection::SetValueType<int32>(_parent_child_index, in_parent_child_index);
+	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
 	return;
 }
 
-void DscUi::UiComponentCanvas::SetNode(
-	DscDag::NodeToken in_parent_child_index,
-	DscDag::NodeToken in_clear_colour_node,
-	DscDag::NodeToken in_manual_scroll_x,
-	DscDag::NodeToken in_manual_scroll_y
-)
+void DscUi::UiComponentCanvas::SetNode(const DagGroupUiComponent& in_ui_component_group)
 {
-	_parent_child_index = in_parent_child_index;
-	_clear_colour_node = in_clear_colour_node;
-	_manual_scroll_x = in_manual_scroll_x;
-	_manual_scroll_y = in_manual_scroll_y;
+	_ui_component_group = in_ui_component_group;
 	return;
 }
 

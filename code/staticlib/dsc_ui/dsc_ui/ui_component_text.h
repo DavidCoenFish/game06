@@ -2,6 +2,7 @@
 #include "dsc_ui.h"
 #include "i_ui_component.h"
 #include "ui_enum.h"
+#include <dsc_dag\dag_group.h>
 
 namespace DscText
 {
@@ -29,8 +30,12 @@ namespace DscUi
 		{
 			return false;
 		}
+		virtual const bool CanScroll() override
+		{
+			return true;
+		}
 
-		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale) override;
+		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale) override;
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
@@ -42,12 +47,7 @@ namespace DscUi
 
 		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
 
-		virtual void SetNode(
-			DscDag::NodeToken in_parent_child_index,
-			DscDag::NodeToken in_clear_colour_node,
-			DscDag::NodeToken in_manual_scroll_x,
-			DscDag::NodeToken in_manual_scroll_y
-		) override;
+		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group) override;
 
 	private:
 		DscText::TextManager& _text_manager;
@@ -55,10 +55,7 @@ namespace DscUi
 
 		std::unique_ptr<DscText::TextRun> _text_run = {};
 
-		DscDag::NodeToken _parent_child_index = {};
-		DscDag::NodeToken _clear_colour_node = {};
-		DscDag::NodeToken _manual_scroll_x = {};
-		DscDag::NodeToken _manual_scroll_y = {};
+		DagGroupUiComponent _ui_component_group;
 
 	};
 }

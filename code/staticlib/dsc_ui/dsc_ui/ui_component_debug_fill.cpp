@@ -2,6 +2,7 @@
 #include "ui_manager.h"
 #include <dsc_common\vector_int2.h>
 #include <dsc_dag\dag_collection.h>
+#include <dsc_dag\dag_group.h>
 #include <dsc_render\i_render_target.h>
 #include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\geometry_generic.h>
@@ -45,17 +46,11 @@ void DscUi::UiComponentDebugFill::Draw(
 
 void DscUi::UiComponentDebugFill::SetParentChildIndex(const int32 in_parent_child_index)
 {
-	DSC_ASSERT(nullptr != _parent_child_index, "invalid state");
-	DscDag::DagCollection::SetValueType<int32>(_parent_child_index, in_parent_child_index);
+	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
 	return;
 }
 
-void DscUi::UiComponentDebugFill::SetNode(
-	DscDag::NodeToken in_parent_child_index,
-	DscDag::NodeToken,
-	DscDag::NodeToken,
-	DscDag::NodeToken
-)
+void DscUi::UiComponentDebugFill::SetNode(const DagGroupUiComponent& in_ui_component_group)
 {
-	_parent_child_index = in_parent_child_index;
+	_ui_component_group = in_ui_component_group;
 }

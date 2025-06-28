@@ -6,6 +6,7 @@
 #include <dsc_text\text_manager.h>
 #include <dsc_text\text_run.h>
 #include <dsc_dag\dag_collection.h>
+#include <dsc_dag\dag_group.h>
 
 DscUi::UiComponentText::UiComponentText(
 	DscText::TextManager& in_text_manager,
@@ -19,7 +20,7 @@ DscUi::UiComponentText::UiComponentText(
 	// nop
 }
 
-const DscCommon::VectorInt2 DscUi::UiComponentText::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale)
+const DscCommon::VectorInt2 DscUi::UiComponentText::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2&, const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale)
 {
 	DscCommon::VectorInt2 result = {};
 	DscText::TextRun* const text_run_raw = _text_run.get();
@@ -61,28 +62,18 @@ void DscUi::UiComponentText::Draw(
 
 void DscUi::UiComponentText::SetClearColour(const DscCommon::VectorFloat4& in_colour)
 {
-	DSC_ASSERT(nullptr != _clear_colour_node, "invalid state");
-	DscDag::DagCollection::SetValueType(_clear_colour_node, in_colour);
+	DscDag::DagCollection::SetValueType(_ui_component_group.GetNodeToken(TUiComponentGroup::TClearColourNode), in_colour);
 	return;
 }
 
 void DscUi::UiComponentText::SetParentChildIndex(const int32 in_parent_child_index)
 {
-	DSC_ASSERT(nullptr != _parent_child_index, "invalid state");
-	DscDag::DagCollection::SetValueType<int32>(_parent_child_index, in_parent_child_index);
+	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
 	return;
 }
 
-void DscUi::UiComponentText::SetNode(
-	DscDag::NodeToken in_parent_child_index,
-	DscDag::NodeToken in_clear_colour_node,
-	DscDag::NodeToken in_manual_scroll_x,
-	DscDag::NodeToken in_manual_scroll_y
-)
+void DscUi::UiComponentText::SetNode(const DagGroupUiComponent& in_ui_component_group)
 {
-	_parent_child_index = in_parent_child_index;
-	_clear_colour_node = in_clear_colour_node;
-	_manual_scroll_x = in_manual_scroll_x;
-	_manual_scroll_y = in_manual_scroll_y;
+	_ui_component_group = in_ui_component_group;
 	return;
 }

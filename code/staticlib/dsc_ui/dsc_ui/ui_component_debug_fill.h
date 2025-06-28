@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
 #include "i_ui_component.h"
+#include <dsc_dag\dag_group.h>
 
 namespace DscCommon
 {
@@ -33,6 +34,10 @@ namespace DscUi
 		{
 			return true;
 		}
+		virtual const bool CanScroll() override
+		{
+			return false;
+		}
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
@@ -42,19 +47,14 @@ namespace DscUi
 
 		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
 
-		virtual void SetNode(
-			DscDag::NodeToken in_parent_child_index,
-			DscDag::NodeToken in_clear_colour_node,
-			DscDag::NodeToken in_manual_scroll_x,
-			DscDag::NodeToken in_manual_scroll_y
-		) override;
+		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group) override;
 
 	private:
 		std::shared_ptr<DscRenderResource::Shader> _shader = {};
 		std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
 
-		DscDag::NodeToken _parent_child_index;
+		DagGroupUiComponent _ui_component_group;
 
 	};
 }

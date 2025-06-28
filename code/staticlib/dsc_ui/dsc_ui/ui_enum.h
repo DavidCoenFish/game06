@@ -62,4 +62,17 @@ namespace DscUi
 
 	typedef DscDag::DagGroup<TUiParentNodeGroup, static_cast<std::size_t>(TUiParentNodeGroup::TCount)> DagGroupUiParentNode;
 
+	// ment to be the group of nodes a UiComponent may need to write to
+	// in_shader_constant here feels like a bit of overkill, we dont write to it, but saves collecting 10 or so bits of data to calculate it.. alternative is to have it higher in the UiComponent like UiComponentCanvas? UiComponentStack?
+	enum class TUiComponentGroup : uint8
+	{
+		TParentChildIndex,
+		TClearColourNode,
+		TManualScrollX,
+		TManualScrollY,
+		TCount
+	};
+	typedef DscDag::DagGroup<TUiComponentGroup, static_cast<std::size_t>(TUiComponentGroup::TCount)> DagGroupUiComponent;
+
+
 }

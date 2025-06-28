@@ -3,7 +3,7 @@
 #include "ui_component_canvas.h"
 #include "ui_component_debug_fill.h"
 #include "ui_component_fill.h"
-#include "ui_component_padding.h"
+#include "ui_component_margin.h"
 #include "ui_component_stack.h"
 #include "ui_component_text.h"
 #include "ui_dag_node_component.h"
@@ -57,19 +57,21 @@ namespace
         return node;
     }
 
-    DscDag::NodeToken MakeNodeConvertAvaliableSizeToDesiredSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_avaliable_size, const DscDag::NodeToken in_ui_scale)
+    DscDag::NodeToken MakeNodeConvertAvaliableSizeToDesiredSize(DscDag::DagCollection& in_dag_collection, DscDag::NodeToken in_ui_component, DscDag::NodeToken in_parent_avaliable_size, DscDag::NodeToken in_avaliable_size, const DscDag::NodeToken in_ui_scale)
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate([](std::any& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             DscUi::UiDagNodeComponent* ui_component = dynamic_cast<DscUi::UiDagNodeComponent*>(in_input_array[0]);
-            DscCommon::VectorInt2 avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
-            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+            DscCommon::VectorInt2 parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+            DscCommon::VectorInt2 avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[2]);
+            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
 
-            value = ui_component->GetComponent().ConvertAvaliableSizeToDesiredSize(avaliable_size, ui_scale);
+            value = ui_component->GetComponent().ConvertAvaliableSizeToDesiredSize(parent_avaliable_size, avaliable_size, ui_scale);
         }
         DSC_DEBUG_ONLY(DSC_COMMA "ConvertAvaliableSizeToDesiredSize"));
         DscDag::DagCollection::LinkIndexNodes(0, in_ui_component, node);
-        DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, node);
-        DscDag::DagCollection::LinkIndexNodes(2, in_ui_scale, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_parent_avaliable_size, node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_avaliable_size, node);
+        DscDag::DagCollection::LinkIndexNodes(3, in_ui_scale, node);
 
         return node;
     }
@@ -580,14 +582,14 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentStack(
     return result;
 }
 
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentPadding(
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentMargin(
     const UiCoord& in_left,
     const UiCoord& in_top,
     const UiCoord& in_right,
     const UiCoord& in_bottom
 )
 {
-    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentPadding>(
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentMargin>(
         _ui_panel_shader,
         _ui_panel_geometry,
         in_left,
@@ -754,6 +756,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DscDag::NodeToken desired_size = MakeNodeConvertAvaliableSizeToDesiredSize(
         in_dag_collection, 
         ui_component, 
+        in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiAvaliableSize),
         avaliable_size,
         in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale)
         );
@@ -828,7 +831,13 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         out_value = render_target_pool_texture->_render_target_texture;
     } DSC_DEBUG_ONLY(DSC_COMMA "draw node"));
 
-    ui_component_raw->SetNode(parent_child_index, clear_colour_node, manual_scroll_x, manual_scroll_y);
+    DagGroupUiComponent ui_component_group(&in_dag_collection);
+    ui_component_group.SetNodeToken(TUiComponentGroup::TParentChildIndex, parent_child_index);
+    ui_component_group.SetNodeToken(TUiComponentGroup::TClearColourNode, clear_colour_node);
+    ui_component_group.SetNodeToken(TUiComponentGroup::TManualScrollX, manual_scroll_x);
+    ui_component_group.SetNodeToken(TUiComponentGroup::TManualScrollY, manual_scroll_y);
+
+    ui_component_raw->SetNode(ui_component_group);
 
     result.SetNodeToken(TUiParentNodeGroup::TDraw, draw_node);
     DscDag::DagCollection::LinkIndexNodes(0, in_root_node.GetNodeToken(TUiRootNodeGroup::TFrame), draw_node);
@@ -931,7 +940,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
     return result;
 }
 
-DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeMarginChild(
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component,
@@ -946,7 +955,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
     IUiComponent* ui_component_raw = in_component.get();
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
-    UiComponentPadding* parent_stack = dynamic_cast<UiComponentPadding*>(&ui_dag_node_component->GetComponent());
+    UiComponentMargin* parent_margin = dynamic_cast<UiComponentMargin*>(&ui_dag_node_component->GetComponent());
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -959,7 +968,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
 
-    parent_stack->AddChild(
+    parent_margin->AddChild(
         ui_component_raw,
         in_draw_system,
         result.GetNodeToken(TUiParentNodeGroup::TDraw),

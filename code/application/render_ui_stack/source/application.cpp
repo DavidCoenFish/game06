@@ -126,7 +126,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2()
         );
 #if 1
-        auto ui_component_padding = _resources->_ui_manager->MakeComponentPadding(
+        auto ui_component_margin = _resources->_ui_manager->MakeComponentMargin(
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
@@ -135,7 +135,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto ui_padding_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_padding),
+            std::move(ui_component_margin),
             DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 0.5f),
             _resources->_ui_root_node_group,
             parent_node_group,
@@ -148,7 +148,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::UiCoord(16, 0.0f),
             DscUi::TUiFlow::TVertical
             );
-        auto stack_node = _resources->_ui_manager->MakeUiNodePaddingChild(
+        auto stack_node = _resources->_ui_manager->MakeUiNodeMarginChild(
             *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_component_stack),

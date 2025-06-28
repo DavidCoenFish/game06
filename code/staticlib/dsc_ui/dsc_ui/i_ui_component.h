@@ -1,5 +1,6 @@
 #pragma once
 #include "dsc_ui.h"
+#include "ui_enum.h"
 
 namespace DscCommon
 {
@@ -15,6 +16,8 @@ namespace DscDag
 {
 	class IDagNode;
 	typedef IDagNode* NodeToken;
+	template <typename ENUM, std::size_t SIZE>
+	class DagGroup;
 }
 
 namespace DscRender
@@ -30,6 +33,8 @@ namespace DscRenderResource
 
 namespace DscUi
 {
+	typedef DscDag::DagGroup<TUiComponentGroup, static_cast<std::size_t>(TUiComponentGroup::TCount)> DagGroupUiComponent;
+
 	class IUiComponent
 	{
 	public:
@@ -37,7 +42,12 @@ namespace DscUi
 
 		// so, components that want to have a desired size other than the avalaible size will not play nice with being top level ui components, that has the render viewport of the externaliily provided size
 		// workaround is to just nest in a canvas or other accomidating component (padding? stack?)
+		// can not set the top level render target clear colour, parent index should never be set, 
+		// if we end up with a fixed size canvas, then that could allow the top level have desired size != avaliable size, also ui component stack? but that doesn't make sense, as we don't control the render viewport size of the top level render target...
+		// this may make ui component stack unable to be a top level component?
 		virtual const bool IsAllowedToBeTopLevelUiComponent() = 0;
+		// since we know that certain components wont scroll (ie, there desired size can not be bigger than the geometry size, then we can skip out on making a few nodes
+		virtual const bool CanScroll() = 0;
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
@@ -55,20 +65,11 @@ namespace DscUi
 		virtual void SetManualScrollX(const float in_x);
 		virtual void SetManualScrollY(const float in_y);
 
-		//so, next time this needs to be changed, just change it to a DagNodeGroup? in theory it is only the node the ui component writes to, but possibly need more coupling to read values as well, like parent avaliable size...
-		// in_shader_constant here feels like a bit of overkill, we dont srite to it, but saves collecting 10 or so bits of data to calculate it.. alternative is to have it higher in the UiComponent like UiComponentCanvas? UiComponentStack?
-		// not planning on this being called for top level ui root component?~ can not set the top level render target clear colour, parent index should never be set, 
-		// if we end up with a fixed size canvas, then that could allow the top level have desired size != avaliable size, also ui component stack? but that doesn't make sense, as we don't control the render viewport size of the top level render target...
-		// this may make ui component stack unable to be a top level component?
-		virtual void SetNode(
-			DscDag::NodeToken in_parent_child_index,
-			DscDag::NodeToken in_clear_colour_node,
-			DscDag::NodeToken in_manual_scroll_x,
-			DscDag::NodeToken in_manual_scroll_y
-			);
+		// in theory it is only the node the ui component writes to, but possibly need more coupling to read values as well, like parent avaliable size, but that is a slippery slope of missing dirty calls
+		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group);
 
 		// so, a UiComponentText may do word wrap and have a desired size shrunk in the vertical (or longer in vertical), parent still has GetChildGeometrySize to deal with shrink
-		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale);
+		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale);
 
 		// following only needed if this is a component type that can have children
 		virtual const DscCommon::VectorInt2 GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const;

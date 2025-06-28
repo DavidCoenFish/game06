@@ -2,7 +2,6 @@
 #include "dsc_ui.h"
 #include "i_ui_component.h"
 #include "ui_coord.h"
-#include "ui_enum.h"
 #include <dsc_dag\dag_group.h>
 
 namespace DscCommon
@@ -10,9 +9,6 @@ namespace DscCommon
 	template <typename TYPE>
 	class Vector2;
 	typedef Vector2<int32> VectorInt2;
-	template <typename TYPE>
-	class Vector4;
-	typedef Vector4<float> VectorFloat4;
 }
 
 namespace DscRender
@@ -30,38 +26,38 @@ namespace DscRenderResource
 
 namespace DscUi
 {
-	class UiCoord;
-
-	class UiComponentStack : public IUiComponent
+	/*
+	this is more of a margin than a padding class, it contracts the parents avaliable size
+	possibly a padding class should inflate the desired size
+	*/
+	class UiComponentMargin : public IUiComponent
 	{
 	public:
-		UiComponentStack(
+		UiComponentMargin(
 			const std::shared_ptr<DscRenderResource::Shader>& in_ui_panel_shader,
 			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_ui_panel_geometry,
-			const UiCoord& in_item_gap,
-			const TUiFlow in_ui_flow
-			// do children get the full width/height of the avaliable? or how to do attach/ pivot
+			const UiCoord& in_left,
+			const UiCoord& in_top,
+			const UiCoord& in_right,
+			const UiCoord& in_bottom
 		);
 
 		void AddChild(
 			IUiComponent* const in_child_component, // we don't keep a reference, we just set the parent child index
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::NodeToken in_render_node, 
-			DscDag::NodeToken in_ui_panel_shader_constant_node,
-			DscDag::NodeToken in_geometry_size
+			DscDag::NodeToken in_ui_panel_shader_constant_node
 			);
 
 	private:
 		virtual const bool IsAllowedToBeTopLevelUiComponent() override
 		{
-			return false;
+			return true;
 		}
 		virtual const bool CanScroll() override
 		{
-			return true;
+			return false;
 		}
-
-		virtual const DscCommon::VectorInt2 ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale) override;
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
@@ -82,14 +78,15 @@ namespace DscUi
 	private:
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
-		UiCoord _item_gap = {};
-		TUiFlow _ui_flow = {};
+		UiCoord _left;
+		UiCoord _top;
+		UiCoord _right;
+		UiCoord _bottom;
 
 		struct ChildSlot
 		{
-			DscDag::NodeToken _render_node = {};
-			DscDag::NodeToken _ui_panel_shader_constant_node = {};
-			DscDag::NodeToken _geometry_size = {};
+			DscDag::NodeToken _render_node;
+			DscDag::NodeToken _ui_panel_shader_constant_node;
 			std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
 		};
 		std::vector<ChildSlot> _child_slot_array = {};

@@ -190,16 +190,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         );
 
 #if 0
-        auto ui_component_padding = _resources->_ui_manager->MakeComponentPadding(
+        auto ui_component_margin = _resources->_ui_manager->MakeComponentMargin(
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f)
         );
-        auto ui_padding_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+        auto ui_margin_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_padding),
+            std::move(ui_component_margin),
             DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 0.5f),
             _resources->_ui_root_node_group,
             parent_node_group,
@@ -216,13 +216,13 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(text_run),
             DscUi::TUiComponentBehaviour::TNone
         );
-        auto stack_node = _resources->_ui_manager->MakeUiNodePaddingChild(
+        auto stack_node = _resources->_ui_manager->MakeUiNodeMarginChild(
             *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_component_text),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.5f, 0.5f),
             _resources->_ui_root_node_group,
-            ui_padding_node
+            ui_margin_node
 
             DSC_DEBUG_ONLY(DSC_COMMA "Text")
         );

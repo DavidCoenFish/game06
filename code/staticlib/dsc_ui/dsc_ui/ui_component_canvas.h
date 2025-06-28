@@ -2,6 +2,7 @@
 #include "dsc_ui.h"
 #include "i_ui_component.h"
 #include "vector_ui_coord2.h"
+#include <dsc_dag\dag_group.h>
 
 namespace DscCommon
 {
@@ -48,6 +49,10 @@ namespace DscUi
 		{
 			return true;
 		}
+		virtual const bool CanScroll() override
+		{
+			return false;
+		}
 
 		virtual void Draw(
 			DscRenderResource::Frame& in_frame,
@@ -59,12 +64,7 @@ namespace DscUi
 
 		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
 
-		virtual void SetNode(
-			DscDag::NodeToken in_parent_child_index,
-			DscDag::NodeToken in_clear_colour_node,
-			DscDag::NodeToken in_manual_scroll_x,
-			DscDag::NodeToken in_manual_scroll_y
-		) override;
+		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group) override;
 
 		virtual const DscCommon::VectorInt2 GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const override;
 		virtual const DscCommon::VectorInt2 GetChildGeometrySize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const override;
@@ -85,10 +85,6 @@ namespace DscUi
 		};
 		std::vector<ChildSlot> _child_slot_array = {};
 
-		DscDag::NodeToken _parent_child_index;
-		DscDag::NodeToken _clear_colour_node;
-		DscDag::NodeToken _manual_scroll_x;
-		DscDag::NodeToken _manual_scroll_y;
-
+		DagGroupUiComponent _ui_component_group;
 	};
 }

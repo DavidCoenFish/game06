@@ -143,7 +143,7 @@ namespace DscUi
 			const UiCoord& in_item_gap,
 			const TUiFlow in_ui_flow
 		);
-		std::unique_ptr<IUiComponent> MakeComponentPadding(
+		std::unique_ptr<IUiComponent> MakeComponentMargin(
 			const UiCoord& in_left,
 			const UiCoord& in_top,
 			const UiCoord& in_right,
@@ -190,7 +190,7 @@ namespace DscUi
 		);
 
 		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
-		DagGroupUiParentNode MakeUiNodePaddingChild(
+		DagGroupUiParentNode MakeUiNodeMarginChild(
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component,

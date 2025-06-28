@@ -171,7 +171,7 @@ UiRootNode
 UiNode
 	[] calculate [render command list] // draw ourself to the parent render target
 		[Parent.AvaliableSize, Parent.UiComponent, index] -> [AvaliableSize]
-		[AvaliableSize, UiComponent] calculate [DesiredSize]
+		[Parent.AvaliableSize, AvaliableSize, UiComponent] calculate [DesiredSize]
 
 		[Parent.AvaliableSize, Parent.UiComponent, index] calculate [GeometryOffset]
 		[Parent.AvaliableSize, Parent.UiComponent, index] calculate [GeometrySize]

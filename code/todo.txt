@@ -1,5 +1,5 @@
 - ?ui
-	- UiComponentPadding
+	- UiComponentMargin
 	- UiComponentSwitch (n states, only once active)
 	- UiComponentButton
 	- UiComponentCrossFade? (n states with alpha)

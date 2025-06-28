@@ -16,7 +16,7 @@ void DscUi::IUiComponent::Draw(
 	//nop
 }
 
-const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float)
+const DscCommon::VectorInt2 DscUi::IUiComponent::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2&, const DscCommon::VectorInt2& in_avaliable_size, const float)
 {
 	return in_avaliable_size;
 }
@@ -61,7 +61,7 @@ void DscUi::IUiComponent::SetManualScrollY(const float)
 	//nop
 }
 
-void DscUi::IUiComponent::SetNode(DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken, DscDag::NodeToken)
+void DscUi::IUiComponent::SetNode(const DagGroupUiComponent&)
 {
 	DSC_ASSERT_ALWAYS("unimplemented");
 }

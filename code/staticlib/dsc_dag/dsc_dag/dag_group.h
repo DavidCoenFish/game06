@@ -51,6 +51,7 @@ namespace DscDag
 		NodeToken GetNodeToken(const ENUM in_index) const
 		{
 			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < SIZE), "invalid param");
+			DSC_ASSERT(nullptr != _node_token_array[static_cast<std::size_t>(in_index)], "invalid state");
 			return _node_token_array[static_cast<std::size_t>(in_index)];
 		}
 

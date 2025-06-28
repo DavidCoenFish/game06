@@ -3,6 +3,7 @@
 #include <dsc_common\vector_int2.h>
 #include <dsc_common\vector_float4.h>
 #include <dsc_dag\dag_collection.h>
+#include <dsc_dag\dag_group.h>
 #include <dsc_render\i_render_target.h>
 #include <dsc_render_resource\frame.h>
 #include <dsc_render_resource\geometry_generic.h>
@@ -44,13 +45,13 @@ void DscUi::UiComponentStack::AddChild(
 	return;
 }
 
-const DscCommon::VectorInt2 DscUi::UiComponentStack::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale)
+const DscCommon::VectorInt2 DscUi::UiComponentStack::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const DscCommon::VectorInt2&, const float in_ui_scale)
 {
 	DscCommon::VectorInt2 result = {};
 
 	if (0 < _child_slot_array.size())
 	{
-		const DscCommon::VectorInt2 last_geometry_offset = GetChildGeometryOffset(in_avaliable_size, static_cast<int32>(_child_slot_array.size() - 1), in_ui_scale);
+		const DscCommon::VectorInt2 last_geometry_offset = GetChildGeometryOffset(in_parent_avaliable_size, static_cast<int32>(_child_slot_array.size() - 1), in_ui_scale);
 		const DscCommon::VectorInt2 last_geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(_child_slot_array.back()._geometry_size);
 
 		// currently works for horizontal or vertical flow, if we center or right align, then this will need a switch statement
@@ -86,29 +87,19 @@ void DscUi::UiComponentStack::Draw(
 
 void DscUi::UiComponentStack::SetClearColour(const DscCommon::VectorFloat4& in_colour)
 {
-	DSC_ASSERT(nullptr != _clear_colour_node, "invalid state");
-	DscDag::DagCollection::SetValueType(_clear_colour_node, in_colour);
+	DscDag::DagCollection::SetValueType(_ui_component_group.GetNodeToken(TUiComponentGroup::TClearColourNode), in_colour);
 	return;
 }
 
 void DscUi::UiComponentStack::SetParentChildIndex(const int32 in_parent_child_index)
 {
-	DSC_ASSERT(nullptr != _parent_child_index, "invalid state");
-	DscDag::DagCollection::SetValueType<int32>(_parent_child_index, in_parent_child_index);
+	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
 	return;
 }
 
-void DscUi::UiComponentStack::SetNode(
-	DscDag::NodeToken in_parent_child_index,
-	DscDag::NodeToken in_clear_colour_node,
-	DscDag::NodeToken in_manual_scroll_x,
-	DscDag::NodeToken in_manual_scroll_y
-)
+void DscUi::UiComponentStack::SetNode(const DagGroupUiComponent& in_ui_component_group)
 {
-	_parent_child_index = in_parent_child_index;
-	_clear_colour_node = in_clear_colour_node;
-	_manual_scroll_x = in_manual_scroll_x;
-	_manual_scroll_y = in_manual_scroll_y;
+	_ui_component_group = in_ui_component_group;
 	return;
 }
 
