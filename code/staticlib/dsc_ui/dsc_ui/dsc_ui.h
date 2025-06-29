@@ -51,7 +51,7 @@ namespace DscUi
 	{
 		float _width_height[4]; // _width height, screen left offset, top offset (ui coords are top left relative)
 		float _effect_param[4]; // 4 floats for the effect
-		//float _tint_colour[4];
+		float _tint_colour[4];
 		float _texture_param_0[4]; // viewport width height, texture width height (ui viewport can be smaller than the texture size)
 	};
 

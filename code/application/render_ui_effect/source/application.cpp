@@ -58,37 +58,67 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
             *_resources->_dag_collection,
             std::move(ui_canvas_commponent)
-            );
+            DSC_DEBUG_ONLY(DSC_COMMA "canvas"));
+
         auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
 
-        auto ui_component_debug_fill = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
-        auto node_1_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
+        auto ui_component_debug_grid = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
+        auto debug_grid_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_debug_fill),
+            std::move(ui_component_debug_grid),
             DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f),
             _resources->_ui_root_node_group,
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(),
             DscUi::VectorUiCoord2()
-        );
+            DSC_DEBUG_ONLY(DSC_COMMA "debug grid"));
 
-        auto ui_component_effect = _resources->_ui_manager->MakeComponentEffectRoundCorner(
+        auto ui_drop_shadow = _resources->_ui_manager->MakeComponentEffectDropShadow(
             *_draw_system,
-            DscCommon::VectorFloat4(4.0f, 8.0f, 16.0f, 32.0f)
+            DscCommon::VectorFloat4(2.0f, 4.0f, 0.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)
         );
-        auto effect_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+        auto drop_shadow_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_effect),
+            std::move(ui_drop_shadow),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
             _resources->_ui_root_node_group,
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.25f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            DSC_DEBUG_ONLY(DSC_COMMA "drop shadow"));
+
+        auto margin = _resources->_ui_manager->MakeComponentMargin(
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f)
         );
+        auto margin_node = _resources->_ui_manager->MakeUiNodeEffectDropShadowChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(margin),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            _resources->_ui_root_node_group,
+            drop_shadow_node
+            DSC_DEBUG_ONLY(DSC_COMMA "margin"));
+
+        auto ui_component_round = _resources->_ui_manager->MakeComponentEffectRoundCorner(
+            *_draw_system,
+            DscCommon::VectorFloat4(16.0f, 16.0f, 16.0f, 16.0f)
+        );
+        auto round_corner_node = _resources->_ui_manager->MakeUiNodeMarginChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_round),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            _resources->_ui_root_node_group,
+            margin_node
+            DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
 
         auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
         auto node_2_result = _resources->_ui_manager->MakeUiNodeEffectRounderCornerChild(
@@ -97,8 +127,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(ui_component_fill),
             DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
             _resources->_ui_root_node_group,
-            effect_node
-            );
+            round_corner_node
+            DSC_DEBUG_ONLY(DSC_COMMA "fill"));
     }
 
     return;

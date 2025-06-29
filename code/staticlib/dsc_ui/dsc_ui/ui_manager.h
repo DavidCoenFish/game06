@@ -159,8 +159,15 @@ namespace DscUi
 		);
 		std::unique_ptr<IUiComponent> MakeComponentEffectRoundCorner(
 			DscRender::DrawSystem& in_draw_system,
+			// data[bottom left, top left, top right, bottom right](* ui_scale)
 			const DscCommon::VectorFloat4& in_corner_radius
 		);
+		std::unique_ptr<IUiComponent> MakeComponentEffectDropShadow(
+			DscRender::DrawSystem& in_draw_system,
+			// data[offset_x[-n..n], offset_y[-n..n], strength[0...1], radius (* ui_scale)[0...1]]
+			const DscCommon::VectorFloat4& in_param,
+			const DscCommon::VectorFloat4& in_shadow_colour
+			);
 
 		DagGroupUiRootNode MakeUiRootNode(
 			DscDag::DagCollection& in_dag_collection,
@@ -238,6 +245,18 @@ namespace DscUi
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
+		DagGroupUiParentNode MakeUiNodeEffectDropShadowChild(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<IUiComponent>&& in_component,
+			const DscCommon::VectorFloat4& in_clear_colour,
+
+			const DagGroupUiRootNode& in_root_node,
+			const DagGroupUiParentNode& in_parent_node
+
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
+
 		// could be combined with the DrawUiSystem, but doesn't need to be
 		void UpdateUiSystem(
 			DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
@@ -274,8 +293,9 @@ namespace DscUi
 		std::unique_ptr < DscDagRender::DagResource> _dag_resource = {};
 		
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
-		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_drop_shadow_shader = {};
 
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};

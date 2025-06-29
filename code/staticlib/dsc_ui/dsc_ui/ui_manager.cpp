@@ -2,6 +2,7 @@
 #include "screen_quad.h"
 #include "ui_component_canvas.h"
 #include "ui_component_debug_grid.h"
+#include "ui_component_effect_drop_shadow.h"
 #include "ui_component_effect_round_corner.h"
 #include "ui_component_fill.h"
 #include "ui_component_margin.h"
@@ -521,7 +522,6 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             );
     }
 
-
     // _effect_round_corner_shader
     {
         std::vector<uint8> vertex_shader_data;
@@ -572,6 +572,55 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             );
     }
 
+    //_effect_drop_shadow_shader
+    {
+        std::vector<uint8> vertex_shader_data;
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_drop_shadow_vs.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
+        }
+        std::vector<uint8> pixel_shader_data;
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_drop_shadow_ps.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            ScreenQuad::GetInputElementDesc(),
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(
+                TEffectConstantBuffer(),
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
+        array_shader_resource_info.push_back(
+            // default sampiler as drop shadow tries to sample at the corner of 4 pixels to reduce sample calls
+            DscRenderResource::ShaderResourceInfo::FactorySampler(
+                nullptr,
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        _effect_drop_shadow_shader = std::make_shared<DscRenderResource::Shader>(
+            &in_draw_system,
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            array_shader_resource_info,
+            array_shader_constants_info
+            );
+    }
 }
 
 DscUi::UiManager::~UiManager()
@@ -682,6 +731,25 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectRoundC
         buffer,
         _full_target_quad,
         in_corner_radius
+        );
+    return result;
+}
+
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectDropShadow(
+    DscRender::DrawSystem& in_draw_system,
+    // data[offset_x[-n..n], offset_y[-n..n], strength[0...1], radius (* ui_scale)[0...1]]
+    const DscCommon::VectorFloat4& in_param,
+    const DscCommon::VectorFloat4& in_shadow_colour
+)
+{
+    auto buffer = _effect_drop_shadow_shader->MakeShaderConstantBuffer(&in_draw_system);
+
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentEffectDropShadow>(
+        _effect_drop_shadow_shader,
+        buffer,
+        _full_target_quad,
+        in_param,
+        in_shadow_colour
         );
     return result;
 }
@@ -1121,6 +1189,42 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectRounderCornerChild
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentEffectRoundCorner* effect_round_corner = dynamic_cast<UiComponentEffectRoundCorner*>(&ui_dag_node_component->GetComponent());
+
+    auto result = MakeUiNode(
+        in_draw_system,
+        in_dag_collection,
+        std::move(in_component),
+        in_clear_colour,
+        in_root_node,
+        in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+    );
+
+    effect_round_corner->AddChild(
+        ui_component_raw,
+        result.GetNodeToken(TUiParentNodeGroup::TDraw)
+    );
+
+    return result;
+}
+
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectDropShadowChild(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    const DscCommon::VectorFloat4& in_clear_colour,
+
+    const DagGroupUiRootNode& in_root_node,
+    const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+    IUiComponent* ui_component_raw = in_component.get();
+
+    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
+    UiComponentEffectDropShadow* effect_round_corner = dynamic_cast<UiComponentEffectDropShadow*>(&ui_dag_node_component->GetComponent());
 
     auto result = MakeUiNode(
         in_draw_system,

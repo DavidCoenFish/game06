@@ -12,6 +12,7 @@ cbuffer ConstantBuffer : register(b0)
 {
     float4 _width_height;
     float4 _effect_param;
+    float4 _tint;
     float4 _texture_param_0;
 };
 
@@ -30,7 +31,7 @@ float CalculateCornerAlpha(
 {
     float2 pixel_pos = in_uv * in_width_height;
 
-    //TRoundCorners, // data[bottom left, top left, Top right, bottom right] reference, margin is [left, top, right, bottom]
+    // data[bottom left, top left, top right, bottom right]
 
     float bottom_left = CalculateAlpha(
         max(0.0, in_radius.x - pixel_pos.x + 0.5),
@@ -76,7 +77,6 @@ Pixel main(Interpolant in_input)
         );
 
     result._colour = texel * corner_alpha;
-    //result._colour = float4(_effect_param.x / 64.0, _effect_param.y / 64.0, _effect_param.z / 64.0, 1.0);
 
     return result;
 }
