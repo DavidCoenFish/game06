@@ -23,6 +23,7 @@
 #include "render_ui\dsc.bff"
 #include "render_ui_canvas\dsc.bff"
 #include "render_ui_debug_fill\dsc.bff"
+#include "render_ui_effect\dsc.bff"
 #include "render_ui_stack\dsc.bff"
 #include "render_ui_text\dsc.bff"
 #include "render_version\dsc.bff"

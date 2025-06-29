@@ -26,7 +26,7 @@ namespace DscCommon
 			{
 				return _data[in_index];
 			}
-			static int32 s_dummy = 0;
+			static TYPE s_dummy = 0;
 			return s_dummy;
 		}
 		const TYPE operator[](const int in_index) const

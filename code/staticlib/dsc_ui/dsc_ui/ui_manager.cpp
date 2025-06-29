@@ -1,7 +1,8 @@
 #include "ui_manager.h"
 #include "screen_quad.h"
 #include "ui_component_canvas.h"
-#include "ui_component_debug_fill.h"
+#include "ui_component_debug_grid.h"
+#include "ui_component_effect_round_corner.h"
 #include "ui_component_fill.h"
 #include "ui_component_margin.h"
 #include "ui_component_padding.h"
@@ -521,6 +522,56 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
     }
 
 
+    // _effect_round_corner_shader
+    {
+        std::vector<uint8> vertex_shader_data;
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_round_corner_vs.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
+        }
+        std::vector<uint8> pixel_shader_data;
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_round_corner_ps.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            ScreenQuad::GetInputElementDesc(),
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(
+                TEffectConstantBuffer(),
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
+        array_shader_resource_info.push_back(
+            // data sampiler as expecting to be reading source texture at 1:1 scale
+            DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
+                nullptr,
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        _effect_round_corner_shader = std::make_shared<DscRenderResource::Shader>(
+            &in_draw_system,
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            array_shader_resource_info,
+            array_shader_constants_info
+            );
+    }
+
 }
 
 DscUi::UiManager::~UiManager()
@@ -619,6 +670,21 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentPadding(
     return result;
 }
 
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectRoundCorner(
+    DscRender::DrawSystem& in_draw_system,
+    const DscCommon::VectorFloat4& in_corner_radius
+)
+{
+    auto buffer = _effect_round_corner_shader->MakeShaderConstantBuffer(&in_draw_system);
+
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentEffectRoundCorner>(
+        _effect_round_corner_shader,
+        buffer,
+        _full_target_quad,
+        in_corner_radius
+        );
+    return result;
+}
 
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
@@ -665,7 +731,7 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize)] = render_target_viewport_size;
 
     DscDag::NodeToken ui_draw_scale = in_dag_collection.CreateValue(
-        std::any(float(0.0f)),
+        std::any(float(1.0f)),
         DscDag::TValueChangeCondition::TOnValueChange
         DSC_DEBUG_ONLY(DSC_COMMA "ui scale"));
     node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TUiScale)] = ui_draw_scale;
@@ -689,7 +755,7 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
         DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
         DscRender::IRenderTarget* render_target = DscDag::DagCollection::GetValueType<DscRender::IRenderTarget*>(in_input_array[1]);
         const bool clear_on_draw = DscDag::DagCollection::GetValueType<bool>(in_input_array[2]);
-        const float ui_draw_scale = DscDag::DagCollection::GetValueType<bool>(in_input_array[3]);
+        const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
         UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[4]);
 
         frame->SetRenderTarget(render_target, clear_on_draw);
@@ -838,7 +904,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
         auto render_target_pool_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>>(in_input_array[1]);
         DscRender::IRenderTarget* render_target = render_target_pool_texture->_render_target_texture.get();
-        const float ui_draw_scale = DscDag::DagCollection::GetValueType<bool>(in_input_array[2]);
+        const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
         UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[3]);
 
         frame->AddFrameResource(render_target_pool_texture->_render_target_texture);
@@ -852,20 +918,20 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         // return a std::shared_ptr<DscRenderResource::RenderTargetTexture> rather than a heap wrapper so consumer can see the texture size, the viewport size And the shader resource
         out_value = render_target_pool_texture->_render_target_texture;
     } DSC_DEBUG_ONLY(DSC_COMMA "draw node"));
+    DscDag::DagCollection::LinkIndexNodes(0, in_root_node.GetNodeToken(TUiRootNodeGroup::TFrame), draw_node);
+    DscDag::DagCollection::LinkIndexNodes(1, render_target_pool_texture, draw_node);
+    DscDag::DagCollection::LinkIndexNodes(2, in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale), draw_node);
+    DscDag::DagCollection::LinkIndexNodes(3, ui_component, draw_node);
 
+    result.SetNodeToken(TUiParentNodeGroup::TDraw, draw_node);
+
+    // tell the ui component about the nodes it can write to
     DagGroupUiComponent ui_component_group(&in_dag_collection);
     ui_component_group.SetNodeToken(TUiComponentGroup::TParentChildIndex, parent_child_index);
     ui_component_group.SetNodeToken(TUiComponentGroup::TClearColourNode, clear_colour_node);
     ui_component_group.SetNodeToken(TUiComponentGroup::TManualScrollX, manual_scroll_x);
     ui_component_group.SetNodeToken(TUiComponentGroup::TManualScrollY, manual_scroll_y);
-
     ui_component_raw->SetNode(ui_component_group);
-
-    result.SetNodeToken(TUiParentNodeGroup::TDraw, draw_node);
-    DscDag::DagCollection::LinkIndexNodes(0, in_root_node.GetNodeToken(TUiRootNodeGroup::TFrame), draw_node);
-    DscDag::DagCollection::LinkIndexNodes(1, render_target_pool_texture, draw_node);
-    DscDag::DagCollection::LinkIndexNodes(2, in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale), draw_node);
-    DscDag::DagCollection::LinkIndexNodes(3, ui_component, draw_node);
 
     // not directly in the draw node calculate usage, but if it dirties, want the tree to dirty
     DscDag::DagCollection::LinkIndexNodes(4, shader_constant_node, draw_node);
@@ -1039,6 +1105,41 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
     return result;
 }
 
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectRounderCornerChild(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    const DscCommon::VectorFloat4& in_clear_colour,
+
+    const DagGroupUiRootNode& in_root_node,
+    const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+    IUiComponent* ui_component_raw = in_component.get();
+
+    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
+    UiComponentEffectRoundCorner* effect_round_corner = dynamic_cast<UiComponentEffectRoundCorner*>(&ui_dag_node_component->GetComponent());
+
+    auto result = MakeUiNode(
+        in_draw_system,
+        in_dag_collection,
+        std::move(in_component),
+        in_clear_colour,
+        in_root_node,
+        in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+    );
+
+    effect_round_corner->AddChild(
+        ui_component_raw,
+        result.GetNodeToken(TUiParentNodeGroup::TDraw)
+    );
+
+    return result;
+}
 
 void DscUi::UiManager::UpdateUiSystem(
     DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it

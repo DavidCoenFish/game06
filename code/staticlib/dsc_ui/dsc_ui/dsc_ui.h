@@ -49,9 +49,10 @@ namespace DscUi
 
 	struct TEffectConstantBuffer
 	{
-		float _value[4]; // _width_height_screen_left_offset_top_offset (ui coords are top left relative)
-		float _param[4]; // 4 floats for the effect
+		float _width_height[4]; // _width height, screen left offset, top offset (ui coords are top left relative)
+		float _effect_param[4]; // 4 floats for the effect
 		//float _tint_colour[4];
+		float _texture_param_0[4]; // viewport width height, texture width height (ui viewport can be smaller than the texture size)
 	};
 
 	struct TUiPanelShaderConstantBuffer

@@ -143,17 +143,23 @@ namespace DscUi
 			const UiCoord& in_item_gap,
 			const TUiFlow in_ui_flow
 		);
+		// margin cuts in from the parrent size
 		std::unique_ptr<IUiComponent> MakeComponentMargin(
 			const UiCoord& in_left,
 			const UiCoord& in_top,
 			const UiCoord& in_right,
 			const UiCoord& in_bottom
 		);
+		// padding inflates the desired size of something like text
 		std::unique_ptr<IUiComponent> MakeComponentPadding(
 			const UiCoord& in_left,
 			const UiCoord& in_top,
 			const UiCoord& in_right,
 			const UiCoord& in_bottom
+		);
+		std::unique_ptr<IUiComponent> MakeComponentEffectRoundCorner(
+			DscRender::DrawSystem& in_draw_system,
+			const DscCommon::VectorFloat4& in_corner_radius
 		);
 
 		DagGroupUiRootNode MakeUiRootNode(
@@ -220,6 +226,18 @@ namespace DscUi
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
+		DagGroupUiParentNode MakeUiNodeEffectRounderCornerChild(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<IUiComponent>&& in_component,
+			const DscCommon::VectorFloat4& in_clear_colour,
+
+			const DagGroupUiRootNode& in_root_node,
+			const DagGroupUiParentNode& in_parent_node
+
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
+
 		// could be combined with the DrawUiSystem, but doesn't need to be
 		void UpdateUiSystem(
 			DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
@@ -256,6 +274,7 @@ namespace DscUi
 		std::unique_ptr < DscDagRender::DagResource> _dag_resource = {};
 		
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};

@@ -3,6 +3,7 @@
 #include "i_ui_component.h"
 #include "ui_enum.h"
 #include <dsc_dag\dag_group.h>
+#include <dsc_common\vector_float4.h>
 
 namespace DscCommon
 {
@@ -32,8 +33,13 @@ namespace DscUi
 			const std::shared_ptr<DscRenderResource::Shader>& in_shader,
 			const std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
 			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad,
-			const float in_pixel_radius
+			const DscCommon::VectorFloat4& in_pixel_radius
 			);
+
+		void AddChild(
+			IUiComponent* const in_child_component, // we don't keep a reference, we just set the parent child index to zero
+			DscDag::NodeToken in_render_node
+		);
 
 	private:
 		virtual const bool IsAllowedToBeTopLevelUiComponent() override
@@ -57,7 +63,9 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _shader = {};
 		std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
-		float _pixel_radius = {};
+		DscCommon::VectorFloat4 _pixel_radius = {};
+
+		DscDag::NodeToken _child_render_node = {};
 
 		DagGroupUiComponent _ui_component_group = {};
 
