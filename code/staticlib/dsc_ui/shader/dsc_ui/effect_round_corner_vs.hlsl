@@ -1,4 +1,4 @@
-#include "debug_grid_interpolant.hlsli"
+#include "effect_round_corner_interpolant.hlsli"
 
 struct Vertex
 {

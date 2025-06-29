@@ -23,7 +23,6 @@ Pixel main(Interpolant in_input)
     colour += step(fmod(temp.x + temp.y, 2), 0) * 0.03125;
     colour += step(fmod((int)(temp.x * 0.25) + (int)(temp.y * 0.25), 2), 0) * 0.0625;
     colour += step(fmod((int)(temp.x * 0.0625) + (int)(temp.y * 0.0625), 2), 0) * 0.125;
-    //colour += step(fmod((int)(temp.x * 0.015625) + (int)(temp.y * 0.015625), 2), 0) * 0.25;
 
     // grid lines on 64 pixel
     colour *= (1 - step(fmod(temp.x, 64), 0));

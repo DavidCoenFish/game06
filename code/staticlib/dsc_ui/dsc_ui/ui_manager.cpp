@@ -4,6 +4,7 @@
 #include "ui_component_debug_grid.h"
 #include "ui_component_effect_drop_shadow.h"
 #include "ui_component_effect_round_corner.h"
+#include "ui_component_effect_stroke.h"
 #include "ui_component_fill.h"
 #include "ui_component_margin.h"
 #include "ui_component_padding.h"
@@ -754,6 +755,24 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectDropSh
     return result;
 }
 
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectStroke(
+    DscRender::DrawSystem& in_draw_system,
+    const DscCommon::VectorFloat4& in_param,
+    const DscCommon::VectorFloat4& in_shadow_colour
+)
+{
+    auto buffer = _effect_stroke_shader->MakeShaderConstantBuffer(&in_draw_system);
+
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentEffectStroke>(
+        _effect_stroke_shader,
+        buffer,
+        _full_target_quad,
+        in_param,
+        in_shadow_colour
+        );
+    return result;
+}
+
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component
@@ -1224,7 +1243,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectDropShadowChild(
     IUiComponent* ui_component_raw = in_component.get();
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
-    UiComponentEffectDropShadow* effect_round_corner = dynamic_cast<UiComponentEffectDropShadow*>(&ui_dag_node_component->GetComponent());
+    UiComponentEffectDropShadow* effect = dynamic_cast<UiComponentEffectDropShadow*>(&ui_dag_node_component->GetComponent());
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1237,7 +1256,44 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectDropShadowChild(
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
 
-    effect_round_corner->AddChild(
+    effect->AddChild(
+        ui_component_raw,
+        result.GetNodeToken(TUiParentNodeGroup::TDraw)
+    );
+
+    return result;
+}
+
+
+DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectStrokeChild(
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    std::unique_ptr<IUiComponent>&& in_component,
+    const DscCommon::VectorFloat4& in_clear_colour,
+
+    const DagGroupUiRootNode& in_root_node,
+    const DagGroupUiParentNode& in_parent_node
+
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+    IUiComponent* ui_component_raw = in_component.get();
+
+    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
+    UiComponentEffectStroke* effect = dynamic_cast<UiComponentEffectStroke*>(&ui_dag_node_component->GetComponent());
+
+    auto result = MakeUiNode(
+        in_draw_system,
+        in_dag_collection,
+        std::move(in_component),
+        in_clear_colour,
+        in_root_node,
+        in_parent_node
+
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+    );
+
+    effect->AddChild(
         ui_component_raw,
         result.GetNodeToken(TUiParentNodeGroup::TDraw)
     );

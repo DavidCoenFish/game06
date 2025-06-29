@@ -1,4 +1,4 @@
-#include "debug_grid_interpolant.hlsli"
+#include "effect_round_corner_interpolant.hlsli"
 
 Texture2D g_texture : register(t0);
 SamplerState g_sampler_state : register(s0);

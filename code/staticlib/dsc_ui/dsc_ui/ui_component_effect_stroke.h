@@ -22,20 +22,20 @@ namespace DscRenderResource
 
 namespace DscUi
 {
-	class UiComponentEffectDropShadow : public IUiComponent
+	class UiComponentEffectStroke : public IUiComponent
 	{
 	public:
-		UiComponentEffectDropShadow() = delete;
-		UiComponentEffectDropShadow& operator=(const UiComponentEffectDropShadow&) = delete;
-		UiComponentEffectDropShadow(const UiComponentEffectDropShadow&) = delete;
+		UiComponentEffectStroke() = delete;
+		UiComponentEffectStroke& operator=(const UiComponentEffectStroke&) = delete;
+		UiComponentEffectStroke(const UiComponentEffectStroke&) = delete;
 
-		UiComponentEffectDropShadow(
+		UiComponentEffectStroke(
 			const std::shared_ptr<DscRenderResource::Shader>& in_shader,
 			const std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
 			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad,
-			// data[pixel offset_x (* ui_scale)[-n..n], pixel offset_y (* ui_scale)[-n..n], pixel radius (* ui_scale)[0...1], ...]
+			// radius (* ui scale)
 			const DscCommon::VectorFloat4& in_param,
-			const DscCommon::VectorFloat4& in_shadow_colour
+			const DscCommon::VectorFloat4& in_stroke_colour
 			);
 
 		void AddChild(
@@ -66,7 +66,7 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
 		DscCommon::VectorFloat4 _param = {};
-		DscCommon::VectorFloat4 _shadow_colour = {};
+		DscCommon::VectorFloat4 _stroke_colour = {};
 
 		DscDag::NodeToken _child_render_node = {};
 

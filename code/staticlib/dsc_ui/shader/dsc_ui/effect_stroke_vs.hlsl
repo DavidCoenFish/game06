@@ -1,4 +1,4 @@
-#include "effect_drop_shadow_interpolant.hlsli"
+#include "effect_stroke_interpolant.hlsli"
 
 struct Vertex
 {

@@ -77,7 +77,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         auto ui_drop_shadow = _resources->_ui_manager->MakeComponentEffectDropShadow(
             *_draw_system,
-            DscCommon::VectorFloat4(2.0f, 4.0f, 0.0f, 0.0f),
+            DscCommon::VectorFloat4(2.0f, 4.0f, 2.0f, 0.0f),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)
         );
         auto drop_shadow_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
