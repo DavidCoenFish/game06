@@ -1,4 +1,4 @@
-#include "ui_component_debug_fill.h"
+#include "ui_component_debug_grid.h"
 #include "ui_manager.h"
 #include <dsc_common\vector_int2.h>
 #include <dsc_dag\dag_collection.h>
@@ -9,7 +9,7 @@
 #include <dsc_render_resource\shader.h>
 #include <dsc_render_resource\shader_constant_buffer.h>
 
-DscUi::UiComponentDebugFill::UiComponentDebugFill(
+DscUi::UiComponentDebugGrid::UiComponentDebugGrid(
 	const std::shared_ptr<DscRenderResource::Shader>& in_shader,
 	const std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
 	const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad
@@ -21,7 +21,7 @@ DscUi::UiComponentDebugFill::UiComponentDebugFill(
 	// nop
 }
 
-void DscUi::UiComponentDebugFill::Draw(
+void DscUi::UiComponentDebugGrid::Draw(
 	DscRenderResource::Frame& in_frame,
 	DscRender::IRenderTarget& in_render_target,
 	const float
@@ -33,7 +33,7 @@ void DscUi::UiComponentDebugFill::Draw(
 
 	const DscCommon::VectorInt2 viewport_size = in_render_target.GetViewportSize();
 	{
-		DscUi::TSizeShaderConstantBuffer& buffer = _shader_constant_buffer->GetConstant<DscUi::TSizeShaderConstantBuffer>(0);
+		DscUi::TFillConstantBuffer& buffer = _shader_constant_buffer->GetConstant<DscUi::TFillConstantBuffer>(0);
 		buffer._value[0] = static_cast<float>(viewport_size.GetX());
 		buffer._value[1] = static_cast<float>(viewport_size.GetY());
 	}
@@ -44,13 +44,13 @@ void DscUi::UiComponentDebugFill::Draw(
 	in_frame.SetRenderTarget(nullptr);
 }
 
-void DscUi::UiComponentDebugFill::SetParentChildIndex(const int32 in_parent_child_index)
+void DscUi::UiComponentDebugGrid::SetParentChildIndex(const int32 in_parent_child_index)
 {
 	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
 	return;
 }
 
-void DscUi::UiComponentDebugFill::SetNode(const DagGroupUiComponent& in_ui_component_group)
+void DscUi::UiComponentDebugGrid::SetNode(const DagGroupUiComponent& in_ui_component_group)
 {
 	_ui_component_group = in_ui_component_group;
 }

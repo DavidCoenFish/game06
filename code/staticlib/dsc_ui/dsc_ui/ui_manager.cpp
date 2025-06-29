@@ -455,7 +455,7 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
         array_shader_constants_info.push_back(
             DscRenderResource::ConstantBufferInfo::Factory(
-                TSizeShaderConstantBuffer(),
+                TFillConstantBuffer(),
                 D3D12_SHADER_VISIBILITY_PIXEL
             )
         );
@@ -528,11 +528,11 @@ DscUi::UiManager::~UiManager()
     //nop
 }
 
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentDebugFill(DscRender::DrawSystem& in_draw_system)
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentDebugGrid(DscRender::DrawSystem& in_draw_system)
 {
     auto buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
 
-    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentDebugFill>(
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentDebugGrid>(
         _debug_grid_shader,
         buffer,
         _full_target_quad

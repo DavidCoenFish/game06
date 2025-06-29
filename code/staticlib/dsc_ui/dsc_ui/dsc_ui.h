@@ -39,9 +39,19 @@ namespace DscCommon
 
 namespace DscUi
 {
-	struct TSizeShaderConstantBuffer
+	// for debug fill, of move debug fill to the ffect shader
+	struct TFillConstantBuffer
 	{
-		float _value[4]; // _width_height
+		float _value[4]; // _width_height_screen_left_offset_top_offset (ui coords are top left relative)
+		//float _touch[4]; // mouse pos relative to us [x,y]? time touch click? time right mouse click?
+		//float _tint_colour[4];
+	};
+
+	struct TEffectConstantBuffer
+	{
+		float _value[4]; // _width_height_screen_left_offset_top_offset (ui coords are top left relative)
+		float _param[4]; // 4 floats for the effect
+		//float _tint_colour[4];
 	};
 
 	struct TUiPanelShaderConstantBuffer
@@ -49,14 +59,6 @@ namespace DscUi
 		float _pos_size[4]; // _pos_x_y_size_width_height;
 		float _uv_size[4]; // _ui_x_y_size_width_height;
 		//float _tint_colour[4];
-
-		//void Calculate(
-		//	const DscCommon::VectorInt2& in_parent_render_size,
-		//	const DscCommon::VectorInt2& in_geometry_offset,
-		//	const DscCommon::VectorInt2& in_geometry_size,
-		//	const DscCommon::VectorInt2& in_render_size,
-		//	const DscCommon::VectorFloat2& in_scroll_value
-		//);
 	};
 }
 

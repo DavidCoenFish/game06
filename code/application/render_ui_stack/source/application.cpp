@@ -128,7 +128,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             );
         auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
 
-        auto ui_component_debug_fill = _resources->_ui_manager->MakeComponentDebugFill(*_draw_system);
+        auto ui_component_debug_fill = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
         auto node_1_result = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,

@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
 #include "i_ui_component.h"
+#include "ui_enum.h"
 #include <dsc_dag\dag_group.h>
 
 namespace DscCommon
@@ -20,19 +21,24 @@ namespace DscRenderResource
 
 namespace DscUi
 {
-	class UiComponentDebugFill : public IUiComponent
+	class UiComponentEffectRoundCorner : public IUiComponent
 	{
 	public:
-		UiComponentDebugFill(
+		UiComponentEffectRoundCorner() = delete;
+		UiComponentEffectRoundCorner& operator=(const UiComponentEffectRoundCorner&) = delete;
+		UiComponentEffectRoundCorner(const UiComponentEffectRoundCorner&) = delete;
+
+		UiComponentEffectRoundCorner(
 			const std::shared_ptr<DscRenderResource::Shader>& in_shader,
 			const std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
-			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad
-		);
+			const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_full_target_quad,
+			const float in_pixel_radius
+			);
 
 	private:
 		virtual const bool IsAllowedToBeTopLevelUiComponent() override
 		{
-			return true;
+			return false;
 		}
 
 		virtual void Draw(
@@ -40,6 +46,8 @@ namespace DscUi
 			DscRender::IRenderTarget& in_render_target,
 			const float in_ui_draw_scale
 		) override;
+
+		virtual void SetClearColour(const DscCommon::VectorFloat4& in_colour) override;
 
 		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
 
@@ -49,8 +57,9 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _shader = {};
 		std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
+		float _pixel_radius = {};
 
-		DagGroupUiComponent _ui_component_group;
+		DagGroupUiComponent _ui_component_group = {};
 
 	};
 }

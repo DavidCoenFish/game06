@@ -131,7 +131,7 @@ namespace DscUi
 		UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection);
 		~UiManager();
 
-		std::unique_ptr<IUiComponent> MakeComponentDebugFill(DscRender::DrawSystem& in_draw_system);
+		std::unique_ptr<IUiComponent> MakeComponentDebugGrid(DscRender::DrawSystem& in_draw_system);
 		std::unique_ptr<IUiComponent> MakeComponentFill();
 		std::unique_ptr<IUiComponent> MakeComponentCanvas();
 		std::unique_ptr<IUiComponent> MakeComponentText(
