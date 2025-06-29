@@ -189,7 +189,44 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "Debug fill")
         );
 
-#if 0
+#if 1
+        auto ui_component_margin = _resources->_ui_manager->MakeComponentPadding(
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f),
+            DscUi::UiCoord(16, 0.0f)
+        );
+        auto ui_padding_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_margin),
+            DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 0.5f),
+            _resources->_ui_root_node_group,
+            parent_node_group,
+            DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+
+            DSC_DEBUG_ONLY(DSC_COMMA "Padding")
+        );
+
+        auto text_run = MakeTextRun(*_resources->_text_manager, *_file_system);
+        auto ui_component_text = _resources->_ui_manager->MakeComponentText(
+            *_resources->_text_manager,
+            std::move(text_run),
+            DscUi::TUiComponentBehaviour::TNone
+        );
+        auto stack_node = _resources->_ui_manager->MakeUiNodePaddingChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_text),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.5f, 0.5f),
+            _resources->_ui_root_node_group,
+            ui_padding_node
+
+            DSC_DEBUG_ONLY(DSC_COMMA "Text")
+        );
+#elif 0
         auto ui_component_margin = _resources->_ui_manager->MakeComponentMargin(
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
@@ -207,7 +244,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
 
-            DSC_DEBUG_ONLY(DSC_COMMA "Padding")
+            DSC_DEBUG_ONLY(DSC_COMMA "Margin")
         );
 
         auto text_run = MakeTextRun(*_resources->_text_manager, *_file_system);

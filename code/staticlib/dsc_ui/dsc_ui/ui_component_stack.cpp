@@ -105,7 +105,19 @@ void DscUi::UiComponentStack::SetNode(const DagGroupUiComponent& in_ui_component
 
 const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32, const float) const
 {
-	return in_parent_avaliable_size;
+	DscCommon::VectorInt2 result = {};
+	switch (_ui_flow)
+	{
+	default:
+		break;
+	case TUiFlow::THorizontal:
+		result[1] = in_parent_avaliable_size[1];
+		break;
+	case TUiFlow::TVertical:
+		result[0] = in_parent_avaliable_size[0];
+		break;
+	}
+	return result;
 }
 
 const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildGeometrySize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const

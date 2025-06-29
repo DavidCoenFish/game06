@@ -123,9 +123,11 @@ const DscCommon::VectorInt2 DscUi::UiComponentPadding::GetChildAvaliableSize(con
 
 const DscCommon::VectorInt2 DscUi::UiComponentPadding::GetChildGeometrySize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const
 {
-	// for padding, the child gets the suggested avalaible size
-	(void*)&in_child_desired_size;
-	return in_child_avaliable_size;
+	DscCommon::VectorInt2 result(
+		std::max(in_child_avaliable_size.GetX(), in_child_desired_size.GetX()),
+		std::max(in_child_avaliable_size.GetY(), in_child_desired_size.GetY())
+	);
+	return result;
 }
 
 const DscCommon::VectorInt2 DscUi::UiComponentPadding::GetChildGeometryOffset(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32, const float in_ui_scale) const

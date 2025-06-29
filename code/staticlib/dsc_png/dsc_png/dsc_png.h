@@ -15,7 +15,7 @@ namespace DscPng
 {
 	// DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "screen_quad_texture_vs.cso")
 
-	/// failure logged, zero size data returned
+	/// failure logged, zero size data returned if something goes wrong
 	void LoadPng(
 		std::vector<uint8>& out_data,
 		int32& out_byte_per_pixel,
