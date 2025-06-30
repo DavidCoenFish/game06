@@ -35,23 +35,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
 	DscCommon::VectorInt2 container_size = in_draw_system.GetRenderTargetBackBuffer()->GetSize();
 	const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
 
-    const std::string version = DscCommon::LogSystem::Printf("%s\n%s %s\n%s\n%s",
-        DscVersion::GetVersionString(),
-        DscVersion::GetConfiguration(),
-        DscVersion::GetPlatform(),
-        DscVersion::GetTimestamp(),
-        DscVersion::GetGitRevision()
-    );
-
     const int32 text_colour = DscCommon::Math::ConvertColourToInt(192, 192, 192, 255);
-
-    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-        DscCommon::LogSystem::Printf("%s\n", DscVersion::GetVersionString()),
-        pLocale,
-        font,
-        16,
-        text_colour
-    ));
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
         DscCommon::LogSystem::Printf("%s %s\n", DscVersion::GetConfiguration(), DscVersion::GetPlatform()),
@@ -62,7 +46,15 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
     ));
 
     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-        DscCommon::LogSystem::Printf("%s\n%s", DscVersion::GetTimestamp(), DscVersion::GetGitRevision()),
+        DscCommon::LogSystem::Printf("%s\n", DscVersion::GetGitRevision()),
+        pLocale,
+        font,
+        16,
+        text_colour
+    ));
+
+    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        DscCommon::LogSystem::Printf("%s", DscVersion::GetTimestamp()),
         pLocale,
         font,
         16,
@@ -81,8 +73,8 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         );
 
     DscCommon::VectorInt2 text_size = _text_run->GetTextBounds();
-    DscCommon::VectorInt2 text_size_padded(text_size.GetX() + 16, text_size.GetY() + 12);
-    DscCommon::VectorInt2 text_size_half(text_size.GetX() + 8, text_size.GetY() + 6);
+    DscCommon::VectorInt2 text_size_padded(text_size.GetX() + 16, text_size.GetY() + 16);
+    DscCommon::VectorInt2 text_size_half(text_size.GetX() + 8, text_size.GetY() + 12);
     _text_run->SetTextContainerSize(text_size_half);
     // make a screen quad the size of the text, to the bottom right of the screen
     _screen_quad = std::make_unique<DscUi::ScreenQuad>(

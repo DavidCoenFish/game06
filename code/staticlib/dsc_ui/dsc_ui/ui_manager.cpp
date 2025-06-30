@@ -889,6 +889,8 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
     )
 {
+    (void*)&in_array_effect_data;
+
     DSC_ASSERT(nullptr != in_component, "invalid param");
     DSC_ASSERT(true == in_component->IsAllowedToBeTopLevelUiComponent(), "invalid state");
 
@@ -980,7 +982,7 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection::LinkIndexNodes(5, force_draw, draw_root);
     DscDag::DagCollection::LinkIndexNodes(6, root_draw_render_target_viewport_size, draw_root);
 
-    DealEffectArray(in_array_effect_data, draw_root, node_token_array);
+    //DealEffectArray(in_array_effect_data, draw_root, node_token_array);
     //if (0 < in_array_effect_data.size())
     //{
 
@@ -1030,6 +1032,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
+    (void*)&in_array_effect_data;
     DscUi::DagGroupUiParentNode result(&in_dag_collection);
 
     DscDag::NodeToken ui_component = nullptr;

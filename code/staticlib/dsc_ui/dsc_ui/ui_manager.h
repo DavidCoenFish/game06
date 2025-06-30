@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
 #include "ui_enum.h"
+#include <dsc_common\vector_float4.h>
 
 namespace DscCommon
 {
@@ -253,7 +254,9 @@ namespace DscUi
 			const DscCommon::VectorFloat4& in_clear_colour,
 
 			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
+			const DagGroupUiParentNode& in_parent_node,
+
+			const std::vector<TEffectData>& in_array_effect_data
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 		);

@@ -13,8 +13,6 @@ namespace DscVersion
 	const char* const GetGitRevision();
 	//2025-06-12T19:02:13 (timestamp of the last commit)
 	const char* const GetTimestamp();
-	// 0.1.30791 (major, minor, patch) currently incrementing patch on each commit
-	//const char* const GetVersionString();
 	const char* const GetPlatform();
 	const char* const GetConfiguration();
 

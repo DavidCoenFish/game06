@@ -111,8 +111,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas();
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
             *_resources->_dag_collection,
-            std::move(ui_canvas_commponent)
-            DSC_DEBUG_ONLY(DSC_COMMA "canvas"));
+            std::move(ui_canvas_commponent),
+            std::vector<DscUi::UiManager::TEffectData>()
+            DSC_DEBUG_ONLY(DSC_COMMA "root canvas"));
 
         auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
 
