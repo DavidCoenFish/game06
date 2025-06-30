@@ -51,7 +51,8 @@
     .AdditionalIncludePaths = {}
 
     .DataCopyPath = {
-        "$RootPath$/../data/font"
+        "$RootPath$/../data/font",
+        "$RootPath$/../data/background",
         }
     .DoDataCopy = true
 

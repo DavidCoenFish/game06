@@ -229,6 +229,53 @@ void DscPng::LoadPng(
 	return;
 }
 
+void DscPng::ForceRgba(
+	std::vector<uint8>& in_out_data,
+	const int32 in_byte_per_pixel,
+	const DscCommon::VectorInt2& in_size,
+	const uint8 in_alpha_value
+	)
+{
+	if (4 == in_byte_per_pixel)
+	{
+		return;
+	}
+	std::vector<uint8> source_data = {};
+	std::swap(source_data, in_out_data);
+	in_out_data.resize(in_size.GetX() * in_size.GetY() * 4);
+	if (4 != in_byte_per_pixel)
+	{
+		size_t trace = 0;
+		for (size_t index = 0; index < source_data.size(); index += in_byte_per_pixel)
+		{
+			in_out_data[trace + 0] = 0;
+			in_out_data[trace + 1] = 0;
+			in_out_data[trace + 2] = 0;
+			in_out_data[trace + 3] = in_alpha_value;
+			const uint8 v0 = source_data[index + 0];
+			in_out_data[trace + 0] = v0;
+			if (1 == in_byte_per_pixel)
+			{
+				in_out_data[trace + 1] = v0;
+				in_out_data[trace + 2] = v0;
+			}
+			else if (2 == in_byte_per_pixel)
+			{
+				in_out_data[trace + 1] = v0;
+				in_out_data[trace + 2] = v0;
+				in_out_data[trace + 3] = source_data[index + 1];
+			}
+			else
+			{
+				in_out_data[trace + 1] = source_data[index + 1];
+				in_out_data[trace + 2] = source_data[index + 2];
+			}
+			trace += 4;
+		}
+	}
+}
+
+
 void DscPng::SavePng(
 	const std::vector<uint8>& in_data,
 	const int32 in_byte_per_pixel,

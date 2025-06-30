@@ -47,6 +47,8 @@ const int32 DscUi::UiCoord::Evaluate(const int32 in_parent_primary, const int32 
 	{
 	default:
 		break;
+	case TMethod::TSecondaryPoroportinal:
+		return DscCommon::Math::ScaleInt(in_parent_secondary, _ratio) + DscCommon::Math::ScaleInt(_pixels, in_ui_scale);
 	case TMethod::TMin:
 		return DscCommon::Math::ScaleInt(std::min(in_parent_primary, in_parent_secondary), _ratio) + DscCommon::Math::ScaleInt(_pixels, in_ui_scale);
 	case TMethod::TMax:

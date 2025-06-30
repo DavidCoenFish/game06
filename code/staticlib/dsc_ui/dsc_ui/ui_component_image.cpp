@@ -34,6 +34,7 @@ void DscUi::UiComponentImage::Draw(
 
 	_shader->SetShaderResourceViewHandle(0, _texture->GetHeapWrapperItem());
 	in_frame.SetRenderTarget(&in_render_target);
+	in_frame.SetShader(_shader);
 	in_frame.Draw(_full_target_quad);
 	in_frame.SetRenderTarget(nullptr);
 }

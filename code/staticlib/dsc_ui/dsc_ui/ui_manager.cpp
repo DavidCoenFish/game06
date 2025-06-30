@@ -542,7 +542,7 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         std::vector < DXGI_FORMAT > render_target_format;
         render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
         DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            s_input_element_desc_array,
+            ScreenQuad::GetInputElementDesc(),
             D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
             DXGI_FORMAT_UNKNOWN,
             render_target_format,
@@ -757,7 +757,7 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentImage(
 std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentCanvas()
 {
     std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentCanvas>(
-        _image_shader,
+        _ui_panel_shader,
         _ui_panel_geometry
         );
     return result;
@@ -1468,6 +1468,10 @@ void DscUi::UiManager::DrawUiSystem(
         DscDag::DagCollection::SetValueType<DscCommon::VectorInt2>(node, viewport_size);
         //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "UiManager::DrawUiSystem viewport_size:%d %d\n", viewport_size.GetX(), viewport_size.GetY());
     }
+
+#if defined(_DEBUG)
+    DscDag::DagCollection::DebugDumpNode(in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawRoot));
+#endif //#if defined(_DEBUG)
 
     // after input nodes have been changed, flush the conditional state
     in_ui_root_node_group.ResolveDirtyConditionNodes();

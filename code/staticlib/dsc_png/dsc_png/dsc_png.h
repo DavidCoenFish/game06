@@ -24,6 +24,14 @@ namespace DscPng
 		const std::string& in_file_path
 	);
 
+	// this could be a flag passed to the LoadPng function, but trying keep functions only doing one thing
+	void ForceRgba(
+		std::vector<uint8>& in_out_data,
+		const int32 in_byte_per_pixel,
+		const DscCommon::VectorInt2& in_size,
+		const uint8 in_alpha_value = 255
+		);
+
 	/// failure logged
 	void SavePng(
 		const std::vector<uint8>& in_data,

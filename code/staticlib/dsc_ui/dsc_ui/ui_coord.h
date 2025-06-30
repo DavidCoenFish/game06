@@ -9,6 +9,7 @@ namespace DscUi
 		enum class TMethod
 		{
 			TPrimaryPoroportinal = 0, //default, ((in_parent_primary * _ratio) + _pixels)
+			TSecondaryPoroportinal, // ((in_parent_secondary * _ratio) + _pixels)
 			TMin, //((std::min(in_parent_primary, in_parent_secondary)* _ratio) + _pixels)
 			TMax, //((std::max(in_parent_primary, in_parent_secondary)* _ratio) + _pixels)
 		};

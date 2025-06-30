@@ -13,6 +13,7 @@
 #include <dsc_render_resource/frame.h>
 #include <dsc_render_resource/shader.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
+#include <dsc_render_resource/shader_resource.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_text/text_run.h>
 #include <dsc_text/i_text_run.h>
@@ -21,9 +22,62 @@
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_coord.h>
 #include <dsc_ui/vector_ui_coord2.h>
+#include <dsc_png/dsc_png.h>
 
 namespace
 {
+#if 1
+    std::shared_ptr<DscRenderResource::ShaderResource> MakeShaderResource(DscCommon::FileSystem & in_file_system, DscRender::DrawSystem & in_draw_system, const std::string & in_file_path)
+    {
+        std::vector<uint8> data = {};
+        int32 byte_per_pixel = 0;
+        DscCommon::VectorInt2 size = {};
+
+        DscPng::LoadPng(
+            data,
+            byte_per_pixel,
+            size,
+            in_file_system,
+            in_file_path
+            );
+        DscPng::ForceRgba(
+            data,
+            byte_per_pixel,
+            size
+            );
+        std::shared_ptr<DscRenderResource::ShaderResource> result = {};
+        if (0 < data.size())
+        {
+            D3D12_RESOURCE_DESC desc = {
+                D3D12_RESOURCE_DIMENSION_TEXTURE2D, //D3D12_RESOURCE_DIMENSION Dimension;
+                D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT, //UINT64 Alignment;
+                (UINT64)size.GetX(), //UINT64 Width;
+                (UINT)size.GetY(), //UINT Height;
+                1, //UINT16 DepthOrArraySize;
+                1, //UINT16 MipLevels;
+                DXGI_FORMAT_R8G8B8A8_UNORM, //DXGI_FORMAT Format;
+                DXGI_SAMPLE_DESC{ 1, 0 }, //DXGI_SAMPLE_DESC SampleDesc;
+                D3D12_TEXTURE_LAYOUT_UNKNOWN, //D3D12_TEXTURE_LAYOUT Layout;
+                D3D12_RESOURCE_FLAG_NONE //D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE //D3D12_RESOURCE_FLAGS Flags;
+            };
+            // Describe and create a SRV for the texture.
+            D3D12_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
+            shader_resource_view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            shader_resource_view_desc.Format = desc.Format;
+            shader_resource_view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            shader_resource_view_desc.Texture2D.MipLevels = 1;
+
+            result = std::make_shared<DscRenderResource::ShaderResource>(
+                &in_draw_system,
+                in_draw_system.MakeHeapWrapperCbvSrvUav(), //const std::shared_ptr < HeapWrapperItem >&in_shader_resource,
+                desc, //const D3D12_RESOURCE_DESC & in_desc,
+                shader_resource_view_desc, //const D3D12_SHADER_RESOURCE_VIEW_DESC & in_shader_resource_view_desc,
+                data //const std::vector<uint8_t>&in_data
+                );
+        }
+        return result;
+    }
+#endif
 }
 
 Application::Resources::Resources() 
@@ -61,6 +115,25 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "canvas"));
 
         auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
+
+        auto background_texture = MakeShaderResource(*_file_system, *_draw_system, DscCommon::FileSystem::JoinPath("data", "background", "background_00.png"));
+        auto image_component = _resources->_ui_manager->MakeComponentImage(
+            background_texture
+            );
+        //auto fill_component = _resources->_ui_manager->MakeComponentFill();
+
+        _resources->_ui_manager->MakeUiNodeCanvasChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(image_component),
+            DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f),
+            _resources->_ui_root_node_group,
+            parent_node_group,
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 2.2222f, DscUi::UiCoord::TMethod::TSecondaryPoroportinal), DscUi::UiCoord(0, 1.0f)),
+            //DscUi::VectorUiCoord2(DscUi::UiCoord(100, 0.0f), DscUi::UiCoord(100, 0.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            );
     }
 
     return;

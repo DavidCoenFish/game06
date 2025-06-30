@@ -67,7 +67,7 @@ namespace DscDag
 		}
 
 #if defined(_DEBUG)
-		void DebugDumpNode(NodeToken in_input);
+		static void DebugDumpNode(NodeToken in_input);
 #endif //#if defined(_DEBUG)
 
 	private:
