@@ -433,7 +433,6 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
     }
 
 
-
     // _debug_grid_shader
 	{
         std::vector<uint8> vertex_shader_data;
@@ -889,8 +888,6 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
     )
 {
-    (void*)&in_array_effect_data;
-
     DSC_ASSERT(nullptr != in_component, "invalid param");
     DSC_ASSERT(true == in_component->IsAllowedToBeTopLevelUiComponent(), "invalid state");
 
@@ -952,45 +949,39 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     // for the root, if there are no effects, the root draws to the externally provided render target [render_target, render_target_viewport_size]
     // if there are effects, the root and all the effects minus the last one need their own render targets
     // the last node in the chain also needs to have force draw, allow clear on draw set
+    if (0 == in_array_effect_data.size())
+    {
+        DscDag::NodeToken draw_root = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            DscRender::IRenderTarget* render_target = DscDag::DagCollection::GetValueType<DscRender::IRenderTarget*>(in_input_array[1]);
+            const bool clear_on_draw = DscDag::DagCollection::GetValueType<bool>(in_input_array[2]);
+            const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
+            UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[4]);
 
+            frame->SetRenderTarget(render_target, clear_on_draw);
+            if ((nullptr != ui_dag_node_component) && (nullptr != render_target))
+            {
+                ui_dag_node_component->GetComponent().Draw(*frame, *render_target, ui_draw_scale);
+            }
+        } DSC_DEBUG_ONLY(DSC_COMMA "draw root"));
 
+        DscDag::DagCollection::LinkIndexNodes(0, frame, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(1, render_target, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(2, clear_on_draw, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(3, ui_draw_scale, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(4, ui_component, draw_root);
 
-    DscDag::NodeToken root_draw_render_target = render_target;
-    DscDag::NodeToken root_draw_render_target_viewport_size = render_target_viewport_size;
+        // not directly consumed by the Calculate function, but used to mark it dirty
+        DscDag::DagCollection::LinkIndexNodes(5, force_draw, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(6, render_target_viewport_size, draw_root);
 
-    DscDag::NodeToken draw_root = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-        DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
-        DscRender::IRenderTarget* render_target = DscDag::DagCollection::GetValueType<DscRender::IRenderTarget*>(in_input_array[1]);
-        const bool clear_on_draw = DscDag::DagCollection::GetValueType<bool>(in_input_array[2]);
-        const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
-        UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[4]);
+        node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TDrawRoot)] = draw_root;
+    }
+    else
+    {
+        // if there are effects, the root and all the effects minus the last one need their own render targets
 
-        frame->SetRenderTarget(render_target, clear_on_draw);
-        if ((nullptr != ui_dag_node_component) && (nullptr != render_target))
-        {
-            ui_dag_node_component->GetComponent().Draw(*frame, *render_target, ui_draw_scale);
-        }
-    } DSC_DEBUG_ONLY(DSC_COMMA "draw root"));
-
-    DscDag::DagCollection::LinkIndexNodes(0, frame, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(1, root_draw_render_target, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(2, clear_on_draw, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(3, ui_draw_scale, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(4, ui_component, draw_root);
-
-    // not directly consumed by the Calculate function, but used to mark it dirty
-    DscDag::DagCollection::LinkIndexNodes(5, force_draw, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(6, root_draw_render_target_viewport_size, draw_root);
-
-    //DealEffectArray(in_array_effect_data, draw_root, node_token_array);
-    //if (0 < in_array_effect_data.size())
-    //{
-
-    //}
-    //else
-    //{
-    //    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TDrawRoot)] = draw_root;
-    //}
+    }
 
     DscUi::DagGroupUiRootNode result(&in_dag_collection, node_token_array);
     DSC_ASSERT(true == result.IsValid(), "invalid result");

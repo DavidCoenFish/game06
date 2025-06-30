@@ -287,10 +287,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_version", "dsc_version"
 	ProjectSection(SolutionItems) = preProject
 		staticlib\dsc_version\dsc_version\git_revision.txt = staticlib\dsc_version\dsc_version\git_revision.txt
 		staticlib\dsc_version\dsc_version\timestamp.txt = staticlib\dsc_version\dsc_version\timestamp.txt
-		staticlib\dsc_version\dsc_version\version_major.txt = staticlib\dsc_version\dsc_version\version_major.txt
-		staticlib\dsc_version\dsc_version\version_minor.txt = staticlib\dsc_version\dsc_version\version_minor.txt
-		staticlib\dsc_version\dsc_version\version_patch.txt = staticlib\dsc_version\dsc_version\version_patch.txt
-		staticlib\dsc_version\dsc_version\version_string.txt = staticlib\dsc_version\dsc_version\version_string.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsc_windows", "dsc_windows", "{0271BBBB-6C94-4F93-BC2A-7F5284B7D434}"
