@@ -67,24 +67,6 @@ void DscUi::UiComponentMargin::Draw(
 	in_frame.SetRenderTarget(nullptr);
 }
 
-void DscUi::UiComponentMargin::SetClearColour(const DscCommon::VectorFloat4& in_colour)
-{
-	DscDag::DagCollection::SetValueType(_ui_component_group.GetNodeToken(TUiComponentGroup::TClearColourNode), in_colour);
-	return;
-}
-
-void DscUi::UiComponentMargin::SetParentChildIndex(const int32 in_parent_child_index)
-{
-	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
-	return;
-}
-
-void DscUi::UiComponentMargin::SetNode(const DagGroupUiComponent& in_ui_component_group)
-{
-	_ui_component_group = in_ui_component_group;
-	return;
-}
-
 const DscCommon::VectorInt2 DscUi::UiComponentMargin::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32, const float in_ui_scale) const
 {
 	const int32 width_taken_by_padding = _left.Evaluate(in_parent_avaliable_size.GetX(), in_parent_avaliable_size.GetY(), in_ui_scale) +

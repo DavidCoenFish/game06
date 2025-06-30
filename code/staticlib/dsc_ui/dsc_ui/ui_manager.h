@@ -94,32 +94,9 @@ namespace DscUi
 			const UiCoord& in_right,
 			const UiCoord& in_bottom
 		);
-		std::unique_ptr<IUiComponent> MakeComponentEffectRoundCorner(
-			DscRender::DrawSystem& in_draw_system,
-			// data[bottom left, top left, top right, bottom right](* ui_scale)
-			const DscCommon::VectorFloat4& in_corner_radius
-		);
-		std::unique_ptr<IUiComponent> MakeComponentEffectDropShadow(
-			DscRender::DrawSystem& in_draw_system,
-			// data[offset_x[-n..n], offset_y[-n..n], radius (* ui_scale)[0 ... 6.7]
-			const DscCommon::VectorFloat4& in_param,
-			const DscCommon::VectorFloat4& in_shadow_colour
-			);
-		std::unique_ptr<IUiComponent> MakeComponentEffectStroke(
-			DscRender::DrawSystem& in_draw_system,
-			// radius (* ui_scale)[0 ... 6.7]
-			const DscCommon::VectorFloat4& in_param,
-			const DscCommon::VectorFloat4& in_shadow_colour
-		);
-
-		struct TEffectData
-		{
-			TEffect _effect = {};
-			DscCommon::VectorFloat4 _param = {};
-			DscCommon::VectorFloat4 _colour = {};
-		};
 
 		DagGroupUiRootNode MakeUiRootNode(
+			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<IUiComponent>&& in_component,
 			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
@@ -191,43 +168,7 @@ namespace DscUi
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
-/*
-		DagGroupUiParentNode MakeUiNodeEffectRounderCornerChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
 
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		DagGroupUiParentNode MakeUiNodeEffectDropShadowChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		DagGroupUiParentNode MakeUiNodeEffectStrokeChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-*/
 		// could be combined with the DrawUiSystem, but doesn't need to be
 		void UpdateUiSystem(
 			DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
@@ -260,6 +201,8 @@ namespace DscUi
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 		);
+
+		std::shared_ptr<DscRenderResource::Shader> GetEffectShader(const TEffect in_effect);
 
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored

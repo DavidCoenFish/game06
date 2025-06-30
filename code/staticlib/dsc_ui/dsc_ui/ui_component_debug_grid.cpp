@@ -43,14 +43,3 @@ void DscUi::UiComponentDebugGrid::Draw(
 	in_frame.Draw(_full_target_quad);
 	in_frame.SetRenderTarget(nullptr);
 }
-
-void DscUi::UiComponentDebugGrid::SetParentChildIndex(const int32 in_parent_child_index)
-{
-	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
-	return;
-}
-
-void DscUi::UiComponentDebugGrid::SetNode(const DagGroupUiComponent& in_ui_component_group)
-{
-	_ui_component_group = in_ui_component_group;
-}

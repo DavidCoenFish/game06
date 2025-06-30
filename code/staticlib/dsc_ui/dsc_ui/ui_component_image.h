@@ -43,10 +43,6 @@ namespace DscUi
 			const float in_ui_draw_scale
 		) override;
 
-		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
-
-		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group) override;
-
 	private:
 		std::shared_ptr<DscRenderResource::Shader> _shader = {};
 		std::shared_ptr<DscRenderResource::ShaderResource> _texture = {};

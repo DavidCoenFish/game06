@@ -65,12 +65,6 @@ namespace DscUi
 			const float in_ui_draw_scale
 		) override;
 
-		virtual void SetClearColour(const DscCommon::VectorFloat4& in_colour) override;
-
-		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
-
-		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group) override;
-
 		virtual const DscCommon::VectorInt2 GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const override;
 		virtual const DscCommon::VectorInt2 GetChildGeometrySize(const DscCommon::VectorInt2& in_child_desired_size, const DscCommon::VectorInt2& in_child_avaliable_size) const override;
 		virtual const DscCommon::VectorInt2 GetChildGeometryOffset(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const override;
@@ -90,7 +84,6 @@ namespace DscUi
 		};
 		std::vector<ChildSlot> _child_slot_array = {};
 
-		DagGroupUiComponent _ui_component_group;
 
 	};
 }

@@ -97,24 +97,6 @@ void DscUi::UiComponentCanvas::Draw(
 	in_frame.SetRenderTarget(nullptr);
 }
 
-void DscUi::UiComponentCanvas::SetClearColour(const DscCommon::VectorFloat4& in_colour)
-{
-	DscDag::DagCollection::SetValueType(_ui_component_group.GetNodeToken(TUiComponentGroup::TClearColourNode), in_colour);
-	return;
-}
-
-void DscUi::UiComponentCanvas::SetParentChildIndex(const int32 in_parent_child_index)
-{
-	DscDag::DagCollection::SetValueType<int32>(_ui_component_group.GetNodeToken(TUiComponentGroup::TParentChildIndex), in_parent_child_index);
-	return;
-}
-
-void DscUi::UiComponentCanvas::SetNode(const DagGroupUiComponent& in_ui_component_group)
-{
-	_ui_component_group = in_ui_component_group;
-	return;
-}
-
 const DscCommon::VectorInt2 DscUi::UiComponentCanvas::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_child_index, const float in_ui_scale) const
 {
 	DscCommon::VectorInt2 result(in_parent_avaliable_size);

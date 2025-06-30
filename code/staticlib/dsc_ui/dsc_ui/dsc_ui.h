@@ -25,6 +25,7 @@
 #endif //#ifndef DSC_BFF_BUILD
 
 #include <dsc_common/dsc_common.h>
+#include <dsc_common/vector_float4.h>
 
 namespace DscCommon
 {
@@ -60,6 +61,23 @@ namespace DscUi
 		float _pos_size[4]; // _pos_x_y_size_width_height;
 		float _uv_size[4]; // _ui_x_y_size_width_height;
 		//float _tint_colour[4];
+	};
+
+	enum class TEffect : uint8
+	{
+		//TDesaturate
+		TDropShadow, // opace cast shadow on alphaed pixels (a max blur radius of 6.7 pixels)
+		//TInnerShadow, // alphaed pixels cast shadow on opace (a max blur radius of 6.7 pixels)
+		//TRolloverTextBurn
+		TRoundCornder, // 4 corners of the source texture are alphaed out
+		TStroke, // opace pixels flow out (a max of 6.7 pixels)
+	};
+
+	struct TEffectData
+	{
+		TEffect _effect = {};
+		DscCommon::VectorFloat4 _param = {};
+		DscCommon::VectorFloat4 _colour = {};
 	};
 }
 

@@ -2,9 +2,6 @@
 #include "screen_quad.h"
 #include "ui_component_canvas.h"
 #include "ui_component_debug_grid.h"
-#include "ui_component_effect_drop_shadow.h"
-#include "ui_component_effect_round_corner.h"
-#include "ui_component_effect_stroke.h"
 #include "ui_component_image.h"
 #include "ui_component_fill.h"
 #include "ui_component_margin.h"
@@ -826,60 +823,8 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentPadding(
     return result;
 }
 
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectRoundCorner(
-    DscRender::DrawSystem& in_draw_system,
-    const DscCommon::VectorFloat4& in_corner_radius
-)
-{
-    auto buffer = _effect_round_corner_shader->MakeShaderConstantBuffer(&in_draw_system);
-
-    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentEffectRoundCorner>(
-        _effect_round_corner_shader,
-        buffer,
-        _full_target_quad,
-        in_corner_radius
-        );
-    return result;
-}
-
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectDropShadow(
-    DscRender::DrawSystem& in_draw_system,
-    // data[offset_x[-n..n], offset_y[-n..n], strength[0...1], radius (* ui_scale)[0...1]]
-    const DscCommon::VectorFloat4& in_param,
-    const DscCommon::VectorFloat4& in_shadow_colour
-)
-{
-    auto buffer = _effect_drop_shadow_shader->MakeShaderConstantBuffer(&in_draw_system);
-
-    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentEffectDropShadow>(
-        _effect_drop_shadow_shader,
-        buffer,
-        _full_target_quad,
-        in_param,
-        in_shadow_colour
-        );
-    return result;
-}
-
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectStroke(
-    DscRender::DrawSystem& in_draw_system,
-    const DscCommon::VectorFloat4& in_param,
-    const DscCommon::VectorFloat4& in_shadow_colour
-)
-{
-    auto buffer = _effect_stroke_shader->MakeShaderConstantBuffer(&in_draw_system);
-
-    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentEffectStroke>(
-        _effect_stroke_shader,
-        buffer,
-        _full_target_quad,
-        in_param,
-        in_shadow_colour
-        );
-    return result;
-}
-
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
+    DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<IUiComponent>&& in_component,
 
@@ -891,46 +836,48 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DSC_ASSERT(nullptr != in_component, "invalid param");
     DSC_ASSERT(true == in_component->IsAllowedToBeTopLevelUiComponent(), "invalid state");
 
-    DscDag::NodeToken node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TCount)] = {};
+    DscUi::DagGroupUiRootNode result(&in_dag_collection);
 
     DscDag::NodeToken frame = in_dag_collection.CreateValue(
         std::any((DscRenderResource::Frame*)nullptr), 
         DscDag::TValueChangeCondition::TNever 
         DSC_DEBUG_ONLY(DSC_COMMA "frame"));
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TFrame)] = frame;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TFrame, frame);
 
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TDeviceRestore)] = _dag_resource->GetDagNodeRestored();
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TDeviceRestore, _dag_resource->GetDagNodeRestored());
 
     DscDag::NodeToken force_draw = in_dag_collection.CreateValue(
         std::any(false),
         DscDag::TValueChangeCondition::TNotZero
         DSC_DEBUG_ONLY(DSC_COMMA "force draw"));
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TForceDraw)] = force_draw;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TForceDraw, force_draw);
 
     DscDag::NodeToken clear_on_draw = in_dag_collection.CreateValue(
         std::any(false),
         DscDag::TValueChangeCondition::TOnValueChange
         DSC_DEBUG_ONLY(DSC_COMMA "allow clear on draw"));
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TAllowClearOnDraw)] = clear_on_draw;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TAllowClearOnDraw, clear_on_draw);
 
     DscDag::NodeToken render_target = in_dag_collection.CreateValue(
         std::any((DscRender::IRenderTarget*)nullptr), 
         DscDag::TValueChangeCondition::TNever
         DSC_DEBUG_ONLY(DSC_COMMA "render target"));
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TRenderTarget)] = render_target;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TRenderTarget, render_target);
 
+    // the externally supplied render target size
     DscDag::NodeToken render_target_viewport_size = in_dag_collection.CreateValue(
         std::any(DscCommon::VectorInt2()),
         DscDag::TValueChangeCondition::TOnValueChange
         DSC_DEBUG_ONLY(DSC_COMMA "render target viewport size"));
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize)] = render_target_viewport_size;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TRenderTargetViewportSize, render_target_viewport_size);
 
     DscDag::NodeToken ui_draw_scale = in_dag_collection.CreateValue(
         std::any(float(1.0f)),
         DscDag::TValueChangeCondition::TOnValueChange
         DSC_DEBUG_ONLY(DSC_COMMA "ui scale"));
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TUiScale)] = ui_draw_scale;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TUiScale, ui_draw_scale);
 
+    IUiComponent* raw_ui_component = nullptr;
     DscDag::NodeToken ui_component = nullptr;
     {
         auto node = std::make_unique<UiDagNodeComponent>(
@@ -939,12 +886,13 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
             );
         ui_component = in_dag_collection.AddCustomNode(std::move(node));
     }
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TUiComponent)] = ui_component;
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TUiComponent, ui_component);
 
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TTimeDelta)] = in_dag_collection.CreateValue(
+    DscDag::NodeToken time_delta = in_dag_collection.CreateValue(
         std::any(float(0.0f)),
         DscDag::TValueChangeCondition::TNotZero
         DSC_DEBUG_ONLY(DSC_COMMA "time delta"));
+    result.SetNodeToken(DscUi::TUiRootNodeGroup::TTimeDelta, time_delta);
 
     // for the root, if there are no effects, the root draws to the externally provided render target [render_target, render_target_viewport_size]
     // if there are effects, the root and all the effects minus the last one need their own render targets
@@ -975,15 +923,120 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
         DscDag::DagCollection::LinkIndexNodes(5, force_draw, draw_root);
         DscDag::DagCollection::LinkIndexNodes(6, render_target_viewport_size, draw_root);
 
-        node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TDrawRoot)] = draw_root;
+        result.SetNodeToken(DscUi::TUiRootNodeGroup::TDrawRoot, draw_root);
     }
     else
     {
         // if there are effects, the root and all the effects minus the last one need their own render targets
+        // we now need a render target for the UiComponent to draw to
 
+        DscDag::NodeToken clear_colour_node = in_dag_collection.CreateValue(
+            std::any(DscCommon::VectorFloat4::s_zero),
+            DscDag::TValueChangeCondition::TOnValueChange
+            DSC_DEBUG_ONLY(DSC_COMMA "clear colour"));
+
+        DscDag::NodeToken sub_render_target_pool_texture = MakeNodeCalculateRenderTarget(in_dag_collection, render_target_viewport_size, render_target_viewport_size, _render_target_pool.get(), &in_draw_system, clear_colour_node);
+
+        DscDag::NodeToken draw_root = in_dag_collection.CreateCalculate([](std::any& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            auto render_target_pool_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>>(in_input_array[1]);
+            DscRender::IRenderTarget* render_target = render_target_pool_texture->_render_target_texture.get();
+            const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+            UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_input_array[3]);
+
+            frame->SetRenderTarget(render_target);
+            if ((nullptr != ui_dag_node_component) && (nullptr != render_target))
+            {
+                ui_dag_node_component->GetComponent().Draw(*frame, *render_target, ui_draw_scale);
+            }
+
+            out_value = render_target_pool_texture->_render_target_texture;
+        } DSC_DEBUG_ONLY(DSC_COMMA "draw root"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, frame, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(1, sub_render_target_pool_texture, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(2, ui_draw_scale, draw_root);
+        DscDag::DagCollection::LinkIndexNodes(3, ui_component, draw_root);
+
+        // tell the ui component about the nodes it can write to
+        DagGroupUiComponent ui_component_group(&in_dag_collection);
+        ui_component_group.SetNodeToken(TUiComponentGroup::TClearColourNode, clear_colour_node);
+        raw_ui_component->SetNode(ui_component_group);
+
+        // some future effects may want more than one input texture, ie, TRolloverTextBurn
+        std::vector<DscDag::NodeToken> draw_node_array = {};
+        draw_node_array.push_back(draw_root);
+
+        for (size_t index = 0; index < in_array_effect_data.size(); ++index)
+        {
+            DscDag::NodeToken effect_data_node = MakeEffectData(
+                in_draw_system,
+                index,
+                GetEffectShader(in_array_effect_data[index]._effect),
+                in_array_effect_data[index],
+                raw_ui_component
+            );
+
+            const bool last = index == in_array_effect_data.size() - 1;
+            if (last)
+            {
+                DscDag::NodeToken draw_node = MakeEffectDrawNodeLast(
+                    in_dag_collection,
+                    frame,
+                    render_target,
+                    clear_on_draw,
+                    ui_draw_scale,
+                    force_draw,
+                    render_target_viewport_size,
+                    raw_ui_component,
+                    effect_data_node,
+                    draw_node_array
+                    );
+                draw_node_array.push_back(draw_node);
+                /*
+                DscDag::NodeToken draw_node = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+                    const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+                    DscRender::IRenderTarget* render_target = DscDag::DagCollection::GetValueType<DscRender::IRenderTarget*>(in_input_array[1]);
+                    const bool clear_on_draw = DscDag::DagCollection::GetValueType<bool>(in_input_array[2]);
+
+                    frame->SetRenderTarget(render_target, clear_on_draw);
+                    // draw effect, who owns the shader constant buffer, our ui component?
+
+                } DSC_DEBUG_ONLY(DSC_COMMA "draw root"));
+                DscDag::DagCollection::LinkIndexNodes(0, frame, draw_node);
+                DscDag::DagCollection::LinkIndexNodes(1, render_target, draw_node);
+                DscDag::DagCollection::LinkIndexNodes(2, clear_on_draw, draw_node);
+                DscDag::DagCollection::LinkIndexNodes(3, ui_draw_scale, draw_node);
+
+                result.SetNodeToken(DscUi::TUiRootNodeGroup::TDrawRoot, draw_node);
+
+                DscDag::DagCollection::LinkIndexNodes(10, force_draw, draw_node);
+                DscDag::DagCollection::LinkIndexNodes(11, render_target_viewport_size, draw_node);
+                */
+            }
+            else
+            {
+                DscDag::NodeToken effect_render_target_pool_texture = MakeNodeCalculateRenderTarget(in_dag_collection, render_target_viewport_size, render_target_viewport_size, _render_target_pool.get(), &in_draw_system, clear_colour_node);
+
+                DscDag::NodeToken draw_node = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+                    auto render_target_pool_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture>>(in_input_array[1]);
+                    DscRender::IRenderTarget* render_target = render_target_pool_texture->_render_target_texture.get();
+                    const float ui_draw_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+
+                    frame->SetRenderTarget(render_target);
+                    // draw effect, who owns the shader constant buffer, our ui component?
+
+                } DSC_DEBUG_ONLY(DSC_COMMA "draw root"));
+                DscDag::DagCollection::LinkIndexNodes(0, frame, draw_node);
+                DscDag::DagCollection::LinkIndexNodes(1, sub_render_target_pool_texture, draw_node);
+                DscDag::DagCollection::LinkIndexNodes(2, ui_draw_scale, draw_node);
+                draw_node_array.push_back(draw_node);
+            }
+        }
     }
 
-    DscUi::DagGroupUiRootNode result(&in_dag_collection, node_token_array);
     DSC_ASSERT(true == result.IsValid(), "invalid result");
 
     return result;
@@ -1095,7 +1148,6 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DscDag::NodeToken render_target_pool_texture = MakeNodeCalculateRenderTarget(in_dag_collection, desired_size, geometry_size, _render_target_pool.get(), &in_draw_system, clear_colour_node);
     // reminder: render_target_pool_texture_size is the size of the full texture the render pool has given us, may be bigger than our render viewport/ desired size
     DscDag::NodeToken render_target_pool_texture_size = MakeNodeGetRenderTargetSize(in_dag_collection, render_target_pool_texture);
-
     DscDag::NodeToken render_target_pool_texture_viewport_size = MakeNodeGetRenderTargetViewportSize(in_dag_collection, render_target_pool_texture);
 
     result.SetNodeToken(TUiParentNodeGroup::TUiRenderSize, render_target_pool_texture_viewport_size);
@@ -1152,6 +1204,23 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DSC_ASSERT(true == result.IsValid(), "invalid result");
 
     return result;
+}
+
+std::shared_ptr<DscRenderResource::Shader> DscUi::UiManager::GetEffectShader(const DscUi::TEffect in_effect)
+{
+    switch (in_effect)
+    {
+    default:
+        DSC_ASSERT_ALWAYS("missing switch condition");
+        break;
+    case TEffect::TDropShadow:
+        return _effect_drop_shadow_shader;
+    case TEffect::TRoundCornder:
+        return _effect_round_corner_shader;
+    case TEffect::TStroke:
+        return _effect_stroke_shader;
+    }
+    return nullptr;
 }
 
 DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(

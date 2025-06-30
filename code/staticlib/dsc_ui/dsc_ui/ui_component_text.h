@@ -39,19 +39,12 @@ namespace DscUi
 			const float in_ui_draw_scale
 		) override;
 
-		virtual void SetClearColour(const DscCommon::VectorFloat4& in_colour) override;
-
-		virtual void SetParentChildIndex(const int32 in_parent_child_index) override;
-
-		virtual void SetNode(const DagGroupUiComponent& in_ui_component_group) override;
-
 	private:
 		DscText::TextManager& _text_manager;
 		TUiComponentBehaviour _behaviour = {};
 
 		std::unique_ptr<DscText::TextRun> _text_run = {};
 
-		DagGroupUiComponent _ui_component_group;
 
 	};
 }
