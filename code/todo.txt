@@ -1,10 +1,17 @@
 - ?ui
-	- UiComponentMargin
-	- UiComponentSwitch (n states, only once active)
-	- UiComponentButton
-	- UiComponentCrossFade? (n states with alpha)
-	- UiComponentDropShadow
-	- UiComponentStroke
+	stroke
+	RenderUiMainMenu
+	CrossFade
+	Button
+	Exit
+	Locale
+	ScreenTemplates
+	DagGroupNode type meta data (type info, optional)
+	MainMenu Screen
+	Option Screen
+	Character Screen
+	Combat Screen
+
 - ?partial upload
 
 

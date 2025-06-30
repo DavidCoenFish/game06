@@ -622,6 +622,56 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             array_shader_constants_info
             );
     }
+
+    // _effect_stroke_shader
+    {
+        std::vector<uint8> vertex_shader_data;
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_stroke_vs.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
+        }
+        std::vector<uint8> pixel_shader_data;
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_stroke_ps.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            ScreenQuad::GetInputElementDesc(),
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(
+                TEffectConstantBuffer(),
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
+        array_shader_resource_info.push_back(
+            // default sampiler as stroke tries to sample at the corner of 4 pixel block to reduce sample calls
+            DscRenderResource::ShaderResourceInfo::FactorySampler(
+                nullptr,
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        _effect_stroke_shader = std::make_shared<DscRenderResource::Shader>(
+            &in_draw_system,
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            array_shader_resource_info,
+            array_shader_constants_info
+            );
+    }
 }
 
 DscUi::UiManager::~UiManager()
@@ -1051,6 +1101,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentCanvas* parent_canvas = dynamic_cast<UiComponentCanvas*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != parent_canvas, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1092,6 +1143,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentStack* parent_stack = dynamic_cast<UiComponentStack*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != parent_stack, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1131,6 +1183,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeMarginChild(
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentMargin* parent_margin = dynamic_cast<UiComponentMargin*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != parent_margin, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1169,6 +1222,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentPadding* parent_padding = dynamic_cast<UiComponentPadding*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != parent_padding, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1208,6 +1262,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectRounderCornerChild
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentEffectRoundCorner* effect_round_corner = dynamic_cast<UiComponentEffectRoundCorner*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != effect_round_corner, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1244,6 +1299,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectDropShadowChild(
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentEffectDropShadow* effect = dynamic_cast<UiComponentEffectDropShadow*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != effect, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,
@@ -1281,6 +1337,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectStrokeChild(
 
     UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
     UiComponentEffectStroke* effect = dynamic_cast<UiComponentEffectStroke*>(&ui_dag_node_component->GetComponent());
+    DSC_ASSERT(nullptr != effect, "invalid state");
 
     auto result = MakeUiNode(
         in_draw_system,

@@ -42,7 +42,7 @@ float CalculateStrokeAlpha(
     float2 pivot_pixel = floor(in_uv * _texture_param_0.xy) + float2(0.5, 0.5);
     float4 texel = g_texture.Sample(g_sampler_state, pivot_pixel / _texture_param_0.zw);
 
-    float coverage = texel.a * 0.25;
+    float coverage = texel.a;
 
     coverage += SampleAtOffset(pivot_pixel, float2(0.5, 1.5), _texture_param_0.zw, 0.5, 2.9154);
     coverage += SampleAtOffset(pivot_pixel, float2(0.5, 3.5), _texture_param_0.zw, 2.5, 5.1478);
@@ -72,6 +72,8 @@ Pixel main(Interpolant in_input)
         float4(texel.rgb + (shadow_colour.rgb * (1.0 - texel.a)),
             texel.a + ((1.0 - texel.a) * shadow_colour.a)
             );
+
+    //result._colour = float4(texel.a, texel.a, texel.a, 1.0);
 
     return result;
 }

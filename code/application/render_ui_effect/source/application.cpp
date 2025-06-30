@@ -120,6 +120,78 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             margin_node
             DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
 
+#if 1
+        auto ui_component_canvas = _resources->_ui_manager->MakeComponentCanvas();
+        auto canvas_node = _resources->_ui_manager->MakeUiNodeEffectRounderCornerChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_canvas),
+            DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f),
+            _resources->_ui_root_node_group,
+            round_corner_node
+            DSC_DEBUG_ONLY(DSC_COMMA "canvas"));
+
+        auto ui_component_stroke = _resources->_ui_manager->MakeComponentEffectStroke(
+            *_draw_system,
+            DscCommon::VectorFloat4(4.0f, 0.0f, 0.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
+            );
+        auto stroke_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_stroke),
+            DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f),
+            _resources->_ui_root_node_group,
+            canvas_node,
+
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+
+            DSC_DEBUG_ONLY(DSC_COMMA "stroke"));
+
+        DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+        const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "Hello world",
+            pLocale,
+            font,
+            32,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            24
+        ));
+
+        DscCommon::VectorInt2 container_size = {};
+        const int32 current_width = 0;
+        auto text_run = std::make_unique<DscText::TextRun>(
+            std::move(text_run_array),
+            container_size,
+            true,
+            current_width,
+            DscText::THorizontalAlignment::TMiddle,
+            DscText::TVerticalAlignment::TTop,
+            12
+            );
+
+        auto ui_component_text = _resources->_ui_manager->MakeComponentText(
+            *_resources->_text_manager,
+            std::move(text_run),
+            DscUi::TUiComponentBehaviour::TNone
+        );
+        _resources->_ui_manager->MakeUiNodeEffectStrokeChild(
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(ui_component_text),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            _resources->_ui_root_node_group,
+            stroke_node
+        );
+
+
+#else
         auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
         auto node_2_result = _resources->_ui_manager->MakeUiNodeEffectRounderCornerChild(
             *_draw_system,
@@ -129,6 +201,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             _resources->_ui_root_node_group,
             round_corner_node
             DSC_DEBUG_ONLY(DSC_COMMA "fill"));
+#endif
     }
 
     return;
