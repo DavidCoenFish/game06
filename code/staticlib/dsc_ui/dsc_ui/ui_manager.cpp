@@ -5,6 +5,7 @@
 #include "ui_component_effect_drop_shadow.h"
 #include "ui_component_effect_round_corner.h"
 #include "ui_component_effect_stroke.h"
+#include "ui_component_image.h"
 #include "ui_component_fill.h"
 #include "ui_component_margin.h"
 #include "ui_component_padding.h"
@@ -431,6 +432,8 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             );
     }
 
+
+
     // _debug_grid_shader
 	{
         std::vector<uint8> vertex_shader_data;
@@ -520,6 +523,48 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             pixel_shader_data,
             array_shader_resource_info,
             array_shader_constants_info
+            );
+    }
+
+    // _image_shader
+    {
+        std::vector<uint8> vertex_shader_data;
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "image_vs.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load triangle vertex shader\n");
+        }
+        std::vector<uint8> pixel_shader_data;
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "image_ps.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to triangle load pixel shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            s_input_element_desc_array,
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),  //CD3DX12_BLEND_DESC(D3D12_DEFAULT),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
+        array_shader_resource_info.push_back(
+            // Factory sampler for subpixel accuracy, may not be 1:1 pixels source to screen size
+            DscRenderResource::ShaderResourceInfo::FactorySampler(
+                nullptr,
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        _image_shader = std::make_shared<DscRenderResource::Shader>(
+            &in_draw_system,
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            array_shader_resource_info
             );
     }
 
@@ -697,10 +742,22 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentFill()
     return result;
 }
 
+std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentImage(
+    const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture
+)
+{
+    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentImage>(
+        _image_shader,
+        in_texture,
+        _full_target_quad
+        );
+    return result;
+}
+
 std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentCanvas()
 {
     std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentCanvas>(
-        _ui_panel_shader,
+        _image_shader,
         _ui_panel_geometry
         );
     return result;

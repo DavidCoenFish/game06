@@ -47,9 +47,9 @@ void DscUi::UiComponentEffectStroke::Draw(
 		DscUi::TEffectConstantBuffer& buffer = _shader_constant_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
 		buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
 		buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
-		buffer._effect_param[0] = _param[0];
+		buffer._effect_param[0] = _param[0] * in_ui_scale;
 		buffer._effect_param[1] = _param[1];
-		buffer._effect_param[2] = _param[2] * in_ui_scale;
+		buffer._effect_param[2] = _param[2];
 		buffer._effect_param[3] = _param[3];
 		buffer._tint_colour[0] = _stroke_colour[0];
 		buffer._tint_colour[1] = _stroke_colour[1];

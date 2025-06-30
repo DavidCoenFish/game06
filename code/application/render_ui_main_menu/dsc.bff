@@ -66,8 +66,8 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_ui_effect" .WindowExeParam)
+DscVsprojectWindowExe("render_ui_main_menu" .WindowExeParam)
 
-.SolutionProjects + "render_ui_effect_project"
-.SolutionItemsApplicationProject + "render_ui_effect_project"
-//.SolutionBuildProject = "render_ui_effect_project"
+.SolutionProjects + "render_ui_main_menu_project"
+.SolutionItemsApplicationProject + "render_ui_main_menu_project"
+.SolutionBuildProject = "render_ui_main_menu_project"

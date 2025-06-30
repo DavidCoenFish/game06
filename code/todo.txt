@@ -1,5 +1,6 @@
 - ?ui
-	stroke
+	Image
+	refactor effect to be an array on a root or child node
 	RenderUiMainMenu
 	CrossFade
 	Button
