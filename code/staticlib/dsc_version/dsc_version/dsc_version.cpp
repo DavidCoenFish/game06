@@ -14,12 +14,12 @@ const char* const DscVersion::GetTimestamp()
 		;
 }
 
-const char* const DscVersion::GetVersionString()
-{
-	return ""
-#include "version_string.txt"
-		;
-}
+//const char* const DscVersion::GetVersionString()
+//{
+//	return ""
+//#include "version_string.txt"
+//		;
+//}
 
 const char* const DscVersion::GetPlatform()
 {

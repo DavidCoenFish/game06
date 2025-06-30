@@ -120,7 +120,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto image_component = _resources->_ui_manager->MakeComponentImage(
             background_texture
             );
-        //auto fill_component = _resources->_ui_manager->MakeComponentFill();
 
         _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
@@ -130,7 +129,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             _resources->_ui_root_node_group,
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 2.2222f, DscUi::UiCoord::TMethod::TSecondaryPoroportinal), DscUi::UiCoord(0, 1.0f)),
-            //DscUi::VectorUiCoord2(DscUi::UiCoord(100, 0.0f), DscUi::UiCoord(100, 0.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             );

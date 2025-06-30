@@ -882,7 +882,9 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentEffectStroke
 
 DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
     DscDag::DagCollection& in_dag_collection,
-    std::unique_ptr<IUiComponent>&& in_component
+    std::unique_ptr<IUiComponent>&& in_component,
+
+    const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
     )
@@ -945,6 +947,15 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
         DscDag::TValueChangeCondition::TNotZero
         DSC_DEBUG_ONLY(DSC_COMMA "time delta"));
 
+    // for the root, if there are no effects, the root draws to the externally provided render target [render_target, render_target_viewport_size]
+    // if there are effects, the root and all the effects minus the last one need their own render targets
+    // the last node in the chain also needs to have force draw, allow clear on draw set
+
+
+
+    DscDag::NodeToken root_draw_render_target = render_target;
+    DscDag::NodeToken root_draw_render_target_viewport_size = render_target_viewport_size;
+
     DscDag::NodeToken draw_root = in_dag_collection.CreateCalculate([](std::any&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
         DscRenderResource::Frame* frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
         DscRender::IRenderTarget* render_target = DscDag::DagCollection::GetValueType<DscRender::IRenderTarget*>(in_input_array[1]);
@@ -959,16 +970,25 @@ DscUi::DagGroupUiRootNode DscUi::UiManager::MakeUiRootNode(
         }
     } DSC_DEBUG_ONLY(DSC_COMMA "draw root"));
 
-    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TDrawRoot)] = draw_root;
     DscDag::DagCollection::LinkIndexNodes(0, frame, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(1, render_target, draw_root);
+    DscDag::DagCollection::LinkIndexNodes(1, root_draw_render_target, draw_root);
     DscDag::DagCollection::LinkIndexNodes(2, clear_on_draw, draw_root);
     DscDag::DagCollection::LinkIndexNodes(3, ui_draw_scale, draw_root);
     DscDag::DagCollection::LinkIndexNodes(4, ui_component, draw_root);
 
     // not directly consumed by the Calculate function, but used to mark it dirty
     DscDag::DagCollection::LinkIndexNodes(5, force_draw, draw_root);
-    DscDag::DagCollection::LinkIndexNodes(6, render_target_viewport_size, draw_root);
+    DscDag::DagCollection::LinkIndexNodes(6, root_draw_render_target_viewport_size, draw_root);
+
+    DealEffectArray(in_array_effect_data, draw_root, node_token_array);
+    //if (0 < in_array_effect_data.size())
+    //{
+
+    //}
+    //else
+    //{
+    //    node_token_array[static_cast<size_t>(DscUi::TUiRootNodeGroup::TDrawRoot)] = draw_root;
+    //}
 
     DscUi::DagGroupUiRootNode result(&in_dag_collection, node_token_array);
     DSC_ASSERT(true == result.IsValid(), "invalid result");
@@ -1003,7 +1023,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     const DscCommon::VectorFloat4& in_clear_colour,
 
     const DagGroupUiRootNode& in_root_node,
-    const DagGroupUiParentNode& in_parent_node
+    const DagGroupUiParentNode& in_parent_node,
+
+    const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1149,7 +1171,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
 
     const VectorUiCoord2& in_child_size,
     const VectorUiCoord2& in_child_pivot,
-    const VectorUiCoord2& in_attach_point
+    const VectorUiCoord2& in_attach_point,
+
+    const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1166,7 +1190,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeCanvasChild(
         std::move(in_component),
         in_clear_colour,
         in_root_node,
-        in_parent_node
+        in_parent_node,
+        in_array_effect_data
 
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
@@ -1191,7 +1216,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
     const DscCommon::VectorFloat4& in_clear_colour,
 
     const DagGroupUiRootNode& in_root_node,
-    const DagGroupUiParentNode& in_parent_node
+    const DagGroupUiParentNode& in_parent_node,
+
+    const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1208,7 +1235,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
         std::move(in_component),
         in_clear_colour,
         in_root_node,
-        in_parent_node
+        in_parent_node,
+        in_array_effect_data
 
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
@@ -1231,7 +1259,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeMarginChild(
     const DscCommon::VectorFloat4& in_clear_colour,
 
     const DagGroupUiRootNode& in_root_node,
-    const DagGroupUiParentNode& in_parent_node
+    const DagGroupUiParentNode& in_parent_node,
+
+    const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1248,7 +1278,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeMarginChild(
         std::move(in_component),
         in_clear_colour,
         in_root_node,
-        in_parent_node
+        in_parent_node,
+        in_array_effect_data
 
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
@@ -1270,7 +1301,9 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
     const DscCommon::VectorFloat4& in_clear_colour,
 
     const DagGroupUiRootNode& in_root_node,
-    const DagGroupUiParentNode& in_parent_node
+    const DagGroupUiParentNode& in_parent_node,
+
+    const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1287,7 +1320,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
         std::move(in_component),
         in_clear_colour,
         in_root_node,
-        in_parent_node
+        in_parent_node,
+        in_array_effect_data
 
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
     );
@@ -1302,7 +1336,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
 
     return result;
 }
-
+/*
 DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectRounderCornerChild(
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
@@ -1414,6 +1448,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeEffectStrokeChild(
 
     return result;
 }
+*/
 
 void DscUi::UiManager::UpdateUiSystem(
     DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it

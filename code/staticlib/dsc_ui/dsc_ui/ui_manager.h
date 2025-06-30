@@ -111,10 +111,17 @@ namespace DscUi
 			const DscCommon::VectorFloat4& in_shadow_colour
 		);
 
+		struct TEffectData
+		{
+			TEffect _effect = {};
+			DscCommon::VectorFloat4 _param = {};
+			DscCommon::VectorFloat4 _colour = {};
+		};
+
 		DagGroupUiRootNode MakeUiRootNode(
 			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component
-
+			std::unique_ptr<IUiComponent>&& in_component,
+			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
@@ -132,7 +139,9 @@ namespace DscUi
 
 			const VectorUiCoord2& in_child_size, 
 			const VectorUiCoord2& in_child_pivot, 
-			const VectorUiCoord2& in_attach_point
+			const VectorUiCoord2& in_attach_point,
+
+			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
@@ -145,7 +154,10 @@ namespace DscUi
 			const DscCommon::VectorFloat4& in_clear_colour,
 
 			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
+			const DagGroupUiParentNode& in_parent_node,
+
+			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
+
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
@@ -158,7 +170,9 @@ namespace DscUi
 			const DscCommon::VectorFloat4& in_clear_colour,
 
 			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
+			const DagGroupUiParentNode& in_parent_node,
+
+			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
@@ -170,11 +184,13 @@ namespace DscUi
 			const DscCommon::VectorFloat4& in_clear_colour,
 
 			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node
+			const DagGroupUiParentNode& in_parent_node,
+
+			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
-
+/*
 		DagGroupUiParentNode MakeUiNodeEffectRounderCornerChild(
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
@@ -210,7 +226,7 @@ namespace DscUi
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
-
+*/
 		// could be combined with the DrawUiSystem, but doesn't need to be
 		void UpdateUiSystem(
 			DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it

@@ -10,6 +10,16 @@ namespace DscDag
 
 namespace DscUi
 {
+	enum class TEffect : uint8
+	{
+		//TDesaturate
+		TDropShadow, // opace cast shadow on alphaed pixels (a max blur radius of 6.7 pixels)
+		//TInnerShadow, // alphaed pixels cast shadow on opace (a max blur radius of 6.7 pixels)
+		//TRolloverTextBurn
+		TRoundCornder, // 4 corners of the source texture are alphaed out
+		TStroke, // opace pixels flow out (a max of 6.7 pixels)
+	};
+
 	enum class TUiFlow : uint8
 	{
 		THorizontal,
