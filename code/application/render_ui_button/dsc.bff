@@ -30,7 +30,7 @@
         "dsc_locale",
         "dsc_png",
         "dsc_version",
-        "dsc_ui"
+        "dsc_ui",
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 
@@ -51,8 +51,7 @@
     .AdditionalIncludePaths = {}
 
     .DataCopyPath = {
-        "$RootPath$/../data/font",
-        "$RootPath$/../data/background",
+        "$RootPath$/../data/font"
         }
     .DoDataCopy = true
 
@@ -67,8 +66,8 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_ui_main_menu" .WindowExeParam)
+DscVsprojectWindowExe("render_ui_button" .WindowExeParam)
 
-.SolutionProjects + "render_ui_main_menu_project"
-.SolutionItemsApplicationProject + "render_ui_main_menu_project"
-//.SolutionBuildProject = "render_ui_main_menu_project"
+.SolutionProjects + "render_ui_button_project"
+.SolutionItemsApplicationProject + "render_ui_button_project"
+.SolutionBuildProject = "render_ui_button_project"

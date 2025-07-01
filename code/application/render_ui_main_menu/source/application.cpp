@@ -108,7 +108,7 @@ namespace
             std::vector<DscUi::TEffectData>({ {
                 DscUi::TEffect::TDropShadow,
                 DscCommon::VectorFloat4(2.0f, 4.0f, 2.0f, 0.0f),
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)} })
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)} })
                 );
 
         DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));

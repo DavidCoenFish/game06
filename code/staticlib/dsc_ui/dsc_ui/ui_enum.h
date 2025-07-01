@@ -20,9 +20,14 @@ namespace DscUi
 	enum class TUiComponentBehaviour : uint32
 	{
 		TNone = 0,
-		//TVisible = 1 << 0, ? why have the node in the tree if it is invisible
+		//TVisible = 1 << 0, ? why have the node in the tree if it is invisible? convienience? or use UiComponentSwitch/ UiComponentCrossfade for that?
 		THasManualScrollX = 1 << 0,
 		THasManualScrollY = 1 << 1,
+
+		TDisabled = 1 << 2,
+		// or are these inputs/ state?
+		//TRollover = 1 << 3,
+		//TClicked = 1 << 4
 	};
 
 	enum class TUiRootNodeGroup : uint8
