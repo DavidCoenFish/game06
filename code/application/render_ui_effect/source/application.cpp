@@ -56,8 +56,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas();
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
+            *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_canvas_commponent)
+            std::move(ui_canvas_commponent),
+            std::vector<DscUi::TEffectData>()
             DSC_DEBUG_ONLY(DSC_COMMA "canvas"));
 
         auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
@@ -72,55 +74,67 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(),
-            DscUi::VectorUiCoord2()
+            DscUi::VectorUiCoord2(),
+            std::vector<DscUi::TEffectData>()
             DSC_DEBUG_ONLY(DSC_COMMA "debug grid"));
-
-        auto ui_drop_shadow = _resources->_ui_manager->MakeComponentEffectDropShadow(
-            *_draw_system,
-            DscCommon::VectorFloat4(2.0f, 4.0f, 2.0f, 0.0f),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)
-        );
-        auto drop_shadow_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+#if 1
+        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
+        auto round_corner_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_drop_shadow),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            std::move(ui_component_fill),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
             _resources->_ui_root_node_group,
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.25f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
-            DSC_DEBUG_ONLY(DSC_COMMA "drop shadow"));
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            std::vector<DscUi::TEffectData>({{
+                    DscUi::TEffect::TRoundedCorner,
+                    DscCommon::VectorFloat4(16.0f, 16.0f, 16.0f, 16.0f),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)}})
 
+            DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
+
+#else
         auto margin = _resources->_ui_manager->MakeComponentMargin(
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f)
         );
-        auto margin_node = _resources->_ui_manager->MakeUiNodeEffectDropShadowChild(
+        auto margin_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
             std::move(margin),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.00f),
             _resources->_ui_root_node_group,
-            drop_shadow_node
+            parent_node_group,
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.25f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            std::vector<DscUi::TEffectData>({ {
+                    DscUi::TEffect::TDropShadow,
+                    DscCommon::VectorFloat4(2.0f, 4.0f, 2.0f, 0.0f),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)} })
             DSC_DEBUG_ONLY(DSC_COMMA "margin"));
 
-        auto ui_component_round = _resources->_ui_manager->MakeComponentEffectRoundCorner(
-            *_draw_system,
-            DscCommon::VectorFloat4(16.0f, 16.0f, 16.0f, 16.0f)
-        );
+        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
         auto round_corner_node = _resources->_ui_manager->MakeUiNodeMarginChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_round),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            std::move(ui_component_fill),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
             _resources->_ui_root_node_group,
-            margin_node
-            DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
+            margin_node,
+            std::vector<DscUi::TEffectData>({ DscUi::TEffectData({
+                    DscUi::TEffect::TRoundedCorner,
+                    DscCommon::VectorFloat4(16.0f, 16.0f, 16.0f, 16.0f),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)}) })
 
-#if 1
+            DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
+#endif
+#if 0
         auto ui_component_canvas = _resources->_ui_manager->MakeComponentCanvas();
         auto canvas_node = _resources->_ui_manager->MakeUiNodeEffectRounderCornerChild(
             *_draw_system,
@@ -190,17 +204,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             stroke_node
         );
 
-
-#else
-        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
-        auto node_2_result = _resources->_ui_manager->MakeUiNodeEffectRounderCornerChild(
-            *_draw_system,
-            *_resources->_dag_collection,
-            std::move(ui_component_fill),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
-            _resources->_ui_root_node_group,
-            round_corner_node
-            DSC_DEBUG_ONLY(DSC_COMMA "fill"));
 #endif
     }
 

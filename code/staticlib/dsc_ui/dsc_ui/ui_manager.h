@@ -203,6 +203,7 @@ namespace DscUi
 		);
 
 		std::shared_ptr<DscRenderResource::Shader> GetEffectShader(const TEffect in_effect);
+		std::shared_ptr<DscRenderResource::GeometryGeneric> GetEffectGeometry(const TEffect in_effect);
 
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored

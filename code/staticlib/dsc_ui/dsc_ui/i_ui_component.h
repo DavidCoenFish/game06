@@ -30,6 +30,8 @@ namespace DscRender
 namespace DscRenderResource
 {
 	class Frame;
+	class GeometryGeneric;
+	class Shader;
 	class ShaderConstantBuffer;
 }
 
@@ -52,7 +54,10 @@ namespace DscUi
 		struct TEffectComponentData
 		{
 			TEffectData _effect_data = {};
+			DscDag::NodeToken _shader_constant_buffer_node = {}; // node to mark dirty if we want to change items in _effect_data
+			std::shared_ptr<DscRenderResource::Shader> _shader = {};
 			std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
+			std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry = {};
 		};
 		void SetEffectData(const int32 in_index, const TEffectComponentData& in_effect_data);
 		TEffectComponentData GetEffectData(const int32 in_index);
