@@ -77,6 +77,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2(),
             std::vector<DscUi::TEffectData>()
             DSC_DEBUG_ONLY(DSC_COMMA "debug grid"));
+
 #if 1
         auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
         auto round_corner_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
@@ -92,6 +93,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::TEffectData>({{
                     DscUi::TEffect::TRoundedCorner,
                     DscCommon::VectorFloat4(16.0f, 16.0f, 16.0f, 16.0f),
+                    //DscCommon::VectorFloat4(64.0f, 64.0f, 64.0f, 64.0f),
                     DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)}})
 
             DSC_DEBUG_ONLY(DSC_COMMA "round corner"));

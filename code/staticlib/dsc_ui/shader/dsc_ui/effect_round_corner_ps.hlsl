@@ -14,6 +14,7 @@ cbuffer ConstantBuffer : register(b0)
     float4 _effect_param;
     float4 _tint;
     float4 _texture_param_0;
+    float4 _texture_param_1;
 };
 
 float CalculateAlpha(float in_x, float in_y, float in_radius)
@@ -34,26 +35,26 @@ float CalculateCornerAlpha(
     // data[bottom left, top left, top right, bottom right]
 
     float bottom_left = CalculateAlpha(
-        max(0.0, in_radius.x - pixel_pos.x + 0.5),
-        max(0.0, in_radius.x - (in_width_height.y - pixel_pos.y) + 0.5),
+        max(0.0, in_radius.x - pixel_pos.x),
+        max(0.0, in_radius.x - (in_width_height.y - pixel_pos.y)),
         in_radius.x
     );
 
     float top_left = CalculateAlpha(
-        max(0.0, in_radius.y - pixel_pos.x + 0.5),
-        max(0.0, in_radius.y - pixel_pos.y + 0.5),
+        max(0.0, in_radius.y - pixel_pos.x),
+        max(0.0, in_radius.y - pixel_pos.y),
         in_radius.y
     );
 
     float top_right = CalculateAlpha(
-        max(0.0, in_radius.z - (in_width_height.x - pixel_pos.x) + 0.5),
-        max(0.0, in_radius.z - pixel_pos.y + 0.5),
+        max(0.0, in_radius.z - (in_width_height.x - pixel_pos.x)),
+        max(0.0, in_radius.z - pixel_pos.y),
         in_radius.z
     );
 
     float bottom_right = CalculateAlpha(
-        max(0.0, in_radius.w - (in_width_height.x - pixel_pos.x + 0.5)),
-        max(0.0, in_radius.w - (in_width_height.y - pixel_pos.y + 0.5)),
+        max(0.0, in_radius.w - (in_width_height.x - pixel_pos.x)),
+        max(0.0, in_radius.w - (in_width_height.y - pixel_pos.y)),
         in_radius.w
     );
 

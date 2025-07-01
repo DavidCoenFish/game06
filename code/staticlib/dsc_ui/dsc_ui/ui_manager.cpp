@@ -555,7 +555,8 @@ namespace
 
             for (int32 index = 0; index < texture_count; ++index)
             {
-                std::shared_ptr<DscRenderResource::RenderTargetTexture> _render_target_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetTexture>>(in_input_array[4 + index]);
+                DscDag::NodeToken draw_node = in_input_array[4 + index];
+                auto _render_target_texture = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::RenderTargetTexture>>(draw_node);
                 effect_component_data._shader->SetShaderResourceViewHandle(index, _render_target_texture->GetShaderResourceHeapWrapperItem());
             }
 
@@ -574,7 +575,8 @@ namespace
 
         for (int32 index = 0; index < texture_count; ++index)
         {
-            DscDag::DagCollection::LinkIndexNodes(4 + index, in_draw_node_array[static_cast<int32>(in_draw_node_array.size()) - 1 - index], node);
+            DscDag::NodeToken draw_node = in_draw_node_array[static_cast<int32>(in_draw_node_array.size()) - 1 - index];
+            DscDag::DagCollection::LinkIndexNodes(4 + index, draw_node, node);
         }
 
         return node;
@@ -1396,8 +1398,8 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     DscDag::DagCollection::LinkIndexNodes(1, render_target_pool_texture, draw_node);
     DscDag::DagCollection::LinkIndexNodes(2, in_root_node.GetNodeToken(TUiRootNodeGroup::TUiScale), draw_node);
     DscDag::DagCollection::LinkIndexNodes(3, ui_component, draw_node);
-
-    result.SetNodeToken(TUiParentNodeGroup::TDraw, draw_node);
+    // not directly in the draw node calculate usage, but if it dirties, want the tree to dirty
+    DscDag::DagCollection::LinkIndexNodes(4, shader_constant_node, draw_node);
 
     // tell the ui component about the nodes it can write to
     DagGroupUiComponent ui_component_group(&in_dag_collection);
@@ -1408,7 +1410,7 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
     ui_component_raw->SetNode(ui_component_group);
 
     DscDag::NodeToken final_draw_node = draw_node;
-    if (0 == in_array_effect_data.size())
+    if (0 < in_array_effect_data.size())
     {
         std::vector<DscDag::NodeToken> draw_node_array = {};
         draw_node_array.push_back(draw_node);
@@ -1450,10 +1452,10 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNode(
         }
     }
 
-    // not directly in the draw node calculate usage, but if it dirties, want the tree to dirty
-    DscDag::DagCollection::LinkIndexNodes(4, shader_constant_node, final_draw_node);
     // add our draw node as an input to the parent draw
     DscDag::DagCollection::LinkNodes(final_draw_node, in_parent_node.GetNodeToken(TUiParentNodeGroup::TDraw));
+
+    result.SetNodeToken(TUiParentNodeGroup::TDraw, final_draw_node);
 
     DSC_ASSERT(true == result.IsValid(), "invalid result");
 
@@ -1692,7 +1694,7 @@ void DscUi::UiManager::DrawUiSystem(
     }
 
 #if defined(_DEBUG)
-    DscDag::DagCollection::DebugDumpNode(in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawRoot));
+    //DscDag::DagCollection::DebugDumpNode(in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawRoot));
 #endif //#if defined(_DEBUG)
 
     // after input nodes have been changed, flush the conditional state
