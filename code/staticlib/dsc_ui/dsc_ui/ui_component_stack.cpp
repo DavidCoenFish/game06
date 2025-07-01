@@ -30,7 +30,10 @@ void DscUi::UiComponentStack::AddChild(
 	DscRender::DrawSystem& in_draw_system,
 	DscDag::NodeToken in_render_node,
 	DscDag::NodeToken in_ui_panel_shader_constant_node,
-	DscDag::NodeToken in_geometry_size
+	DscDag::NodeToken in_geometry_size,
+	const UiCoord& in_primary_size,
+	const UiCoord& in_primary_pivot,
+	const UiCoord& in_attach_point
 	)
 {
 	auto shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
@@ -40,18 +43,21 @@ void DscUi::UiComponentStack::AddChild(
 		in_render_node,
 		in_ui_panel_shader_constant_node,
 		in_geometry_size,
-		shader_constant_buffer
+		shader_constant_buffer,
+		in_primary_size,
+		in_primary_pivot,
+		in_attach_point
 		}));
 	return;
 }
 
-const DscCommon::VectorInt2 DscUi::UiComponentStack::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const DscCommon::VectorInt2&, const float in_ui_scale)
+const DscCommon::VectorInt2 DscUi::UiComponentStack::ConvertAvaliableSizeToDesiredSize(const DscCommon::VectorInt2&, const DscCommon::VectorInt2& in_avaliable_size, const float in_ui_scale)
 {
 	DscCommon::VectorInt2 result = {};
 
 	if (0 < _child_slot_array.size())
 	{
-		const DscCommon::VectorInt2 last_geometry_offset = GetChildGeometryOffset(in_parent_avaliable_size, static_cast<int32>(_child_slot_array.size() - 1), in_ui_scale);
+		const DscCommon::VectorInt2 last_geometry_offset = GetChildGeometryOffset(in_avaliable_size, static_cast<int32>(_child_slot_array.size() - 1), in_ui_scale);
 		const DscCommon::VectorInt2 last_geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(_child_slot_array.back()._geometry_size);
 
 		// currently works for horizontal or vertical flow, if we center or right align, then this will need a switch statement
@@ -85,7 +91,7 @@ void DscUi::UiComponentStack::Draw(
 	in_frame.SetRenderTarget(nullptr);
 }
 
-const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32, const float) const
+const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildAvaliableSize(const DscCommon::VectorInt2& in_parent_avaliable_size, const int32 in_index, const float in_ui_scale) const
 {
 	DscCommon::VectorInt2 result = {};
 	switch (_ui_flow)
@@ -93,10 +99,10 @@ const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildAvaliableSize(const
 	default:
 		break;
 	case TUiFlow::THorizontal:
-		result[1] = in_parent_avaliable_size[1];
+		result[1] = _child_slot_array[in_index]._primary_size.Evaluate(in_parent_avaliable_size.GetY(), in_parent_avaliable_size.GetX(), in_ui_scale);
 		break;
 	case TUiFlow::TVertical:
-		result[0] = in_parent_avaliable_size[0];
+		result[0] = _child_slot_array[in_index]._primary_size.Evaluate(in_parent_avaliable_size.GetX(), in_parent_avaliable_size.GetY(), in_ui_scale);
 		break;
 	}
 	return result;
@@ -151,10 +157,20 @@ const DscCommon::VectorInt2 DscUi::UiComponentStack::GetChildGeometryOffset(cons
 		default:
 			break;
 		case TUiFlow::THorizontal:
-			result.Set(trace, 0);
+		{
+			const DscCommon::VectorInt2 geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(_child_slot_array[in_child_index]._geometry_size);
+			const int32 offset = _child_slot_array[in_child_index]._attach_point.Evaluate(in_parent_avaliable_size.GetY(), in_parent_avaliable_size.GetX(), in_ui_scale) -
+				_child_slot_array[in_child_index]._primary_pivot.Evaluate(geometry_size.GetY(), geometry_size.GetX(), in_ui_scale);
+			result.Set(trace, offset);
+		}
 			break;
 		case TUiFlow::TVertical:
-			result.Set(0, trace);
+		{
+			const DscCommon::VectorInt2 geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(_child_slot_array[in_child_index]._geometry_size);
+			const int32 offset = _child_slot_array[in_child_index]._attach_point.Evaluate(in_parent_avaliable_size.GetX(), in_parent_avaliable_size.GetY(), in_ui_scale) -
+				_child_slot_array[in_child_index]._primary_pivot.Evaluate(geometry_size.GetX(), geometry_size.GetY(), in_ui_scale);
+			result.Set(offset, trace);
+		}
 			break;
 		}
 	}

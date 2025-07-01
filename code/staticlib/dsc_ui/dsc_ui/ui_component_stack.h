@@ -46,9 +46,12 @@ namespace DscUi
 		void AddChild(
 			IUiComponent* const in_child_component, // we don't keep a reference, we just set the parent child index
 			DscRender::DrawSystem& in_draw_system,
-			DscDag::NodeToken in_render_node, 
+			DscDag::NodeToken in_render_node,
 			DscDag::NodeToken in_ui_panel_shader_constant_node,
-			DscDag::NodeToken in_geometry_size
+			DscDag::NodeToken in_geometry_size,
+			const UiCoord& in_primary_size,
+			const UiCoord& in_primary_pivot,
+			const UiCoord& in_attach_point
 			);
 
 	private:
@@ -81,6 +84,9 @@ namespace DscUi
 			DscDag::NodeToken _ui_panel_shader_constant_node = {};
 			DscDag::NodeToken _geometry_size = {};
 			std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _shader_constant_buffer = {};
+			UiCoord _primary_size = {};
+			UiCoord _primary_pivot = {};
+			UiCoord _attach_point = {};
 		};
 		std::vector<ChildSlot> _child_slot_array = {};
 

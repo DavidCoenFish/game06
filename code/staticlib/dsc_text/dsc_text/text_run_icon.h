@@ -26,7 +26,8 @@ namespace DscText
 			const int32 in_icon_id = 0,
 			GlyphCollectionIcon* const in_icon_font = nullptr,
 			const int32 in_colour_tint = 0xff000000,
-			const int32 in_line_height_minimun = 0
+			const int32 in_line_height_minimun = 0,
+			const int32 in_line_depth_minimun = 0
 		);
 
 	private:
@@ -44,5 +45,6 @@ namespace DscText
 		GlyphCollectionIcon* const _icon_font = 0;
 		const int32 _colour_tint;
 		const int32 _line_height_minimun;
+		const int32 _line_depth_minimun;
 	};
 }

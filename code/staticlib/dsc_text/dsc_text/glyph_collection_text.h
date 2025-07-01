@@ -53,23 +53,9 @@ namespace DscText
 			const int in_width_limit = 0,
 			const int32 in_colour = 0xff000000,
 			const int32 in_line_minimum_height = 0,
+			const int32 in_line_minimum_depth = 0,
 			const int32 in_line_gap_pixel = 0
 		);
-
-		///// Draw a glyph to a pixel blob, made to match the target size
-		//void DrawToPixels(
-		//	std::vector<uint8_t>& out_data,
-		//	const int in_target_width,
-		//	const int in_target_height,
-		//	const std::string& in_string_utf8,
-		//	const TextLocale* const in_locale_token,
-		//	const int in_font_size,
-		//	const int in_offset_x = 0,
-		//	const int in_offset_y = 0
-		//);
-
-		//hb_font_t* DebugGetFont() { return _harf_buzz_font; }
-
 
 	private:
 		struct FontFace
@@ -90,6 +76,7 @@ namespace DscText
 			const bool in_width_limit_enabled,
 			const int32 in_width_limit,
 			const int32 in_line_minimum_height,
+			const int32 in_line_minimum_depth,
 			const int32 in_colour,
 			const int32 in_line_gap_pixel
 		);

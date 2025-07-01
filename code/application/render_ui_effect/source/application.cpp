@@ -78,27 +78,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::TEffectData>()
             DSC_DEBUG_ONLY(DSC_COMMA "debug grid"));
 
-#if 1
-        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
-        auto round_corner_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
-            *_draw_system,
-            *_resources->_dag_collection,
-            std::move(ui_component_fill),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
-            _resources->_ui_root_node_group,
-            parent_node_group,
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.25f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            std::vector<DscUi::TEffectData>({{
-                    DscUi::TEffect::TRoundedCorner,
-                    DscCommon::VectorFloat4(16.0f, 16.0f, 16.0f, 16.0f),
-                    //DscCommon::VectorFloat4(64.0f, 64.0f, 64.0f, 64.0f),
-                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)}})
-
-            DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
-
-#else
         auto margin = _resources->_ui_manager->MakeComponentMargin(
             DscUi::UiCoord(16, 0.0f),
             DscUi::UiCoord(16, 0.0f),
@@ -109,10 +88,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             std::move(margin),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.00f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
             _resources->_ui_root_node_group,
             parent_node_group,
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.25f), DscUi::UiCoord(0, 0.25f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             std::vector<DscUi::TEffectData>({ {
@@ -121,11 +100,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                     DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)} })
             DSC_DEBUG_ONLY(DSC_COMMA "margin"));
 
-        auto ui_component_fill = _resources->_ui_manager->MakeComponentFill();
-        auto round_corner_node = _resources->_ui_manager->MakeUiNodeMarginChild(
+        auto canvas2 = _resources->_ui_manager->MakeComponentCanvas();
+        auto canvas2_node = _resources->_ui_manager->MakeUiNodeMarginChild(
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_component_fill),
+            std::move(canvas2),
             DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
             _resources->_ui_root_node_group,
             margin_node,
@@ -135,36 +114,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                     DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)}) })
 
             DSC_DEBUG_ONLY(DSC_COMMA "round corner"));
-#endif
-#if 0
-        auto ui_component_canvas = _resources->_ui_manager->MakeComponentCanvas();
-        auto canvas_node = _resources->_ui_manager->MakeUiNodeEffectRounderCornerChild(
-            *_draw_system,
-            *_resources->_dag_collection,
-            std::move(ui_component_canvas),
-            DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f),
-            _resources->_ui_root_node_group,
-            round_corner_node
-            DSC_DEBUG_ONLY(DSC_COMMA "canvas"));
-
-        auto ui_component_stroke = _resources->_ui_manager->MakeComponentEffectStroke(
-            *_draw_system,
-            DscCommon::VectorFloat4(4.0f, 0.0f, 0.0f, 0.0f),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
-            );
-        auto stroke_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
-            *_draw_system,
-            *_resources->_dag_collection,
-            std::move(ui_component_stroke),
-            DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f),
-            _resources->_ui_root_node_group,
-            canvas_node,
-
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
-
-            DSC_DEBUG_ONLY(DSC_COMMA "stroke"));
 
         DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
 
@@ -188,7 +137,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             true,
             current_width,
             DscText::THorizontalAlignment::TMiddle,
-            DscText::TVerticalAlignment::TTop,
+            DscText::TVerticalAlignment::TMiddle,
             12
             );
 
@@ -197,16 +146,21 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(text_run),
             DscUi::TUiComponentBehaviour::TNone
         );
-        _resources->_ui_manager->MakeUiNodeEffectStrokeChild(
+        _resources->_ui_manager->MakeUiNodeCanvasChild(
             *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_component_text),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
             _resources->_ui_root_node_group,
-            stroke_node
+            canvas2_node,
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            std::vector<DscUi::TEffectData>({ {
+                    DscUi::TEffect::TStroke,
+                    DscCommon::VectorFloat4(4.0f, 0.0f, 0.0f, 0.0f),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)} })
         );
-
-#endif
     }
 
     return;

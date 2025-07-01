@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
 #include "ui_enum.h"
+#include "ui_coord.h"
 #include <dsc_common\vector_float4.h>
 
 namespace DscCommon
@@ -134,8 +135,11 @@ namespace DscUi
 			const DagGroupUiRootNode& in_root_node,
 			const DagGroupUiParentNode& in_parent_node,
 
-			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
+			const UiCoord& in_primary_size = UiCoord(0, 1.0f),
+			const UiCoord& in_primary_pivot = UiCoord(0, 0.0f),
+			const UiCoord& in_attach_point = UiCoord(0, 0.0f),
 
+			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
 
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);

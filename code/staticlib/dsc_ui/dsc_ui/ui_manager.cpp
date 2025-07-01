@@ -1520,6 +1520,10 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
     const DagGroupUiRootNode& in_root_node,
     const DagGroupUiParentNode& in_parent_node,
 
+    const UiCoord& in_primary_size,
+    const UiCoord& in_primary_pivot,
+    const UiCoord& in_attach_point,
+
     const std::vector<TEffectData>& in_array_effect_data
 
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
@@ -1548,7 +1552,10 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
         in_draw_system,
         result.GetNodeToken(TUiParentNodeGroup::TDraw),
         result.GetNodeToken(TUiParentNodeGroup::TUiPanelShaderConstant),
-        result.GetNodeToken(TUiParentNodeGroup::TUiGeometrySize)
+        result.GetNodeToken(TUiParentNodeGroup::TUiGeometrySize),
+        in_primary_size,
+        in_primary_pivot,
+        in_attach_point
     );
 
     return result;

@@ -32,7 +32,11 @@ namespace
         DscUi::UiManager& in_ui_manager,
         const DscUi::DagGroupUiRootNode& in_root_node,
         const DscUi::DagGroupUiParentNode& in_parent_node,
-        const std::string& in_message)
+        const std::string& in_message,
+        const DscUi::UiCoord& in_size = DscUi::UiCoord(0, 1.0f),
+        const DscUi::UiCoord& in_pivot = DscUi::UiCoord(0, 0.0f),
+        const DscUi::UiCoord& in_attach = DscUi::UiCoord(0, 0.0f)
+    )
     {
         auto ui_padding = in_ui_manager.MakeComponentPadding(
             DscUi::UiCoord(16, 0.0f),
@@ -46,7 +50,10 @@ namespace
             std::move(ui_padding),
             DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 0.5f),
             in_root_node,
-            in_parent_node
+            in_parent_node,
+            in_size,
+            in_pivot,
+            in_attach
         );
 
         DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
@@ -123,6 +130,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas();
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
+            *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_canvas_commponent)
             );
@@ -188,11 +196,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
         );
 #endif
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Hello");
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "World");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Hello"); // , DscUi::UiCoord(0, 0.75f), DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f));
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "World"); //, DscUi::UiCoord(0, 0.75f));
         AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Some longer text that is very long");
         AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "I ran out of things to say, so i will just keep on making noise");
-        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Not a button yet");
+        AddTextToNode(*_file_system, *_draw_system, *_resources->_dag_collection, *_resources->_text_manager, *_resources->_ui_manager, _resources->_ui_root_node_group, stack_node, "Not a button yet"); //, DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f));
     }
 
     return;

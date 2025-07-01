@@ -46,6 +46,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas();
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
+            *_draw_system,
             *_resources->_dag_collection,
             std::move(ui_canvas_commponent)
             );
@@ -72,7 +73,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f),
             _resources->_ui_root_node_group,
             parent_node_group,
-#if 1
+#if 0
             DscUi::VectorUiCoord2(DscUi::UiCoord(200, 0.0f), DscUi::UiCoord(100, 0.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(200, 0.0f), DscUi::UiCoord(100, 0.0f))

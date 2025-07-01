@@ -167,8 +167,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto ui_canvas_commponent = _resources->_ui_manager->MakeComponentCanvas();
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
+            *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_canvas_commponent)
+            std::move(ui_canvas_commponent),
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Canvas")
             );
@@ -184,7 +186,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(),
-            DscUi::VectorUiCoord2()
+            DscUi::VectorUiCoord2(),
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Debug fill")
         );
@@ -205,7 +208,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Padding")
         );
@@ -222,7 +226,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(ui_component_text),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.5f, 0.5f),
             _resources->_ui_root_node_group,
-            ui_padding_node
+            ui_padding_node,
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Text")
         );
@@ -242,7 +247,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(400, 0.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Margin")
         );
@@ -259,7 +265,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(ui_component_text),
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.5f, 0.5f),
             _resources->_ui_root_node_group,
-            ui_margin_node
+            ui_margin_node,
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Text")
         );
@@ -279,7 +286,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             parent_node_group,
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
             DscUi::VectorUiCoord2(),
-            DscUi::VectorUiCoord2()
+            DscUi::VectorUiCoord2(),
+            std::vector<DscUi::TEffectData>()
 
             DSC_DEBUG_ONLY(DSC_COMMA "Text")
         );

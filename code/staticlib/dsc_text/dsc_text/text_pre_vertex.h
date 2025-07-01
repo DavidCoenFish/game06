@@ -36,6 +36,7 @@ namespace DscText
 			const int32 in_pos_x,
 			const int32 in_pos_y,
 			const int32 in_line_minimum_height,
+			const int32 in_line_minimum_depth,
 			const int32 in_colour, // DscCommon::VectorFloat4& in_colour,
 			const float in_ui_scale
 		);
@@ -45,6 +46,7 @@ namespace DscText
 			const int32 in_pos_x,
 			const int32 in_pos_y,
 			const int32 in_line_minimum_height,
+			const int32 in_line_minimum_depth,
 			const int32 in_colour // in_colour
 		);
 
@@ -56,6 +58,7 @@ namespace DscText
 			const int32 in_pos_x,
 			const int32 in_pos_y,
 			const int32 in_line_minimum_height,
+			const int32 in_line_minimum_depth,
 			const int32 in_colour // const DscCommon::VectorFloat4& in_colour
 		);
 
@@ -92,6 +95,7 @@ namespace DscText
 		bool _line_dirty; // Pre vertex added to line, but not adjusted for max height on line
 		DscCommon::VectorInt2 _line_vertical_bounds;
 		int _current_line_height; // Allow for things added to the line to be taller
+		int _current_line_depth; // Allow for things added to the line to be deeper
 		int32 _accumulate_line_height_offset = 0;
 
 	};

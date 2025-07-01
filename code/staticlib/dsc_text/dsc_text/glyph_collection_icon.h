@@ -36,7 +36,8 @@ namespace DscText
 			const float in_ui_scale = 1.0f,
 			const int32 in_colour = 0xffffffff,
 			const int32 in_line_gap_pixels = 0,
-			const int32 in_line_minimum_height = 0
+			const int32 in_line_minimum_height = 0,
+			const int32 in_line_minimum_depth = 0
 		);
 
 

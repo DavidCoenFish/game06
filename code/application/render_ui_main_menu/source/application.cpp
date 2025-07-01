@@ -26,7 +26,6 @@
 
 namespace
 {
-#if 1
     std::shared_ptr<DscRenderResource::ShaderResource> MakeShaderResource(DscCommon::FileSystem & in_file_system, DscRender::DrawSystem & in_draw_system, const std::string & in_file_path)
     {
         std::vector<uint8> data = {};
@@ -77,7 +76,86 @@ namespace
         }
         return result;
     }
-#endif
+
+    void AddButton(
+        const std::string& in_text, 
+        DscUi::UiManager& in_ui_manager, 
+        const int32 in_top_padding,
+        DscRender::DrawSystem& in_draw_system,
+        DscDag::DagCollection& in_dag_collection,
+        DscCommon::FileSystem& in_file_system,
+        const DscUi::DagGroupUiRootNode& in_ui_root_node_group,
+        const DscUi::DagGroupUiParentNode& in_stack_node,
+        DscText::TextManager& in_text_manager
+        )
+    {
+        auto ui_padding = in_ui_manager.MakeComponentPadding(
+            DscUi::UiCoord(8, 0.0f),
+            DscUi::UiCoord(in_top_padding, 0.0f),
+            DscUi::UiCoord(8, 0.0f),
+            DscUi::UiCoord(8, 0.0f)
+        );
+        auto padding_node = in_ui_manager.MakeUiNodeStackChild(
+            in_draw_system,
+            in_dag_collection,
+            std::move(ui_padding),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+            in_ui_root_node_group,
+            in_stack_node,
+            DscUi::UiCoord(300, 0.0f),
+            DscUi::UiCoord(0, 0.5f),
+            DscUi::UiCoord(0, 0.5f),
+            std::vector<DscUi::TEffectData>({ {
+                DscUi::TEffect::TDropShadow,
+                DscCommon::VectorFloat4(2.0f, 4.0f, 2.0f, 0.0f),
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.75f)} })
+                );
+
+        DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+        const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            in_text,
+            pLocale,
+            font,
+            32,
+            DscCommon::Math::ConvertColourToInt(0, 0, 0, 255),
+            24,
+            12
+        ));
+
+        DscCommon::VectorInt2 container_size = {};
+        const int32 current_width = 0;
+        auto text_run = std::make_unique<DscText::TextRun>(
+            std::move(text_run_array),
+            container_size,
+            true,
+            current_width,
+            DscText::THorizontalAlignment::TMiddle,
+            DscText::TVerticalAlignment::TMiddle
+            );
+
+        auto ui_component_text = in_ui_manager.MakeComponentText(
+            in_text_manager,
+            std::move(text_run),
+            DscUi::TUiComponentBehaviour::TNone
+        );
+        in_ui_manager.MakeUiNodePaddingChild(
+            in_draw_system,
+            in_dag_collection,
+            std::move(ui_component_text),
+            DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f),
+            in_ui_root_node_group,
+            padding_node,
+            std::vector<DscUi::TEffectData>({ {
+                    DscUi::TEffect::TRoundedCorner,
+                    DscCommon::VectorFloat4(8.0f, 8.0f, 8.0f, 8.0f),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)} })
+                    );
+    }
+
 }
 
 Application::Resources::Resources() 
@@ -115,25 +193,215 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::move(ui_canvas_commponent),
             std::vector<DscUi::TEffectData>()
             DSC_DEBUG_ONLY(DSC_COMMA "root canvas"));
-
         auto parent_node_group = DscUi::UiManager::ConvertUiRootNodeToParentNode(_resources->_ui_root_node_group);
 
-        auto background_texture = MakeShaderResource(*_file_system, *_draw_system, DscCommon::FileSystem::JoinPath("data", "background", "background_00.png"));
-        auto image_component = _resources->_ui_manager->MakeComponentImage(
-            background_texture
+        {
+            auto background_texture = MakeShaderResource(*_file_system, *_draw_system, DscCommon::FileSystem::JoinPath("data", "background", "background_00.png"));
+            auto image_component = _resources->_ui_manager->MakeComponentImage(
+                background_texture
+                );
+            _resources->_ui_manager->MakeUiNodeCanvasChild(
+                *_draw_system,
+                *_resources->_dag_collection,
+                std::move(image_component),
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+                _resources->_ui_root_node_group,
+                parent_node_group,
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 2.2222f, DscUi::UiCoord::TMethod::TSecondaryPoroportinal), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+                );
+        }
+
+        {
+            auto component_stack = _resources->_ui_manager->MakeComponentStack(DscUi::UiCoord(0, 0.0f), DscUi::TUiFlow::TVertical);
+            auto stack_node = _resources->_ui_manager->MakeUiNodeCanvasChild(
+                *_draw_system,
+                *_resources->_dag_collection,
+                std::move(component_stack),
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+                _resources->_ui_root_node_group,
+                parent_node_group,
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             );
 
-        _resources->_ui_manager->MakeUiNodeCanvasChild(
-            *_draw_system,
-            *_resources->_dag_collection,
-            std::move(image_component),
-            DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f),
-            _resources->_ui_root_node_group,
-            parent_node_group,
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 2.2222f, DscUi::UiCoord::TMethod::TSecondaryPoroportinal), DscUi::UiCoord(0, 1.0f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+#if 1
+            // https://legendaryquest.netfirms.com/ Legendary Quest https://r12a.github.io/app-conversion/ U+2122 (tm) E2 84 A2
+            {
+                auto ui_padding = _resources->_ui_manager->MakeComponentPadding(
+                    DscUi::UiCoord(0, 0.0f),
+                    DscUi::UiCoord(32, 0.0f),
+                    DscUi::UiCoord(0, 0.0f),
+                    DscUi::UiCoord(6, 0.0f)
+                );
+                auto padding_node = _resources->_ui_manager->MakeUiNodeStackChild(
+                    *_draw_system,
+                    *_resources->_dag_collection,
+                    std::move(ui_padding),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+                    _resources->_ui_root_node_group,
+                    stack_node,
+                    DscUi::UiCoord(0, 1.0f),
+                    DscUi::UiCoord(0, 0.0f),
+                    DscUi::UiCoord(0, 0.0f),
+                    std::vector<DscUi::TEffectData>({ {
+                            DscUi::TEffect::TStroke,
+                            DscCommon::VectorFloat4(4.0f, 0.0f, 0.0f, 0.0f),
+                            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)} })
+                            );
+
+                DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+                std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+                const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+
+                text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                    "Legendary Quest",
+                    pLocale,
+                    font,
+                    88,
+                    DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+                    64
+                ));
+                text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                    "\xE2" "\x84" "\xA2",
+                    pLocale,
+                    font,
+                    64,
+                    DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+                ));
+
+                DscCommon::VectorInt2 container_size = {};
+                const int32 current_width = 0;
+                auto text_run = std::make_unique<DscText::TextRun>(
+                    std::move(text_run_array),
+                    container_size,
+                    true,
+                    current_width,
+                    DscText::THorizontalAlignment::TMiddle,
+                    DscText::TVerticalAlignment::TMiddle
+                    );
+
+                auto ui_component_text = _resources->_ui_manager->MakeComponentText(
+                    *_resources->_text_manager,
+                    std::move(text_run),
+                    DscUi::TUiComponentBehaviour::TNone
+                );
+                _resources->_ui_manager->MakeUiNodePaddingChild(
+                    *_draw_system,
+                    *_resources->_dag_collection,
+                    std::move(ui_component_text),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+                    _resources->_ui_root_node_group,
+                    padding_node
+                );
+
+            }
+
+            // CRPG Sandbox
+            {
+                DscText::GlyphCollectionText* font = _resources->_text_manager->LoadFont(*_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+                std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+                const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+
+                text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                    "CRPG Sanbox",
+                    pLocale,
+                    font,
+                    32,
+                    DscCommon::Math::ConvertColourToInt(0, 0, 0, 255)
+                ));
+
+                DscCommon::VectorInt2 container_size = {};
+                const int32 current_width = 0;
+                auto text_run = std::make_unique<DscText::TextRun>(
+                    std::move(text_run_array),
+                    container_size,
+                    true,
+                    current_width,
+                    DscText::THorizontalAlignment::TMiddle,
+                    DscText::TVerticalAlignment::TMiddle
+                    );
+
+                auto ui_component_text = _resources->_ui_manager->MakeComponentText(
+                    *_resources->_text_manager,
+                    std::move(text_run),
+                    DscUi::TUiComponentBehaviour::TNone
+                );
+                _resources->_ui_manager->MakeUiNodeStackChild(
+                    *_draw_system,
+                    *_resources->_dag_collection,
+                    std::move(ui_component_text),
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
+                    _resources->_ui_root_node_group,
+                    stack_node
+                );
+            }
+#endif
+            AddButton(
+                "Character",
+                *_resources->_ui_manager,
+                32,
+                *_draw_system,
+                *_resources->_dag_collection,
+                *_file_system,
+                _resources->_ui_root_node_group,
+                stack_node,
+                *_resources->_text_manager
+                );
+
+            AddButton(
+                "Combat",
+                *_resources->_ui_manager,
+                8,
+                *_draw_system,
+                *_resources->_dag_collection,
+                *_file_system,
+                _resources->_ui_root_node_group,
+                stack_node,
+                *_resources->_text_manager
             );
+
+            AddButton(
+                "Scenario",
+                *_resources->_ui_manager,
+                8,
+                *_draw_system,
+                *_resources->_dag_collection,
+                *_file_system,
+                _resources->_ui_root_node_group,
+                stack_node,
+                *_resources->_text_manager
+            );
+
+            AddButton(
+                "Options",
+                *_resources->_ui_manager,
+                8,
+                *_draw_system,
+                *_resources->_dag_collection,
+                *_file_system,
+                _resources->_ui_root_node_group,
+                stack_node,
+                *_resources->_text_manager
+            );
+
+            AddButton(
+                "Exit",
+                *_resources->_ui_manager,
+                8,
+                *_draw_system,
+                *_resources->_dag_collection,
+                *_file_system,
+                _resources->_ui_root_node_group,
+                stack_node,
+                *_resources->_text_manager
+            );
+
+        }
     }
 
     return;

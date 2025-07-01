@@ -27,6 +27,7 @@ void DscText::TextPreVertex::AddPreVertexScale(
 	const int32 in_pos_x,
 	const int32 in_pos_y,
 	const int32 in_line_minimum_height,
+	const int32 in_line_minimum_depth,
 	const int32 in_colour,
 	const float in_ui_scale
 	)
@@ -41,6 +42,7 @@ void DscText::TextPreVertex::AddPreVertexScale(
 		in_pos_x,
 		in_pos_y,
 		DscCommon::Math::ScaleInt(in_line_minimum_height, in_ui_scale),
+		DscCommon::Math::ScaleInt(in_line_minimum_depth, in_ui_scale),
 		in_colour
 	);
 }
@@ -50,6 +52,7 @@ void DscText::TextPreVertex::AddPreVertex(
 	const int32 in_pos_x,
 	const int32 in_pos_y,
 	const int32 in_line_minimum_height,
+	const int32 in_line_minimum_depth,
 	const int32 in_colour
 )
 {
@@ -61,6 +64,7 @@ void DscText::TextPreVertex::AddPreVertex(
 		in_pos_x,
 		in_pos_y,
 		in_line_minimum_height,
+		in_line_minimum_depth,
 		in_colour
 	);
 }
@@ -73,12 +77,14 @@ void DscText::TextPreVertex::AddPreVertex(
 	const int32 in_pos_x,
 	const int32 in_pos_y,
 	const int32 in_line_minimum_height,
+	const int32 in_line_minimum_depth,
 	const int32 in_colour
 )
 {
 	_line_dirty = true;
 	_bound_dirty = true;
 	_current_line_height = std::max(_current_line_height, in_line_minimum_height);
+	_current_line_depth = std::max(_current_line_depth, in_line_minimum_depth);
 
 	const int pos_x = in_pos_x + in_bearing.GetX();
 	const int pos_y = in_pos_y - (in_width_height.GetY() - in_bearing.GetY());
@@ -89,6 +95,7 @@ void DscText::TextPreVertex::AddPreVertex(
 		pos_y + in_width_height.GetY()
 	);
 	_current_line_height = std::max(_current_line_height, pos[3]);
+	_current_line_depth = std::max(_current_line_depth, -(pos[1]));
 
 	_pre_vertex_data.push_back(PreVertexData({
 		pos,
@@ -100,6 +107,9 @@ void DscText::TextPreVertex::AddPreVertex(
 
 	_line_vertical_bounds[0] = std::min(_line_vertical_bounds[0], pos[1]);
 	_line_vertical_bounds[1] = std::max(_line_vertical_bounds[1], pos[3]);
+
+	_line_vertical_bounds[0] = std::min(_line_vertical_bounds[0], -_current_line_depth);
+	_line_vertical_bounds[1] = std::max(_line_vertical_bounds[1], _current_line_height);
 
 	while ((int)_horizontal_bounds.size() <= _line_index)
 	{
@@ -132,6 +142,7 @@ void DscText::TextPreVertex::StartNewLine(
 
 	_line_index += 1;
 	_current_line_height = 0;
+	_current_line_depth = 0;
 	_line_vertical_bounds = DscCommon::VectorInt2(std::numeric_limits<int>::max(), -std::numeric_limits<int>::max());
 
 	while ((int)_horizontal_bounds.size() <= _line_index)
@@ -139,6 +150,7 @@ void DscText::TextPreVertex::StartNewLine(
 		_horizontal_bounds.push_back(DscCommon::VectorInt2(std::numeric_limits<int>::max(), -std::numeric_limits<int>::max()));
 	}
 
+	return;
 }
 
 const DscCommon::VectorInt2 DscText::TextPreVertex::GetBounds()
@@ -278,6 +290,7 @@ void DscText::TextPreVertex::FinishLine(const int32 in_line_gap_pixels)
 	}
 
 	_accumulate_line_height_offset += _current_line_height;
+	_accumulate_line_height_offset += _current_line_depth;
 	_line_dirty = false;
 
 	//move backward over _pre_vertex_data, items on _line_index

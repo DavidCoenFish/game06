@@ -44,8 +44,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto ui_commponent = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
+            *_draw_system,
             *_resources->_dag_collection,
-            std::move(ui_commponent)
+            std::move(ui_commponent),
+            std::vector<DscUi::TEffectData>()
+            DSC_DEBUG_ONLY(DSC_COMMA "root debug grid")
         );
     }
 

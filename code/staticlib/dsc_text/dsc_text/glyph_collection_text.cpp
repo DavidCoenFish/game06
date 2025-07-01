@@ -108,6 +108,7 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 	const int32 in_width_limit,
 	const int32 in_colour,
 	const int32 in_line_minimum_height,
+	const int32 in_line_minimum_depth,
 	const int32 in_line_gap_pixel
 )
 {
@@ -129,6 +130,7 @@ void DscText::GlyphCollectionText::BuildPreVertexData(
 		in_width_limit_enabled,
 		in_width_limit,
 		in_line_minimum_height,
+		in_line_minimum_depth,
 		in_colour,
 		in_line_gap_pixel
 	);
@@ -196,6 +198,7 @@ void DscText::GlyphCollectionText::ShapeText(
 	const bool in_width_limit_enabled,
 	const int32 in_width_limit,
 	const int32 in_line_minimum_height,
+	const int32 in_line_minimum_depth,
 	const int32 in_colour,
 	const int32 in_line_gap_pixel
 )
@@ -260,6 +263,7 @@ void DscText::GlyphCollectionText::ShapeText(
 				in_out_cursor + x_offset,
 				y_offset,
 				in_line_minimum_height,
+				in_line_minimum_depth,
 				in_colour
 			);
 		}
