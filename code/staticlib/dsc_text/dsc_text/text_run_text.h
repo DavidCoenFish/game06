@@ -24,7 +24,8 @@ namespace DscText
 			const int32 in_font_size = 0,
 			const int32 in_colour = 0xff000000,
 			const int32 in_line_minimum_height = 0,
-			const int32 in_line_minimum_depth = 0
+			const int32 in_line_minimum_depth = 0,
+			const int32 in_base_line_offset = 0
 		);
 
 	private:
@@ -45,5 +46,6 @@ namespace DscText
 		const int32 _colour;
 		const int32 _line_minimum_height; // how many pixels above the neutal line we claim to fill
 		const int32 _line_minimum_depth; // howm any pixels below the neutal line we claim to fill
+		const int32 _base_line_offset;
 	};
 }

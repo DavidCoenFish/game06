@@ -91,7 +91,7 @@ namespace
     {
         auto ui_padding = in_ui_manager.MakeComponentPadding(
             DscUi::UiCoord(8, 0.0f),
-            DscUi::UiCoord(in_top_padding, 0.0f),
+            DscUi::UiCoord(8 + in_top_padding, 0.0f),
             DscUi::UiCoord(8, 0.0f),
             DscUi::UiCoord(8, 0.0f)
         );
@@ -120,10 +120,10 @@ namespace
             in_text,
             pLocale,
             font,
-            32,
-            DscCommon::Math::ConvertColourToInt(0, 0, 0, 255),
             24,
-            12
+            DscCommon::Math::ConvertColourToInt(0, 0, 0, 255),
+            16,
+            8
         ));
 
         DscCommon::VectorInt2 container_size = {};
@@ -269,8 +269,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                     "\xE2" "\x84" "\xA2",
                     pLocale,
                     font,
-                    64,
-                    DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+                    32,
+                    DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+                    0,
+                    0,
+                    32
                 ));
 
                 DscCommon::VectorInt2 container_size = {};
@@ -311,7 +314,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                     "CRPG Sanbox",
                     pLocale,
                     font,
-                    32,
+                    24,
                     DscCommon::Math::ConvertColourToInt(0, 0, 0, 255)
                 ));
 
@@ -356,7 +359,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             AddButton(
                 "Combat",
                 *_resources->_ui_manager,
-                8,
+                0,
                 *_draw_system,
                 *_resources->_dag_collection,
                 *_file_system,
@@ -368,7 +371,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             AddButton(
                 "Scenario",
                 *_resources->_ui_manager,
-                8,
+                0,
                 *_draw_system,
                 *_resources->_dag_collection,
                 *_file_system,
@@ -380,7 +383,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             AddButton(
                 "Options",
                 *_resources->_ui_manager,
-                8,
+                0,
                 *_draw_system,
                 *_resources->_dag_collection,
                 *_file_system,
@@ -392,7 +395,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             AddButton(
                 "Exit",
                 *_resources->_ui_manager,
-                8,
+                0,
                 *_draw_system,
                 *_resources->_dag_collection,
                 *_file_system,

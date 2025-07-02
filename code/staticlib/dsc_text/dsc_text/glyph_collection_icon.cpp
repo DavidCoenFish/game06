@@ -26,7 +26,8 @@ void DscText::GlyphCollectionIcon::BuildPreVertexData(
 	const int32 in_colour_tint,
 	const int32 in_line_gap_pixels,
 	const int32 in_line_minimum_height,
-	const int32 in_line_minimum_depth
+	const int32 in_line_minimum_depth,
+	const int32 in_base_line_offset
 	)
 {
 	auto found = _map_icon_cell.find(in_icon_id);
@@ -49,7 +50,8 @@ void DscText::GlyphCollectionIcon::BuildPreVertexData(
 		in_line_minimum_height,
 		in_line_minimum_depth,
 		in_colour_tint,
-		in_ui_scale
+		in_ui_scale,
+		in_base_line_offset
 	);
 
 	in_out_cursor += cell_width_height[0];

@@ -29,7 +29,8 @@ void DscText::TextPreVertex::AddPreVertexScale(
 	const int32 in_line_minimum_height,
 	const int32 in_line_minimum_depth,
 	const int32 in_colour,
-	const float in_ui_scale
+	const float in_ui_scale,
+	const int32 in_base_line_offset
 	)
 {
 	const DscCommon::VectorInt2 width_height = in_cell.GetWidthHeight(in_ui_scale);
@@ -43,7 +44,8 @@ void DscText::TextPreVertex::AddPreVertexScale(
 		in_pos_y,
 		DscCommon::Math::ScaleInt(in_line_minimum_height, in_ui_scale),
 		DscCommon::Math::ScaleInt(in_line_minimum_depth, in_ui_scale),
-		in_colour
+		in_colour,
+		DscCommon::Math::ScaleInt(in_base_line_offset, in_ui_scale)
 	);
 }
 
@@ -53,7 +55,8 @@ void DscText::TextPreVertex::AddPreVertex(
 	const int32 in_pos_y,
 	const int32 in_line_minimum_height,
 	const int32 in_line_minimum_depth,
-	const int32 in_colour
+	const int32 in_colour,
+	const int32 in_base_line_offset
 )
 {
 	AddPreVertex(
@@ -65,7 +68,8 @@ void DscText::TextPreVertex::AddPreVertex(
 		in_pos_y,
 		in_line_minimum_height,
 		in_line_minimum_depth,
-		in_colour
+		in_colour,
+		in_base_line_offset
 	);
 }
 
@@ -78,7 +82,8 @@ void DscText::TextPreVertex::AddPreVertex(
 	const int32 in_pos_y,
 	const int32 in_line_minimum_height,
 	const int32 in_line_minimum_depth,
-	const int32 in_colour
+	const int32 in_colour,
+	const int32 in_base_line_offset
 )
 {
 	_line_dirty = true;
@@ -90,9 +95,9 @@ void DscText::TextPreVertex::AddPreVertex(
 	const int pos_y = in_pos_y - (in_width_height.GetY() - in_bearing.GetY());
 	const DscCommon::VectorInt4 pos = DscCommon::VectorInt4(
 		pos_x,
-		pos_y,
+		pos_y + in_base_line_offset,
 		pos_x + in_width_height.GetX(),
-		pos_y + in_width_height.GetY()
+		pos_y + in_width_height.GetY() + in_base_line_offset
 	);
 	_current_line_height = std::max(_current_line_height, pos[3]);
 	_current_line_depth = std::max(_current_line_depth, -(pos[1]));

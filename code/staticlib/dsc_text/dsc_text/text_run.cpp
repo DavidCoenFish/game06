@@ -17,7 +17,8 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 	const int32 in_font_size,
 	const int32 in_colour,
 	const int32 in_line_minimum_height,
-	const int32 in_line_minimum_depth
+	const int32 in_line_minimum_depth,
+	const int32 in_base_line_offset
 )
 {
 	return std::make_unique<DscText::TextRunText>(
@@ -27,7 +28,8 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 		in_font_size,
 		in_colour,
 		in_line_minimum_height,
-		in_line_minimum_depth
+		in_line_minimum_depth,
+		in_base_line_offset
 		);
 }
 
@@ -36,7 +38,8 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataIcon(
 	GlyphCollectionIcon* const in_icon_font,
 	const int32 in_colour_tint,
 	const int32 in_line_minimum_height,
-	const int32 in_line_minimum_depth
+	const int32 in_line_minimum_depth,
+	const int32 in_base_line_offset
 )
 {
 	return std::make_unique<DscText::TextRunIcon>(
@@ -44,7 +47,8 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataIcon(
 		in_icon_font,
 		in_colour_tint,
 		in_line_minimum_height,
-		in_line_minimum_depth
+		in_line_minimum_depth,
+		in_base_line_offset
 		);
 }
 

@@ -6,13 +6,15 @@ DscText::TextRunIcon::TextRunIcon(
 	GlyphCollectionIcon* const in_icon_font,
 	const int32 in_colour_tint,
 	const int32 in_line_height_minimun,
-	const int32 in_line_depth_minimun
+	const int32 in_line_depth_minimun,
+	const int32 in_base_line_offset
 )
 	: _icon_id(in_icon_id)
 	, _icon_font(in_icon_font)
 	, _colour_tint(in_colour_tint)
 	, _line_height_minimun(in_line_height_minimun)
 	, _line_depth_minimun(in_line_depth_minimun)
+	, _base_line_offset(in_base_line_offset)
 {
 	// nop
 }
@@ -36,6 +38,7 @@ void DscText::TextRunIcon::BuildPreVertexData(
 		_colour_tint,
 		in_new_line_gap_pixels,
 		_line_height_minimun,
-		_line_depth_minimun
+		_line_depth_minimun,
+		_base_line_offset
 		);
 }

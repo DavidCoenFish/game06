@@ -9,7 +9,8 @@ DscText::TextRunText::TextRunText(
 	const int32 in_font_size,
 	const int32 in_colour,
 	const int32 in_line_minimum_height,
-	const int32 in_line_minimum_depth
+	const int32 in_line_minimum_depth,
+	const int32 in_base_line_offset
 )
 	: _string_utf8(in_string_utf8)
 	, _font(in_font)
@@ -18,6 +19,7 @@ DscText::TextRunText::TextRunText(
 	, _colour(in_colour)
 	, _line_minimum_height(in_line_minimum_height)
 	, _line_minimum_depth(in_line_minimum_depth)
+	, _base_line_offset(in_base_line_offset)
 {
 	//nop
 }
@@ -42,7 +44,8 @@ void DscText::TextRunText::BuildPreVertexData(
 		_colour,
 		DscCommon::Math::ScaleInt(_line_minimum_height, in_ui_scale),
 		DscCommon::Math::ScaleInt(_line_minimum_depth, in_ui_scale),
-		DscCommon::Math::ScaleInt(in_new_line_gap_pixels, in_ui_scale)
+		DscCommon::Math::ScaleInt(in_new_line_gap_pixels, in_ui_scale),
+		DscCommon::Math::ScaleInt(_base_line_offset, in_ui_scale)
 	);
 
 }

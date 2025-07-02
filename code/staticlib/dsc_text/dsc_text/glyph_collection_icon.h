@@ -37,7 +37,8 @@ namespace DscText
 			const int32 in_colour = 0xffffffff,
 			const int32 in_line_gap_pixels = 0,
 			const int32 in_line_minimum_height = 0,
-			const int32 in_line_minimum_depth = 0
+			const int32 in_line_minimum_depth = 0,
+			const int32 in_base_line_offset = 0
 		);
 
 

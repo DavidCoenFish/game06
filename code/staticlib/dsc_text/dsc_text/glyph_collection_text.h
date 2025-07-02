@@ -54,7 +54,8 @@ namespace DscText
 			const int32 in_colour = 0xff000000,
 			const int32 in_line_minimum_height = 0,
 			const int32 in_line_minimum_depth = 0,
-			const int32 in_line_gap_pixel = 0
+			const int32 in_line_gap_pixel = 0,
+			const int32 in_base_line_offset = 0
 		);
 
 	private:
@@ -78,7 +79,8 @@ namespace DscText
 			const int32 in_line_minimum_height,
 			const int32 in_line_minimum_depth,
 			const int32 in_colour,
-			const int32 in_line_gap_pixel
+			const int32 in_line_gap_pixel,
+			const int32 in_base_line_offset
 		);
 		Glyph* FindCell(
 			hb_codepoint_t in_codepoint,

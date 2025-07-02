@@ -34,14 +34,16 @@ namespace DscText
 			const int32 in_font_size = 0,
 			const int32 in_colour = 0xff000000,
 			const int32 in_line_minimum_height = 0,
-			const int32 in_line_minimum_depth = 0
+			const int32 in_line_minimum_depth = 0,
+			const int32 in_base_line_offset = 0
 		);
 		static std::unique_ptr<ITextRun> MakeTextRunDataIcon(
 			const int in_icon_id = 0,
 			GlyphCollectionIcon* const in_icon_font = nullptr,
 			const int32 in_colour = 0xff000000,
 			const int32 in_line_minimum_height = 0,
-			const int32 in_line_minimum_depth = 0
+			const int32 in_line_minimum_depth = 0,
+			const int32 in_base_line_offset = 0
 		);
 
 		TextRun() = delete;

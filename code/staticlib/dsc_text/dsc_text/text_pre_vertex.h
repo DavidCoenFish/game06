@@ -38,7 +38,8 @@ namespace DscText
 			const int32 in_line_minimum_height,
 			const int32 in_line_minimum_depth,
 			const int32 in_colour, // DscCommon::VectorFloat4& in_colour,
-			const float in_ui_scale
+			const float in_ui_scale,
+			const int32 in_base_line_offset
 		);
 
 		void AddPreVertex(
@@ -47,7 +48,8 @@ namespace DscText
 			const int32 in_pos_y,
 			const int32 in_line_minimum_height,
 			const int32 in_line_minimum_depth,
-			const int32 in_colour // in_colour
+			const int32 in_colour, // in_colour
+			const int32 in_base_line_offset
 		);
 
 		void AddPreVertex(
@@ -59,7 +61,8 @@ namespace DscText
 			const int32 in_pos_y,
 			const int32 in_line_minimum_height,
 			const int32 in_line_minimum_depth,
-			const int32 in_colour // const DscCommon::VectorFloat4& in_colour
+			const int32 in_colour, // const DscCommon::VectorFloat4& in_colour
+			const int32 in_base_line_offset
 		);
 
 		void UpdateHorizontalBounds(
