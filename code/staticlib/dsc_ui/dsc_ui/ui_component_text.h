@@ -22,7 +22,10 @@ namespace DscUi
 		UiComponentText(
 			DscText::TextManager& in_text_manager,
 			std::unique_ptr<DscText::TextRun>&& in_text_run,
-			const TUiComponentBehaviour in_behaviour
+			const TUiComponentBehaviour in_behaviour,
+			const bool in_enable_scale = false, 
+			const int32 in_scale_threashold = 0, 
+			const float in_scale_factor = 0.0f
 			);
 
 	private:
@@ -39,11 +42,17 @@ namespace DscUi
 			const float in_ui_draw_scale
 		) override;
 
+		const float CalculateLocalUiScale(const int32 in_avaliable_width, const float in_ui_scale);
+
 	private:
 		DscText::TextManager& _text_manager;
 		TUiComponentBehaviour _behaviour = {};
 
 		std::unique_ptr<DscText::TextRun> _text_run = {};
+
+		bool _increase_ui_scale_by_avaliable_width_factor = false;
+		int32 _scale_width_low_threashhold = 0; // example 800
+		float _scale_factor = 0.0f; // 0.0015789 for scale of 4.8 when width is 3040 more than 800,
 
 
 	};

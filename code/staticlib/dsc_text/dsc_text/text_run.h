@@ -96,6 +96,7 @@ namespace DscText
 		void SetUIScale(
 			const float in_ui_scale
 		);
+		const float GetUIScale() const { return _ui_scale;  }
 
 	private:
 		std::vector<std::unique_ptr<ITextRun>> _text_run_array;

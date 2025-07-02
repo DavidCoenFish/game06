@@ -987,13 +987,19 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentCanvas()
 std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentText(
     DscText::TextManager& in_text_manager,
     std::unique_ptr<DscText::TextRun>&& in_text_run,
-    const TUiComponentBehaviour in_behaviour
+    const TUiComponentBehaviour in_behaviour,
+    const bool in_enable_scale,
+    const int32 in_scale_threashold,
+    const float in_scale_factor
     )
 {
     std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentText>(
         in_text_manager,
         std::move(in_text_run),
-        in_behaviour
+        in_behaviour,
+        in_enable_scale,
+        in_scale_threashold,
+        in_scale_factor
         );
     return result;
 }

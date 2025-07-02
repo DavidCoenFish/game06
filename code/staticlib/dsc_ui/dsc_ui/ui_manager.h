@@ -75,7 +75,10 @@ namespace DscUi
 		std::unique_ptr<IUiComponent> MakeComponentText(
 			DscText::TextManager& in_text_manager,
 			std::unique_ptr<DscText::TextRun>&& in_text_run,
-			const TUiComponentBehaviour in_behaviour
+			const TUiComponentBehaviour in_behaviour,
+			const bool in_enable_scale = false,
+			const int32 in_scale_threashold = 0,
+			const float in_scale_factor = 0.0f
 			);
 		std::unique_ptr<IUiComponent> MakeComponentStack(
 			const UiCoord& in_item_gap,

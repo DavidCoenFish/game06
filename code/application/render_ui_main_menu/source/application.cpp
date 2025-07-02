@@ -261,9 +261,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                     "Legendary Quest",
                     pLocale,
                     font,
-                    88,
+                    80,
                     DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
-                    64
+                    60
                 ));
                 text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
                     "\xE2" "\x84" "\xA2",
@@ -290,8 +290,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 auto ui_component_text = _resources->_ui_manager->MakeComponentText(
                     *_resources->_text_manager,
                     std::move(text_run),
-                    DscUi::TUiComponentBehaviour::TNone
+                    DscUi::TUiComponentBehaviour::TNone,
+                    true,
+                    800,
+                    0.00125f // (3.8 / 3040), want a scale of 4.8 when at size 3840, which is 3040 more than 800, and 4.8 = 3.8 + 1
                 );
+
                 _resources->_ui_manager->MakeUiNodePaddingChild(
                     *_draw_system,
                     *_resources->_dag_collection,
