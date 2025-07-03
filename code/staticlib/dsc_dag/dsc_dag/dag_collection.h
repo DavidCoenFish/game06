@@ -15,10 +15,13 @@ namespace DscDag
 	class DagCollection
 	{
 	public:
-		template <typename IN_TYPE, typename IN_CALLBACK = DscDag::CallbackOnValueChange<IN_TYPE>>
-		NodeToken CreateValue(const IN_TYPE& in_value DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		template <typename IN_TYPE>
+		NodeToken CreateValue(
+			const IN_TYPE& in_value,
+			typename const DscDag::DagNodeValue<IN_TYPE>::TCallbackOnSet = DscDag::CallbackOnValueChange<IN_TYPE>::Function
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 		{
-			auto node = std::make_unique<DagNodeValue<IN_TYPE, IN_CALLBACK>>(in_value DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 			NodeToken node_token = node.get();
 			_nodes.insert(std::move(node));
 			return node_token;

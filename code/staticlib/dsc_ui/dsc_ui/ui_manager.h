@@ -82,6 +82,7 @@ namespace DscUi
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::unique_ptr<UiRenderTarget>&& in_ui_texture
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 			);
 #if 0
 		UiNodeGroup ConvertRootNodeGroupToNodeGroup(
@@ -114,6 +115,7 @@ namespace DscUi
 			DscDag::NodeToken in_frame_node,
 			DscDag::NodeToken in_ui_render_target_node,
 			DscDag::NodeToken in_render_target_viewport_size_node
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 		);
 
 		std::shared_ptr<DscRenderResource::Shader> GetEffectShader(const TEffect in_effect);

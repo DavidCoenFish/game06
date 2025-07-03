@@ -47,13 +47,19 @@ namespace DscDag
 	};
 
 	// interest in a templated version as you can't compare std::any without knowing the type
-	template <typename IN_TYPE, typename IN_CALLBACK = CallbackOnValueChange<IN_TYPE> DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
+	//template <typename IN_TYPE, typename IN_CALLBACK = CallbackOnValueChange<IN_TYPE> DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
+	template <typename IN_TYPE>
 	class DagNodeValue : public IDagNode
 	{
 	public:
-		DagNodeValue(const IN_TYPE& in_value DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		typedef std::function<void(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE& in_rhs)> TCallbackOnSet;
+
+		DagNodeValue(const IN_TYPE& in_value, 
+			const TCallbackOnSet& in_callback_on_set_value = CallbackOnValueChange<IN_TYPE>::Function
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 			: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
 			, _value(in_value)
+			, _callback_on_set(in_callback_on_set_value)
 		{
 			// Nop
 		}
@@ -67,7 +73,8 @@ namespace DscDag
 		{
 			bool set_dirty = false;
 			bool bail = false;
-			IN_CALLBACK::Function(set_dirty, bail, _value, in_value);
+			//IN_CALLBACK::Function(set_dirty, bail, _value, in_value);
+			_callback_on_set(set_dirty, bail, _value, in_value);
 
 			if (true == bail)
 			{
@@ -119,7 +126,7 @@ namespace DscDag
 		virtual void SetFromNode(IDagNode* const in_node) override
 		{
 			// break a cyclic dependency, would normally call DagCollection::GetValueType, but it needs to have our definition
-			auto value_node = dynamic_cast<DagNodeValue<IN_TYPE, IN_CALLBACK DSC_DEBUG_ONLY(DSC_COMMA IN_DEBUG_PRINT)>*>(in_node);
+			auto value_node = dynamic_cast<DagNodeValue<IN_TYPE>*>(in_node);
 			if (nullptr != value_node)
 			{
 				SetValue(value_node->GetValue());
@@ -146,7 +153,7 @@ namespace DscDag
 			result += "\"";
 			result += " type:";
 			result += typeid(IN_TYPE).name();
-			result += " value:" + IN_DEBUG_PRINT::Function(_value);
+			//result += " value:" + IN_DEBUG_PRINT::Function(_value);
 			result += "\n";
 
 			return result;
@@ -156,7 +163,7 @@ namespace DscDag
 	private:
 		IN_TYPE _value = {};
 		std::set<NodeToken> _output = {};
-
+		TCallbackOnSet _callback_on_set = {};
 	};
 
 } //DscDag

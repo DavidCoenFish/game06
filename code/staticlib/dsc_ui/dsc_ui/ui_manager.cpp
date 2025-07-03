@@ -416,36 +416,44 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     std::unique_ptr<UiRenderTarget>&& in_ui_render_target
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
     UiRootNodeGroup result;
 
-    result.SetNodeToken(TUiRootNodeGroup::TFrame, in_dag_collection.CreateValue<DscRenderResource::Frame*, DscDag::CallbackNever<DscRenderResource::Frame*>>(
-        (DscRenderResource::Frame*)(nullptr)
+    result.SetNodeToken(TUiRootNodeGroup::TFrame, in_dag_collection.CreateValue<DscRenderResource::Frame*>(
+        (DscRenderResource::Frame*)(nullptr),
+        DscDag::CallbackNever<DscRenderResource::Frame*>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "frame")));
 
-    result.SetNodeToken(TUiRootNodeGroup::TTimeDelta, in_dag_collection.CreateValue<float, DscDag::CallbackNoZero<float>>(
-        0.0f
+    result.SetNodeToken(TUiRootNodeGroup::TTimeDelta, in_dag_collection.CreateValue<float>(
+        0.0f,
+        DscDag::CallbackNoZero<float>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "time delta")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiScale, in_dag_collection.CreateValue(
-        1.0f
+        1.0f,
+        DscDag::CallbackOnValueChange<float>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "ui scale")));
 
     result.SetNodeToken(TUiRootNodeGroup::TInputState, in_dag_collection.CreateValue(
-        UiInputState()
+        UiInputState(),
+        DscDag::CallbackOnSetValue<UiInputState>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "input state")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiComponentType, in_dag_collection.CreateValue(
-        in_type
+        in_type,
+        DscDag::CallbackOnValueChange<TUiComponentType>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
 
-    result.SetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>, DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>>(
-        std::vector<UiNodeGroup>()
+    result.SetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
+        std::vector<UiNodeGroup>(),
+        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
-    result.SetNodeToken(TUiRootNodeGroup::TForceDraw, in_dag_collection.CreateValue<bool, DscDag::CallbackNoZero<bool>>(
-        false
+    result.SetNodeToken(TUiRootNodeGroup::TForceDraw, in_dag_collection.CreateValue<bool>(
+        false,
+        DscDag::CallbackNoZero<bool>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "force draw")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiRenderTarget, in_dag_collection.CreateValueUnique(
@@ -453,11 +461,13 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DSC_DEBUG_ONLY(DSC_COMMA "ui render target")));
 
     result.SetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize, in_dag_collection.CreateValue(
-        DscCommon::VectorInt2::s_zero
+        DscCommon::VectorInt2::s_zero,
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "render target size")));
 
     result.SetNodeToken(TUiRootNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(
-        DscCommon::VectorFloat4::s_zero
+        DscCommon::VectorFloat4::s_zero,
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
 
     result.SetNodeToken(TUiRootNodeGroup::TDrawNode, MakeDrawNode(
@@ -467,6 +477,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         result.GetNodeToken(TUiRootNodeGroup::TFrame),
         result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
         result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize)
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
         ));
 
     result.Validate();
@@ -515,6 +526,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_render_target_viewport_size_node
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
     DscDag::NodeToken result_node = {};
@@ -545,11 +557,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             frame->Draw(weak_full_target_quad.lock());
             frame->SetRenderTarget(nullptr);
         }
-        DSC_DEBUG_ONLY(DSC_COMMA "Draw"));
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + "Draw"));
 
         auto shader_buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
-            shader_buffer
+            shader_buffer,
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
             DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
 
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);

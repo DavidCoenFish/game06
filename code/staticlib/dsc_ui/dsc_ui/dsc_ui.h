@@ -11,15 +11,11 @@
 #include "..\..\dsc_render\dsc_render\dsc_render.h"
 #include "..\..\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
 #include "screen_quad.h"
-#include "ui_component_canvas.h"
-#include "ui_component_debug_fill.h"
-#include "ui_component_fill.h"
-#include "ui_component_padding.h"
-#include "ui_component_text.h"
 #include "ui_coord.h"
-#include "ui_dag_node_component.h"
 #include "ui_enum.h"
+#include "ui_input_state.h"
 #include "ui_manager.h"
+#include "ui_render_target.h"
 #include "vector_ui_coord2.h"
 
 #endif //#ifndef DSC_BFF_BUILD

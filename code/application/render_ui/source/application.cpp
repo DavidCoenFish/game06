@@ -14,6 +14,8 @@
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
 #include <dsc_ui/ui_manager.h>
+#include <dsc_ui/ui_render_target.h>
+#include <dsc_ui/ui_input_state.h>
 
 namespace
 {
@@ -40,16 +42,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
     }
 
-    //{
-    //    auto ui_commponent = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
-    //    _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
-    //        *_draw_system,
-    //        *_resources->_dag_collection,
-    //        std::move(ui_commponent),
-    //        std::vector<DscUi::TEffectData>()
-    //        DSC_DEBUG_ONLY(DSC_COMMA "root debug grid")
-    //    );
-    //}
+    {
+        auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
+        _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
+            DscUi::TUiComponentType::TGridFill,
+            *_draw_system,
+            *_resources->_dag_collection,
+            std::move(top_texture)
+            DSC_DEBUG_ONLY(DSC_COMMA "root debug grid ")
+        );
+    }
 
     return;
 }
@@ -75,16 +77,18 @@ const bool Application::Update()
 
         frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
 
-        //if (_resources->_ui_manager)
-        //{
-        //    _resources->_ui_manager->DrawUiSystem(
-        //        _resources->_ui_root_node_group,
-        //        _draw_system->GetRenderTargetBackBuffer(),
-        //        *frame,
-        //        true, //false,
-        //        false //true,
-        //    );
-        //}
+        if (_resources->_ui_manager)
+        {
+            _resources->_ui_manager->Draw(
+                _resources->_ui_root_node_group,
+                *_resources->_dag_collection,
+                *frame,
+                true, //false,
+                0.0f,
+                DscUi::UiInputState(),
+                _draw_system->GetRenderTargetBackBuffer()
+            );
+        }
 
         if (_resources->_onscreen_version)
         {

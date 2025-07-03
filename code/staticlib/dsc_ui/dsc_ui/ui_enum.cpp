@@ -51,6 +51,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
+	case DscUi::TUiRootNodeGroup::TUiScale:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
+		return s_meta_data;
+	}
 	case DscUi::TUiRootNodeGroup::TFrame:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscRenderResource::Frame*) };
