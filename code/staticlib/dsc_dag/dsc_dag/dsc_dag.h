@@ -15,6 +15,7 @@
 #include "dag_node_calculate.h"
 #include "dag_node_condition.h"
 #include "dag_node_value.h"
+#include "dag_node_value_unique.h"
 #include "i_dag_node.h"
 
 #endif //#ifndef DSC_BFF_BUILD

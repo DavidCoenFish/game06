@@ -17,20 +17,19 @@ typedef unsigned __int64 uint64;
 //FastBuild nmake workaround
 // allow the IDE to get definitions, otherwise the Fastbuild definitions are defined in scripts and used as cmd line param to compiler and linker...
 #ifndef DSC_BFF_BUILD
-#ifndef _UNICODE
-#define _UNICODE
-#endif
-#ifndef UNICODE
-#define UNICODE
-#endif
+	#ifndef _UNICODE
+		#define _UNICODE
+	#endif
+	#ifndef UNICODE
+		#define UNICODE
+	#endif
 
-// reminder, this is just used in the IDE, otherwise defines are in the BFF script files for each platform configuration, see code\fbuild\dsc.bff
-#define _DEBUG
+	// reminder, this is just used in the IDE, otherwise defines are in the BFF script files for each platform configuration, see code\fbuild\dsc.bff
+	#define _DEBUG
 
-#ifdef _DEBUG
-	#define DSC_LOG
-#endif
-
+	#ifdef _DEBUG
+		#define DSC_LOG
+	#endif
 #endif //#ifndef DSC_BFF_BUILD
 
 // Windows
@@ -86,7 +85,7 @@ typedef unsigned __int64 uint64;
 #include <wrl/client.h>
 #include <wrl/event.h>
 #ifdef _DEBUG
-#include <dxgidebug.h>
+	#include <dxgidebug.h>
 #endif
 // To use graphics and CPU markup events with the latest version of PIX, change this to include <pix3.h>
 // then add the NuGet package WinPixEventRuntime to the project.
@@ -98,13 +97,13 @@ typedef unsigned __int64 uint64;
 #define ENUM_TOKEN_PAIR(ENUM, TOKEN) ENUM::TOKEN,#TOKEN
 #define DSC_CONDITION_THROW(CONDITION, MESSAGE) if (CONDITION) { throw std::exception(MESSAGE); }
 #if defined(_DEBUG)
-#define DSC_ASSERT(CONDITION, MESSAGE) if (false == (CONDITION)){ __debugbreak(); } assert(MESSAGE && (CONDITION))
-#define DSC_ASSERT_ALWAYS(MESSAGE) __debugbreak(); assert(MESSAGE && false)
-#define DSC_DEBUG_ONLY(PAYLOAD) PAYLOAD
+	#define DSC_ASSERT(CONDITION, MESSAGE) if (false == (CONDITION)){ __debugbreak(); } assert(MESSAGE && (CONDITION))
+	#define DSC_ASSERT_ALWAYS(MESSAGE) __debugbreak(); assert(MESSAGE && false)
+	#define DSC_DEBUG_ONLY(PAYLOAD) PAYLOAD
 #else
-#define DSC_ASSERT(CONDITION, MESSAGE) __noop
-#define DSC_ASSERT_ALWAYS(MESSAGE) __noop
-#define DSC_DEBUG_ONLY(PAYLOAD)
+	#define DSC_ASSERT(CONDITION, MESSAGE) __noop
+	#define DSC_ASSERT_ALWAYS(MESSAGE) __noop
+	#define DSC_DEBUG_ONLY(PAYLOAD)
 #endif
 #define DSC_TODO(MESSAGE, ...) DSC_ASSERT_ALWAYS(MESSAGE)
 

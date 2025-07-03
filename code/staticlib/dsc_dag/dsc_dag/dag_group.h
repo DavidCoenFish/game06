@@ -14,7 +14,7 @@ namespace DscDag
 		DagGroupNodeMetaData(const DagGroupNodeMetaData&) = delete;
 
 		bool _optional = {};
-		std::type_info _type_info;
+		const std::type_info& _type_info;
 	};
 
 	template <typename IN_ENUM>
@@ -57,6 +57,17 @@ namespace DscDag
 		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token)
 		{
 			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < IN_SIZE), "invalid param");
+#if (_DEBUG)
+			const DagGroupNodeMetaData& meta_data = GetDagGroupMetaData(in_index);
+			if (nullptr == in_node_token)
+			{
+				DSC_ASSERT(meta_data._optional == true, "invalid param");
+			}
+			else
+			{
+				DSC_ASSERT(meta_data._type_info == in_node_token->GetTypeInfo(), "invalid param");
+			}
+#endif
 			_node_token_array[static_cast<std::size_t>(in_index)] = in_node_token;
 			return;
 		}

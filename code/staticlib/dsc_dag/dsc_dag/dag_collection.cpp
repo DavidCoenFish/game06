@@ -26,13 +26,6 @@ DscDag::NodeToken DscDag::DagCollection::CreateCondition(NodeToken in_condition,
 	return node_token;
 }
 
-DscDag::NodeToken DscDag::DagCollection::AddCustomNode(std::unique_ptr<IDagNode>&& in_node)
-{
-	NodeToken node_token = in_node.get();
-	_nodes.insert(std::move(in_node));
-	return node_token;
-}
-
 // should already have all links removed? assert if links still exisit?
 void DscDag::DagCollection::DeleteNode(NodeToken in_node)
 {

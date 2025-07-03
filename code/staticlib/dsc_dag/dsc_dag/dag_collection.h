@@ -4,6 +4,7 @@
 #include <dsc_dag\i_dag_node.h>
 #include <dsc_dag\dag_enum.h>
 #include <dsc_dag\dag_node_value.h>
+#include <dsc_dag\dag_node_value_unique.h>
 #include <dsc_dag\dag_node_calculate.h>
 
 namespace DscDag
@@ -24,6 +25,15 @@ namespace DscDag
 		}
 
 		template <typename IN_TYPE>
+		NodeToken CreateValueUnique(std::unique_ptr<IN_TYPE>&& in_value DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		{
+			auto node = std::make_unique<DagNodeValueUnique<IN_TYPE>>(std::move(in_value) DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+			NodeToken node_token = node.get();
+			_nodes.insert(std::move(node));
+			return node_token;
+		}
+
+		template <typename IN_TYPE>
 		//NodeToken CreateCalculate(const std::function<void(IN_TYPE&, std::set<NodeToken>&, std::vector<NodeToken>&)>& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
 		NodeToken CreateCalculate(const typename DagNodeCalculate<IN_TYPE>::TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
 		{
@@ -38,9 +48,6 @@ namespace DscDag
 		// condition doesn't have a normal link to destination node, they are only set when the condition is updated/ resolved. see ResolveDirtyConditionNodes
 		NodeToken CreateCondition(NodeToken in_condition, NodeToken in_true_source, NodeToken in_false_source, NodeToken in_true_destination, NodeToken in_false_destination DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
 
-		// was trying to shoe horn generic values into a std::any for CreateValue, but std::any can not hold a std::unique_ptr. so allow custom IDagNode to hold things like std::unique
-		// todo, write a generic DagNodeValueUnique?
-		NodeToken AddCustomNode(std::unique_ptr<IDagNode>&& in_node);
 		// should already have all links removed? assert if links still exisit?
 		void DeleteNode(NodeToken in_node);
 
@@ -71,6 +78,12 @@ namespace DscDag
 			if (nullptr != calculate_node)
 			{
 				return calculate_node->GetValue();
+			}
+
+			auto value_unique_node = dynamic_cast<DagNodeValueUnique< IN_TYPE>*>(in_input);
+			if (nullptr != value_unique_node)
+			{
+				return value_unique_node->GetValue();
 			}
 
 			DSC_ASSERT_ALWAYS("invalid code path");
