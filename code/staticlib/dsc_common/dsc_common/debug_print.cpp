@@ -10,5 +10,12 @@ const std::string DscCommon::DebugPrint::TabDepth(const int32_t in_depth)
 	}
 	return result;
 }
+
+template <>
+const std::string DscCommon::DebugPrint::PrintType(const std::nullptr_t&)
+{
+	return std::string("<nullptr>");
+}
+
 #endif //#if defined(_DEBUG)
 

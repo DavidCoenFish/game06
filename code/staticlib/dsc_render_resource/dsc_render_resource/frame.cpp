@@ -153,3 +153,13 @@ void DscRenderResource::Frame::ResourceBarrier(
 //	return;
 //}
 
+#if defined(_DEBUG)
+
+//template <>
+//const std::string DscCommon::DebugPrint::PrintType<DscRenderResource::Frame*>(DscRenderResource::Frame* in_value)
+//{
+//	return std::string();
+//}
+
+#endif //#if defined(_DEBUG)
+

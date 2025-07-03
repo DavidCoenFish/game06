@@ -13,8 +13,7 @@ namespace DscUi
 	class UiInputState
 	{
 	public:
-		UiInputState(
-			);
+		UiInputState();
 
 		// mouse pos in pixels, relative to 
 		void SetMouseTouch(
@@ -23,9 +22,18 @@ namespace DscUi
 			const bool in_right_button_down
 			);
 
+		// return true if values changed
+		const bool Update(const UiInputState& in_ui_input_state);
+
+		const bool operator==(const UiInputState& in_rhs) const;
+		const bool operator!=(const UiInputState& in_rhs) const;
 	private:
+		//array of touch data
 	
 
 
 	};
 }
+
+
+

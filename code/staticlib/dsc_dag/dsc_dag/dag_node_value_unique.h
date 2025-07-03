@@ -24,9 +24,9 @@ namespace DscDag
 			// Nop
 		}
 
-		IN_TYPE& GetValue() const
+		IN_TYPE* const GetValue() const
 		{
-			return *_value.get();
+			return _value.get();
 		}
 
 	private:

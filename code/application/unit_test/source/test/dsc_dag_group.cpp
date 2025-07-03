@@ -46,12 +46,12 @@ namespace
 
 		DscDag::DagCollection collection = {};
 
-		DscDag::DagGroup<TTestGroup, static_cast<size_t>(TTestGroup::TCount)> group0(&collection);
+		DscDag::DagGroup<TTestGroup, static_cast<size_t>(TTestGroup::TCount)> group0;
 		group0.SetNodeToken(TTestGroup::TInt, collection.CreateValue(7));
 		group0.SetNodeToken(TTestGroup::TFloat, collection.CreateValue(3.4f));
 		group0.Validate();
 
-		DscDag::DagGroup<TTestGroup, static_cast<size_t>(TTestGroup::TCount)> group1(&collection);
+		DscDag::DagGroup<TTestGroup, static_cast<size_t>(TTestGroup::TCount)> group1;
 		group1.SetNodeToken(TTestGroup::TInt, collection.CreateValue(8));
 		group1.Validate();
 

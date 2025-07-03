@@ -13,7 +13,7 @@
 #include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
-//#include <dsc_ui/ui_manager.h>
+#include <dsc_ui/ui_manager.h>
 
 namespace
 {
@@ -37,7 +37,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
         _resources->_dag_collection = std::make_unique<DscDag::DagCollection>();
-        //_resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
+        _resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
     }
 
     //{
@@ -72,6 +72,8 @@ const bool Application::Update()
     if (_draw_system && _resources && (false == GetMinimized()))
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
+
+        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
 
         //if (_resources->_ui_manager)
         //{

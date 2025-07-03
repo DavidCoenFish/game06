@@ -3,7 +3,7 @@
 
 namespace DscCommon
 {
-	template <typename TYPE>
+	template <typename IN_TYPE>
 	class Vector2
 	{
 	public:
@@ -12,42 +12,42 @@ namespace DscCommon
 		Vector2() {}
 
 		explicit Vector2(
-			const TYPE in_x,
-			const TYPE in_y
+			const IN_TYPE in_x,
+			const IN_TYPE in_y
 		) : _data{ in_x, in_y }
 		{
 			return;
 		}
 
-		TYPE& operator[](const int in_index)
+		IN_TYPE& operator[](const int in_index)
 		{
 			if ((0 <= in_index) && (in_index < Index::Count))
 			{
 				return _data[in_index];
 			}
-			static TYPE s_dummy = {};
+			static IN_TYPE s_dummy = {};
 			return s_dummy;
 		}
-		const TYPE operator[](const int in_index) const
+		const IN_TYPE operator[](const int in_index) const
 		{
 			if ((0 <= in_index) && (in_index < Index::Count))
 			{
 				return _data[in_index];
 			}
-			static TYPE s_dummy = {};
+			static IN_TYPE s_dummy = {};
 			return s_dummy;
 		}
-		const TYPE GetX() const
+		const IN_TYPE GetX() const
 		{
 			return _data[Index::X];
 		}
-		const TYPE GetY() const
+		const IN_TYPE GetY() const
 		{
 			return _data[Index::Y];
 		}
 		void Set(
-			const TYPE in_x,
-			const TYPE in_y
+			const IN_TYPE in_x,
+			const IN_TYPE in_y
 		)
 		{
 			_data[Index::X] = in_x;
@@ -68,23 +68,6 @@ namespace DscCommon
 		}
 
 		const bool operator!=(const Vector2& in_rhs) const
-		{
-			return !operator==(in_rhs);
-		}
-
-		const bool operator==(const int32 in_rhs) const
-		{
-			for (int index = 0; index < Index::Count; ++index)
-			{
-				if (_data[index] != in_rhs)
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-
-		const bool operator!=(const int32 in_rhs) const 
 		{
 			return !operator==(in_rhs);
 		}
@@ -124,6 +107,31 @@ namespace DscCommon
 		};
 
 	private:
-		TYPE _data[Index::Count] = {};
+		IN_TYPE _data[Index::Count] = {};
 	};
 } //namespace DscCommon
+
+//template <typename IN_TYPE>
+//const bool operator==(const DscCommon::Vector2<IN_TYPE>& in_lhs, const int32 in_rhs)
+//{
+//	for (int index = 0; index < 2; ++index)
+//	{
+//		if (in_lhs[index] != in_rhs)
+//		{
+//			return false;
+//		}
+//	}
+//	return true;
+//}
+//
+//template <typename IN_TYPE>
+//const bool operator!=(const DscCommon::Vector2<IN_TYPE>& in_lhs, const int32 in_rhs)
+//{
+//	return !operator==(in_lhs, in_rhs);
+//}
+//
+//template <typename IN_TYPE>
+//const bool operator!=(const int32 in_lhs, const DscCommon::Vector2<IN_TYPE>& in_rhs)
+//{
+//	return !operator==(in_rhs, in_lhs);
+//}

@@ -29,14 +29,13 @@ namespace DscDag
 	class DagGroup
 	{
 	public:
-		DagGroup(DagCollection* const in_dag_collection = nullptr) : _dag_collection(in_dag_collection) {}
-		DagGroup(DagCollection* const in_dag_collection, NodeToken const (&in_node_token_array)[IN_SIZE])
-			: _dag_collection(in_dag_collection)
+		DagGroup() {}
+		DagGroup(NodeToken const (&in_node_token_array)[IN_SIZE])
 		{
 			static_assert(IN_SIZE == static_cast<std::size_t>(IN_ENUM::TCount));
 			for (std::size_t index = 0; index < IN_SIZE; ++index)
 			{
-				_node_token_array[index] = in_node_token_array[index];
+				SetNodeToken(static_cast<IN_ENUM>(index), in_node_token_array[index]);
 			}
 			return;
 		}
@@ -45,7 +44,6 @@ namespace DscDag
 		{
 			if (this != &in_rhs)
 			{
-				_dag_collection = in_rhs._dag_collection;
 				for (std::size_t index = 0; index < IN_SIZE; ++index)
 				{
 					_node_token_array[index] = in_rhs._node_token_array[index];
@@ -81,11 +79,6 @@ namespace DscDag
 
 		void Validate() const
 		{
-			if (nullptr == _dag_collection)
-			{
-				DSC_ASSERT_ALWAYS("invalid state");
-				return;
-			}
 			for (std::size_t index = 0; index < IN_SIZE; ++index)
 			{
 				const DagGroupNodeMetaData& meta_data = GetDagGroupMetaData(static_cast<IN_ENUM>(index));
@@ -110,19 +103,7 @@ namespace DscDag
 			return;
 		}
 
-		void ResolveDirtyConditionNodes()
-		{
-			DSC_ASSERT(nullptr != _dag_collection, "invalid state");
-			_dag_collection->ResolveDirtyConditionNodes();
-		}
-
-		DagCollection* GetDagCollection() const 
-		{
-			return _dag_collection;
-		}
-
 	private:
-		DagCollection* _dag_collection = nullptr;
 		NodeToken _node_token_array[IN_SIZE] = {};
 
 	}; // DagGroup

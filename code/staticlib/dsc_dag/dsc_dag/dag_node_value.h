@@ -5,17 +5,54 @@
 #include "dag_node_calculate.h"
 #include <dsc_common\dsc_common.h>
 #include <dsc_common\debug_print.h>
+#include <dsc_common\vector_2.h>
+#include <dsc_common\vector_4.h>
 
 namespace DscDag
 {
-	// interest in a templated version as you can't compare std::any without knowing the type
 	template <typename IN_TYPE>
+	struct CallbackOnSetValue {
+		static void Function(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE&)
+		{
+			out_dirty = true;
+			out_bail = false;
+		}
+	};
+
+	template <typename IN_TYPE>
+	struct CallbackNever {
+		static void Function(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE&)
+		{
+			out_dirty = false;
+			out_bail = false;
+		}
+	};
+
+	template <typename IN_TYPE>
+	struct CallbackOnValueChange {
+		static void Function(bool& out_dirty, bool& out_bail, const IN_TYPE& in_lhs, const IN_TYPE& in_rhs)
+		{
+			out_dirty = true;
+			out_bail = (in_lhs == in_rhs);
+		}
+	};
+
+	template <typename IN_TYPE>
+	struct CallbackNoZero {
+		static void Function(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE& in_rhs)
+		{
+			out_dirty = 0 != in_rhs;
+			out_bail = false;
+		}
+	};
+
+	// interest in a templated version as you can't compare std::any without knowing the type
+	template <typename IN_TYPE, typename IN_CALLBACK = CallbackOnValueChange<IN_TYPE> DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
 	class DagNodeValue : public IDagNode
 	{
 	public:
-		DagNodeValue(const IN_TYPE& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		DagNodeValue(const IN_TYPE& in_value DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 			: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
-			, _change_condition(in_change_condition)
 			, _value(in_value)
 		{
 			// Nop
@@ -29,30 +66,12 @@ namespace DscDag
 		void SetValue(const IN_TYPE& in_value)
 		{
 			bool set_dirty = false;
+			bool bail = false;
+			IN_CALLBACK::Function(set_dirty, bail, _value, in_value);
 
-			switch (_change_condition)
+			if (true == bail)
 			{
-			default:
-				break;
-			case TValueChangeCondition::TOnSet:
-				set_dirty = true;
-				break;
-			case TValueChangeCondition::TNever:
-				break;
-			case TValueChangeCondition::TOnValueChange:
-				// bail out of SetValue without marking dirty if value found to be equivalent
-				if (_value == in_value)
-				{
-					return;
-				}
-				set_dirty = true;
-				break;
-			case TValueChangeCondition::TNotZero:
-				if (in_value != 0)
-				{
-					set_dirty = true;
-				}
-				break;
+				return;
 			}
 
 			_value = in_value;
@@ -100,7 +119,7 @@ namespace DscDag
 		virtual void SetFromNode(IDagNode* const in_node) override
 		{
 			// break a cyclic dependency, would normally call DagCollection::GetValueType, but it needs to have our definition
-			auto value_node = dynamic_cast<DagNodeValue<IN_TYPE>*>(in_node);
+			auto value_node = dynamic_cast<DagNodeValue<IN_TYPE, IN_CALLBACK DSC_DEBUG_ONLY(DSC_COMMA IN_DEBUG_PRINT)>*>(in_node);
 			if (nullptr != value_node)
 			{
 				SetValue(value_node->GetValue());
@@ -127,7 +146,7 @@ namespace DscDag
 			result += "\"";
 			result += " type:";
 			result += typeid(IN_TYPE).name();
-			result += " value:" + DscCommon::DebugPrint::PrintType(_value);
+			result += " value:" + IN_DEBUG_PRINT::Function(_value);
 			result += "\n";
 
 			return result;
@@ -135,7 +154,6 @@ namespace DscDag
 #endif //#if defined(_DEBUG)
 
 	private:
-		TValueChangeCondition _change_condition = {};
 		IN_TYPE _value = {};
 		std::set<NodeToken> _output = {};
 

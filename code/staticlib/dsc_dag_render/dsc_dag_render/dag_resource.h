@@ -6,6 +6,7 @@
 namespace DscDag
 {
 	class IDagNode;
+	typedef IDagNode* NodeToken;
 	class DagCollection;
 }
 
@@ -26,14 +27,14 @@ namespace DscDagRender
 
 		DagResource(
 			DscRender::DrawSystem* const in_draw_system,
-			DscDag::IDagNode* in_dag_node_restored,
-			DscDag::IDagNode* in_dag_node_screen_size
+			DscDag::NodeToken in_dag_node_restored,
+			DscDag::NodeToken in_dag_node_screen_size
 			);
 
-		DscDag::IDagNode* GetDagNodeRestored() const {
+		DscDag::NodeToken GetDagNodeRestored() const {
 			return _dag_node_restored;
 		}
-		DscDag::IDagNode* GetDagNodeScreenSize() const {
+		DscDag::NodeToken GetDagNodeScreenSize() const {
 			return _dag_node_screen_size;
 		}
 	private:
@@ -49,7 +50,7 @@ namespace DscDagRender
 			const DscCommon::VectorInt2& in_size
 		) override;
 	private:
-		DscDag::IDagNode* _dag_node_restored = nullptr;
-		DscDag::IDagNode* _dag_node_screen_size = nullptr;
+		DscDag::NodeToken _dag_node_restored = nullptr;
+		DscDag::NodeToken _dag_node_screen_size = nullptr;
 	};
 } //namespace DscDagRender

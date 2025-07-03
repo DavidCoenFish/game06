@@ -15,10 +15,10 @@ namespace DscDag
 	class DagCollection
 	{
 	public:
-		template <typename IN_TYPE>
-		NodeToken CreateValue(const IN_TYPE& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange  DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		template <typename IN_TYPE, typename IN_CALLBACK = DscDag::CallbackOnValueChange<IN_TYPE>>
+		NodeToken CreateValue(const IN_TYPE& in_value DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 		{
-			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value, in_change_condition DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+			auto node = std::make_unique<DagNodeValue<IN_TYPE, IN_CALLBACK>>(in_value DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 			NodeToken node_token = node.get();
 			_nodes.insert(std::move(node));
 			return node_token;
@@ -83,12 +83,25 @@ namespace DscDag
 			auto value_unique_node = dynamic_cast<DagNodeValueUnique< IN_TYPE>*>(in_input);
 			if (nullptr != value_unique_node)
 			{
-				return value_unique_node->GetValue();
+				return *value_unique_node->GetValue();
 			}
 
 			DSC_ASSERT_ALWAYS("invalid code path");
 			static IN_TYPE kData = {};
 			return kData;
+		}
+
+		template <typename IN_TYPE>
+		static IN_TYPE* GetUniqueValueType(NodeToken in_input)
+		{
+			auto value_unique_node = dynamic_cast<DagNodeValueUnique< IN_TYPE>*>(in_input);
+			if (nullptr != value_unique_node)
+			{
+				return value_unique_node->GetValue();
+			}
+
+			DSC_ASSERT_ALWAYS("invalid code path");
+			return nullptr;
 		}
 
 		template <typename IN_TYPE>

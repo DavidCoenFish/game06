@@ -2,6 +2,7 @@
 #include "dsc_render_resource.h"
 
 #include <dsc_common/dsc_common.h>
+#include <dsc_common/debug_print.h>
 
 namespace DscRender
 {
@@ -97,3 +98,23 @@ namespace DscRenderResource
 		std::shared_ptr<DscRender::ResourceList> _resource_list;
 	};
 } //namespace DscRenderResource
+
+#if defined(_DEBUG)
+namespace DscCommon
+{
+	namespace DebugPrint
+	{
+		//template <typename IN_TYPE>
+		//const std::string PrintType(const IN_TYPE& in_value);
+
+		//template <>
+		//const std::string PrintType(DscRenderResource::Frame* in_value);
+
+	}
+}
+  
+//const std::string PrintType(const IN_TYPE& in_value)
+
+//template <>
+//const std::string DscCommon::DebugPrint::PrintType<DscRenderResource::Frame*>(const DscRenderResource::Frame*& in_value);
+#endif //#if defined(_DEBUG)

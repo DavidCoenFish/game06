@@ -5,13 +5,12 @@
 #include <dsc_render/i_render_target.h>
 #include <dsc_common/vector_int2.h>
 
-
 std::unique_ptr<DscDagRender::DagResource> DscDagRender::DagResource::Factory(
 	DscRender::DrawSystem* const in_draw_system,
 	DscDag::DagCollection* const in_dag_collection
 )
 {
-	auto dag_node_restored = in_dag_collection->CreateValue<int>(0, DscDag::TValueChangeCondition::TOnSet);
+	auto dag_node_restored = in_dag_collection->CreateValue<int>(0);
 	auto dag_node_screen_size = in_dag_collection->CreateValue<DscCommon::VectorInt2>(in_draw_system->GetRenderTargetBackBuffer()->GetSize());
 
 	return std::make_unique<DscDagRender::DagResource>(
@@ -23,8 +22,8 @@ std::unique_ptr<DscDagRender::DagResource> DscDagRender::DagResource::Factory(
 
 DscDagRender::DagResource::DagResource(
 	DscRender::DrawSystem* const in_draw_system,
-	DscDag::IDagNode* in_dag_node_restored,
-	DscDag::IDagNode* in_dag_node_screen_size
+	DscDag::NodeToken in_dag_node_restored,
+	DscDag::NodeToken in_dag_node_screen_size
 )
 	: DscRender::IResource(in_draw_system)
 	, _dag_node_restored(in_dag_node_restored)

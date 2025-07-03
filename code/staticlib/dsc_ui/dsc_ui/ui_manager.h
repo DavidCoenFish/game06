@@ -1,7 +1,5 @@
 #pragma once
 #include "dsc_ui.h"
-
-#if 0
 #include "ui_enum.h"
 #include "ui_coord.h"
 #include <dsc_common\vector_float4.h>
@@ -35,6 +33,7 @@ namespace DscRenderResource
 	class Frame;
 	class GeometryGeneric;
 	class RenderTargetPool;
+	class RenderTargetTexture;
 	class Shader;
 	class ShaderConstantBuffer;
 	class ShaderResource;
@@ -55,6 +54,8 @@ namespace DscUi
 {
 	class IUiComponent;
 	class UiCoord;
+	class UiInputState;
+	class UiRenderTarget;
 	class VectorUiCoord2;
 
 	class UiManager
@@ -64,130 +65,55 @@ namespace DscUi
 		UiManager& operator=(const UiManager&) = delete;
 		UiManager(const UiManager&) = delete;
 
-		//DscDag::DagCollection
 		UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection);
 		~UiManager();
 
-		std::unique_ptr<IUiComponent> MakeComponentDebugGrid(DscRender::DrawSystem& in_draw_system);
-		std::unique_ptr<IUiComponent> MakeComponentFill();
-		std::unique_ptr<IUiComponent> MakeComponentImage(
-			const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture
-			);
-		std::unique_ptr<IUiComponent> MakeComponentCanvas();
-		std::unique_ptr<IUiComponent> MakeComponentText(
-			DscText::TextManager& in_text_manager,
-			std::unique_ptr<DscText::TextRun>&& in_text_run,
-			const TUiComponentBehaviour in_behaviour,
-			const bool in_enable_scale = false,
-			const int32 in_scale_threashold = 0,
-			const float in_scale_factor = 0.0f
-			);
-		std::unique_ptr<IUiComponent> MakeComponentStack(
-			const UiCoord& in_item_gap,
-			const TUiFlow in_ui_flow
-		);
-
-		// padding inflates the desired size of something like text
-		std::unique_ptr<IUiComponent> MakeComponentPadding(
-			const UiCoord& in_left,
-			const UiCoord& in_top,
-			const UiCoord& in_right,
-			const UiCoord& in_bottom
-		);
-
-		DagGroupUiRootNode MakeUiRootNode(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		static DagGroupUiParentNode ConvertUiRootNodeToParentNode(const DagGroupUiRootNode& in_ui_root_node_group);
-
-		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
-		DagGroupUiParentNode MakeUiNodeCanvasChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node,
-
-			const VectorUiCoord2& in_child_size, 
-			const VectorUiCoord2& in_child_pivot, 
-			const VectorUiCoord2& in_attach_point,
-
-			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
-		DagGroupUiParentNode MakeUiNodeStackChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node,
-
-			const UiCoord& in_primary_size = UiCoord(0, 1.0f),
-			const UiCoord& in_primary_pivot = UiCoord(0, 0.0f),
-			const UiCoord& in_attach_point = UiCoord(0, 0.0f),
-
-			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		DagGroupUiParentNode MakeUiNodePaddingChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node,
-
-			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		// could be combined with the DrawUiSystem, but doesn't need to be
-		void UpdateUiSystem(
-			DagGroupUiRootNode& in_ui_root_node_group, // not const as setting values on it
-			const float in_time_delta
-			// input state? keys down, touch pos, gamepad
-			);
-
-		void DrawUiSystem(
-			DagGroupUiRootNode& in_ui_root_node_group, // not const as resolve conditional nodes may change data...
+		std::unique_ptr<UiRenderTarget> MakeUiRenderTarget(
 			DscRender::IRenderTarget* const in_render_target,
+			const bool in_allow_clear_on_draw
+			);
+		std::unique_ptr<UiRenderTarget> MakeUiRenderTarget(
+			const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture,
+			const bool in_allow_clear_on_draw
+			);
+
+		UiRootNodeGroup MakeRootNode(
+			const TUiComponentType in_type,
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			std::unique_ptr<UiRenderTarget>&& in_ui_texture
+			);
+#if 0
+		UiNodeGroup ConvertRootNodeGroupToNodeGroup(
+			const UiRootNodeGroup& in_ui_root_node_group
+			);
+		UiNodeGroup AddChildNode(
+			const TUiComponentType in_type,
+			DscRender::DrawSystem& in_draw_system,
+			const UiRootNodeGroup& in_root_node_group,
+			const UiNodeGroup& in_parent
+			);
+#endif
+		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
+
+		void Draw(
+			const UiRootNodeGroup& in_root_node_group,
+			DscDag::DagCollection& in_dag_collection,
 			DscRenderResource::Frame& in_frame,
-			const bool in_force_top_level_draw, // if this render target is shared, need to at least redraw the top level ui
-			const bool in_clear_on_draw, // clear the top level render target before we draw to it
-			const float in_ui_scale = 1.0f
-		);
+			const bool in_force_draw,
+			const float in_time_delta,
+			const UiInputState& in_input_state,
+			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
+			);
 
 	private:
-		// if this has a reason to be public, then lets make it puplic
-		// on adding a child to a parent is when it's clear colour is set...
-		DagGroupUiParentNode MakeUiNode(
+		DscDag::NodeToken MakeDrawNode(
+			const TUiComponentType in_type,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node,
-
-			const std::vector<TEffectData>& in_array_effect_data
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+			DscDag::NodeToken in_frame_node,
+			DscDag::NodeToken in_ui_render_target_node,
+			DscDag::NodeToken in_render_target_viewport_size_node
 		);
 
 		std::shared_ptr<DscRenderResource::Shader> GetEffectShader(const TEffect in_effect);
@@ -196,7 +122,7 @@ namespace DscUi
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored
 		std::unique_ptr < DscDagRender::DagResource> _dag_resource = {};
-		
+
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _image_shader = {};
@@ -210,6 +136,6 @@ namespace DscUi
 
 		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
 
+
 	};
 }
-#endif

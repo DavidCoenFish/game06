@@ -107,3 +107,29 @@ namespace DscCommon
 		TYPE _data[Index::Count];
 	};
 } //namespace DscCommon
+
+//template <typename IN_TYPE>
+//const bool operator==(const DscCommon::Vector4<IN_TYPE>& in_lhs, const int32 in_rhs)
+//{
+//	for (int index = 0; index < 4; ++index)
+//	{
+//		if (in_lhs[index] != in_rhs)
+//		{
+//			return false;
+//		}
+//	}
+//	return true;
+//}
+//
+//template <typename IN_TYPE>
+//const bool operator!=(const DscCommon::Vector4<IN_TYPE>& in_lhs, const int32 in_rhs)
+//{
+//	return !operator==(in_lhs, in_rhs);
+//}
+//
+//template <typename IN_TYPE>
+//const bool operator!=(const int32 in_lhs, const DscCommon::Vector4<IN_TYPE>& in_rhs)
+//{
+//	return !operator==(in_rhs, in_lhs);
+//}
+//

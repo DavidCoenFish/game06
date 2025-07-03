@@ -1,6 +1,6 @@
 #pragma once
 #include "dsc_ui.h"
-//#include <dag_group.h>
+#include <dsc_dag/dag_group.h>
 
 namespace DscDag
 {
@@ -29,99 +29,61 @@ namespace DscUi
 		//TRollover = 1 << 3,
 		//TClicked = 1 << 4
 	};
-#if 1
-	enum class TUiRootNodeGroup : uint8
+
+	enum class TUiComponentType : uint8
 	{
-		TFrame = 0,
-		TDeviceRestore, // the d3dx12 device was reset and then restored, all gpu data was potentially invalidated
-		TForceDraw,
-		TAllowClearOnDraw, // if we share the render target with another system drawing to it? then we don't clear the render target when we set it active
-		TRenderTarget,
-		TRenderTargetViewportSize, // ~root avaliable size, can not be calculate from the render target as render target is set to never dirty, and we WANT to detect size changes
-		TUiScale,
-		TUiComponent,
-		TTimeDelta,
-		TDrawRoot, // getting the value of this node will trigger the frame command list of what needs to be drawn to be populated
+		TGridFill,
+		TFill,
+		TImage,
 
-		//TInputState // touch pos, keys down, gamepad...
-
-		TCount
 	};
-
-	typedef DscDag::DagGroup<TUiRootNodeGroup, static_cast<std::size_t>(TUiRootNodeGroup::TCount)> DagGroupUiRootNode;
-
-	enum class TUiParentNodeGroup : uint8
-	{
-		TUiComponent, // the ui dag node component
-		TUiAvaliableSize, // the avaliable size this node had avaliable to it, used for child geometry size and geometry offset
-		TUiDesiredSize,
-		TUiRenderSize, // the eventually calculated viewport size of the render target. for stack components, this may need child geoemtry size and geometry offset to be calculated. 
-						// possibly remove TUiRenderSize and caculate it as the viewport size of the render target?
-						// no, it is needed to pass info to child
-		TUiGeometrySize, 
-		TDraw, // returns the render target that this ui component draws to
-
-		TUiPanelShaderConstant, // kind of goes with TDraw (which returns the shader resrource/ render target texture for drawing
-
-		TCount
-	};
-
-	typedef DscDag::DagGroup<TUiParentNodeGroup, static_cast<std::size_t>(TUiParentNodeGroup::TCount)> DagGroupUiParentNode;
-
-	// ment to be the group of nodes a UiComponent may need to write to
-	// in_shader_constant here feels like a bit of overkill, we dont write to it, but saves collecting 10 or so bits of data to calculate it.. alternative is to have it higher in the UiComponent like UiComponentCanvas? UiComponentStack?
-	enum class TUiComponentGroup : uint8
-	{
-		TParentChildIndex,
-		TClearColourNode,
-		//THasManualScrollX,
-		TManualScrollX,
-		//THasManualScrollY,
-		TManualScrollY,
-		TCount
-	};
-	typedef DscDag::DagGroup<TUiComponentGroup, static_cast<std::size_t>(TUiComponentGroup::TCount)> DagGroupUiComponent;
-#else
-	//enum class TUiComponentType : uint8
-	//{
-	//	TGridFill,
-	//	TFill,
-	//	TImage,
-
-	//};
 
 	enum class TUiRootNodeGroup : uint8
 	{
 		TDrawNode,
+		TUiComponentType,
 		TArrayChildUiNodeGroup,
 		TForceDraw, // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
-		TUiTexture, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
-		TRenderTargetSize,
+		TUiRenderTarget, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
+		TRenderTargetViewportSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
+		TUiScale,
 
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
 		TInputState, // dirty if 
-	};
 
+		TCount
+	};
+	typedef DscDag::DagGroup<TUiRootNodeGroup, static_cast<std::size_t>(TUiRootNodeGroup::TCount)> UiRootNodeGroup;
+} // DscUi
+template <>
+const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUiRootNodeGroup in_value);
+
+namespace DscUi
+{
 	// is there a node which is the array of children nodes? or the array of 
 
 	enum class TUiNodeGroup : uint8
 	{
 		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
+		TUiComponentType,
 		TArrayChildUiNodeGroup,
-		TUiTexture,
+		TUiRenderTarget,
 		TRenderTargetSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
 		TGeometrySize,
 		TScrollPos, // where is the geometry size quad is on the render target texture
-		TClearColourNode,
+		TClearColour,
 		THasManualScrollX,
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
-	};
-	typedef DscDag::DagGroup<TUiParentNodeGroup, static_cast<std::size_t>(TUiParentNodeGroup::TCount)> DagGroupUiParentNode;
 
-#endif
-}
+		TCount
+	};
+	typedef DscDag::DagGroup<TUiNodeGroup, static_cast<std::size_t>(TUiNodeGroup::TCount)> UiNodeGroup;
+} // DscUi
+
+template <>
+const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUiNodeGroup in_value);

@@ -5,7 +5,7 @@
 
 namespace DscDag
 {
-	template <typename IN_TYPE>
+	template <typename IN_TYPE DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
 	class DagNodeCalculate : public IDagNode
 	{
 	public:
@@ -149,7 +149,7 @@ namespace DscDag
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += " type:";
 			result += typeid(IN_TYPE).name();
-			result += " value:" + DscCommon::DebugPrint::PrintType(_value);
+			result += " value:" + IN_DEBUG_PRINT::Function(_value);
 			result += "\n";
 
 			if (0 < _input.size())
