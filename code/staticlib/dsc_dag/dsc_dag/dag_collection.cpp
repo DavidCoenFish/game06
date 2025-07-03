@@ -12,25 +12,9 @@ bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<D
 	return a.get() < b.get();
 }
 
-DscDag::NodeToken DscDag::DagCollection::CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
-{
-	auto node = std::make_unique<DagNodeValue>(in_value, in_change_condition DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
-	NodeToken node_token = node.get();
-	_nodes.insert(std::move(node));
-	return node_token;
-}
-
-DscDag::NodeToken DscDag::DagCollection::CreateCalculate(const TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
-{
-	auto node = std::make_unique<DagNodeCalculate>(in_calculate DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
-	NodeToken node_token = node.get();
-	_nodes.insert(std::move(node));
-	return node_token;
-}
-
 DscDag::NodeToken DscDag::DagCollection::CreateCondition(NodeToken in_condition, NodeToken in_true_source, NodeToken in_false_source, NodeToken in_true_destination, NodeToken in_false_destination DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
 {
-	auto node = std::make_unique<DagNodeCondition>(*this, in_true_destination, in_false_destination DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+	auto node = std::make_unique<DagNodeCondition>(*this, in_true_source, in_false_source, in_true_destination, in_false_destination DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 	NodeToken node_token = node.get();
 	_nodes.insert(std::move(node));
 
@@ -38,17 +22,8 @@ DscDag::NodeToken DscDag::DagCollection::CreateCondition(NodeToken in_condition,
 	{
 		LinkIndexNodes(0, in_condition, node_token);
 	}
-	if (nullptr != in_true_source)
-	{
-		LinkIndexNodes(1, in_true_source, node_token);
-	}
-	if (nullptr != in_false_source)
-	{
-		LinkIndexNodes(2, in_false_source, node_token);
-	}
 
 	return node_token;
-
 }
 
 DscDag::NodeToken DscDag::DagCollection::AddCustomNode(std::unique_ptr<IDagNode>&& in_node)
@@ -94,7 +69,7 @@ void DscDag::DagCollection::ResolveDirtyConditionNodes()
 		std::swap(_dirty_condition_nodes, temp);
 		for (auto& item : temp)
 		{
-			item->GetValue();
+			item->Update();
 		}
 	}
 	return;
@@ -131,8 +106,8 @@ void DscDag::DagCollection::LinkNodes(NodeToken in_input, NodeToken in_output)
 	DSC_ASSERT(nullptr != in_output, "invalid param");
 	if ((nullptr != in_input) && (nullptr != in_output))
 	{
-		in_output->AddInput(in_input);
 		in_input->AddOutput(in_output);
+		in_output->AddInput(in_input);
 	}
 	return;
 }
@@ -143,8 +118,8 @@ void DscDag::DagCollection::LinkIndexNodes(int32 in_index, NodeToken in_input, N
 	DSC_ASSERT(nullptr != in_output, "invalid param");
 	if ((nullptr != in_input) && (nullptr != in_output))
 	{
-		in_output->SetIndexInput(in_index, in_input);
 		in_input->AddOutput(in_output);
+		in_output->SetIndexInput(in_index, in_input);
 	}
 	return;
 }
@@ -172,19 +147,6 @@ void DscDag::DagCollection::UnlinkIndexNodes(int32 in_index, NodeToken in_input,
 	{
 		in_output->SetIndexInput(in_index, nullptr);
 	}
-	return;
-}
-
-const std::any& DscDag::DagCollection::GetValue(NodeToken in_input)
-{
-	DSC_ASSERT(nullptr != in_input, "invalid param");
-	return in_input->GetValue();
-}
-
-void DscDag::DagCollection::SetValue(NodeToken in_input, const std::any& in_value)
-{
-	DSC_ASSERT(nullptr != in_input, "invalid param");
-	in_input->SetValue(in_value);
 	return;
 }
 

@@ -1,10 +1,10 @@
 #include "ui_manager.h"
+#if 0
 #include "screen_quad.h"
 #include "ui_component_canvas.h"
 #include "ui_component_debug_grid.h"
 #include "ui_component_image.h"
 #include "ui_component_fill.h"
-#include "ui_component_margin.h"
 #include "ui_component_padding.h"
 #include "ui_component_stack.h"
 #include "ui_component_text.h"
@@ -1018,24 +1018,6 @@ std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentStack(
     return result;
 }
 
-std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentMargin(
-    const UiCoord& in_left,
-    const UiCoord& in_top,
-    const UiCoord& in_right,
-    const UiCoord& in_bottom
-)
-{
-    std::unique_ptr<IUiComponent> result = std::make_unique<UiComponentMargin>(
-        _ui_panel_shader,
-        _ui_panel_geometry,
-        in_left,
-        in_top,
-        in_right,
-        in_bottom
-        );
-    return result;
-}
-
 std::unique_ptr<DscUi::IUiComponent> DscUi::UiManager::MakeComponentPadding(
     const UiCoord& in_left,
     const UiCoord& in_top,
@@ -1567,48 +1549,6 @@ DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeStackChild(
     return result;
 }
 
-DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodeMarginChild(
-    DscRender::DrawSystem& in_draw_system,
-    DscDag::DagCollection& in_dag_collection,
-    std::unique_ptr<IUiComponent>&& in_component,
-    const DscCommon::VectorFloat4& in_clear_colour,
-
-    const DagGroupUiRootNode& in_root_node,
-    const DagGroupUiParentNode& in_parent_node,
-
-    const std::vector<TEffectData>& in_array_effect_data
-
-    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
-)
-{
-    IUiComponent* ui_component_raw = in_component.get();
-
-    UiDagNodeComponent* ui_dag_node_component = dynamic_cast<UiDagNodeComponent*>(in_parent_node.GetNodeToken(TUiParentNodeGroup::TUiComponent));
-    UiComponentMargin* parent_margin = dynamic_cast<UiComponentMargin*>(&ui_dag_node_component->GetComponent());
-    DSC_ASSERT(nullptr != parent_margin, "invalid state");
-
-    auto result = MakeUiNode(
-        in_draw_system,
-        in_dag_collection,
-        std::move(in_component),
-        in_clear_colour,
-        in_root_node,
-        in_parent_node,
-        in_array_effect_data
-
-        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
-    );
-
-    parent_margin->AddChild(
-        ui_component_raw,
-        in_draw_system,
-        result.GetNodeToken(TUiParentNodeGroup::TDraw),
-        result.GetNodeToken(TUiParentNodeGroup::TUiPanelShaderConstant)
-    );
-
-    return result;
-}
-
 DscUi::DagGroupUiParentNode DscUi::UiManager::MakeUiNodePaddingChild(
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
@@ -1741,3 +1681,4 @@ std::shared_ptr<DscRenderResource::GeometryGeneric> DscUi::UiManager::GetEffectG
     return _full_target_quad;
 }
 
+#endif

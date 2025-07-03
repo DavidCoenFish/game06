@@ -462,7 +462,6 @@ const bool Application::Update()
 
         frame.reset();
     }
-    
     return true;
 }
 void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale)

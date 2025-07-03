@@ -338,3 +338,28 @@ const HWND DscWindows::WindowHelper(
 
 	return hwnd;
 }
+
+const bool DscWindows::GetMouseState(
+	const HWND in_hwnd,
+	DscCommon::VectorInt2& out_pos,
+	bool& out_left_button,
+	bool& out_right_button
+	)
+{
+	bool valid = false;
+	POINT p{ 0,0 };
+	if (GetCursorPos(&p))
+	{
+		if (ScreenToClient(in_hwnd, &p))
+		{
+			valid = true;
+		}
+	}
+
+	out_pos.Set(p.x, p.y);
+
+	out_left_button = (0 != GetAsyncKeyState(VK_LBUTTON));
+	out_right_button = (0 != GetAsyncKeyState(VK_RBUTTON));
+
+	return valid;
+}

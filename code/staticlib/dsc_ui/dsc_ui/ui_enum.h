@@ -29,7 +29,7 @@ namespace DscUi
 		//TRollover = 1 << 3,
 		//TClicked = 1 << 4
 	};
-
+#if 1
 	enum class TUiRootNodeGroup : uint8
 	{
 		TFrame = 0,
@@ -81,6 +81,47 @@ namespace DscUi
 		TCount
 	};
 	typedef DscDag::DagGroup<TUiComponentGroup, static_cast<std::size_t>(TUiComponentGroup::TCount)> DagGroupUiComponent;
+#else
+	//enum class TUiComponentType : uint8
+	//{
+	//	TGridFill,
+	//	TFill,
+	//	TImage,
 
+	//};
 
+	enum class TUiRootNodeGroup : uint8
+	{
+		TDrawNode,
+		TArrayChildUiNodeGroup,
+		TForceDraw, // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
+		TUiTexture, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
+		TRenderTargetSize,
+		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
+
+		TFrame, // no dirty on set
+		TTimeDelta, // dirty if not zero
+		TInputState, // dirty if 
+	};
+
+	// is there a node which is the array of children nodes? or the array of 
+
+	enum class TUiNodeGroup : uint8
+	{
+		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
+		TArrayChildUiNodeGroup,
+		TUiTexture,
+		TRenderTargetSize,
+		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
+		TGeometrySize,
+		TScrollPos, // where is the geometry size quad is on the render target texture
+		TClearColourNode,
+		THasManualScrollX,
+		TManualScrollX,
+		THasManualScrollY,
+		TManualScrollY,
+	};
+	typedef DscDag::DagGroup<TUiParentNodeGroup, static_cast<std::size_t>(TUiParentNodeGroup::TCount)> DagGroupUiParentNode;
+
+#endif
 }

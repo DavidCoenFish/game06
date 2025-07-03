@@ -10,9 +10,9 @@ const bool TestSanity()
 	bool ok = true;
 
 	DscDag::DagCollection collection = {};
-	auto n0 = collection.CreateValue(std::any(1));
-	auto n1 = collection.CreateValue(std::any(2));
-	auto n2 = collection.CreateCalculate([](std::any& output, std::set<DscDag::NodeToken>& inputSet, std::vector<DscDag::NodeToken>) {
+	auto n0 = collection.CreateValue(1);
+	auto n1 = collection.CreateValue(2);
+	auto n2 = collection.CreateCalculate<int>([](int& output, std::set<DscDag::NodeToken>& inputSet, std::vector<DscDag::NodeToken>) {
 		int32 sum = 0;
 		for (auto& item : inputSet)
 		{
@@ -25,7 +25,7 @@ const bool TestSanity()
 	DscDag::DagCollection::LinkNodes(n1, n2);
 
 	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::DagCollection::GetValueType<int32>(n2));
-	DscDag::DagCollection::SetValue(n0, std::any(3));
+	DscDag::DagCollection::SetValueType(n0, 3);
 	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::DagCollection::GetValueType<int32>(n2));
 
 	return ok;
@@ -36,10 +36,10 @@ const bool TestDirty()
 	bool ok = true;
 
 	DscDag::DagCollection collection = {};
-	auto n0 = collection.CreateValue(std::any(1));
-	auto n1 = collection.CreateValue(std::any(2));
+	auto n0 = collection.CreateValue(1);
+	auto n1 = collection.CreateValue(2);
 	int calculateCount = 0;
-	auto n2 = collection.CreateCalculate([&calculateCount](std::any& output, std::set<DscDag::NodeToken>& inputSet, std::vector<DscDag::NodeToken>) {
+	auto n2 = collection.CreateCalculate<int>([&calculateCount](int& output, std::set<DscDag::NodeToken>& inputSet, std::vector<DscDag::NodeToken>) {
 		calculateCount += 1;
 		int32 sum = 0;
 		for (auto& item : inputSet)
@@ -56,12 +56,12 @@ const bool TestDirty()
 	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::DagCollection::GetValueType<int32>(n2));
 	ok = TEST_UTIL_EQUAL(ok, 1, calculateCount);
 
-	DscDag::DagCollection::SetValue(n0, std::any(3));
+	DscDag::DagCollection::SetValueType(n0, 3);
 	ok = TEST_UTIL_EQUAL(ok, 1, calculateCount);
 	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::DagCollection::GetValueType<int32>(n2));
 	ok = TEST_UTIL_EQUAL(ok, 2, calculateCount);
 
-	DscDag::DagCollection::SetValue(n0, std::any(3));
+	DscDag::DagCollection::SetValueType(n0, 3);
 	ok = TEST_UTIL_EQUAL(ok, 2, calculateCount);
 	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::DagCollection::GetValueType<int32>(n2));
 	ok = TEST_UTIL_EQUAL(ok, 2, calculateCount);

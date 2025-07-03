@@ -1,5 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
+
+#if 0
 #include "ui_enum.h"
 #include "ui_coord.h"
 #include <dsc_common\vector_float4.h>
@@ -84,13 +86,7 @@ namespace DscUi
 			const UiCoord& in_item_gap,
 			const TUiFlow in_ui_flow
 		);
-		// margin cuts in from the parrent size
-		std::unique_ptr<IUiComponent> MakeComponentMargin(
-			const UiCoord& in_left,
-			const UiCoord& in_top,
-			const UiCoord& in_right,
-			const UiCoord& in_bottom
-		);
+
 		// padding inflates the desired size of something like text
 		std::unique_ptr<IUiComponent> MakeComponentPadding(
 			const UiCoord& in_left,
@@ -141,21 +137,6 @@ namespace DscUi
 			const UiCoord& in_primary_size = UiCoord(0, 1.0f),
 			const UiCoord& in_primary_pivot = UiCoord(0, 0.0f),
 			const UiCoord& in_attach_point = UiCoord(0, 0.0f),
-
-			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
-
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-		);
-
-		// calls through to MakeUiNode, and on adding a child to a parent is when the ui component gets its ParentChildIndex set?
-		DagGroupUiParentNode MakeUiNodeMarginChild(
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<IUiComponent>&& in_component,
-			const DscCommon::VectorFloat4& in_clear_colour,
-
-			const DagGroupUiRootNode& in_root_node,
-			const DagGroupUiParentNode& in_parent_node,
 
 			const std::vector<TEffectData>& in_array_effect_data = std::vector<TEffectData>()
 
@@ -231,3 +212,4 @@ namespace DscUi
 
 	};
 }
+#endif

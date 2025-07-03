@@ -17,6 +17,7 @@
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_coord.h>
 #include <dsc_ui/vector_ui_coord2.h>
+#include <dsc_windows/window_helper.h>
 
 namespace
 {
@@ -103,6 +104,18 @@ Application::~Application()
 const bool Application::Update()
 {
     BaseType::Update();
+
+    {
+        DscCommon::VectorInt2 mouse_pos = {};
+        bool left_button = false;
+        bool right_button = false;
+
+        if (true == DscWindows::GetMouseState(GetHwnd(), mouse_pos, left_button, right_button))
+        {
+            DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "mouse x:%d y:%d left_button:%d right_button:%d\n", mouse_pos.GetX(), mouse_pos.GetY(), left_button, right_button);
+        }
+    }
+
     if (_draw_system && _resources && (false == GetMinimized()))
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
@@ -126,7 +139,7 @@ const bool Application::Update()
 
         frame.reset();
     }
-    
+
     return true;
 }
 void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale)

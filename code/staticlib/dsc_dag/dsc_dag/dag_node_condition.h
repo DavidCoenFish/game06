@@ -1,7 +1,7 @@
 #pragma once
 #include "dsc_dag.h"
+#include "i_dag_node.h"
 #include <dsc_common\dsc_common.h>
-#include <dsc_dag\i_dag_node.h>
 
 namespace DscDag
 {
@@ -24,22 +24,24 @@ namespace DscDag
 		DagNodeCondition(
 			DagCollection& in_dag_collection,
 			//NodeToken in_condition, // use SetIndexInput(0, in_condition)
-			//NodeToken in_true_source, // use SetIndexInput(1, in_true_source) 
-			//NodeToken in_false_source, // use SetIndexInput(2, in_false_source)  
+			NodeToken in_true_source,
+			NodeToken in_false_source,
 			NodeToken in_true_destination, 
 			NodeToken in_false_destination
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
 		);
 
-		//void Update();
 
 	private:
 		// used to trigger calculation? return true/ false (if we have a condition node attached)
-		virtual const std::any& GetValue() override;
-		virtual void MarkDirty();
+		virtual void MarkDirty() override;
+		// if dirty, flush dirty flags from input, check condition, set appropriate output
+		virtual void Update() override;
 		virtual const bool GetHasNoLinks() const override;
-		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
-		//virtual NodeToken GetIndexInput(const int32 in_index) const;
+		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override;
+		virtual void AddInput(NodeToken in_nodeID) override;
+		virtual void RemoveInput(NodeToken in_nodeID) override;
+		virtual const std::type_info& GetTypeInfo() const override;
 
 #if defined(_DEBUG)
 		virtual const std::string DebugPrint(const int32 in_depth = 0) const override;
@@ -48,12 +50,17 @@ namespace DscDag
 	private:
 		DagCollection& _dag_collection;
 		bool _dirty = false;
-		NodeToken _condition = nullptr;
+		// cache the condition result, also indicates that we have linked ourself to the true or false source
+		bool _condition_true = false;
+		bool _condition_false = false;
+		NodeToken _condition = nullptr; // expect to be set via SetIndexInput
 		NodeToken _true_source = nullptr;
 		NodeToken _false_source = nullptr;
 		NodeToken _true_destination = nullptr;
 		NodeToken _false_destination = nullptr;
-		std::any _value = {};
+
+		// if we start linking in_true_source and in_false_souce as inputs when they match our condition state
+		std::set<NodeToken> _input = {};
 
 	}; // DagNodeValue
 } //DscDag

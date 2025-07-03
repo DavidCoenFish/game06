@@ -3,18 +3,36 @@
 #include <dsc_common\dsc_common.h>
 #include <dsc_dag\i_dag_node.h>
 #include <dsc_dag\dag_enum.h>
+#include <dsc_dag\dag_node_value.h>
+#include <dsc_dag\dag_node_calculate.h>
 
 namespace DscDag
 {
-	typedef std::function<void(std::any&, std::set<NodeToken>&, std::vector<NodeToken>&)> TCalculateFunction;
 	class IDagNode;
 	class DagNodeCondition;
 
 	class DagCollection
 	{
 	public:
-		NodeToken CreateValue(const std::any& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange  DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""));
-		NodeToken CreateCalculate(const TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
+		template <typename IN_TYPE>
+		NodeToken CreateValue(const IN_TYPE& in_value, const TValueChangeCondition in_change_condition = TValueChangeCondition::TOnValueChange  DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		{
+			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value, in_change_condition DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+			NodeToken node_token = node.get();
+			_nodes.insert(std::move(node));
+			return node_token;
+		}
+
+		template <typename IN_TYPE>
+		//NodeToken CreateCalculate(const std::function<void(IN_TYPE&, std::set<NodeToken>&, std::vector<NodeToken>&)>& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
+		NodeToken CreateCalculate(const typename DagNodeCalculate<IN_TYPE>::TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
+		{
+			auto node = std::make_unique<DagNodeCalculate<IN_TYPE>>(in_calculate DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+			NodeToken node_token = node.get();
+			_nodes.insert(std::move(node));
+			return node_token;
+		}
+
 		// note. we expect index input 0 to be a true/ false node, index input 1 to be true source value, and index input 2 to be false source
 		// these can be set latter, for convienience, they are param here and automatically linked
 		// condition doesn't have a normal link to destination node, they are only set when the condition is updated/ resolved. see ResolveDirtyConditionNodes
@@ -40,30 +58,38 @@ namespace DscDag
 		static void UnlinkNodes(NodeToken in_input, NodeToken in_output);
 		static void UnlinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output);
 		
-		static const std::any& GetValue(NodeToken in_input);
-		static void SetValue(NodeToken in_input, const std::any& in_value);
-
-		template <typename TYPE>
-		static const TYPE GetValueType(NodeToken in_input)
+		template <typename IN_TYPE>
+		static const IN_TYPE& GetValueType(NodeToken in_input)
 		{
-			auto& any = GetValue(in_input);
-			if (typeid(TYPE) == any.type())
+			auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
+			if (nullptr != value_node)
 			{
-				return std::any_cast<TYPE>(any);
+				return value_node->GetValue();
 			}
-			static TYPE kData = {};
+
+			auto calculate_node = dynamic_cast<DagNodeCalculate< IN_TYPE>*>(in_input);
+			if (nullptr != calculate_node)
+			{
+				return calculate_node->GetValue();
+			}
+
+			DSC_ASSERT_ALWAYS("invalid code path");
+			static IN_TYPE kData = {};
 			return kData;
 		}
 
-		template <typename TYPE>
-		static void SetValueType(NodeToken in_input, const TYPE in_value)
+		template <typename IN_TYPE>
+		static void SetValueType(NodeToken in_input, const IN_TYPE& in_value)
 		{
-			SetValue(in_input, std::any(in_value));
-		}
-		template <typename TYPE>
-		static void SetValueTypeRef(NodeToken in_input, const TYPE& in_value)
-		{
-			SetValue(in_input, std::any(in_value));
+			auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
+			if (nullptr != value_node)
+			{
+				value_node->SetValue(in_value);
+			}
+			else
+			{
+				DSC_ASSERT_ALWAYS("invalid code path");
+			}
 		}
 
 #if defined(_DEBUG)

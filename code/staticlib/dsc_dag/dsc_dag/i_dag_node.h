@@ -13,25 +13,25 @@ namespace DscDag
 		IDagNode(DSC_DEBUG_ONLY(const std::string& in_debug_name));
 		virtual ~IDagNode();
 
-		//assert on value node
+		//assert on value node, they have their own logic for setting dirty?
 		virtual void MarkDirty();
-
-		virtual const bool GetHasNoLinks() const = 0;
-
-		virtual void AddOutput(NodeToken in_nodeID);
-		virtual void RemoveOutput(NodeToken in_nodeID);
+		// regenerate value/ remove dirty flag as a side effect?
+		virtual void Update();
 		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
-		//virtual NodeToken GetIndexInput(const int32 in_index) const;
 		virtual void AddInput(NodeToken in_nodeID);
 		virtual void RemoveInput(NodeToken in_nodeID);
+		virtual void AddOutput(NodeToken in_nodeID);
+		virtual void RemoveOutput(NodeToken in_nodeID);
 
-		//assert on calculate node or custom node
-		virtual void SetValue(const std::any& in_value);
+		virtual const bool GetHasNoLinks() const = 0;
+		// do we need a recurcive version of this?
+		//virtual void UnlinkInputs();
 
-		//not const as calculate may trigger state change
-		// even on custom nodes this needs to be implemented, as now Calculate trigger GetValue on input to purge the input dirty flag
-		// this is starting to be used to trigger calculation/ evaluate condition, the returned std::any may actually just be empty for those cases
-		virtual const std::any& GetValue() = 0;
+		virtual const std::type_info& GetTypeInfo() const = 0;
+
+		// for DagCondition, wanted to be able to assign output of one node to another node, but with type infor kept in the derrived classes
+		// asserts when called if not overridden 
+		virtual void SetFromNode(IDagNode* const in_node);
 
 #if defined(_DEBUG)
 		virtual const std::string DebugPrint(const int32 in_depth = 0) const = 0;

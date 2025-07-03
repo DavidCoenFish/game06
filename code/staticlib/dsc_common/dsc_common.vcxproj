@@ -14,6 +14,8 @@
     <CustomBuild Include="dsc.bff" />
     <CustomBuild Include="dsc_common\data_helper.cpp" />
     <CustomBuild Include="dsc_common\data_helper.h" />
+    <CustomBuild Include="dsc_common\debug_print.cpp" />
+    <CustomBuild Include="dsc_common\debug_print.h" />
     <CustomBuild Include="dsc_common\dsc_common.cpp" />
     <CustomBuild Include="dsc_common\dsc_common.h" />
     <CustomBuild Include="dsc_common\enum_soft_bind.cpp" />

@@ -70,4 +70,4 @@ DscVsprojectWindowExe("render_ui_button" .WindowExeParam)
 
 .SolutionProjects + "render_ui_button_project"
 .SolutionItemsApplicationProject + "render_ui_button_project"
-//.SolutionBuildProject = "render_ui_button_project"
+.SolutionBuildProject = "render_ui_button_project"

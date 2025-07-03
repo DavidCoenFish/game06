@@ -117,6 +117,7 @@ typedef unsigned __int64 uint64;
 #ifndef DSC_BFF_BUILD
 
 #include "data_helper.h"
+#include "debug_print.h"
 #include "enum_soft_bind.h"
 #include "file_overlay_local.h"
 #include "file_system.h"
