@@ -13,15 +13,14 @@
 #include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
-#include <dsc_ui/ui_manager.h>
-#include <dsc_ui/i_ui_component.h>
+//#include <dsc_ui/ui_manager.h>
 
 namespace
 {
 }
 
 Application::Resources::Resources()
-    : _ui_root_node_group(nullptr)
+    //: _ui_root_node_group(nullptr)
 {
     //nop
 }
@@ -38,19 +37,19 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
         _resources->_dag_collection = std::make_unique<DscDag::DagCollection>();
-        _resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
+        //_resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
     }
 
-    {
-        auto ui_commponent = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
-        _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
-            *_draw_system,
-            *_resources->_dag_collection,
-            std::move(ui_commponent),
-            std::vector<DscUi::TEffectData>()
-            DSC_DEBUG_ONLY(DSC_COMMA "root debug grid")
-        );
-    }
+    //{
+    //    auto ui_commponent = _resources->_ui_manager->MakeComponentDebugGrid(*_draw_system);
+    //    _resources->_ui_root_node_group = _resources->_ui_manager->MakeUiRootNode(
+    //        *_draw_system,
+    //        *_resources->_dag_collection,
+    //        std::move(ui_commponent),
+    //        std::vector<DscUi::TEffectData>()
+    //        DSC_DEBUG_ONLY(DSC_COMMA "root debug grid")
+    //    );
+    //}
 
     return;
 }
@@ -74,16 +73,16 @@ const bool Application::Update()
     {
         std::unique_ptr<DscRenderResource::Frame> frame = DscRenderResource::Frame::CreateNewFrame(*_draw_system);
 
-        if (_resources->_ui_manager)
-        {
-            _resources->_ui_manager->DrawUiSystem(
-                _resources->_ui_root_node_group,
-                _draw_system->GetRenderTargetBackBuffer(),
-                *frame,
-                true, //false,
-                false //true,
-            );
-        }
+        //if (_resources->_ui_manager)
+        //{
+        //    _resources->_ui_manager->DrawUiSystem(
+        //        _resources->_ui_root_node_group,
+        //        _draw_system->GetRenderTargetBackBuffer(),
+        //        *frame,
+        //        true, //false,
+        //        false //true,
+        //    );
+        //}
 
         if (_resources->_onscreen_version)
         {

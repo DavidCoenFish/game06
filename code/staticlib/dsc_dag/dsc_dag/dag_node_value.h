@@ -40,7 +40,7 @@ namespace DscDag
 			case TValueChangeCondition::TNever:
 				break;
 			case TValueChangeCondition::TOnValueChange:
-				// bail out of SetValue without marking diry if value found to be equivalent
+				// bail out of SetValue without marking dirty if value found to be equivalent
 				if (_value == in_value)
 				{
 					return;
@@ -48,7 +48,7 @@ namespace DscDag
 				set_dirty = true;
 				break;
 			case TValueChangeCondition::TNotZero:
-				if (0 != in_value)
+				if (in_value != 0)
 				{
 					set_dirty = true;
 				}

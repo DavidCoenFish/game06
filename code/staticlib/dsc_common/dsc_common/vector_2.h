@@ -72,6 +72,23 @@ namespace DscCommon
 			return !operator==(in_rhs);
 		}
 
+		const bool operator==(const int32 in_rhs) const
+		{
+			for (int index = 0; index < Index::Count; ++index)
+			{
+				if (_data[index] != in_rhs)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		const bool operator!=(const int32 in_rhs) const 
+		{
+			return !operator==(in_rhs);
+		}
+
 		Vector2& operator=(const Vector2& in_rhs)
 		{
 			for (int index = 0; index < Index::Count; ++index)

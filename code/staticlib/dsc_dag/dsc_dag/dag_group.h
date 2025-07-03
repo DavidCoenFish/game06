@@ -57,7 +57,7 @@ namespace DscDag
 		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token)
 		{
 			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < IN_SIZE), "invalid param");
-#if (_DEBUG)
+#if defined(_DEBUG)
 			const DagGroupNodeMetaData& meta_data = GetDagGroupMetaData(in_index);
 			if (nullptr == in_node_token)
 			{

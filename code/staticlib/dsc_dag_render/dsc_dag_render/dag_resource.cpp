@@ -11,8 +11,8 @@ std::unique_ptr<DscDagRender::DagResource> DscDagRender::DagResource::Factory(
 	DscDag::DagCollection* const in_dag_collection
 )
 {
-	auto dag_node_restored = in_dag_collection->CreateValue(std::any(0), DscDag::TValueChangeCondition::TOnSet);
-	auto dag_node_screen_size = in_dag_collection->CreateValue(std::any(in_draw_system->GetRenderTargetBackBuffer()->GetSize()));
+	auto dag_node_restored = in_dag_collection->CreateValue<int>(0, DscDag::TValueChangeCondition::TOnSet);
+	auto dag_node_screen_size = in_dag_collection->CreateValue<DscCommon::VectorInt2>(in_draw_system->GetRenderTargetBackBuffer()->GetSize());
 
 	return std::make_unique<DscDagRender::DagResource>(
 		in_draw_system, 
