@@ -114,8 +114,9 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			DscDag::NodeToken in_frame_node,
 			DscDag::NodeToken in_ui_render_target_node,
-			DscDag::NodeToken in_render_target_viewport_size_node
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+			DscDag::NodeToken in_render_target_viewport_size_node,
+			DscDag::NodeToken in_force_draw_or_null = nullptr
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
 		std::shared_ptr<DscRenderResource::Shader> GetEffectShader(const TEffect in_effect);

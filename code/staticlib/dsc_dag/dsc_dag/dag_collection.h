@@ -18,10 +18,10 @@ namespace DscDag
 		template <typename IN_TYPE>
 		NodeToken CreateValue(
 			const IN_TYPE& in_value,
-			typename const DscDag::DagNodeValue<IN_TYPE>::TCallbackOnSet = DscDag::CallbackOnValueChange<IN_TYPE>::Function
+			typename const DscDag::DagNodeValue<IN_TYPE>::TCallbackOnSet& in_on_set_callback = typename DscDag::CallbackOnValueChange<IN_TYPE>::Function
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 		{
-			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value, in_on_set_callback DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 			NodeToken node_token = node.get();
 			_nodes.insert(std::move(node));
 			return node_token;
@@ -37,7 +37,6 @@ namespace DscDag
 		}
 
 		template <typename IN_TYPE>
-		//NodeToken CreateCalculate(const std::function<void(IN_TYPE&, std::set<NodeToken>&, std::vector<NodeToken>&)>& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
 		NodeToken CreateCalculate(const typename DagNodeCalculate<IN_TYPE>::TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
 		{
 			auto node = std::make_unique<DagNodeCalculate<IN_TYPE>>(in_calculate DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));

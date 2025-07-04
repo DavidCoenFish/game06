@@ -476,7 +476,8 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         in_dag_collection,
         result.GetNodeToken(TUiRootNodeGroup::TFrame),
         result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
-        result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize)
+        result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
+        result.GetNodeToken(TUiRootNodeGroup::TForceDraw)
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
         ));
 
@@ -525,7 +526,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     DscDag::DagCollection& in_dag_collection,
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
-    DscDag::NodeToken in_render_target_viewport_size_node
+    DscDag::NodeToken in_render_target_viewport_size_node,
+    DscDag::NodeToken in_force_draw_or_null
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
@@ -569,6 +571,10 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(3, in_render_target_viewport_size_node, result_node);
+        if (in_force_draw_or_null)
+        {
+            DscDag::DagCollection::LinkIndexNodes(4, in_force_draw_or_null, result_node);
+        }
     }
     }
     return result_node;
