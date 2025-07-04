@@ -697,7 +697,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
 
     UiComponentResourceNodeGroup component_resource_node_group;
     component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, in_dag_collection.CreateValue(
-        DscCommon::VectorFloat4(),
+        in_construction_helper._clear_colour,
         DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
 
@@ -731,6 +731,87 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
     return result;
 }
 
+DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
+    DscDag::DagCollection& in_dag_collection,
+    const UiRootNodeGroup& in_ui_root_node_group
+)
+{
+    UiNodeGroup result;
+
+    result.SetNodeToken(TUiNodeGroup::TDrawNode, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawNode));
+    result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentType));
+    result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources));
+    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup));
+    result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(TUiNodeGroup::TUiRenderTarget, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget));
+    result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize));
+    result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(TUiNodeGroup::TScrollPos,
+        in_dag_collection.CreateValue(
+            DscCommon::VectorFloat2::s_zero,
+            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
+
+    result.Validate();
+
+    return result;
+}
+
+DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
+    const TComponentConstructionHelper& in_construction_helper,
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    const UiRootNodeGroup& in_root_node_group,
+    const UiNodeGroup& in_parent,
+    const std::vector<TEffectConstructionHelper>& in_effect_array
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+    )
+{
+    UiNodeGroup result;
+
+    UiComponentResourceNodeGroup component_resource_node_group;
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, in_dag_collection.CreateValue(
+        in_construction_helper._clear_colour,
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
+
+    // draw needs to know the size we want for our texture
+    result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_dag_collection.CreateValue(
+        DscCommon::VectorInt2(100, 100), // todo
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
+
+    auto draw_node = MakeDrawStack(
+        GetDrawTypeFromComponentType(in_construction_helper._component_type), //TUiDrawType
+        in_draw_system,
+        in_dag_collection,
+        in_effect_array,
+        in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame),
+        result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
+        in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
+        nullptr,
+        component_resource_node_group
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " draw")
+    );
+    result.SetNodeToken(TUiNodeGroup::TDrawNode, draw_node);
+
+    component_resource_node_group.Validate();
+
+    result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<DscUi::UiComponentResourceNodeGroup>(
+        component_resource_node_group,
+        DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "component resource node group")));
+
+    result.Validate();
+
+    // TODO: need a better way to append values to item in an array node than taking a copy of the entire array several times, DagNodeArray?
+    auto child_array = DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup));
+    child_array.push_back(result);
+    DscDag::DagCollection::SetValueType<std::vector<DscUi::UiNodeGroup>>(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), child_array);
+
+    return result;
+}
+
 void DscUi::UiManager::Draw(
     const UiRootNodeGroup& in_root_node_group,
     DscDag::DagCollection& in_dag_collection,
@@ -755,7 +836,14 @@ void DscUi::UiManager::Draw(
             render_target->UpdateExternalRenderTarget(in_external_render_target_or_null);
         }
 
-        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), render_target->GetViewportSize());
+        const DscCommon::VectorInt2 viewport_size = render_target->GetViewportSize();
+        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), viewport_size);
+        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize), DscCommon::VectorFloat4(
+            0.0f,
+            0.0f,
+            static_cast<float>(viewport_size.GetX()),
+            static_cast<float>(viewport_size.GetY())
+            ));
     }
 
     in_dag_collection.ResolveDirtyConditionNodes();

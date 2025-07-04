@@ -81,6 +81,7 @@ namespace DscUi
 		struct TComponentConstructionHelper
 		{
 			TUiComponentType _component_type;
+			DscCommon::VectorFloat4 _clear_colour;
 		};
 		static TComponentConstructionHelper MakeComponentGridFill();
 
@@ -97,10 +98,11 @@ namespace DscUi
 			const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
 			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
 			);
-#if 0
 		UiNodeGroup ConvertRootNodeGroupToNodeGroup(
+			DscDag::DagCollection& in_dag_collection,
 			const UiRootNodeGroup& in_ui_root_node_group
 			);
+
 		UiNodeGroup AddChildNode(
 			const TComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
@@ -108,8 +110,9 @@ namespace DscUi
 			const UiRootNodeGroup& in_root_node_group,
 			const UiNodeGroup& in_parent,
 			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
 		);
-#endif
+
 		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
 
 		void Draw(
