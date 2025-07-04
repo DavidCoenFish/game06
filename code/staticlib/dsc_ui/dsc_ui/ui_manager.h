@@ -160,6 +160,7 @@ namespace DscUi
 
 		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_drop_shadow_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_inner_shadow_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_stroke_shader = {};
 
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};

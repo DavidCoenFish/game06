@@ -72,7 +72,7 @@ namespace DscDag
 		static const IN_TYPE& GetValueType(NodeToken in_input)
 		{
 			DSC_ASSERT(nullptr != in_input, "invalid param");
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
 			DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
 
 			auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
@@ -102,7 +102,7 @@ namespace DscDag
 		static IN_TYPE* GetUniqueValueType(NodeToken in_input)
 		{
 			DSC_ASSERT(nullptr != in_input, "invalid param");
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetUniqueValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetUniqueValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
 			DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
 
 			auto value_unique_node = dynamic_cast<DagNodeValueUnique< IN_TYPE>*>(in_input);
@@ -119,7 +119,7 @@ namespace DscDag
 		static void SetValueType(NodeToken in_input, const IN_TYPE& in_value)
 		{
 			DSC_ASSERT(nullptr != in_input, "invalid param");
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "SetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "SetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
 			DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
 
 			auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
