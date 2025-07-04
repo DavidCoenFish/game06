@@ -32,6 +32,39 @@ namespace
         }
         });
 
+    const DscUi::TUiDrawType GetDrawTypeFromComponentType(const DscUi::TUiComponentType in_component_type)
+    {
+        switch (in_component_type)
+        {
+        default:
+            DSC_ASSERT_ALWAYS("missing case");
+            break;
+        case DscUi::TUiComponentType::TGridFill:
+            return DscUi::TUiDrawType::TGridFill;
+        }
+        return DscUi::TUiDrawType::TCount;
+    }
+/*
+    const DscUi::TUiDrawType GetDrawTypeFromEffectType(const DscUi::TUiEffectType in_effect_type)
+    {
+        switch (in_effect_type)
+        {
+        default:
+            DSC_ASSERT_ALWAYS("missing case");
+            break;
+        case DscUi::TUiEffectType::TEffectCorner:
+            return DscUi::TUiDrawType::TEffectCorner;
+        case DscUi::TUiEffectType::TEffectDropShadow:
+            return DscUi::TUiDrawType::TEffectDropShadow;
+        case DscUi::TUiEffectType::TEffectInnerShadow:
+            return DscUi::TUiDrawType::TEffectInnerShadow;
+        case DscUi::TUiEffectType::TEffectStroke:
+            return DscUi::TUiDrawType::TEffectStroke;
+        }
+        return DscUi::TUiDrawType::TCount;
+    }
+*/
+
 } // namespace
 
 DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
@@ -411,13 +444,18 @@ std::unique_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
     return std::make_unique<DscUi::UiRenderTarget>(in_render_target_texture, in_allow_clear_on_draw);
 }
 
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentGridFill()
+{
+    return TComponentConstructionHelper({ TUiComponentType::TGridFill});
+}
+
 DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
-    const TUiComponentType in_type,
+    const TComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
-    std::unique_ptr<UiRenderTarget>&& in_ui_render_target
-    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
-)
+    std::unique_ptr<UiRenderTarget>&& in_ui_render_target,
+    const std::vector<TEffectConstructionHelper>& in_effect_array
+    )
 {
     UiRootNodeGroup result;
 
@@ -442,7 +480,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DSC_DEBUG_ONLY(DSC_COMMA "input state")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiComponentType, in_dag_collection.CreateValue(
-        in_type,
+        in_construction_helper._component_type,
         DscDag::CallbackOnValueChange<TUiComponentType>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
 
@@ -470,16 +508,28 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
 
-    result.SetNodeToken(TUiRootNodeGroup::TDrawNode, MakeDrawNode(
-        in_type,
+    result.SetNodeToken(TUiRootNodeGroup::TEffectParamArray, in_dag_collection.CreateValue(
+        std::vector<DscDag::NodeToken>(),
+        DscDag::CallbackOnSetValue<std::vector<DscDag::NodeToken>>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "effect param array")));
+
+    (void*)&in_effect_array;
+
+    std::vector<DscDag::NodeToken> array_input_stack;
+    auto draw_node = MakeDrawNode(
+        GetDrawTypeFromComponentType(in_construction_helper._component_type), //TUiDrawType
         in_draw_system,
         in_dag_collection,
+        array_input_stack,
         result.GetNodeToken(TUiRootNodeGroup::TFrame),
         result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
         result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
-        result.GetNodeToken(TUiRootNodeGroup::TForceDraw)
-        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
-        ));
+        result.GetNodeToken(TUiRootNodeGroup::TForceDraw),
+        result.GetNodeToken(TUiRootNodeGroup::TEffectParamArray)
+        DSC_DEBUG_ONLY(DSC_COMMA "root draw")
+    );
+
+    result.SetNodeToken(TUiRootNodeGroup::TDrawNode, draw_node);
 
     result.Validate();
 
@@ -521,26 +571,31 @@ void DscUi::UiManager::Draw(
 }
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
-    const TUiComponentType in_type,
+    const TUiDrawType in_type,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
+    std::vector<DscDag::NodeToken>& in_array_input_stack,
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_render_target_viewport_size_node,
-    DscDag::NodeToken in_force_draw_or_null
+    DscDag::NodeToken in_force_draw_or_null,
+    DscDag::NodeToken in_effect_param_node_or_null
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
+    DSC_UNUSED(in_effect_param_node_or_null);
+    DSC_UNUSED(in_array_input_stack);
+
     DscDag::NodeToken result_node = {};
     switch (in_type)
     {
     default:
         break;
-    case TUiComponentType::TGridFill:
+    case TUiDrawType::TGridFill:
     {
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_full_target_quad = _full_target_quad;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _debug_grid_shader;
-        result_node = in_dag_collection.CreateCalculate<std::nullptr_t>([weak_full_target_quad, weak_shader](std::nullptr_t&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        result_node = in_dag_collection.CreateCalculate<UiRenderTarget*>([weak_full_target_quad, weak_shader](UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");
             auto ui_render_target = DscDag::DagCollection::GetUniqueValueType<UiRenderTarget>(in_input_array[1]);
@@ -558,6 +613,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             frame->SetShader(weak_shader.lock(), shader_buffer);
             frame->Draw(weak_full_target_quad.lock());
             frame->SetRenderTarget(nullptr);
+
+            out_value = ui_render_target;
         }
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + "Draw"));
 

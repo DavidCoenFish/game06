@@ -45,11 +45,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     {
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
-            DscUi::TUiComponentType::TGridFill,
+            DscUi::UiManager::MakeComponentGridFill(),
             *_draw_system,
             *_resources->_dag_collection,
             std::move(top_texture)
-            DSC_DEBUG_ONLY(DSC_COMMA "root debug grid ")
         );
     }
 

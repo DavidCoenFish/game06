@@ -77,23 +77,37 @@ namespace DscUi
 			const bool in_allow_clear_on_draw
 			);
 
+		struct TComponentConstructionHelper
+		{
+			TUiComponentType _component_type;
+		};
+		static TComponentConstructionHelper MakeComponentGridFill();
+
+		struct TEffectConstructionHelper
+		{
+			TUiEffectType _effect_type;
+			DscCommon::VectorFloat4 _effect_param;
+			DscCommon::VectorFloat4 _effect_param_tint;
+		};
 		UiRootNodeGroup MakeRootNode(
-			const TUiComponentType in_type,
+			const TComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<UiRenderTarget>&& in_ui_texture
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+			std::unique_ptr<UiRenderTarget>&& in_ui_render_target,
+			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
 			);
 #if 0
 		UiNodeGroup ConvertRootNodeGroupToNodeGroup(
 			const UiRootNodeGroup& in_ui_root_node_group
 			);
 		UiNodeGroup AddChildNode(
-			const TUiComponentType in_type,
+			const TComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
 			const UiRootNodeGroup& in_root_node_group,
-			const UiNodeGroup& in_parent
-			);
+			const UiNodeGroup& in_parent,
+			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
+		);
 #endif
 		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
 
@@ -109,13 +123,15 @@ namespace DscUi
 
 	private:
 		DscDag::NodeToken MakeDrawNode(
-			const TUiComponentType in_type,
+			const TUiDrawType in_type,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
+			std::vector<DscDag::NodeToken>& in_array_input_stack,
 			DscDag::NodeToken in_frame_node,
 			DscDag::NodeToken in_ui_render_target_node,
 			DscDag::NodeToken in_render_target_viewport_size_node,
-			DscDag::NodeToken in_force_draw_or_null = nullptr
+			DscDag::NodeToken in_force_draw_or_null = nullptr,
+			DscDag::NodeToken in_effect_param_node_or_null = nullptr
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 

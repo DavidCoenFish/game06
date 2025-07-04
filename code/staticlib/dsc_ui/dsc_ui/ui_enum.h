@@ -32,10 +32,30 @@ namespace DscUi
 
 	enum class TUiComponentType : uint8
 	{
+		TGridFill
+	};
+
+
+	enum class TUiDrawType : uint8
+	{
+		TUiPanel, // array of chlidren
 		TGridFill,
 		TFill,
 		TImage,
+		TEffectDropShadow,
+		TEffectInnerShadow,
+		TEffectCorner,
+		TEffectStroke,
 
+		TCount
+	};
+
+	enum class TUiEffectType : uint8
+	{
+		TEffectDropShadow,
+		TEffectInnerShadow,
+		TEffectCorner,
+		TEffectStroke
 	};
 
 	enum class TUiRootNodeGroup : uint8
@@ -48,6 +68,7 @@ namespace DscUi
 		TRenderTargetViewportSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
 		TUiScale,
+		TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>> two vectfloat4 for each effect?
 
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
@@ -79,6 +100,7 @@ namespace DscUi
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
+		TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>>
 
 		TCount
 	};

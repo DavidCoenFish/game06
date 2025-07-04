@@ -17,7 +17,7 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		break;
 	case DscUi::TUiRootNodeGroup::TDrawNode:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::nullptr_t) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
 		return s_meta_data;
 	}
 	case DscUi::TUiRootNodeGroup::TUiComponentType:
@@ -56,6 +56,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
 		return s_meta_data;
 	}
+	case DscUi::TUiRootNodeGroup::TEffectParamArray:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
+		return s_meta_data;
+	}
 	case DscUi::TUiRootNodeGroup::TFrame:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscRenderResource::Frame*) };
@@ -87,7 +92,7 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		break;
 	case DscUi::TUiNodeGroup::TDrawNode:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::shared_ptr<DscRenderResource::RenderTargetTexture>) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TUiComponentType:
@@ -149,6 +154,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	case DscUi::TUiNodeGroup::TManualScrollY:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
+		return s_meta_data;
+	}
+	case DscUi::TUiNodeGroup::TEffectParamArray:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
 		return s_meta_data;
 	}
 

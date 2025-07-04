@@ -109,6 +109,8 @@ typedef unsigned __int64 uint64;
 
 #define ARRAY_LITERAL_SIZE(DATA) (sizeof(DATA)/sizeof(DATA[0]))
 #define DSC_COMMA ,
+#define DSC_UNUSED(PARAM) (void*)&PARAM;
+
 
 //FastBuild nmake workaround
 // allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
