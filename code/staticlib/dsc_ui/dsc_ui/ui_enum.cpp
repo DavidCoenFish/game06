@@ -55,11 +55,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
 		return s_meta_data;
 	}
-	case DscUi::TUiRootNodeGroup::TEffectParamArray:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
-		return s_meta_data;
-	}
+	//case DscUi::TUiRootNodeGroup::TEffectParamArray:
+	//{
+	//	static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
+	//	return s_meta_data;
+	//}
 	case DscUi::TUiRootNodeGroup::TFrame:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscRenderResource::Frame*) };
@@ -153,11 +153,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TEffectParamArray:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
-		return s_meta_data;
-	}
+	//case DscUi::TUiNodeGroup::TEffectParamArray:
+	//{
+	//	static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
+	//	return s_meta_data;
+	//}
 
 	}
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };

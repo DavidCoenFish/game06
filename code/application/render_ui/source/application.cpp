@@ -43,12 +43,15 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     }
 
     {
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array = {};
+        effect_array.push_back({DscUi::TUiEffectType::TEffectCorner, DscCommon::VectorFloat4(64.0f, 64.0f, 64.0f, 64.0f)});
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
             DscUi::UiManager::MakeComponentGridFill(),
             *_draw_system,
             *_resources->_dag_collection,
-            std::move(top_texture)
+            top_texture,
+            effect_array
         );
     }
 

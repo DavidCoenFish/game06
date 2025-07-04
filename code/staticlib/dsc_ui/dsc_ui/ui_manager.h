@@ -131,7 +131,7 @@ namespace DscUi
 			DscDag::NodeToken in_frame_node,
 			// we don't dirty on ui render target being set, so have a render target viewport size which dirties on size change
 			DscDag::NodeToken in_render_target_viewport_size_node,
-			DscDag::NodeToken in_effect_param_node,
+			DscDag::NodeToken in_ui_scale,
 			DscDag::NodeToken in_last_render_target_or_null,
 			DscDag::NodeToken in_clear_colour_or_null
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
@@ -143,13 +143,12 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			std::vector<DscDag::NodeToken>& in_array_input_stack,
 			DscDag::NodeToken in_frame_node,
-			DscDag::NodeToken in_effect_param_node,
-			DscDag::NodeToken in_ui_render_target_node
+			DscDag::NodeToken in_ui_render_target_node,
+			DscDag::NodeToken in_ui_scale,
+			DscDag::NodeToken in_effect_param_or_null,
+			DscDag::NodeToken in_effect_tint_or_null
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
-
-		std::shared_ptr<DscRenderResource::Shader> GetEffectShader(const TEffect in_effect);
-		std::shared_ptr<DscRenderResource::GeometryGeneric> GetEffectGeometry(const TEffect in_effect);
 
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored

@@ -47,8 +47,8 @@ namespace DscUi
 	struct TEffectConstantBuffer
 	{
 		float _width_height[4]; // _width height, screen left offset, // todo: top offset (ui coords are top left relative)
-		float _effect_param[4]; // 4 floats for the effect
-		float _tint_colour[4];
+		float _effect_param[4]; // 4 floats for the effect * ui scale
+		float _effect_tint[4];
 		float _texture_param_0[4]; // viewport width height, texture width height (ui viewport can be smaller than the texture size)
 		float _texture_param_1[4]; // viewport width height, texture width height (ui viewport can be smaller than the texture size)
 	};
@@ -58,23 +58,6 @@ namespace DscUi
 		float _pos_size[4]; // _pos_x_y_size_width_height;
 		float _uv_size[4]; // _ui_x_y_size_width_height;
 		//float _tint_colour[4];
-	};
-
-	enum class TEffect : uint8
-	{
-		//TDesaturate
-		TDropShadow, // opace cast shadow on alphaed pixels (a max blur radius of 6.7 pixels)
-		//TInnerShadow, // alphaed pixels cast shadow on opace (a max blur radius of 6.7 pixels)
-		//TRolloverTextBurn
-		TRoundedCorner, // 4 corners of the source texture are alphaed out
-		TStroke, // opace pixels flow out (a max of 6.7 pixels)
-	};
-
-	struct TEffectData
-	{
-		TEffect _effect = {};
-		DscCommon::VectorFloat4 _param = {};
-		DscCommon::VectorFloat4 _colour = {};
 	};
 }
 

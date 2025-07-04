@@ -69,7 +69,7 @@ namespace DscUi
 		TRenderTargetViewportSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
 		TUiScale,
-		TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>> two vectfloat4 for each effect?
+		//TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>> two vectfloat4 for each effect?
 
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
@@ -90,7 +90,7 @@ namespace DscUi
 	{
 		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
 		TUiComponentType,
-		//TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group?
+		//TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
 		TArrayChildUiNodeGroup,
 		TUiRenderTarget,
 		TRenderTargetSize,
@@ -102,7 +102,7 @@ namespace DscUi
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
-		TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>>
+		//TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>>
 
 		TCount
 	};
