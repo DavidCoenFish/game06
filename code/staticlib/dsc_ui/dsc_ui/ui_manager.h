@@ -133,7 +133,7 @@ namespace DscUi
 			DscDag::NodeToken in_render_target_viewport_size_node,
 			DscDag::NodeToken in_ui_scale,
 			DscDag::NodeToken in_last_render_target_or_null,
-			DscDag::NodeToken in_clear_colour_or_null
+			UiComponentResourceNodeGroup& in_component_resource_group
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
@@ -167,7 +167,5 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
 
 		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
-
-
 	};
 }

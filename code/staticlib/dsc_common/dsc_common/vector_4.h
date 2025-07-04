@@ -104,7 +104,7 @@ namespace DscCommon
 		};
 
 	private:
-		TYPE _data[Index::Count];
+		TYPE _data[Index::Count] = {};
 	};
 } //namespace DscCommon
 

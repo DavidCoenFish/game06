@@ -695,10 +695,11 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
 
-    //result.SetNodeToken(TUiRootNodeGroup::TEffectParamArray, in_dag_collection.CreateValue(
-    //    std::vector<DscDag::NodeToken>(),
-    //    DscDag::CallbackOnSetValue<std::vector<DscDag::NodeToken>>::Function
-    //    DSC_DEBUG_ONLY(DSC_COMMA "effect param array")));
+    UiComponentResourceNodeGroup component_resource_node_group;
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, in_dag_collection.CreateValue(
+        DscCommon::VectorFloat4(),
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
 
     auto draw_node = MakeDrawStack(
         GetDrawTypeFromComponentType(in_construction_helper._component_type), //TUiDrawType
@@ -709,15 +710,21 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
         result.GetNodeToken(TUiRootNodeGroup::TUiScale),
         result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
-        nullptr
+        component_resource_node_group
         DSC_DEBUG_ONLY(DSC_COMMA "root draw")
     );
-
     // if force draw is true, we just need to re apply the last draw step, even if nothing else has changed
     DscDag::DagCollection::LinkNodes(result.GetNodeToken(TUiRootNodeGroup::TForceDraw), draw_node);
     DscDag::DagCollection::LinkNodes(result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), draw_node);
 
     result.SetNodeToken(TUiRootNodeGroup::TDrawNode, draw_node);
+
+    component_resource_node_group.Validate();
+
+    result.SetNodeToken(TUiRootNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<DscUi::UiComponentResourceNodeGroup>(
+        component_resource_node_group,
+        DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "component resource node group")));
 
     result.Validate();
 
@@ -768,11 +775,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     DscDag::NodeToken in_render_target_viewport_size_node,
     DscDag::NodeToken in_ui_scale,
     DscDag::NodeToken in_last_render_target_or_null,
-    DscDag::NodeToken in_clear_colour_or_null
+    UiComponentResourceNodeGroup& in_component_resource_group
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
     std::vector<DscDag::NodeToken> array_draw_nodes;
+    std::vector<DscDag::NodeToken> effect_param_array;
     DscDag::NodeToken last_draw_node = nullptr;
 
     {
@@ -783,16 +791,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
         }
         else
         {
-            DscDag::NodeToken component_clear_colour = in_clear_colour_or_null;
-            // so, the root node, if it has an effect, will not have a clear colour?
-            //DSC_ASSERT(nullptr != in_clear_colour_or_null, "invalid param for this case");
-            if (nullptr == component_clear_colour)
-            {
-                component_clear_colour = in_dag_collection.CreateValue(
-                    DscCommon::VectorFloat4::s_zero,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));
-            }
+            DscDag::NodeToken component_clear_colour = in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TClearColour);
 
             ui_render_target_node = MakeUiRenderTargetNode(
                 in_draw_system, 
@@ -847,11 +846,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 effect_data._effect_param,
                 DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
                 DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
+            effect_param_array.push_back(effect_param);
             DscDag::NodeToken effect_tint = in_dag_collection.CreateValue(
                 effect_data._effect_param_tint,
                 DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
                 DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
-            // todo, keep ref of effect_param_node and effect_tint_node in a ui component resource group?
+            effect_param_array.push_back(effect_tint);
 
             last_draw_node = MakeDrawNode(
                 GetDrawTypeFromEffectType(effect_data._effect_type),
@@ -867,6 +867,16 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             );
             array_draw_nodes.push_back(last_draw_node);
         }
+    }
+
+    if (0 < effect_param_array.size())
+    {
+        in_component_resource_group.SetNodeToken(TUiComponentResourceNodeGroup::TEffectParamArray,
+            in_dag_collection.CreateValue(
+                effect_param_array,
+                DscDag::CallbackNever<std::vector<DscDag::NodeToken>>::Function
+                DSC_DEBUG_ONLY(DSC_COMMA "effect param array")
+            ));
     }
 
     DSC_ASSERT(nullptr != last_draw_node, "invalid state");

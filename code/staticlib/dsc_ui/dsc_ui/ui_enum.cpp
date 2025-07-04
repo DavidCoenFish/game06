@@ -25,6 +25,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::TUiComponentType) };
 		return s_meta_data;
 	}
+	case DscUi::TUiRootNodeGroup::TUiComponentResources:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiComponentResourceNodeGroup) };
+		return s_meta_data;
+	}
 	case DscUi::TUiRootNodeGroup::TArrayChildUiNodeGroup:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscUi::UiNodeGroup>) };
@@ -55,11 +60,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
 		return s_meta_data;
 	}
-	//case DscUi::TUiRootNodeGroup::TEffectParamArray:
-	//{
-	//	static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
-	//	return s_meta_data;
-	//}
 	case DscUi::TUiRootNodeGroup::TFrame:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscRenderResource::Frame*) };
@@ -98,19 +98,24 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::TUiComponentType) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TUiComponentResources:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiComponentResourceNodeGroup) };
+		return s_meta_data;
+	}
 	case DscUi::TUiNodeGroup::TArrayChildUiNodeGroup:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscUi::UiNodeGroup>) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TRenderRequestSize:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
+		return s_meta_data;
+	}
 	case DscUi::TUiNodeGroup::TUiRenderTarget:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::shared_ptr<DscUi::UiRenderTarget>) };
-		return s_meta_data;
-	}
-	case DscUi::TUiNodeGroup::TRenderTargetSize:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TScreenSpaceSize:
@@ -128,38 +133,53 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat2) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TClearColour:
+
+	}
+	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
+	return s_dummy;
+}
+
+template <>
+const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUiComponentResourceNodeGroup in_value)
+{
+	switch (in_value)
+	{
+	default:
+		DSC_ASSERT_ALWAYS("invalid switch");
+		break;
+	case DscUi::TUiComponentResourceNodeGroup::TClearColour:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::THasManualScrollX:
+	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(bool) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TManualScrollX:
+	case DscUi::TUiComponentResourceNodeGroup::THasManualScrollX:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(bool) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::THasManualScrollY:
+	case DscUi::TUiComponentResourceNodeGroup::TManualScrollX:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(bool) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TManualScrollY:
+	case DscUi::TUiComponentResourceNodeGroup::THasManualScrollY:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(bool) };
 		return s_meta_data;
 	}
-	//case DscUi::TUiNodeGroup::TEffectParamArray:
-	//{
-	//	static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
-	//	return s_meta_data;
-	//}
+	case DscUi::TUiComponentResourceNodeGroup::TManualScrollY:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
+	}
 
 	}
+
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;
 }
