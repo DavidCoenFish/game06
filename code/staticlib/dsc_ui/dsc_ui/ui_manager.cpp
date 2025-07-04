@@ -44,7 +44,7 @@ namespace
         }
         return DscUi::TUiDrawType::TCount;
     }
-/*
+
     const DscUi::TUiDrawType GetDrawTypeFromEffectType(const DscUi::TUiEffectType in_effect_type)
     {
         switch (in_effect_type)
@@ -63,7 +63,46 @@ namespace
         }
         return DscUi::TUiDrawType::TCount;
     }
-*/
+
+    DscDag::NodeToken MakeUiRenderTargetNode(
+        DscRender::DrawSystem& in_draw_system,
+        DscRenderResource::RenderTargetPool& in_render_target_pool,
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::NodeToken in_clear_colour,
+        DscDag::NodeToken in_request_size_node)
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate<std::shared_ptr<DscUi::UiRenderTarget>>([&in_render_target_pool, &in_draw_system](std::shared_ptr<DscUi::UiRenderTarget>& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const DscCommon::VectorInt2 request_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+            const DscCommon::VectorFloat4 clear_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[1]);
+
+            if (nullptr == value)
+            {
+                value = std::make_shared<DscUi::UiRenderTarget>(true);
+            }
+
+            std::vector<DscRender::RenderTargetFormatData> target_format_data_array = {};
+            target_format_data_array.push_back(
+                DscRender::RenderTargetFormatData(
+                    DXGI_FORMAT_B8G8R8A8_UNORM,
+                    true,
+                    clear_colour
+                )
+            );
+
+            value->UpdateRenderTargetPool(
+                in_draw_system,
+                in_render_target_pool,
+                request_size,
+                clear_colour
+                );
+
+        } DSC_DEBUG_ONLY(DSC_COMMA "ui render target"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_request_size_node, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_clear_colour, node);
+
+        return node;
+    }
 
 } // namespace
 
@@ -428,20 +467,20 @@ DscUi::UiManager::~UiManager()
     //nop
 }
 
-std::unique_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
+std::shared_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
     DscRender::IRenderTarget* const in_render_target,
     const bool in_allow_clear_on_draw
 )
 {
-    return std::make_unique<DscUi::UiRenderTarget>(in_render_target, in_allow_clear_on_draw);
+    return std::make_shared<DscUi::UiRenderTarget>(in_render_target, in_allow_clear_on_draw);
 }
 
-std::unique_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
+std::shared_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
     const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture,
     const bool in_allow_clear_on_draw
 )
 {
-    return std::make_unique<DscUi::UiRenderTarget>(in_render_target_texture, in_allow_clear_on_draw);
+    return std::make_shared<DscUi::UiRenderTarget>(in_render_target_texture, in_allow_clear_on_draw);
 }
 
 DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentGridFill()
@@ -453,7 +492,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
     const TComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
-    std::unique_ptr<UiRenderTarget>&& in_ui_render_target,
+    const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
     const std::vector<TEffectConstructionHelper>& in_effect_array
     )
 {
@@ -494,8 +533,9 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DscDag::CallbackNoZero<bool>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "force draw")));
 
-    result.SetNodeToken(TUiRootNodeGroup::TUiRenderTarget, in_dag_collection.CreateValueUnique(
-        std::move(in_ui_render_target)
+    result.SetNodeToken(TUiRootNodeGroup::TUiRenderTarget, in_dag_collection.CreateValue(
+        in_ui_render_target,
+        DscDag::CallbackOnSetValue<std::shared_ptr<DscUi::UiRenderTarget>>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "ui render target")));
 
     result.SetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize, in_dag_collection.CreateValue(
@@ -513,21 +553,22 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DscDag::CallbackOnSetValue<std::vector<DscDag::NodeToken>>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "effect param array")));
 
-    (void*)&in_effect_array;
-
-    std::vector<DscDag::NodeToken> array_input_stack;
-    auto draw_node = MakeDrawNode(
+    auto draw_node = MakeDrawStack(
         GetDrawTypeFromComponentType(in_construction_helper._component_type), //TUiDrawType
         in_draw_system,
         in_dag_collection,
-        array_input_stack,
+        in_effect_array,
         result.GetNodeToken(TUiRootNodeGroup::TFrame),
-        result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
         result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
-        result.GetNodeToken(TUiRootNodeGroup::TForceDraw),
-        result.GetNodeToken(TUiRootNodeGroup::TEffectParamArray)
+        result.GetNodeToken(TUiRootNodeGroup::TEffectParamArray),
+        result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
+        nullptr
         DSC_DEBUG_ONLY(DSC_COMMA "root draw")
     );
+
+    // if force draw is true, we just need to re apply the last draw step, even if nothing else has changed
+    DscDag::DagCollection::LinkNodes(result.GetNodeToken(TUiRootNodeGroup::TForceDraw), draw_node);
+    DscDag::DagCollection::LinkNodes(result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), draw_node);
 
     result.SetNodeToken(TUiRootNodeGroup::TDrawNode, draw_node);
 
@@ -553,7 +594,7 @@ void DscUi::UiManager::Draw(
 
     {
         DscDag::NodeToken node = in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget);
-        auto render_target = DscDag::DagCollection::GetUniqueValueType<UiRenderTarget>(node);
+        auto render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(node);
         DSC_ASSERT(nullptr != render_target, "invalid state");
         if (in_external_render_target_or_null)
         {
@@ -570,21 +611,138 @@ void DscUi::UiManager::Draw(
     return;
 }
 
+DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
+    const TUiDrawType in_type,
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    const std::vector<TEffectConstructionHelper>& in_effect_array,
+    DscDag::NodeToken in_frame_node,
+    // used to request render target for non last render target (the last render target can be external and provided via in_last_render_target_or_null)
+    DscDag::NodeToken in_render_size_node,
+    DscDag::NodeToken in_effect_param_node,
+    DscDag::NodeToken in_last_render_target_or_null,
+    DscDag::NodeToken in_clear_colour_or_null
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+    std::vector<DscDag::NodeToken> array_draw_nodes;
+    DscDag::NodeToken last_draw_node = nullptr;
+
+    {
+        DscDag::NodeToken ui_render_target_node = nullptr;
+        if ((0 == in_effect_array.size()) && (nullptr != in_last_render_target_or_null))
+        {
+            ui_render_target_node = in_last_render_target_or_null;
+        }
+        else
+        {
+            DSC_ASSERT(nullptr != in_clear_colour_or_null, "invalid param for this case");
+            ui_render_target_node = MakeUiRenderTargetNode(
+                in_draw_system, 
+                *_render_target_pool, 
+                in_dag_collection, 
+                in_clear_colour_or_null, 
+                in_render_size_node);
+        }
+
+        last_draw_node = MakeDrawNode(
+            in_type,
+            in_draw_system,
+            in_dag_collection,
+            array_draw_nodes,
+            in_frame_node,
+            in_effect_param_node,
+            ui_render_target_node
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+        );
+        array_draw_nodes.push_back(last_draw_node);
+    }
+    if (0 < in_effect_array.size())
+    {
+        std::vector<DscDag::NodeToken> array_effect_param_nodes;
+
+        for (size_t index = 0; index < in_effect_array.size(); ++index)
+        {
+            DscDag::NodeToken ui_render_target_node = nullptr;
+            if ((index == in_effect_array.size() - 1) && (nullptr != in_last_render_target_or_null))
+            {
+                ui_render_target_node = in_last_render_target_or_null;
+            }
+            else
+            {
+                DscDag::NodeToken effect_clear_colour = in_dag_collection.CreateValue(
+                    DscCommon::VectorFloat4::s_zero,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));
+
+                ui_render_target_node = MakeUiRenderTargetNode(
+                    in_draw_system, 
+                    *_render_target_pool, 
+                    in_dag_collection, 
+                    effect_clear_colour, 
+                    in_render_size_node);
+            }
+
+            const auto& effect_data = in_effect_array[index];
+            {
+                DscDag::NodeToken effect_param = in_dag_collection.CreateValue(
+                    effect_data._effect_param,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
+                array_effect_param_nodes.push_back(effect_param);
+            }
+            {
+                DscDag::NodeToken effect_tint = in_dag_collection.CreateValue(
+                    effect_data._effect_param_tint,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
+                array_effect_param_nodes.push_back(effect_tint);
+            }
+            DscDag::DagCollection::SetValueType(in_effect_param_node, array_effect_param_nodes);
+
+            last_draw_node = MakeDrawNode(
+                GetDrawTypeFromEffectType(effect_data._effect_type),
+                in_draw_system,
+                in_dag_collection,
+                array_draw_nodes,
+                in_frame_node,
+                in_effect_param_node,
+                ui_render_target_node
+                DSC_DEBUG_ONLY(DSC_COMMA "effect draw")
+            );
+            array_draw_nodes.push_back(last_draw_node);
+        }
+    }
+
+    return last_draw_node;
+}
+
+
 DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     const TUiDrawType in_type,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
-    std::vector<DscDag::NodeToken>& in_array_input_stack,
+    std::vector<DscDag::NodeToken>& in_array_draw_nodes,
     DscDag::NodeToken in_frame_node,
-    DscDag::NodeToken in_ui_render_target_node,
-    DscDag::NodeToken in_render_target_viewport_size_node,
-    DscDag::NodeToken in_force_draw_or_null,
-    DscDag::NodeToken in_effect_param_node_or_null
+    DscDag::NodeToken in_effect_param_node,
+    DscDag::NodeToken in_ui_render_target_node
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
-    DSC_UNUSED(in_effect_param_node_or_null);
-    DSC_UNUSED(in_array_input_stack);
+    DSC_UNUSED(in_effect_param_node);
+    DSC_UNUSED(in_array_draw_nodes);
+
+    DSC_ASSERT(nullptr != in_frame_node, "invalid param");
+    DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "MakeDrawNode in_input:%s TYPE:%s\n", in_frame_node->GetTypeInfo().name(), typeid(DscRenderResource::Frame*).name());
+    DSC_ASSERT(in_frame_node->GetTypeInfo() == typeid(DscRenderResource::Frame*), "invalid param");
+
+    DSC_ASSERT(nullptr != in_effect_param_node, "invalid param");
+    DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "MakeDrawNode in_input:%s TYPE:%s\n", in_effect_param_node->GetTypeInfo().name(), typeid(std::vector<DscDag::NodeToken>).name());
+    DSC_ASSERT(in_effect_param_node->GetTypeInfo() == typeid(std::vector<DscDag::NodeToken>), "invalid param");
+
+    DSC_ASSERT(nullptr != in_ui_render_target_node, "invalid param");
+    DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "MakeDrawNode in_input:%s TYPE:%s\n", in_ui_render_target_node->GetTypeInfo().name(), typeid(std::shared_ptr<DscUi::UiRenderTarget>).name());
+    DSC_ASSERT(in_ui_render_target_node->GetTypeInfo() == typeid(std::shared_ptr<DscUi::UiRenderTarget>), "invalid param");
 
     DscDag::NodeToken result_node = {};
     switch (in_type)
@@ -595,10 +753,10 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     {
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_full_target_quad = _full_target_quad;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _debug_grid_shader;
-        result_node = in_dag_collection.CreateCalculate<UiRenderTarget*>([weak_full_target_quad, weak_shader](UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_full_target_quad, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");
-            auto ui_render_target = DscDag::DagCollection::GetUniqueValueType<UiRenderTarget>(in_input_array[1]);
+            auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
             auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
             DSC_ASSERT(nullptr != shader_buffer, "invalid state");
@@ -614,7 +772,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             frame->Draw(weak_full_target_quad.lock());
             frame->SetRenderTarget(nullptr);
 
-            out_value = ui_render_target;
+            out_value = ui_render_target.get();
         }
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + "Draw"));
 
@@ -627,11 +785,6 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
-        DscDag::DagCollection::LinkIndexNodes(3, in_render_target_viewport_size_node, result_node);
-        if (in_force_draw_or_null)
-        {
-            DscDag::DagCollection::LinkIndexNodes(4, in_force_draw_or_null, result_node);
-        }
     }
     }
     return result_node;

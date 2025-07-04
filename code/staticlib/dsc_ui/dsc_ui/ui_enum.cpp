@@ -37,8 +37,7 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	}
 	case DscUi::TUiRootNodeGroup::TUiRenderTarget:
 	{
-		// std::unique_ptr via DagNodeValueUnique
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::shared_ptr<DscUi::UiRenderTarget>) };
 		return s_meta_data;
 	}
 	case DscUi::TUiRootNodeGroup::TRenderTargetViewportSize:
@@ -73,7 +72,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	}
 	case DscUi::TUiRootNodeGroup::TInputState:
 	{
-		// std::unique_ptr via DagNodeValueUnique
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiInputState) };
 		return s_meta_data;
 	}
@@ -107,8 +105,7 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	}
 	case DscUi::TUiNodeGroup::TUiRenderTarget:
 	{
-		// std::unique_ptr via DagNodeValueUnique
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::shared_ptr<DscUi::UiRenderTarget>) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TRenderTargetSize:

@@ -68,11 +68,12 @@ namespace DscUi
 		UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection);
 		~UiManager();
 
-		std::unique_ptr<UiRenderTarget> MakeUiRenderTarget(
+		// these are std::shared_ptr as do not have a DagNodeCalculate unique, and we are 
+		std::shared_ptr<UiRenderTarget> MakeUiRenderTarget(
 			DscRender::IRenderTarget* const in_render_target,
 			const bool in_allow_clear_on_draw
 			);
-		std::unique_ptr<UiRenderTarget> MakeUiRenderTarget(
+		std::shared_ptr<UiRenderTarget> MakeUiRenderTarget(
 			const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture,
 			const bool in_allow_clear_on_draw
 			);
@@ -93,7 +94,7 @@ namespace DscUi
 			const TComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
-			std::unique_ptr<UiRenderTarget>&& in_ui_render_target,
+			const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
 			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
 			);
 #if 0
@@ -122,16 +123,28 @@ namespace DscUi
 			);
 
 	private:
+		DscDag::NodeToken MakeDrawStack(
+			const TUiDrawType in_type,
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			const std::vector<TEffectConstructionHelper>& in_effect_array,
+			DscDag::NodeToken in_frame_node,
+			// we don't dirty on ui render target being set, so have a render target viewport size which dirties on size change
+			DscDag::NodeToken in_render_target_viewport_size_node,
+			DscDag::NodeToken in_effect_param_node,
+			DscDag::NodeToken in_last_render_target_or_null,
+			DscDag::NodeToken in_clear_colour_or_null
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+		);
+
 		DscDag::NodeToken MakeDrawNode(
 			const TUiDrawType in_type,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::vector<DscDag::NodeToken>& in_array_input_stack,
 			DscDag::NodeToken in_frame_node,
-			DscDag::NodeToken in_ui_render_target_node,
-			DscDag::NodeToken in_render_target_viewport_size_node,
-			DscDag::NodeToken in_force_draw_or_null = nullptr,
-			DscDag::NodeToken in_effect_param_node_or_null = nullptr
+			DscDag::NodeToken in_effect_param_node,
+			DscDag::NodeToken in_ui_render_target_node
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 

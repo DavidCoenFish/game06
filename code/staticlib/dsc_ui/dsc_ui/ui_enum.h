@@ -62,6 +62,7 @@ namespace DscUi
 	{
 		TDrawNode,
 		TUiComponentType,
+		//TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes?
 		TArrayChildUiNodeGroup,
 		TForceDraw, // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
 		TUiRenderTarget, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
@@ -89,6 +90,7 @@ namespace DscUi
 	{
 		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
 		TUiComponentType,
+		//TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group?
 		TArrayChildUiNodeGroup,
 		TUiRenderTarget,
 		TRenderTargetSize,
