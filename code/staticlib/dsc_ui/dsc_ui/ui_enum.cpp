@@ -2,6 +2,7 @@
 #include "ui_render_target.h"
 #include "ui_input_state.h"
 #include <dsc_dag/dag_group.h>
+#include <dsc_render_resource/shader_resource.h>
 
 template class DscDag::DagGroup<DscUi::TUiRootNodeGroup, static_cast<std::size_t>(DscUi::TUiRootNodeGroup::TCount)>;
 
@@ -155,6 +156,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	case DscUi::TUiComponentResourceNodeGroup::TFillColour:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TTexture:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::shared_ptr<DscRenderResource::ShaderResource>) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:

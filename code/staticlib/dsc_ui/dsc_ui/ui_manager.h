@@ -83,9 +83,11 @@ namespace DscUi
 			TUiComponentType _component_type;
 			DscCommon::VectorFloat4 _clear_colour;
 			DscCommon::VectorFloat4 _fill;
+			std::shared_ptr<DscRenderResource::ShaderResource> _texture;
 		};
 		static TComponentConstructionHelper MakeComponentDebugGrid();
 		static TComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
+		static TComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
 
 		struct TEffectConstructionHelper
 		{

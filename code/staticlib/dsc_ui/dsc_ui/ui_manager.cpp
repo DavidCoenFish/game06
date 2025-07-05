@@ -21,6 +21,7 @@
 #include <dsc_render_resource\shader.h>
 #include <dsc_render_resource\shader_constant_buffer.h>
 #include <dsc_render_resource\shader_pipeline_state_data.h>
+#include <dsc_render_resource\shader_resource.h>
 #include <dsc_render_resource\shader_resource_info.h>
 
 namespace
@@ -44,6 +45,8 @@ namespace
             return DscUi::TUiDrawType::TDebugGrid;
         case DscUi::TUiComponentType::TFill:
             return DscUi::TUiDrawType::TFill;
+        case DscUi::TUiComponentType::TImage:
+            return DscUi::TUiDrawType::TImage;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -626,6 +629,13 @@ DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentFi
     return result;
 }
 
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture)
+{
+    TComponentConstructionHelper result({ TUiComponentType::TImage });
+    result._texture = in_texture;
+    return result;
+}
+
 DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
     const TComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
@@ -1081,6 +1091,40 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(3, fill_colour, result_node);
+    }
+    break;
+    case TUiDrawType::TImage:
+    {
+        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
+        std::weak_ptr<DscRenderResource::Shader> weak_shader = _image_shader;
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            DSC_ASSERT(nullptr != frame, "invalid state");
+            auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
+            DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+            auto shader_resource = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderResource>>(in_input_array[2]);
+
+            ui_render_target->ActivateRenderTarget(*frame);
+            auto shader = weak_shader.lock();
+            shader->SetShaderResourceViewHandle(0, shader_resource->GetHeapWrapperItem());
+            frame->SetShader(shader);
+            frame->Draw(weak_geometry.lock());
+            frame->SetRenderTarget(nullptr);
+
+            out_value = ui_render_target.get();
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+
+        DSC_ASSERT(nullptr != in_construction_helper_or_null, "invalid state");
+        auto texture_node = in_dag_collection.CreateValue(
+            in_construction_helper_or_null->_texture,
+            DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function
+            DSC_DEBUG_ONLY(DSC_COMMA "fill colour"));
+        in_component_resource_group.SetNodeToken(TUiComponentResourceNodeGroup::TTexture, texture_node);
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(2, texture_node, result_node);
     }
     break;
     case TUiDrawType::TEffectCorner:

@@ -33,7 +33,8 @@ namespace DscUi
 	enum class TUiComponentType : uint8
 	{
 		TDebugGrid,
-		TFill
+		TFill,
+		TImage
 	};
 
 
@@ -117,6 +118,7 @@ namespace DscUi
 		// don't animate ClearColour, is used as the clear colour value with the render target texture. make better to animate a effect tint param?
 		TClearColour,
 		TFillColour,
+		TTexture,
 		TEffectParamArray,
 		THasManualScrollX,
 		TManualScrollX,

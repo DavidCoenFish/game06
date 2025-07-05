@@ -51,8 +51,7 @@
     .AdditionalIncludePaths = {}
 
     .DataCopyPath = {
-        "$RootPath$/../data/font",
-        "$RootPath$/../data/background",
+        "$RootPath$/../data/font"
         }
     .DoDataCopy = true
 
@@ -67,8 +66,8 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_ui" .WindowExeParam)
+DscVsprojectWindowExe("render_ui_root_effect" .WindowExeParam)
 
-.SolutionProjects + "render_ui_project"
-.SolutionItemsApplicationProject + "render_ui_project"
-.SolutionBuildProject = "render_ui_project"
+.SolutionProjects + "render_ui_root_effect_project"
+.SolutionItemsApplicationProject + "render_ui_root_effect_project"
+//.SolutionBuildProject = "render_ui_root_effect_project"
