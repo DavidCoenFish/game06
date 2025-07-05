@@ -34,7 +34,8 @@ namespace DscUi
 	{
 		TDebugGrid,
 		TFill,
-		TImage
+		TImage,
+		TCanvas
 	};
 
 
@@ -73,6 +74,7 @@ namespace DscUi
 		TRenderTargetViewportSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
 		TUiScale,
+		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar
 		//TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>> two vectfloat4 for each effect?
 
 		TFrame, // no dirty on set
@@ -96,11 +98,13 @@ namespace DscUi
 		TUiComponentType,
 		TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
 		TArrayChildUiNodeGroup,
-		TRenderRequestSize, // the size that is used to request the render target from the resource pool (or the viewport size of the external render target given to the top level node)
+		TAvaliableSize, // the initial layout size we were told by the parent that we had avaliable
+		TRenderRequestSize, // the size that is used to request the render target from the resource pool (or the viewport size of the external render target given to the top level node) (max of desired size and geometry size)
 		TUiRenderTarget, // viewport/requested size, as well as the full texture size. note: for pooling the render targets, viewport may be smaller than texture
-		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
-		TGeometrySize,
+		TGeometryOffset, // public so parent can panel draw this node
+		TGeometrySize, // public so parent can panel draw this node
 		TScrollPos, // where is the geometry size quad is on the render target texture
+		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
 
 		TCount
 	};
@@ -124,6 +128,8 @@ namespace DscUi
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
+
+		//TArrayOwnedNodesnodes what to delete if this component is removed
 
 		TCount
 	};

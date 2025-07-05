@@ -109,6 +109,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscUi::UiNodeGroup>) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TAvaliableSize: // the initial layout size we were told by the parent that we had avaliable
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
+		return s_meta_data;
+	}
 	case DscUi::TUiNodeGroup::TRenderRequestSize:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
@@ -119,9 +124,10 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::shared_ptr<DscUi::UiRenderTarget>) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TScreenSpaceSize:
+	case DscUi::TUiNodeGroup::TGeometryOffset: // public so parent can panel draw this node
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
+		// does this need to be a float so we can animate move?
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscCommon::VectorFloat2>) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TGeometrySize:
@@ -134,7 +140,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat2) };
 		return s_meta_data;
 	}
-
+	case DscUi::TUiNodeGroup::TScreenSpaceSize:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
+		return s_meta_data;
+	}
 	}
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;

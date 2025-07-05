@@ -47,6 +47,8 @@ namespace
             return DscUi::TUiDrawType::TFill;
         case DscUi::TUiComponentType::TImage:
             return DscUi::TUiDrawType::TImage;
+        case DscUi::TUiComponentType::TCanvas:
+            return DscUi::TUiDrawType::TUiPanel;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -636,6 +638,13 @@ DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentIm
     return result;
 }
 
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentCanvas(const DscCommon::VectorFloat4& in_clear_colour)
+{
+    TComponentConstructionHelper result({ TUiComponentType::TCanvas });
+    result._clear_colour = in_clear_colour;
+    return result;
+}
+
 DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
     const TComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
@@ -742,11 +751,17 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
     result.SetNodeToken(TUiNodeGroup::TDrawNode, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawNode));
     result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentType));
     result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources));
-    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup));
+    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup));    
+    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TUiRenderTarget, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget));
     result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize));
     result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
+        in_dag_collection.CreateValue(
+            DscCommon::VectorFloat2::s_zero,
+            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function
+            DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
     result.SetNodeToken(TUiNodeGroup::TScrollPos,
         in_dag_collection.CreateValue(
             DscCommon::VectorFloat2::s_zero,
@@ -1125,6 +1140,11 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, texture_node, result_node);
+    }
+    break;
+    case TUiDrawType::TUiPanel:
+    {
+
     }
     break;
     case TUiDrawType::TEffectCorner:

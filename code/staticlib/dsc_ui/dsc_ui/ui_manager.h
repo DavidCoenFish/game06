@@ -84,10 +84,34 @@ namespace DscUi
 			DscCommon::VectorFloat4 _clear_colour;
 			DscCommon::VectorFloat4 _fill;
 			std::shared_ptr<DscRenderResource::ShaderResource> _texture;
+
+			VectorUiCoord2 _child_size;
+			VectorUiCoord2 _child_pivot;
+			VectorUiCoord2 _attach_point;
+
+			TComponentConstructionHelper& SetClearColour(
+				const DscCommon::VectorFloat4& in_clear_colour
+			)
+			{
+				_clear_colour = in_clear_colour;
+				return *this;
+			}
+			TComponentConstructionHelper& SetCanvasSlot(
+				const VectorUiCoord2& in_child_size,
+				const VectorUiCoord2& in_child_pivot,
+				const VectorUiCoord2& in_attach_point
+				)
+			{
+				_child_size = in_child_size;
+				_child_pivot = in_child_pivot;
+				_attach_point = in_attach_point;
+				return *this;
+			}
 		};
 		static TComponentConstructionHelper MakeComponentDebugGrid();
 		static TComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
 		static TComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
+		static TComponentConstructionHelper MakeComponentCanvas(const DscCommon::VectorFloat4& in_clear_colour);
 
 		struct TEffectConstructionHelper
 		{
