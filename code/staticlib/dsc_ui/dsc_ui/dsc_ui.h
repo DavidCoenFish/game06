@@ -36,12 +36,15 @@ namespace DscCommon
 
 namespace DscUi
 {
+	struct TDebugGridConstantBuffer
+	{
+		float _width_height[4]; // _width_height_screen_left_offset_top_offset (ui coords are top left relative)
+	};
+
 	// for debug fill, of move debug fill to the ffect shader
 	struct TFillConstantBuffer
 	{
-		float _value[4]; // _width_height_screen_left_offset_top_offset (ui coords are top left relative)
-		//float _touch[4]; // mouse pos relative to us [x,y]? time touch click? time right mouse click?
-		//float _tint_colour[4];
+		float _colour[4];
 	};
 
 	struct TEffectConstantBuffer

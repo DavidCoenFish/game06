@@ -69,6 +69,15 @@ namespace DscDag
 			return _value;
 		}
 
+		IN_TYPE& GetValueNonConst(const bool in_set_dirty)
+		{
+			if (true == in_set_dirty)
+			{
+				SetDirty();
+			}
+			return _value;
+		}
+
 		void SetValue(const IN_TYPE& in_value)
 		{
 			bool set_dirty = false;
@@ -84,14 +93,19 @@ namespace DscDag
 			_value = in_value;
 			if (true == set_dirty)
 			{
-				for (auto& item : _output)
-				{
-					item->MarkDirty();
-				}
+				SetDirty();
 			}
 		}
 
 	private:
+		void SetDirty()
+		{
+			for (auto& item : _output)
+			{
+				item->MarkDirty();
+			}
+		}
+
 		virtual void AddOutput(NodeToken in_nodeID) override
 		{
 			DSC_ASSERT(nullptr != in_nodeID, "invalid param");

@@ -13,7 +13,7 @@ namespace DscDag
 		DagGroupNodeMetaData& operator=(const DagGroupNodeMetaData&) = delete;
 		DagGroupNodeMetaData(const DagGroupNodeMetaData&) = delete;
 
-		bool _optional = {};
+		bool _optional = false;
 		const std::type_info& _type_info;
 	};
 

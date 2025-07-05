@@ -32,20 +32,22 @@ namespace DscUi
 
 	enum class TUiComponentType : uint8
 	{
-		TGridFill
+		TDebugGrid,
+		TFill
 	};
 
 
 	enum class TUiDrawType : uint8
 	{
 		TUiPanel, // array of chlidren
-		TGridFill,
+		TDebugGrid,
 		TFill,
 		TImage,
 		TEffectDropShadow,
 		TEffectInnerShadow,
 		TEffectCorner,
 		TEffectStroke,
+		TEffectTint,
 
 		TCount
 	};
@@ -55,7 +57,8 @@ namespace DscUi
 		TEffectDropShadow,
 		TEffectInnerShadow,
 		TEffectCorner,
-		TEffectStroke
+		TEffectStroke,
+		TEffectTint
 	};
 
 	enum class TUiRootNodeGroup : uint8
@@ -113,6 +116,7 @@ namespace DscUi
 	{
 		// don't animate ClearColour, is used as the clear colour value with the render target texture. make better to animate a effect tint param?
 		TClearColour,
+		TFillColour,
 		TEffectParamArray,
 		THasManualScrollX,
 		TManualScrollX,

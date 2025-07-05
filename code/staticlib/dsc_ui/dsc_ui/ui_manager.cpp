@@ -7,6 +7,7 @@
 #include <dsc_common\file_system.h>
 #include <dsc_common\log_system.h>
 #include <dsc_common\vector_float2.h>
+#include <dsc_dag\dag_array_helper.h>
 #include <dsc_dag\dag_collection.h>
 #include <dsc_dag\dag_group.h>
 #include <dsc_dag_render\dag_resource.h>
@@ -39,8 +40,10 @@ namespace
         default:
             DSC_ASSERT_ALWAYS("missing case");
             break;
-        case DscUi::TUiComponentType::TGridFill:
-            return DscUi::TUiDrawType::TGridFill;
+        case DscUi::TUiComponentType::TDebugGrid:
+            return DscUi::TUiDrawType::TDebugGrid;
+        case DscUi::TUiComponentType::TFill:
+            return DscUi::TUiDrawType::TFill;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -60,6 +63,8 @@ namespace
             return DscUi::TUiDrawType::TEffectInnerShadow;
         case DscUi::TUiEffectType::TEffectStroke:
             return DscUi::TUiDrawType::TEffectStroke;
+        case DscUi::TUiEffectType::TEffectTint:
+            return DscUi::TUiDrawType::TEffectTint;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -118,6 +123,9 @@ namespace
         const int32 in_input_texture_count
         DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
     {
+        DSC_ASSERT(nullptr != in_geometry, "invalid param");
+        DSC_ASSERT(nullptr != in_shader, "invalid param");
+
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = in_geometry;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = in_shader;
         DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader, in_input_texture_count](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
@@ -201,6 +209,71 @@ namespace
         return result_node;
     }
 
+    std::shared_ptr<DscRenderResource::Shader> CreateEffectShader(
+        DscRender::DrawSystem& in_draw_system,
+        DscCommon::FileSystem& in_file_system,
+        const std::string& in_vertex_shader_name,
+        const std::string& in_pixel_shader_name,
+        const bool in_use_data_sampler,
+        const int32 in_texture_count = 1
+        )
+    {
+        std::vector<uint8> vertex_shader_data;
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", in_vertex_shader_name)))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
+        }
+        std::vector<uint8> pixel_shader_data;
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", in_pixel_shader_name)))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            DscUi::ScreenQuad::GetInputElementDesc(),
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(
+                DscUi::TEffectConstantBuffer(),
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
+        for (int32 index = 0; index < in_texture_count; ++index)
+        {
+            array_shader_resource_info.push_back(
+                // data sampiler if expecting to be reading source texture at 1:1 scale (no bilinear smear)
+                in_use_data_sampler ?
+                DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
+                    nullptr,
+                    D3D12_SHADER_VISIBILITY_PIXEL
+                ) : 
+                DscRenderResource::ShaderResourceInfo::FactorySampler(
+                    nullptr,
+                    D3D12_SHADER_VISIBILITY_PIXEL
+                )
+            );
+        }
+        return std::make_shared<DscRenderResource::Shader>(
+            &in_draw_system,
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            array_shader_resource_info,
+            array_shader_constants_info
+            );
+    }
+
 } // namespace
 
 DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
@@ -208,7 +281,7 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
     _dag_resource = DscDagRender::DagResource::Factory(&in_draw_system, &in_dag_collection);
     _render_target_pool = std::make_unique<DscRenderResource::RenderTargetPool>(DscRenderResource::s_default_pixel_alignment);
 
-    //_full_target_quad
+    //_full_quad_pos_uv
     {
         std::vector<uint8_t> vertex_raw_data;
 
@@ -236,12 +309,41 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
         DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
 
-        _full_target_quad = std::make_shared<DscRenderResource::GeometryGeneric>(
+        _full_quad_pos_uv = std::make_shared<DscRenderResource::GeometryGeneric>(
             &in_draw_system,
             D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
             ScreenQuad::GetInputElementDesc(),
             vertex_raw_data,
             4
+            );
+    }
+
+    //_full_quad_pos
+    {
+        std::vector<uint8_t> vertex_raw_data;
+
+        //0.0f, 0.0f,
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, -1.0f);
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
+
+        //1.0f, 0.0f,
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
+
+        //0.0f, 1.0f,
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, -1.0f);
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, -1.0f);
+
+        //1.0f, 1.0f,
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, 1.0f);
+        DscCommon::DataHelper::AppendValue(vertex_raw_data, -1.0f);
+
+        _full_quad_pos = std::make_shared<DscRenderResource::GeometryGeneric>(
+            &in_draw_system,
+            D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+            s_input_element_desc_array,
+            vertex_raw_data,
+            2
             );
     }
 
@@ -301,7 +403,7 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
         array_shader_constants_info.push_back(
             DscRenderResource::ConstantBufferInfo::Factory(
-                TFillConstantBuffer(),
+                TDebugGridConstantBuffer(),
                 D3D12_SHADER_VISIBILITY_PIXEL
             )
         );
@@ -408,205 +510,87 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             );
     }
 
-    // _effect_round_corner_shader
+    // _fill_shader
     {
         std::vector<uint8> vertex_shader_data;
-        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_round_corner_vs.cso")))
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "fill_vs.cso")))
         {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load triangle vertex shader\n");
         }
         std::vector<uint8> pixel_shader_data;
-        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_round_corner_ps.cso")))
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "fill_ps.cso")))
         {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to triangle load pixel shader\n");
         }
 
         std::vector < DXGI_FORMAT > render_target_format;
         render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
         DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            ScreenQuad::GetInputElementDesc(),
+            s_input_element_desc_array,
             D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
             DXGI_FORMAT_UNKNOWN,
             render_target_format,
-            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
+            CD3DX12_BLEND_DESC(D3D12_DEFAULT),
             CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
             CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
         );
         std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
         array_shader_constants_info.push_back(
             DscRenderResource::ConstantBufferInfo::Factory(
-                TEffectConstantBuffer(),
+                TFillConstantBuffer(),
                 D3D12_SHADER_VISIBILITY_PIXEL
             )
         );
-        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
-        array_shader_resource_info.push_back(
-            // data sampiler as expecting to be reading source texture at 1:1 scale
-            DscRenderResource::ShaderResourceInfo::FactoryDataSampler(
-                nullptr,
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        _effect_round_corner_shader = std::make_shared<DscRenderResource::Shader>(
+        _fill_shader = std::make_shared<DscRenderResource::Shader>(
             &in_draw_system,
             shader_pipeline_state_data,
             vertex_shader_data,
             std::vector<uint8_t>(),
             pixel_shader_data,
-            array_shader_resource_info,
+            std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>>(),
             array_shader_constants_info
             );
     }
 
-    //_effect_drop_shadow_shader
-    {
-        std::vector<uint8> vertex_shader_data;
-        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_drop_shadow_vs.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
-        }
-        std::vector<uint8> pixel_shader_data;
-        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_drop_shadow_ps.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
-        }
+    _effect_round_corner_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_round_corner_vs.cso",
+        "effect_round_corner_ps.cso",
+        true
+        );
 
-        std::vector < DXGI_FORMAT > render_target_format;
-        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
-        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            ScreenQuad::GetInputElementDesc(),
-            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-            DXGI_FORMAT_UNKNOWN,
-            render_target_format,
-            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
-            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
-        array_shader_constants_info.push_back(
-            DscRenderResource::ConstantBufferInfo::Factory(
-                TEffectConstantBuffer(),
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
-        array_shader_resource_info.push_back(
-            // default sampiler as drop shadow tries to sample at the corner of 4 pixels to reduce sample calls
-            DscRenderResource::ShaderResourceInfo::FactorySampler(
-                nullptr,
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        _effect_drop_shadow_shader = std::make_shared<DscRenderResource::Shader>(
-            &in_draw_system,
-            shader_pipeline_state_data,
-            vertex_shader_data,
-            std::vector<uint8_t>(),
-            pixel_shader_data,
-            array_shader_resource_info,
-            array_shader_constants_info
-            );
-    }
+    _effect_drop_shadow_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_drop_shadow_vs.cso",
+        "effect_drop_shadow_ps.cso",
+        false
+    );
 
-    //_effect_inner_shadow_shader
-    {
-        std::vector<uint8> vertex_shader_data;
-        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_inner_shadow_vs.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
-        }
-        std::vector<uint8> pixel_shader_data;
-        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_inner_shadow_ps.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
-        }
+    _effect_inner_shadow_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_inner_shadow_vs.cso",
+        "effect_inner_shadow_ps.cso",
+        false
+    );
 
-        std::vector < DXGI_FORMAT > render_target_format;
-        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
-        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            ScreenQuad::GetInputElementDesc(),
-            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-            DXGI_FORMAT_UNKNOWN,
-            render_target_format,
-            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
-            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
-        array_shader_constants_info.push_back(
-            DscRenderResource::ConstantBufferInfo::Factory(
-                TEffectConstantBuffer(),
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
-        array_shader_resource_info.push_back(
-            // default sampiler as drop shadow tries to sample at the corner of 4 pixels to reduce sample calls
-            DscRenderResource::ShaderResourceInfo::FactorySampler(
-                nullptr,
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        _effect_inner_shadow_shader = std::make_shared<DscRenderResource::Shader>(
-            &in_draw_system,
-            shader_pipeline_state_data,
-            vertex_shader_data,
-            std::vector<uint8_t>(),
-            pixel_shader_data,
-            array_shader_resource_info,
-            array_shader_constants_info
-            );
-    }
+    _effect_stroke_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_stroke_vs.cso",
+        "effect_stroke_ps.cso",
+        true
+    );
 
-    // _effect_stroke_shader
-    {
-        std::vector<uint8> vertex_shader_data;
-        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_stroke_vs.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load vertex shader\n");
-        }
-        std::vector<uint8> pixel_shader_data;
-        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "effect_stroke_ps.cso")))
-        {
-            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load pixel shader\n");
-        }
-
-        std::vector < DXGI_FORMAT > render_target_format;
-        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
-        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-            ScreenQuad::GetInputElementDesc(),
-            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-            DXGI_FORMAT_UNKNOWN,
-            render_target_format,
-            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),
-            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
-        array_shader_constants_info.push_back(
-            DscRenderResource::ConstantBufferInfo::Factory(
-                TEffectConstantBuffer(),
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
-        array_shader_resource_info.push_back(
-            // default sampiler as stroke tries to sample at the corner of 4 pixel block to reduce sample calls
-            DscRenderResource::ShaderResourceInfo::FactorySampler(
-                nullptr,
-                D3D12_SHADER_VISIBILITY_PIXEL
-            )
-        );
-        _effect_stroke_shader = std::make_shared<DscRenderResource::Shader>(
-            &in_draw_system,
-            shader_pipeline_state_data,
-            vertex_shader_data,
-            std::vector<uint8_t>(),
-            pixel_shader_data,
-            array_shader_resource_info,
-            array_shader_constants_info
-            );
-    }
+    _effect_tint_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_tint_vs.cso",
+        "effect_tint_ps.cso",
+        true
+    );
 }
 
 DscUi::UiManager::~UiManager()
@@ -630,9 +614,16 @@ std::shared_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
     return std::make_shared<DscUi::UiRenderTarget>(in_render_target_texture, in_allow_clear_on_draw);
 }
 
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentGridFill()
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentDebugGrid()
 {
-    return TComponentConstructionHelper({ TUiComponentType::TGridFill});
+    return TComponentConstructionHelper({ TUiComponentType::TDebugGrid});
+}
+
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentFill(const DscCommon::VectorFloat4& in_colour)
+{
+    TComponentConstructionHelper result({ TUiComponentType::TFill });
+    result._fill = in_colour;
+    return result;
 }
 
 DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
@@ -702,7 +693,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
 
     auto draw_node = MakeDrawStack(
-        GetDrawTypeFromComponentType(in_construction_helper._component_type), //TUiDrawType
+        in_construction_helper,
         in_draw_system,
         in_dag_collection,
         in_effect_array,
@@ -782,7 +773,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
 
     auto draw_node = MakeDrawStack(
-        GetDrawTypeFromComponentType(in_construction_helper._component_type), //TUiDrawType
+        in_construction_helper, //TUiDrawType
         in_draw_system,
         in_dag_collection,
         in_effect_array,
@@ -804,10 +795,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 
     result.Validate();
 
-    // TODO: need a better way to append values to item in an array node than taking a copy of the entire array several times, DagNodeArray?
-    auto child_array = DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup));
-    child_array.push_back(result);
-    DscDag::DagCollection::SetValueType<std::vector<DscUi::UiNodeGroup>>(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), child_array);
+    DscDag::ArrayHelper::PushBack(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), result);
 
     return result;
 }
@@ -854,7 +842,7 @@ void DscUi::UiManager::Draw(
 }
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
-    const TUiDrawType in_type,
+    const TComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     const std::vector<TEffectConstructionHelper>& in_effect_array,
@@ -890,7 +878,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
         }
 
         last_draw_node = MakeDrawNode(
-            in_type,
+            GetDrawTypeFromComponentType(in_construction_helper._component_type),
+            &in_construction_helper,
             in_draw_system,
             in_dag_collection,
             array_draw_nodes,
@@ -898,7 +887,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             ui_render_target_node,
             in_ui_scale,
             nullptr,
-            nullptr
+            nullptr,
+            in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
         );
         array_draw_nodes.push_back(last_draw_node);
@@ -920,6 +910,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     DscCommon::VectorFloat4::s_zero,
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
                     DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));
+                // you could put this in the effect_param_array, but then the stride of the effect param could be weird
+                // could also put it in in_component_resource_group
 
                 ui_render_target_node = MakeUiRenderTargetNode(
                     in_draw_system, 
@@ -943,6 +935,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
 
             last_draw_node = MakeDrawNode(
                 GetDrawTypeFromEffectType(effect_data._effect_type),
+                nullptr,
                 in_draw_system,
                 in_dag_collection,
                 array_draw_nodes,
@@ -950,7 +943,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 ui_render_target_node,
                 in_ui_scale,
                 effect_param,
-                effect_tint
+                effect_tint,
+                in_component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "effect draw")
             );
             array_draw_nodes.push_back(last_draw_node);
@@ -975,6 +969,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     const TUiDrawType in_type,
+    const TComponentConstructionHelper* const in_construction_helper_or_null,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     std::vector<DscDag::NodeToken>& in_array_input_stack,
@@ -982,7 +977,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_ui_scale,
     DscDag::NodeToken in_effect_param_or_null,
-    DscDag::NodeToken in_effect_tint_or_null
+    DscDag::NodeToken in_effect_tint_or_null,
+    UiComponentResourceNodeGroup& in_component_resource_group
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
@@ -1000,11 +996,11 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     default:
         DSC_ASSERT_ALWAYS("missing switch");
         break;
-    case TUiDrawType::TGridFill:
+    case TUiDrawType::TDebugGrid:
     {
-        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_full_target_quad = _full_target_quad;
+        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _debug_grid_shader;
-        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_full_target_quad, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");
             auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
@@ -1014,13 +1010,13 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 
             const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
 
-            auto& buffer = shader_buffer->GetConstant<TFillConstantBuffer>(0);
-            buffer._value[0] = static_cast<float>(viewport_size.GetX());
-            buffer._value[1] = static_cast<float>(viewport_size.GetY());
+            auto& buffer = shader_buffer->GetConstant<TDebugGridConstantBuffer>(0);
+            buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
+            buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
 
             ui_render_target->ActivateRenderTarget(*frame);
             frame->SetShader(weak_shader.lock(), shader_buffer);
-            frame->Draw(weak_full_target_quad.lock());
+            frame->Draw(weak_geometry.lock());
             frame->SetRenderTarget(nullptr);
 
             out_value = ui_render_target.get();
@@ -1032,15 +1028,64 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             shader_buffer,
             DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
             DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
+        //todo: add shader_buffer to in_component_resource_group?
 
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
     }
     break;
+    case TUiDrawType::TFill:
+    {
+        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos;
+        std::weak_ptr<DscRenderResource::Shader> weak_shader = _fill_shader;
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            DSC_ASSERT(nullptr != frame, "invalid state");
+            auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
+            DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+            auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+            DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+            DscCommon::VectorFloat4 fill_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[3]);
+
+            auto& buffer = shader_buffer->GetConstant<TFillConstantBuffer>(0);
+            buffer._colour[0] = fill_colour.GetX();
+            buffer._colour[1] = fill_colour.GetY();
+            buffer._colour[2] = fill_colour.GetZ();
+            buffer._colour[3] = fill_colour.GetW();
+
+            ui_render_target->ActivateRenderTarget(*frame);
+            frame->SetShader(weak_shader.lock(), shader_buffer);
+            frame->Draw(weak_geometry.lock());
+            frame->SetRenderTarget(nullptr);
+
+            out_value = ui_render_target.get();
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+
+        auto shader_buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
+        auto shader_buffer_node = in_dag_collection.CreateValue(
+            shader_buffer,
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
+            DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
+        //todo: add shader_buffer to in_component_resource_group?
+
+        DSC_ASSERT(nullptr != in_construction_helper_or_null, "invalid state");
+        auto fill_colour = in_dag_collection.CreateValue(
+            in_construction_helper_or_null->_fill,
+            DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+            DSC_DEBUG_ONLY(DSC_COMMA "fill colour"));
+        in_component_resource_group.SetNodeToken(TUiComponentResourceNodeGroup::TFillColour, fill_colour);
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(3, fill_colour, result_node);
+    }
+    break;
     case TUiDrawType::TEffectCorner:
         result_node = MakeEffectDrawNode(
-            _full_target_quad,
+            _full_quad_pos_uv,
             _effect_round_corner_shader,
             in_dag_collection,
             in_draw_system,
@@ -1055,7 +1100,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     break;
     case TUiDrawType::TEffectDropShadow:
         result_node = MakeEffectDrawNode(
-            _full_target_quad,
+            _full_quad_pos_uv,
             _effect_drop_shadow_shader,
             in_dag_collection,
             in_draw_system,
@@ -1070,7 +1115,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         break;
     case TUiDrawType::TEffectInnerShadow:
         result_node = MakeEffectDrawNode(
-            _full_target_quad,
+            _full_quad_pos_uv,
             _effect_inner_shadow_shader,
             in_dag_collection,
             in_draw_system,
@@ -1085,8 +1130,23 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         break;
     case TUiDrawType::TEffectStroke:
         result_node = MakeEffectDrawNode(
-            _full_target_quad,
+            _full_quad_pos_uv,
             _effect_stroke_shader,
+            in_dag_collection,
+            in_draw_system,
+            in_frame_node,
+            in_ui_render_target_node,
+            in_ui_scale,
+            in_effect_param_or_null,
+            in_effect_tint_or_null,
+            in_array_input_stack,
+            1
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+        break;
+    case TUiDrawType::TEffectTint:
+        result_node = MakeEffectDrawNode(
+            _full_quad_pos_uv,
+            _effect_tint_shader,
             in_dag_collection,
             in_draw_system,
             in_frame_node,

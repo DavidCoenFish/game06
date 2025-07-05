@@ -82,8 +82,10 @@ namespace DscUi
 		{
 			TUiComponentType _component_type;
 			DscCommon::VectorFloat4 _clear_colour;
+			DscCommon::VectorFloat4 _fill;
 		};
-		static TComponentConstructionHelper MakeComponentGridFill();
+		static TComponentConstructionHelper MakeComponentDebugGrid();
+		static TComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
 
 		struct TEffectConstructionHelper
 		{
@@ -127,7 +129,7 @@ namespace DscUi
 
 	private:
 		DscDag::NodeToken MakeDrawStack(
-			const TUiDrawType in_type,
+			const TComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			const std::vector<TEffectConstructionHelper>& in_effect_array,
@@ -142,6 +144,7 @@ namespace DscUi
 
 		DscDag::NodeToken MakeDrawNode(
 			const TUiDrawType in_type,
+			const TComponentConstructionHelper* const in_construction_helper_or_null,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::vector<DscDag::NodeToken>& in_array_input_stack,
@@ -149,7 +152,8 @@ namespace DscUi
 			DscDag::NodeToken in_ui_render_target_node,
 			DscDag::NodeToken in_ui_scale,
 			DscDag::NodeToken in_effect_param_or_null,
-			DscDag::NodeToken in_effect_tint_or_null
+			DscDag::NodeToken in_effect_tint_or_null,
+			UiComponentResourceNodeGroup& in_component_resource_group
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
@@ -160,13 +164,19 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _image_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _fill_shader = {};
 
 		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_drop_shadow_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_inner_shadow_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_stroke_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_tint_shader = {};
 
-		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_target_quad = {};
+		// a full quad is of pos range [-1 ... 1] and uv range of [0 ... 1]
+		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_quad_pos_uv = {};
+		// a full quad is of pos range [-1 ... 1]
+		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_quad_pos = {};
+		// panel geometry is vertex of pos range [0 ... 1] intended to be affected by shader variables
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
 
 		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};

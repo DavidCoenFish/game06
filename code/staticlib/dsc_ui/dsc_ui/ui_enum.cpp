@@ -152,6 +152,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TFillColour:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
+		return s_meta_data;
+	}
 	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };

@@ -24,8 +24,15 @@ namespace DscDag
 			// Nop
 		}
 
-		IN_TYPE* const GetValue() const
+		IN_TYPE* const GetValue(const bool in_mark_dirty = false) const
 		{
+			if (true == in_mark_dirty)
+			{
+				for (auto& item : _output)
+				{
+					item->MarkDirty();
+				}
+			}
 			return _value.get();
 		}
 

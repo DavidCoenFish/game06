@@ -9,6 +9,7 @@
 //G:\development\game06\code\staticlib\dsc_dag\dsc_dag\dsc_dag.h
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 
+#include "dag_array_helper.h"
 #include "dag_collection.h"
 #include "dag_enum.h"
 #include "dag_group.h"
