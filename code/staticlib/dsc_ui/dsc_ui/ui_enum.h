@@ -74,7 +74,6 @@ namespace DscUi
 		TRenderTargetViewportSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
 		TUiScale,
-		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar
 		//TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>> two vectfloat4 for each effect?
 
 		TFrame, // no dirty on set
@@ -129,7 +128,9 @@ namespace DscUi
 		THasManualScrollY,
 		TManualScrollY,
 
-		//TArrayOwnedNodesnodes what to delete if this component is removed
+		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiNodeGroup
+		
+		TArrayOwnedNodes, //what nodes to delete if this component is removed
 
 		TCount
 	};

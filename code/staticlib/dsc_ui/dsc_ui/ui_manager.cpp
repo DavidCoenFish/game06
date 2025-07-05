@@ -710,6 +710,10 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         in_construction_helper._clear_colour,
         DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes, in_dag_collection.CreateValue(
+        std::vector<DscDag::NodeToken>(),
+        DscDag::CallbackNever<std::vector<DscDag::NodeToken>>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
     auto draw_node = MakeDrawStack(
         in_construction_helper,
@@ -720,6 +724,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
         result.GetNodeToken(TUiRootNodeGroup::TUiScale),
         result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
+        result.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group
         DSC_DEBUG_ONLY(DSC_COMMA "root draw")
     );
@@ -785,17 +790,75 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 {
     UiNodeGroup result;
 
+    //TUiComponentType
+    result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_dag_collection.CreateValue(
+        in_construction_helper._component_type,
+        DscDag::CallbackOnValueChange<TUiComponentType>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
+
     UiComponentResourceNodeGroup component_resource_node_group;
-    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, in_dag_collection.CreateValue(
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes,
+        in_dag_collection.CreateValue(
+            std::vector<DscDag::NodeToken>(),
+            DscDag::CallbackNever<std::vector<DscDag::NodeToken>>::Function
+            DSC_DEBUG_ONLY(DSC_COMMA "array owned nodes")));
+
+    auto clear_colour_node = in_dag_collection.CreateValue(
         in_construction_helper._clear_colour,
         DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
-        DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
+        DSC_DEBUG_ONLY(DSC_COMMA "clear colour"));
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, clear_colour_node);
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), clear_colour_node);
 
-    // draw needs to know the size we want for our texture
+    auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
+    auto shader_constant_buffer_node = in_dag_collection.CreateValue(
+        panel_shader_constant_buffer,
+        DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "ui panel shader constant buffer"));
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TUiPanelShaderConstantBuffer, shader_constant_buffer_node);
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), shader_constant_buffer_node);
+
+    //TArrayChildUiNodeGroup
+    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
+        std::vector<UiNodeGroup>(),
+        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "array child")));
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup));
+
+    //TAvaliableSize calculate our avaliable size
+    /*
+    in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize);
+    in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale);
+    =>
+    avaliable size
+    result.SetNodeToken(TUiNodeGroup::TAvaliableSize)
+    */
+    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_parent.GetNodeToken(TUiNodeGroup::TRenderRequestSize));
+
+    // calculate our desired size
+    // calculate our geometry offset
+    // calculate our geometry size
+
+    // todo: calculate our render request size (max desired and geometry size)
+    // TRenderRequestSize draw needs to know the size we want for our texture
     result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_dag_collection.CreateValue(
-        DscCommon::VectorInt2(100, 100), // todo
+        DscCommon::VectorInt2(100, 100), //DscCommon::VectorInt2::s_zero,
         DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
         DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TRenderRequestSize));
+
+    //TUiRenderTarget, // viewport/requested size, as well as the full texture size. note: for pooling the render targets, viewport may be smaller than texture
+    result.SetNodeToken(TUiNodeGroup::TUiRenderTarget, in_dag_collection.CreateValue(
+        std::make_shared<>()
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
+
+    //TGeometryOffset, // public so parent can panel draw this node
+    //TGeometrySize, // public so parent can panel draw this node
+    //TScrollPos, // where is the geometry size quad is on the render target texture
+    //TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
+
+
 
     auto draw_node = MakeDrawStack(
         in_construction_helper, //TUiDrawType
@@ -806,6 +869,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
         in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
         nullptr,
+        result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " draw")
     );
@@ -821,6 +885,12 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
     result.Validate();
 
     DscDag::ArrayHelper::PushBack(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), result);
+
+    // effect the child Update function to be called just before the parent Update/draw
+    DscDag::DagCollection::LinkNodes(
+        draw_node,
+        in_parent.GetNodeToken(TUiNodeGroup::TDrawNode)
+        );
 
     return result;
 }
@@ -876,6 +946,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     DscDag::NodeToken in_render_target_viewport_size_node,
     DscDag::NodeToken in_ui_scale,
     DscDag::NodeToken in_last_render_target_or_null,
+    DscDag::NodeToken in_child_array_node_or_null,
     UiComponentResourceNodeGroup& in_component_resource_group
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -900,6 +971,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 in_dag_collection, 
                 component_clear_colour,
                 in_render_target_viewport_size_node);
+            DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), ui_render_target_node);
         }
 
         last_draw_node = MakeDrawNode(
@@ -913,10 +985,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             in_ui_scale,
             nullptr,
             nullptr,
+            in_child_array_node_or_null,
             in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
         );
         array_draw_nodes.push_back(last_draw_node);
+        DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), last_draw_node);
     }
     if (0 < in_effect_array.size())
     {
@@ -935,8 +1009,10 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     DscCommon::VectorFloat4::s_zero,
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
                     DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));
+                DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), effect_clear_colour);
+
                 // you could put this in the effect_param_array, but then the stride of the effect param could be weird
-                // could also put it in in_component_resource_group
+                // could also put it in in_component_resource_group? have it's own array of 
 
                 ui_render_target_node = MakeUiRenderTargetNode(
                     in_draw_system, 
@@ -944,6 +1020,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     in_dag_collection, 
                     effect_clear_colour, 
                     in_render_target_viewport_size_node);
+                DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), ui_render_target_node);
             }
 
             const auto& effect_data = in_effect_array[index];
@@ -952,11 +1029,13 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
                 DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
             effect_param_array.push_back(effect_param);
+            DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), effect_param);
             DscDag::NodeToken effect_tint = in_dag_collection.CreateValue(
                 effect_data._effect_param_tint,
                 DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
                 DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
             effect_param_array.push_back(effect_tint);
+            DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), effect_tint);
 
             last_draw_node = MakeDrawNode(
                 GetDrawTypeFromEffectType(effect_data._effect_type),
@@ -969,10 +1048,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 in_ui_scale,
                 effect_param,
                 effect_tint,
+                in_child_array_node_or_null,
                 in_component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "effect draw")
             );
             array_draw_nodes.push_back(last_draw_node);
+            DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), last_draw_node);
         }
     }
 
@@ -1003,6 +1084,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     DscDag::NodeToken in_ui_scale,
     DscDag::NodeToken in_effect_param_or_null,
     DscDag::NodeToken in_effect_tint_or_null,
+    DscDag::NodeToken in_child_array_node_or_null,
     UiComponentResourceNodeGroup& in_component_resource_group
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1144,7 +1226,62 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     break;
     case TUiDrawType::TUiPanel:
     {
+        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _ui_panel_geometry;
+        std::weak_ptr<DscRenderResource::Shader> weak_shader = _ui_panel_shader;
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            DSC_ASSERT(nullptr != frame, "invalid state");
+            const auto& ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
+            DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+            const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[2]);
 
+            ui_render_target->ActivateRenderTarget(*frame);
+            auto shader = weak_shader.lock();
+            auto geometry = weak_geometry.lock();
+            const DscCommon::VectorInt2 parent_render_size = ui_render_target->GetViewportSize();
+
+            for (const auto& child : child_array)
+            {
+                DscUi::UiRenderTarget* child_render_target = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(child.GetNodeToken(TUiNodeGroup::TDrawNode));
+                DSC_ASSERT(nullptr != child_render_target, "invalid state");
+
+                const auto& child_resources = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(child.GetNodeToken(TUiNodeGroup::TUiComponentResources));
+                const auto& shader_constant_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(child_resources.GetNodeToken(TUiComponentResourceNodeGroup::TUiPanelShaderConstantBuffer));
+
+                auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
+                //float _pos_size[4]; // _pos_x_y_size_width_height;
+                // geometry is in range [-1 ... 1], but we want the offset relative to top left
+                const DscCommon::VectorFloat2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
+                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
+                buffer._pos_size[0] = ((geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
+                buffer._pos_size[1] = ((1.0f - (geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
+                buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
+                buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
+
+                //float _uv_size[4]; // _ui_x_y_size_width_height;
+                const DscCommon::VectorFloat2& scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TScrollPos));
+                const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
+                const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
+                const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
+                buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_texture_size.GetX());
+                const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetY())));
+                buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * scroll_y / static_cast<float>(render_texture_size.GetY());
+                buffer._uv_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_texture_size.GetX());
+                buffer._uv_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_texture_size.GetY());
+
+                shader->SetShaderResourceViewHandle(0, child_render_target->GetTexture());
+                frame->SetShader(shader, shader_constant_buffer);
+                frame->Draw(geometry);
+            }
+
+            out_value = ui_render_target.get();
+        }
+        DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
+        DSC_ASSERT(nullptr != in_child_array_node_or_null, "invalid state");
+        DscDag::DagCollection::LinkIndexNodes(2, in_child_array_node_or_null, result_node);
     }
     break;
     case TUiDrawType::TEffectCorner:

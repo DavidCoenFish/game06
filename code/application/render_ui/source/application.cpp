@@ -21,6 +21,7 @@
 
 namespace
 {
+/*
     std::shared_ptr<DscRenderResource::ShaderResource> MakeShaderResource(DscCommon::FileSystem& in_file_system, DscRender::DrawSystem& in_draw_system, const std::string& in_file_path)
     {
         std::vector<uint8> data = {};
@@ -71,6 +72,7 @@ namespace
         }
         return result;
     }
+*/
 }
 
 Application::Resources::Resources()
@@ -98,12 +100,29 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
 
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
+            DscUi::UiManager::MakeComponentCanvas(DscCommon::VectorFloat4::s_zero),
             //DscUi::UiManager::MakeComponentDebugGrid(),
-            DscUi::UiManager::MakeComponentImage(MakeShaderResource(*_file_system, *_draw_system, DscCommon::FileSystem::JoinPath("data", "background", "background_00.png"))),
+            //DscUi::UiManager::MakeComponentImage(MakeShaderResource(*_file_system, *_draw_system, DscCommon::FileSystem::JoinPath("data", "background", "background_00.png"))),
             *_draw_system,
             *_resources->_dag_collection,
             top_texture
         );
+
+        auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*_resources->_dag_collection, _resources->_ui_root_node_group);
+
+        _resources->_ui_manager->AddChildNode(
+            DscUi::UiManager::MakeComponentFill(DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)).SetCanvasSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(128, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
+                ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            root_as_parent,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "child one")
+            );
     }
 
     return;

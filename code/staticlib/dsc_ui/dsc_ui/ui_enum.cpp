@@ -3,6 +3,7 @@
 #include "ui_input_state.h"
 #include <dsc_dag/dag_group.h>
 #include <dsc_render_resource/shader_resource.h>
+#include <dsc_render_resource/shader_constant_buffer.h>
 
 template class DscDag::DagGroup<DscUi::TUiRootNodeGroup, static_cast<std::size_t>(DscUi::TUiRootNodeGroup::TCount)>;
 
@@ -127,7 +128,7 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	case DscUi::TUiNodeGroup::TGeometryOffset: // public so parent can panel draw this node
 	{
 		// does this need to be a float so we can animate move?
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscCommon::VectorFloat2>) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat2) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TGeometrySize:
@@ -196,6 +197,16 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	case DscUi::TUiComponentResourceNodeGroup::TManualScrollY:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TUiPanelShaderConstantBuffer:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TArrayOwnedNodes:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
 		return s_meta_data;
 	}
 

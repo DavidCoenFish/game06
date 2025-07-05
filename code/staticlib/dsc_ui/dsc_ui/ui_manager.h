@@ -2,6 +2,7 @@
 #include "dsc_ui.h"
 #include "ui_enum.h"
 #include "ui_coord.h"
+#include "vector_ui_coord2.h"
 #include <dsc_common\vector_float4.h>
 
 namespace DscCommon
@@ -85,9 +86,10 @@ namespace DscUi
 			DscCommon::VectorFloat4 _fill;
 			std::shared_ptr<DscRenderResource::ShaderResource> _texture;
 
-			VectorUiCoord2 _child_size;
-			VectorUiCoord2 _child_pivot;
-			VectorUiCoord2 _attach_point;
+			bool _has_child_slot_data = false;
+			VectorUiCoord2 _child_size = {};
+			VectorUiCoord2 _child_pivot = {};
+			VectorUiCoord2 _attach_point = {};
 
 			TComponentConstructionHelper& SetClearColour(
 				const DscCommon::VectorFloat4& in_clear_colour
@@ -102,6 +104,7 @@ namespace DscUi
 				const VectorUiCoord2& in_attach_point
 				)
 			{
+				_has_child_slot_data = true;
 				_child_size = in_child_size;
 				_child_pivot = in_child_pivot;
 				_attach_point = in_attach_point;
@@ -126,7 +129,7 @@ namespace DscUi
 			const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
 			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
 			);
-		UiNodeGroup ConvertRootNodeGroupToNodeGroup(
+		static UiNodeGroup ConvertRootNodeGroupToNodeGroup(
 			DscDag::DagCollection& in_dag_collection,
 			const UiRootNodeGroup& in_ui_root_node_group
 			);
@@ -164,6 +167,7 @@ namespace DscUi
 			DscDag::NodeToken in_render_target_viewport_size_node,
 			DscDag::NodeToken in_ui_scale,
 			DscDag::NodeToken in_last_render_target_or_null,
+			DscDag::NodeToken in_child_array_node_or_null,
 			UiComponentResourceNodeGroup& in_component_resource_group
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
@@ -179,6 +183,7 @@ namespace DscUi
 			DscDag::NodeToken in_ui_scale,
 			DscDag::NodeToken in_effect_param_or_null,
 			DscDag::NodeToken in_effect_tint_or_null,
+			DscDag::NodeToken in_child_array_node_or_null,
 			UiComponentResourceNodeGroup& in_component_resource_group
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);

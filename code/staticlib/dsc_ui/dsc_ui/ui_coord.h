@@ -27,6 +27,7 @@ namespace DscUi
 
 		/// if this is a horizontal ui cord, then the primary input is the parents horizontal value, and vertical the scondary
 		/// if this is a vertical ui cord, then the primary input is the parents vertical value, and horizontal the scondary
+		/// todo: this may want to return a float, as we move towards to animated positions?
 		const int32 Evaluate(const int32 in_parent_primary, const int32 in_parent_secondary, const float in_ui_scale = 1.0f) const;
 
 	private:
