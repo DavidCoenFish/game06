@@ -70,15 +70,15 @@ namespace DscUi
 		TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
 		TArrayChildUiNodeGroup,
 		TForceDraw, // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
-		TUiRenderTarget, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
 		TRenderTargetViewportSize,
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
 		TUiScale,
-		//TEffectParamArray, // std::vector<DagNodeValue<VectorFloat4>>> two vectfloat4 for each effect?
 
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
 		TInputState, // dirty if 
+
+		TUiRenderTarget, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
 
 		TCount
 	};
@@ -99,7 +99,6 @@ namespace DscUi
 		TArrayChildUiNodeGroup,
 		TAvaliableSize, // the initial layout size we were told by the parent that we had avaliable
 		TRenderRequestSize, // the size that is used to request the render target from the resource pool (or the viewport size of the external render target given to the top level node) (max of desired size and geometry size)
-		TUiRenderTarget, // viewport/requested size, as well as the full texture size. note: for pooling the render targets, viewport may be smaller than texture
 		TGeometryOffset, // public so parent can panel draw this node
 		TGeometrySize, // public so parent can panel draw this node
 		TScrollPos, // where is the geometry size quad is on the render target texture
@@ -118,6 +117,7 @@ namespace DscUi
 	//this is ment as the data store for a UiComponent, but we replaced the UiComponent with a dag node/ node group...
 	enum class TUiComponentResourceNodeGroup : uint8
 	{
+		//TUiRenderTarget, // the root has a token for this, but nothing else directly need this, just have node ownership into the TArrayOwnedNodes
 		// don't animate ClearColour, is used as the clear colour value with the render target texture. make better to animate a effect tint param?
 		TClearColour,
 		TFillColour,
@@ -128,7 +128,7 @@ namespace DscUi
 		THasManualScrollY,
 		TManualScrollY,
 
-		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiNodeGroup
+		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiNodeGroup?
 		
 		TArrayOwnedNodes, //what nodes to delete if this component is removed
 

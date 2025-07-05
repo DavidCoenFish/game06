@@ -720,10 +720,9 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         in_draw_system,
         in_dag_collection,
         in_effect_array,
-        result.GetNodeToken(TUiRootNodeGroup::TFrame),
-        result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
-        result.GetNodeToken(TUiRootNodeGroup::TUiScale),
+        result,
         result.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget),
+        result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
         result.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group
         DSC_DEBUG_ONLY(DSC_COMMA "root draw")
@@ -759,7 +758,6 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
     result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup));    
     result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
-    result.SetNodeToken(TUiNodeGroup::TUiRenderTarget, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget));
     result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize));
     result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
@@ -847,28 +845,42 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
     DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TRenderRequestSize));
 
-    //TUiRenderTarget, // viewport/requested size, as well as the full texture size. note: for pooling the render targets, viewport may be smaller than texture
-    result.SetNodeToken(TUiNodeGroup::TUiRenderTarget, in_dag_collection.CreateValue(
-        std::make_shared<>()
-        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
-        DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
-
     //TGeometryOffset, // public so parent can panel draw this node
+    result.SetNodeToken(TUiNodeGroup::TGeometryOffset, in_dag_collection.CreateValue(
+        DscCommon::VectorFloat2(0, 0), //DscCommon::VectorInt2::s_zero,
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TGeometryOffset));
+
     //TGeometrySize, // public so parent can panel draw this node
+    result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_dag_collection.CreateValue(
+        DscCommon::VectorInt2(100, 100), //DscCommon::VectorInt2::s_zero,
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "geometry size")));
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TGeometrySize));
+
     //TScrollPos, // where is the geometry size quad is on the render target texture
+    result.SetNodeToken(TUiNodeGroup::TScrollPos, in_dag_collection.CreateValue(
+        DscCommon::VectorFloat2(0, 0), //DscCommon::VectorInt2::s_zero,
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TScrollPos));
+
     //TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
-
-
+    result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(
+        DscCommon::VectorFloat4(0, 0, 0, 0),
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+        DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
+    DscDag::ArrayHelper::PushBack(component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), result.GetNodeToken(TUiNodeGroup::TScreenSpaceSize));
 
     auto draw_node = MakeDrawStack(
         in_construction_helper, //TUiDrawType
         in_draw_system,
         in_dag_collection,
         in_effect_array,
-        in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame),
-        result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
-        in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
+        in_root_node_group,
         nullptr,
+        result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
         result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " draw")
@@ -941,11 +953,9 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     const std::vector<TEffectConstructionHelper>& in_effect_array,
-    DscDag::NodeToken in_frame_node,
-    // we don't dirty on ui render target being set, so have a render target viewport size which dirties on size change
-    DscDag::NodeToken in_render_target_viewport_size_node,
-    DscDag::NodeToken in_ui_scale,
+    const UiRootNodeGroup& in_root_node_group,
     DscDag::NodeToken in_last_render_target_or_null,
+    DscDag::NodeToken in_render_request_size_node,
     DscDag::NodeToken in_child_array_node_or_null,
     UiComponentResourceNodeGroup& in_component_resource_group
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
@@ -970,7 +980,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 *_render_target_pool, 
                 in_dag_collection, 
                 component_clear_colour,
-                in_render_target_viewport_size_node);
+                in_render_request_size_node);
             DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), ui_render_target_node);
         }
 
@@ -980,9 +990,9 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             in_draw_system,
             in_dag_collection,
             array_draw_nodes,
-            in_frame_node,
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame),
             ui_render_target_node,
-            in_ui_scale,
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
             nullptr,
             nullptr,
             in_child_array_node_or_null,
@@ -1019,7 +1029,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     *_render_target_pool, 
                     in_dag_collection, 
                     effect_clear_colour, 
-                    in_render_target_viewport_size_node);
+                    in_render_request_size_node);
                 DscDag::ArrayHelper::PushBack(in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TArrayOwnedNodes), ui_render_target_node);
             }
 
@@ -1043,9 +1053,9 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 in_draw_system,
                 in_dag_collection,
                 array_draw_nodes,
-                in_frame_node,
+                in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame),
                 ui_render_target_node,
-                in_ui_scale,
+                in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
                 effect_param,
                 effect_tint,
                 in_child_array_node_or_null,

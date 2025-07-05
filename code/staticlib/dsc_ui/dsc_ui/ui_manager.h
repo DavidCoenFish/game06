@@ -157,16 +157,15 @@ namespace DscUi
 			);
 
 	private:
+		// so, if MakeDrawStack creates a UiRenderTaget, how does that get back into the parent, TUiNodeGroup::TUiRenderTarget
 		DscDag::NodeToken MakeDrawStack(
 			const TComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			const std::vector<TEffectConstructionHelper>& in_effect_array,
-			DscDag::NodeToken in_frame_node,
-			// we don't dirty on ui render target being set, so have a render target viewport size which dirties on size change
-			DscDag::NodeToken in_render_target_viewport_size_node,
-			DscDag::NodeToken in_ui_scale,
+			const UiRootNodeGroup& in_root_node_group,
 			DscDag::NodeToken in_last_render_target_or_null,
+			DscDag::NodeToken in_render_request_size,
 			DscDag::NodeToken in_child_array_node_or_null,
 			UiComponentResourceNodeGroup& in_component_resource_group
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")

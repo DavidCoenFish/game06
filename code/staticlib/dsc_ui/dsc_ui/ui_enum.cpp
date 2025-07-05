@@ -120,11 +120,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TUiRenderTarget:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::shared_ptr<DscUi::UiRenderTarget>) };
-		return s_meta_data;
-	}
 	case DscUi::TUiNodeGroup::TGeometryOffset: // public so parent can panel draw this node
 	{
 		// does this need to be a float so we can animate move?
