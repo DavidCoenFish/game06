@@ -12,12 +12,22 @@ bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<D
 	return a.get() < b.get();
 }
 
-DscDag::NodeToken DscDag::DagCollection::CreateCondition(NodeToken in_condition, NodeToken in_true_source, NodeToken in_false_source, NodeToken in_true_destination, NodeToken in_false_destination DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
+DscDag::NodeToken DscDag::DagCollection::CreateCondition(
+	NodeToken in_condition, 
+	NodeToken in_true_source, 
+	NodeToken in_false_source, 
+	NodeToken in_true_destination, 
+	NodeToken in_false_destination,
+	IDagGroup* in_dag_group_owner_or_nullptr
+	DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
 {
 	auto node = std::make_unique<DagNodeCondition>(*this, in_true_source, in_false_source, in_true_destination, in_false_destination DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 	NodeToken node_token = node.get();
 	_nodes.insert(std::move(node));
-
+	if (nullptr != in_dag_group_owner_or_nullptr)
+	{
+		in_dag_group_owner_or_nullptr->AddOwnership(node_token);
+	}
 	if (nullptr != in_condition)
 	{
 		LinkIndexNodes(0, in_condition, node_token);

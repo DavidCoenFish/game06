@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_dag.h"
 #include "dag_collection.h"
+#include "i_dag_group.h"
 
 namespace DscDag
 {
@@ -26,7 +27,7 @@ namespace DscDag
 	/// which could require another array of the type ids/ if empty allowed? and if allowed to set? and bring the GetValueType into method this class?
 	/// </summary>
 	template <typename IN_ENUM, std::size_t IN_SIZE>
-	class DagGroup
+	class DagGroup : public IDagGroup
 	{
 	public:
 		DagGroup() {}
@@ -53,7 +54,7 @@ namespace DscDag
 			return *this;
 		}
 
-		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token, const bool in_skip_owned = false)
+		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token)
 		{
 			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < IN_SIZE), "invalid param");
 #if defined(_DEBUG)
@@ -69,20 +70,7 @@ namespace DscDag
 #endif
 			_node_token_array[static_cast<std::size_t>(in_index)] = in_node_token;
 
-			if (false == in_skip_owned)
-			{
-				AddOwnedNodeToken(in_node_token);
-			}
-
 			return;
-		}
-
-		void AddOwnedNodeToken(NodeToken in_node_token)
-		{
-			if (nullptr != in_node_token)
-			{
-				_node_ownership_group.push_back(in_node_token);
-			}
 		}
 
 		NodeToken GetNodeToken(const IN_ENUM in_index) const
@@ -122,6 +110,16 @@ namespace DscDag
 				}
 			}
 			return;
+		}
+
+	private:
+		// move this to an interface and have the DagCollection create functions support it
+		virtual void AddOwnership(NodeToken in_node_token) override
+		{
+			if (nullptr != in_node_token)
+			{
+				_node_ownership_group.push_back(in_node_token);
+			}
 		}
 
 	private:

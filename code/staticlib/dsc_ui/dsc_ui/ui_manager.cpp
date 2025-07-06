@@ -79,34 +79,37 @@ namespace
         DscRenderResource::RenderTargetPool& in_render_target_pool,
         DscDag::DagCollection& in_dag_collection,
         DscDag::NodeToken in_clear_colour,
-        DscDag::NodeToken in_request_size_node)
+        DscDag::NodeToken in_request_size_node,
+        DscUi::UiComponentResourceNodeGroup& in_component_resource_group
+        )
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate<std::shared_ptr<DscUi::UiRenderTarget>>([&in_render_target_pool, &in_draw_system](std::shared_ptr<DscUi::UiRenderTarget>& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            const DscCommon::VectorInt2 request_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
-            const DscCommon::VectorFloat4 clear_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[1]);
+                const DscCommon::VectorInt2 request_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                const DscCommon::VectorFloat4 clear_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[1]);
 
-            if (nullptr == value)
-            {
-                value = std::make_shared<DscUi::UiRenderTarget>(true);
-            }
+                if (nullptr == value)
+                {
+                    value = std::make_shared<DscUi::UiRenderTarget>(true);
+                }
 
-            std::vector<DscRender::RenderTargetFormatData> target_format_data_array = {};
-            target_format_data_array.push_back(
-                DscRender::RenderTargetFormatData(
-                    DXGI_FORMAT_B8G8R8A8_UNORM,
-                    true,
-                    clear_colour
-                )
-            );
-
-            value->UpdateRenderTargetPool(
-                in_draw_system,
-                in_render_target_pool,
-                request_size,
-                clear_colour
+                std::vector<DscRender::RenderTargetFormatData> target_format_data_array = {};
+                target_format_data_array.push_back(
+                    DscRender::RenderTargetFormatData(
+                        DXGI_FORMAT_B8G8R8A8_UNORM,
+                        true,
+                        clear_colour
+                    )
                 );
 
-        } DSC_DEBUG_ONLY(DSC_COMMA "ui render target"));
+                value->UpdateRenderTargetPool(
+                    in_draw_system,
+                    in_render_target_pool,
+                    request_size,
+                    clear_colour
+                    );
+            }, 
+            &in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "ui render target"));
 
         DscDag::DagCollection::LinkIndexNodes(0, in_request_size_node, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_clear_colour, node);
@@ -135,71 +138,72 @@ namespace
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = in_geometry;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = in_shader;
         DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader, in_input_texture_count](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            DscRenderResource::Frame* const frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
-            DSC_ASSERT(nullptr != frame, "invalid state");
-            auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);
-            DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-            auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-            DSC_ASSERT(nullptr != shader_buffer, "invalid state");
-            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
-            const DscCommon::VectorFloat4 effect_param = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
-            const DscCommon::VectorFloat4 effect_tint = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
+                DscRenderResource::Frame* const frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+                DSC_ASSERT(nullptr != frame, "invalid state");
+                auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);
+                DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+                auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+                DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+                const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
+                const DscCommon::VectorFloat4 effect_param = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
+                const DscCommon::VectorFloat4 effect_tint = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
 
-            const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
+                const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
 
-            auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
-            buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
-            buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
-            buffer._effect_param[0] = effect_param[0] * ui_scale;
-            buffer._effect_param[1] = effect_param[1] * ui_scale;
-            buffer._effect_param[2] = effect_param[2] * ui_scale;
-            buffer._effect_param[3] = effect_param[3] * ui_scale;
-            buffer._effect_tint[0] = effect_tint[0];
-            buffer._effect_tint[1] = effect_tint[1];
-            buffer._effect_tint[2] = effect_tint[2];
-            buffer._effect_tint[3] = effect_tint[3];
+                auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
+                buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
+                buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
+                buffer._effect_param[0] = effect_param[0] * ui_scale;
+                buffer._effect_param[1] = effect_param[1] * ui_scale;
+                buffer._effect_param[2] = effect_param[2] * ui_scale;
+                buffer._effect_param[3] = effect_param[3] * ui_scale;
+                buffer._effect_tint[0] = effect_tint[0];
+                buffer._effect_tint[1] = effect_tint[1];
+                buffer._effect_tint[2] = effect_tint[2];
+                buffer._effect_tint[3] = effect_tint[3];
 
-            std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
-            DSC_ASSERT(nullptr != shader, "invalid state");
+                std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
+                DSC_ASSERT(nullptr != shader, "invalid state");
 
-            if (0 < in_input_texture_count)
-            {
-                DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
-                const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
-                buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
-                buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
-                const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
-                buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
-                buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
-                shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
-            }
-            if (1 < in_input_texture_count)
-            {
-                DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
-                const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
-                buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
-                buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
-                const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
-                buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
-                buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
-                shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
-            }
+                if (0 < in_input_texture_count)
+                {
+                    DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
+                    const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
+                    buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
+                    buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
+                    const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
+                    buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
+                    buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
+                    shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
+                }
+                if (1 < in_input_texture_count)
+                {
+                    DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
+                    const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
+                    buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
+                    buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
+                    const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
+                    buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
+                    buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
+                    shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
+                }
 
-            ui_render_target->ActivateRenderTarget(*frame);
-            frame->SetShader(shader, shader_buffer);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
+                ui_render_target->ActivateRenderTarget(*frame);
+                frame->SetShader(shader, shader_buffer);
+                frame->Draw(weak_geometry.lock());
+                frame->SetRenderTarget(nullptr);
 
-            out_value = ui_render_target.get();
-        }
+                out_value = ui_render_target.get();
+            },
+            &in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + "Draw"));
 
         auto shader_buffer = in_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
             shader_buffer,
-            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
+            &in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
-        in_component_resource_group.AddOwnedNodeToken(shader_buffer_node);
 
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
@@ -291,7 +295,8 @@ namespace
             DscUi::TUiComponentResourceNodeGroup::TClearColour,
             in_dag_collection.CreateValue(
                 in_construction_helper._clear_colour,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                &component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
 
         if (true == in_construction_helper._has_fill)
@@ -300,7 +305,8 @@ namespace
                 DscUi::TUiComponentResourceNodeGroup::TFillColour,
                 in_dag_collection.CreateValue(
                     in_construction_helper._fill,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "fill colour")));
         }
 
@@ -310,7 +316,8 @@ namespace
                 DscUi::TUiComponentResourceNodeGroup::TTexture,
                 in_dag_collection.CreateValue(
                     in_construction_helper._texture,
-                    DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function
+                    DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function,
+                    &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "texture")));
         }
 
@@ -320,19 +327,22 @@ namespace
                 DscUi::TUiComponentResourceNodeGroup::TChildSlotSize,
                 in_dag_collection.CreateValue(
                     in_construction_helper._child_size,
-                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function
+                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                    &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "child slot size")));
             component_resource_group.SetNodeToken(
                 DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot,
                 in_dag_collection.CreateValue(
                     in_construction_helper._child_pivot,
-                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function
+                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                    &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "child slot pivot")));
             component_resource_group.SetNodeToken(
                 DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach,
                 in_dag_collection.CreateValue(
                     in_construction_helper._attach_point,
-                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function
+                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                    &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "child slot parent attach")));
         }
 
@@ -719,58 +729,69 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
 
     result.SetNodeToken(TUiRootNodeGroup::TFrame, in_dag_collection.CreateValue<DscRenderResource::Frame*>(
         (DscRenderResource::Frame*)(nullptr),
-        DscDag::CallbackNever<DscRenderResource::Frame*>::Function
+        DscDag::CallbackNever<DscRenderResource::Frame*>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "frame")));
 
     result.SetNodeToken(TUiRootNodeGroup::TTimeDelta, in_dag_collection.CreateValue<float>(
         0.0f,
-        DscDag::CallbackNoZero<float>::Function
+        DscDag::CallbackNoZero<float>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "time delta")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiScale, in_dag_collection.CreateValue(
         1.0f,
-        DscDag::CallbackOnValueChange<float>::Function
+        DscDag::CallbackOnValueChange<float>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui scale")));
 
     result.SetNodeToken(TUiRootNodeGroup::TInputState, in_dag_collection.CreateValue(
         UiInputState(),
-        DscDag::CallbackOnSetValue<UiInputState>::Function
+        DscDag::CallbackOnSetValue<UiInputState>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "input state")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiComponentType, in_dag_collection.CreateValue(
         in_construction_helper._component_type,
-        DscDag::CallbackOnValueChange<TUiComponentType>::Function
+        DscDag::CallbackOnValueChange<TUiComponentType>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
 
     result.SetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
         std::vector<UiNodeGroup>(),
-        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function
+        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
     result.SetNodeToken(TUiRootNodeGroup::TForceDraw, in_dag_collection.CreateValue<bool>(
         false,
-        DscDag::CallbackNoZero<bool>::Function
+        DscDag::CallbackNoZero<bool>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "force draw")));
 
     result.SetNodeToken(TUiRootNodeGroup::TUiRenderTarget, in_dag_collection.CreateValue(
         in_ui_render_target,
-        DscDag::CallbackOnSetValue<std::shared_ptr<DscUi::UiRenderTarget>>::Function
+        DscDag::CallbackOnSetValue<std::shared_ptr<DscUi::UiRenderTarget>>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui render target")));
 
     result.SetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize, in_dag_collection.CreateValue(
         DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "render target size")));
 
     result.SetNodeToken(TUiRootNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(
         DscCommon::VectorFloat4::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
 
     UiComponentResourceNodeGroup component_resource_node_group;
     component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, in_dag_collection.CreateValue(
         in_construction_helper._clear_colour,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
 
     auto draw_node = MakeDrawStack(
@@ -795,7 +816,8 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
 
     result.SetNodeToken(TUiRootNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<DscUi::UiComponentResourceNodeGroup>(
         component_resource_node_group,
-        DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function
+        DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "component resource node group")));
 
     result.Validate();
@@ -810,23 +832,25 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
 {
     UiNodeGroup result;
 
-    result.SetNodeToken(TUiNodeGroup::TDrawNode, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawNode), true);
-    result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentType), true);
-    result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources), true);
-    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup), true);
-    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), true);
-    result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), true);
-    result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize), true);
-    result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), true);
+    result.SetNodeToken(TUiNodeGroup::TDrawNode, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TDrawNode));
+    result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentType));
+    result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources));
+    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup));
+    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
+    result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize));
+    result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
         in_dag_collection.CreateValue(
             DscCommon::VectorFloat2::s_zero,
-            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function
+            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function,
+            &result
             DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
     result.SetNodeToken(TUiNodeGroup::TScrollPos,
         in_dag_collection.CreateValue(
             DscCommon::VectorFloat2::s_zero,
-            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function
+            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function,
+            &result
             DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
 
     result.Validate();
@@ -848,25 +872,29 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 
     result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<DscUi::UiComponentResourceNodeGroup>(
         MakeComponentResourceGroup(in_dag_collection, in_construction_helper),
-        DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function
+        DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "component resource node group")));
 
     result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_dag_collection.CreateValue(
         in_construction_helper._component_type,
-        DscDag::CallbackOnValueChange<TUiComponentType>::Function
+        DscDag::CallbackOnValueChange<TUiComponentType>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
 
     {
         auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
         result.SetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer, in_dag_collection.CreateValue(
             panel_shader_constant_buffer,
-            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
+            &result
             DSC_DEBUG_ONLY(DSC_COMMA "ui panel shader constant buffer")));
     }
 
     result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
         std::vector<UiNodeGroup>(),
-        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function
+        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
     //TAvaliableSize calculate our avaliable size
@@ -877,7 +905,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
     avaliable size
     result.SetNodeToken(TUiNodeGroup::TAvaliableSize)
     */
-    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_parent.GetNodeToken(TUiNodeGroup::TRenderRequestSize), true);
+    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_parent.GetNodeToken(TUiNodeGroup::TRenderRequestSize));
 
     // calculate our desired size
     // calculate our geometry offset
@@ -887,31 +915,36 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
     // TRenderRequestSize draw needs to know the size we want for our texture
     result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_dag_collection.CreateValue(
         DscCommon::VectorInt2(100, 100), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
 
     //TGeometryOffset, // public so parent can panel draw this node
     result.SetNodeToken(TUiNodeGroup::TGeometryOffset, in_dag_collection.CreateValue(
         DscCommon::VectorFloat2(0, 0), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
 
     //TGeometrySize, // public so parent can panel draw this node
     result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_dag_collection.CreateValue(
         DscCommon::VectorInt2(100, 100), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "geometry size")));
 
     //TScrollPos, // where is the geometry size quad is on the render target texture
     result.SetNodeToken(TUiNodeGroup::TScrollPos, in_dag_collection.CreateValue(
         DscCommon::VectorFloat2(0, 0), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
 
     //TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
     result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(
         DscCommon::VectorFloat4(0, 0, 0, 0),
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+        &result
         DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
 
     UiComponentResourceNodeGroup& component_resource_node_group = DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources), false);
@@ -1018,7 +1051,9 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 *_render_target_pool, 
                 in_dag_collection, 
                 component_clear_colour,
-                in_render_request_size_node);
+                in_render_request_size_node,
+                in_component_resource_group
+                );
         }
 
         last_draw_node = MakeDrawNode(
@@ -1053,7 +1088,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             {
                 DscDag::NodeToken effect_clear_colour = in_dag_collection.CreateValue(
                     DscCommon::VectorFloat4::s_zero,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));
 
                 // you could put this in the effect_param_array, but then the stride of the effect param could be weird
@@ -1064,18 +1100,22 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     *_render_target_pool, 
                     in_dag_collection, 
                     effect_clear_colour, 
-                    in_render_request_size_node);
+                    in_render_request_size_node,
+                    in_component_resource_group
+                    );
             }
 
             const auto& effect_data = in_effect_array[index];
             DscDag::NodeToken effect_param = in_dag_collection.CreateValue(
                 effect_data._effect_param,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                &in_component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
             effect_param_array.push_back(effect_param);
             DscDag::NodeToken effect_tint = in_dag_collection.CreateValue(
                 effect_data._effect_param_tint,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function
+                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                &in_component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
             effect_param_array.push_back(effect_tint);
 
@@ -1103,7 +1143,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
         in_component_resource_group.SetNodeToken(TUiComponentResourceNodeGroup::TEffectParamArray,
             in_dag_collection.CreateValue(
                 effect_param_array,
-                DscDag::CallbackNever<std::vector<DscDag::NodeToken>>::Function
+                DscDag::CallbackNever<std::vector<DscDag::NodeToken>>::Function,
+                &in_component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "effect param array")
             ));
     }
@@ -1168,15 +1209,16 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             frame->SetRenderTarget(nullptr);
 
             out_value = ui_render_target.get();
-        }
+        },
+            & in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 
         auto shader_buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
             shader_buffer,
-            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
+            &in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
-        //todo: add shader_buffer to in_component_resource_group?
 
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
@@ -1208,19 +1250,21 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             frame->SetRenderTarget(nullptr);
 
             out_value = ui_render_target.get();
-        }
+        },
+            & in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 
         auto shader_buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
             shader_buffer,
-            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
+            &in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
-        in_component_resource_group.AddOwnedNodeToken(shader_buffer_node);
 
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
+        DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TFillColour), "invalid state");
         DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TFillColour), result_node);
     }
     break;
@@ -1243,13 +1287,15 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             frame->SetRenderTarget(nullptr);
 
             out_value = ui_render_target.get();
-        }
+        },
+            & in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 
         DSC_ASSERT(nullptr != in_construction_helper_or_null, "invalid state");
         auto texture_node = in_dag_collection.CreateValue(
             in_construction_helper_or_null->_texture,
-            DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function
+            DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function,
+            &in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA "fill colour"));
         in_component_resource_group.SetNodeToken(TUiComponentResourceNodeGroup::TTexture, texture_node);
 
@@ -1308,7 +1354,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             }
 
             out_value = ui_render_target.get();
-        }
+        },
+            & in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);

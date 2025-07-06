@@ -3,6 +3,7 @@
 #include <dsc_common\dsc_common.h>
 #include <dsc_common\log_system.h>
 #include <dsc_dag\i_dag_node.h>
+#include <dsc_dag\i_dag_group.h>
 #include <dsc_dag\dag_enum.h>
 #include <dsc_dag\dag_node_value.h>
 #include <dsc_dag\dag_node_value_unique.h>
@@ -21,37 +22,64 @@ namespace DscDag
 		template <typename IN_TYPE>
 		NodeToken CreateValue(
 			const IN_TYPE& in_value,
-			typename const DscDag::DagNodeValue<IN_TYPE>::TCallbackOnSet& in_on_set_callback = typename DscDag::CallbackOnValueChange<IN_TYPE>::Function
+			typename const DscDag::DagNodeValue<IN_TYPE>::TCallbackOnSet& in_on_set_callback = typename DscDag::CallbackOnValueChange<IN_TYPE>::Function,
+			IDagGroup* in_dag_group_owner_or_nullptr = nullptr
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 		{
 			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value, in_on_set_callback DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 			NodeToken node_token = node.get();
 			_nodes.insert(std::move(node));
+			if (nullptr != in_dag_group_owner_or_nullptr)
+			{
+				in_dag_group_owner_or_nullptr->AddOwnership(node_token);
+			}
 			return node_token;
 		}
 
 		template <typename IN_TYPE>
-		NodeToken CreateValueUnique(std::unique_ptr<IN_TYPE>&& in_value DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
+		NodeToken CreateValueUnique(
+			std::unique_ptr<IN_TYPE>&& in_value,
+			IDagGroup* in_dag_group_owner_or_nullptr = nullptr
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
 		{
 			auto node = std::make_unique<DagNodeValueUnique<IN_TYPE>>(std::move(in_value) DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 			NodeToken node_token = node.get();
 			_nodes.insert(std::move(node));
+			if (nullptr != in_dag_group_owner_or_nullptr)
+			{
+				in_dag_group_owner_or_nullptr->AddOwnership(node_token);
+			}
 			return node_token;
 		}
 
 		template <typename IN_TYPE>
-		NodeToken CreateCalculate(const typename DagNodeCalculate<IN_TYPE>::TCalculateFunction& in_calculate  DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
+		NodeToken CreateCalculate(
+			const typename DagNodeCalculate<IN_TYPE>::TCalculateFunction& in_calculate,
+			IDagGroup* in_dag_group_owner_or_nullptr = nullptr
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
 		{
 			auto node = std::make_unique<DagNodeCalculate<IN_TYPE>>(in_calculate DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 			NodeToken node_token = node.get();
 			_nodes.insert(std::move(node));
+			if (nullptr != in_dag_group_owner_or_nullptr)
+			{
+				in_dag_group_owner_or_nullptr->AddOwnership(node_token);
+			}
 			return node_token;
 		}
 
-		// note. we expect index input 0 to be a true/ false node, index input 1 to be true source value, and index input 2 to be false source
-		// these can be set latter, for convienience, they are param here and automatically linked
-		// condition doesn't have a normal link to destination node, they are only set when the condition is updated/ resolved. see ResolveDirtyConditionNodes
-		NodeToken CreateCondition(NodeToken in_condition, NodeToken in_true_source, NodeToken in_false_source, NodeToken in_true_destination, NodeToken in_false_destination DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
+		/// note. we expect index input 0 to be a true/ false node to use as the condition, this also means the condition node is dirtied if the condition input is dirtied
+		/// the in_true_source and in_false_source are only linked to the dirty path of the destination when the condition has calculated as true
+		/// THERE is a small window when condition is wating to change, that the non logically correct source and destination can be linked
+		/// condition doesn't have a normal link to destination node, they are only set when the condition is updated/ resolved. see ResolveDirtyConditionNodes
+		NodeToken CreateCondition(
+			NodeToken in_condition, 
+			NodeToken in_true_source, 
+			NodeToken in_false_source, 
+			NodeToken in_true_destination, 
+			NodeToken in_false_destination,
+			IDagGroup* in_dag_group_owner_or_nullptr = nullptr
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""));
 
 		// should already have all links removed? assert if links still exisit?
 		void DeleteNode(NodeToken in_node);
