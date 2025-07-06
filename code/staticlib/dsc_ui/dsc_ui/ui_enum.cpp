@@ -1,6 +1,7 @@
 #include "ui_enum.h"
 #include "ui_render_target.h"
 #include "ui_input_state.h"
+#include "vector_ui_coord2.h"
 #include <dsc_dag/dag_group.h>
 #include <dsc_render_resource/shader_resource.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
@@ -141,6 +142,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TUiPanelShaderConstantBuffer:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
+		return s_meta_data;
+	}
 	}
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;
@@ -154,6 +160,12 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	default:
 		DSC_ASSERT_ALWAYS("invalid switch");
 		break;
+	//case DscUi::TUiComponentResourceNodeGroup::TArrayOwnedNodes:
+	//{
+	//	static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
+	//	return s_meta_data;
+	//}
+
 	case DscUi::TUiComponentResourceNodeGroup::TClearColour:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
@@ -194,17 +206,22 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
-	case DscUi::TUiComponentResourceNodeGroup::TUiPanelShaderConstantBuffer:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
-		return s_meta_data;
-	}
-	case DscUi::TUiComponentResourceNodeGroup::TArrayOwnedNodes:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
-		return s_meta_data;
-	}
 
+	case DscUi::TUiComponentResourceNodeGroup::TChildSlotSize:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
+		return s_meta_data;
+	}
 	}
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };

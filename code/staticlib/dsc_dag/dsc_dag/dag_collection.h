@@ -16,6 +16,8 @@ namespace DscDag
 	class DagCollection
 	{
 	public:
+		//should these create methods also take an optional interface of a group owner, to make unlinking and removing a group of nodes easier?
+
 		template <typename IN_TYPE>
 		NodeToken CreateValue(
 			const IN_TYPE& in_value,
@@ -90,7 +92,35 @@ namespace DscDag
 			auto value_unique_node = dynamic_cast<DagNodeValueUnique< IN_TYPE>*>(in_input);
 			if (nullptr != value_unique_node)
 			{
-				return *value_unique_node->GetValue();
+				IN_TYPE* value = value_unique_node->GetValue(false);
+				DSC_ASSERT(nullptr != value, "invalid state");
+				return *value;
+			}
+
+			DSC_ASSERT_ALWAYS("invalid code path");
+			static IN_TYPE kData = {};
+			return kData;
+		}
+
+		template <typename IN_TYPE>
+		static IN_TYPE& GetValueNonConstRef(NodeToken in_input, const bool in_set_dirty)
+		{
+			DSC_ASSERT(nullptr != in_input, "invalid param");
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
+			DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
+
+			auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
+			if (nullptr != value_node)
+			{
+				return value_node->GetValueNonConst(in_set_dirty);
+			}
+
+			auto value_unique_node = dynamic_cast<DagNodeValueUnique< IN_TYPE>*>(in_input);
+			if (nullptr != value_unique_node)
+			{
+				IN_TYPE* value = value_unique_node->GetValue(in_set_dirty);
+				DSC_ASSERT(nullptr != value, "invalid state");
+				return *value;
 			}
 
 			DSC_ASSERT_ALWAYS("invalid code path");

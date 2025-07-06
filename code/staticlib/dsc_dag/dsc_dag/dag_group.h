@@ -48,11 +48,12 @@ namespace DscDag
 				{
 					_node_token_array[index] = in_rhs._node_token_array[index];
 				}
+				_node_ownership_group = in_rhs._node_ownership_group;
 			}
 			return *this;
 		}
 
-		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token)
+		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token, const bool in_skip_owned = false)
 		{
 			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < IN_SIZE), "invalid param");
 #if defined(_DEBUG)
@@ -67,7 +68,21 @@ namespace DscDag
 			}
 #endif
 			_node_token_array[static_cast<std::size_t>(in_index)] = in_node_token;
+
+			if (false == in_skip_owned)
+			{
+				AddOwnedNodeToken(in_node_token);
+			}
+
 			return;
+		}
+
+		void AddOwnedNodeToken(NodeToken in_node_token)
+		{
+			if (nullptr != in_node_token)
+			{
+				_node_ownership_group.push_back(in_node_token);
+			}
 		}
 
 		NodeToken GetNodeToken(const IN_ENUM in_index) const
@@ -111,6 +126,9 @@ namespace DscDag
 
 	private:
 		NodeToken _node_token_array[IN_SIZE] = {};
+
+		// trying to make it easier to latter collect all the nodes that are to be removed as a group
+		std::vector<NodeToken> _node_ownership_group = {};
 
 	}; // DagGroup
 } //DscDag

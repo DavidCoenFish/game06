@@ -83,7 +83,10 @@ namespace DscUi
 		{
 			TUiComponentType _component_type;
 			DscCommon::VectorFloat4 _clear_colour;
+
+			bool _has_fill = false;
 			DscCommon::VectorFloat4 _fill;
+
 			std::shared_ptr<DscRenderResource::ShaderResource> _texture;
 
 			bool _has_child_slot_data = false;

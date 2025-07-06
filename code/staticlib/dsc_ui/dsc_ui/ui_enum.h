@@ -96,13 +96,16 @@ namespace DscUi
 		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
 		TUiComponentType,
 		TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
-		TArrayChildUiNodeGroup,
+		TArrayChildUiNodeGroup, // so, there is an issue with this, handing around a COPY of a UiNodeGroup is a slight risk of stale data if reference is held elsewhere, use with care
 		TAvaliableSize, // the initial layout size we were told by the parent that we had avaliable
 		TRenderRequestSize, // the size that is used to request the render target from the resource pool (or the viewport size of the external render target given to the top level node) (max of desired size and geometry size)
 		TGeometryOffset, // public so parent can panel draw this node
 		TGeometrySize, // public so parent can panel draw this node
 		TScrollPos, // where is the geometry size quad is on the render target texture
 		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
+		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiComponentResourceNodeGroup or TUiNodeGroup?
+		// trying to have everything to do with layout, or for parent to draw, in the TUiNodeGroup layer
+		// for everything else, put into the TUiComponentResources UiComponentResourceNodeGroup
 
 		TCount
 	};
@@ -117,20 +120,23 @@ namespace DscUi
 	//this is ment as the data store for a UiComponent, but we replaced the UiComponent with a dag node/ node group...
 	enum class TUiComponentResourceNodeGroup : uint8
 	{
-		//TUiRenderTarget, // the root has a token for this, but nothing else directly need this, just have node ownership into the TArrayOwnedNodes
+		//TArrayOwnedNodes, //what nodes do we need to delete if this component is removed, try to list every created node
+
+		//TUiRenderTarget, // the root has a token for this, but nothing else directly need this, just have node ownership into the TArrayOwnedNodes, and ref by required draw nodes
 		// don't animate ClearColour, is used as the clear colour value with the render target texture. make better to animate a effect tint param?
 		TClearColour,
 		TFillColour,
 		TTexture,
-		TEffectParamArray,
+		TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
 		THasManualScrollX,
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
 
-		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiNodeGroup?
-		
-		TArrayOwnedNodes, //what nodes to delete if this component is removed
+		// child slots of presumably a canvas parent, but there may be things other than a canvas that can hold child slots?
+		TChildSlotSize,
+		TChildSlotPivot,
+		TChildSlotParentAttach,
 
 		TCount
 	};
