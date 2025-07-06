@@ -138,6 +138,12 @@ namespace DscUi
 		TChildSlotPivot,
 		TChildSlotParentAttach,
 
+		// lower priority than child slots, but still modify the avaliable(layout) size handed down by the parent
+		TPaddingLeft,
+		TPaddingTop,
+		TPaddingRight,
+		TPaddingBottom,
+
 		TCount
 	};
 	typedef DscDag::DagGroup<TUiComponentResourceNodeGroup, static_cast<std::size_t>(TUiComponentResourceNodeGroup::TCount)> UiComponentResourceNodeGroup;

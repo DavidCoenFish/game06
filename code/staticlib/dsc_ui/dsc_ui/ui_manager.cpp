@@ -346,9 +346,244 @@ namespace
                     DSC_DEBUG_ONLY(DSC_COMMA "child slot parent attach")));
         }
 
+        if (true == in_construction_helper._has_padding)
+        {
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TPaddingLeft,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._padding_left,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "padding left")));
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TPaddingTop,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._padding_top,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "padding top")));
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TPaddingRight,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._padding_right,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "padding right")));
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TPaddingBottom,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._padding_bottom,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "padding bottom")));
+        }
+
+
         return component_resource_group;
     }
 
+
+    DscDag::NodeToken MakeAvaliableSize(
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::NodeToken in_parent_avaliable_size,
+        DscDag::NodeToken in_ui_scale,
+        const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        DscUi::UiNodeGroup& in_owner_group
+    )
+    {
+        DscDag::NodeToken node = in_parent_avaliable_size;
+        if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                    const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[1]);
+                    const DscUi::VectorUiCoord2& child_slot_size = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[2]);
+
+                    value = child_slot_size.EvalueUICoord(parent_avaliable_size, ui_scale);
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "avaliable size child slot"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_parent_avaliable_size, node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
+            DscDag::DagCollection::LinkIndexNodes(2, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize), node);
+        }
+        else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft))
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                    const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[1]);
+                    const DscUi::UiCoord& left = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[2]);
+                    const DscUi::UiCoord& top = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[3]);
+                    const DscUi::UiCoord& right = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[4]);
+                    const DscUi::UiCoord& bottom = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[5]);
+
+                    const int32 width_taken_by_padding = left.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale) +
+                        right.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale);
+                    const int32 height_taken_by_padding = top.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale) +
+                        bottom.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale);
+
+                    value.Set(
+                        parent_avaliable_size.GetX() - width_taken_by_padding,
+                        parent_avaliable_size.GetY() - height_taken_by_padding
+                    );
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "avaliable size padding"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_parent_avaliable_size, node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
+            DscDag::DagCollection::LinkIndexNodes(2, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft), node);
+            DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingTop), node);
+            DscDag::DagCollection::LinkIndexNodes(4, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingRight), node);
+            DscDag::DagCollection::LinkIndexNodes(5, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingBottom), node);
+        }
+        return node;
+    }
+
+    DscDag::NodeToken MakeDesiredSize(
+        const DscUi::TUiComponentType in_component_type,
+        const bool in_desired_size_from_children_max,
+        DscDag::DagCollection & in_dag_collection,
+        DscDag::NodeToken in_ui_scale,
+        DscDag::NodeToken in_avaliable_size,
+        DscDag::NodeToken in_array_child_node_group,
+        const DscUi::UiComponentResourceNodeGroup& in_resource_node_group,
+        DscUi::UiNodeGroup & in_owner_group
+    )
+    {
+        DSC_UNUSED(in_component_type);
+        DSC_UNUSED(in_resource_node_group);
+        DSC_UNUSED(in_ui_scale);
+        DscDag::NodeToken node = in_avaliable_size;
+        //if text, get text bounds size
+        if (true == in_desired_size_from_children_max)
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const std::vector<DscUi::UiNodeGroup>& array_child_node_group = DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_input_array[0]);
+                    DscCommon::VectorInt2 max_size = {};
+                    for (const auto& item : array_child_node_group)
+                    {
+                        const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType< DscCommon::VectorInt2>(item.GetNodeToken(DscUi::TUiNodeGroup::TGeometryOffset));
+                        const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType< DscCommon::VectorInt2>(item.GetNodeToken(DscUi::TUiNodeGroup::TGeometrySize));
+
+                        max_size.Set(
+                            std::max(max_size.GetX(), geometry_offset.GetX() + geometry_size.GetX()),
+                            std::max(max_size.GetY(), geometry_offset.GetY() + geometry_size.GetY())
+                        );
+                    }
+
+                    value = max_size;
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "desired size max children"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_array_child_node_group, node);
+        }
+
+        return node;
+    }
+
+    DscDag::NodeToken MakeRenderRequestSize(
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::NodeToken in_desired_size,
+        DscDag::NodeToken in_geometry_size_size,
+        DscUi::UiNodeGroup& in_owner_group
+        )
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const DscCommon::VectorInt2& desired_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+
+                value.Set(
+                    std::max(desired_size.GetX(), geometry_size.GetX()),
+                    std::max(desired_size.GetY(), geometry_size.GetY())
+                    );
+            },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "avaliable size child slot"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_desired_size, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_geometry_size_size, node);
+        return node;
+    }
+
+    DscDag::NodeToken MakeGeometrySize(
+        DscDag::DagCollection& in_dag_collection,
+        //const DscUi::TUiComponentType in_parent_ui_component_type,
+        const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        DscDag::NodeToken in_desired_size,
+        DscDag::NodeToken in_avaliable_size,
+        DscUi::UiNodeGroup& in_owner_group
+    )
+    {
+        DSC_UNUSED(in_dag_collection);
+        DSC_UNUSED(in_owner_group);
+        DscDag::NodeToken node = in_desired_size;
+        if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
+        {
+            // if we have a child slot, presume we are behaving like a canvas that has the geometry size the same as the avaliable size
+            node = in_avaliable_size;
+        }
+        // todo: how to detect if we are a stack like child node
+        // node = desired_size;
+
+        DSC_ASSERT(nullptr != node, "invalid state");
+        return node;
+    }
+
+    DscDag::NodeToken MakeGeometryOffset(
+        DscDag::DagCollection& in_dag_collection,
+        //const DscUi::TUiComponentType in_parent_ui_component_type,
+        const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        DscDag::NodeToken in_parent_avaliable_size,
+        DscDag::NodeToken in_ui_scale,
+        DscDag::NodeToken in_geometry_size,
+        DscDag::NodeToken in_array_child_ui_node_group,
+        DscUi::UiNodeGroup& in_owner_group
+    )
+    {
+        DSC_UNUSED(in_array_child_ui_node_group);
+
+        DscDag::NodeToken node = nullptr;
+        if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                    const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[1]);
+                    const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[2]);
+
+                    const DscUi::VectorUiCoord2& child_slot_pivot = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[3]);
+                    const DscUi::VectorUiCoord2& child_slot_parent_attach = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[4]);
+
+                    const DscCommon::VectorInt2 pivot_point = child_slot_pivot.EvalueUICoord(geometry_size, ui_scale);
+                    const DscCommon::VectorInt2 attach_point = child_slot_parent_attach.EvalueUICoord(parent_avaliable_size, ui_scale);
+
+                    value.Set(
+                        attach_point.GetX() - pivot_point.GetX(),
+                        attach_point.GetY() - pivot_point.GetY()
+                    );
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "geometry offset child slot"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_parent_avaliable_size, node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
+            DscDag::DagCollection::LinkIndexNodes(2, in_geometry_size, node); // should this be avaliable size or geometry size
+            DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot), node);
+            DscDag::DagCollection::LinkIndexNodes(4, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach), node);
+        }
+        else
+        {
+            node = in_dag_collection.CreateValue<DscCommon::VectorInt2>(
+                DscCommon::VectorInt2::s_zero,
+                DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function,
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "geometry offset zero"));
+        }
+
+        return node;
+    }
 
 } // namespace
 
@@ -842,8 +1077,8 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
     result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
         in_dag_collection.CreateValue(
-            DscCommon::VectorFloat2::s_zero,
-            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function,
+            DscCommon::VectorInt2::s_zero,
+            DscDag::CallbackNever<DscCommon::VectorInt2>::Function,
             &result
             DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
     result.SetNodeToken(TUiNodeGroup::TScrollPos,
@@ -870,7 +1105,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 {
     UiNodeGroup result;
 
-    result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<DscUi::UiComponentResourceNodeGroup>(
+    result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<UiComponentResourceNodeGroup>(
         MakeComponentResourceGroup(in_dag_collection, in_construction_helper),
         DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function,
         &result
@@ -881,6 +1116,12 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         DscDag::CallbackOnValueChange<TUiComponentType>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
+
+    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue(
+        std::vector<UiNodeGroup>(),
+        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
+        &result
+        DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
     {
         auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
@@ -897,41 +1138,60 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
-    //TAvaliableSize calculate our avaliable size
-    /*
-    in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize);
-    in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale);
-    =>
-    avaliable size
-    result.SetNodeToken(TUiNodeGroup::TAvaliableSize)
-    */
-    result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_parent.GetNodeToken(TUiNodeGroup::TRenderRequestSize));
+    //calculate our avaliable size
+    result.SetNodeToken(
+        TUiNodeGroup::TAvaliableSize, 
+        MakeAvaliableSize(
+            in_dag_collection,
+            in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize),
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
+            DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+            result
+        ));
 
-    // calculate our desired size
-    // calculate our geometry offset
-    // calculate our geometry size
+    // calculate our desired size (for stack, this is all the contents, for text, the text render size (if width limit, limit is the avaliable size width))
+    DscDag::NodeToken desired_size = MakeDesiredSize(
+        in_construction_helper._component_type,
+        in_construction_helper._desired_size_from_children_max,
+        in_dag_collection,
+        in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
+        result.GetNodeToken(TUiNodeGroup::TAvaliableSize),
+        result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
+        DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+        result
+        );
 
-    // todo: calculate our render request size (max desired and geometry size)
-    // TRenderRequestSize draw needs to know the size we want for our texture
-    result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_dag_collection.CreateValue(
-        DscCommon::VectorInt2(100, 100), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "render request size")));
+    //TGeometrySize
+    result.SetNodeToken(TUiNodeGroup::TGeometrySize,
+        MakeGeometrySize(
+            in_dag_collection,
+            DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+            desired_size,
+            result.GetNodeToken(TUiNodeGroup::TAvaliableSize),
+            result
+        ));
 
-    //TGeometryOffset, // public so parent can panel draw this node
-    result.SetNodeToken(TUiNodeGroup::TGeometryOffset, in_dag_collection.CreateValue(
-        DscCommon::VectorFloat2(0, 0), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
-
-    //TGeometrySize, // public so parent can panel draw this node
-    result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_dag_collection.CreateValue(
-        DscCommon::VectorInt2(100, 100), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorInt2>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "geometry size")));
+    //TGeometryOffset
+    result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
+        MakeGeometryOffset(
+            in_dag_collection,
+            //DscDag::DagCollection::GetValueType<TUiComponentType>(in_parent.GetNodeToken(TUiNodeGroup::TUiComponentType)),
+            DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+            in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize),
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
+            result.GetNodeToken(TUiNodeGroup::TGeometrySize),
+            result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
+            result
+        ));
+        
+    // calculate our render request size (max desired and geometry size)
+    result.SetNodeToken(TUiNodeGroup::TRenderRequestSize,
+        MakeRenderRequestSize(
+            in_dag_collection,
+            desired_size,
+            result.GetNodeToken(TUiNodeGroup::TGeometrySize),
+            result
+        ));
 
     //TScrollPos, // where is the geometry size quad is on the render target texture
     result.SetNodeToken(TUiNodeGroup::TScrollPos, in_dag_collection.CreateValue(
@@ -1330,10 +1590,10 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                 auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
                 //float _pos_size[4]; // _pos_x_y_size_width_height;
                 // geometry is in range [-1 ... 1], but we want the offset relative to top left
-                const DscCommon::VectorFloat2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
+                const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
                 const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
-                buffer._pos_size[0] = ((geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
-                buffer._pos_size[1] = ((1.0f - (geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
+                buffer._pos_size[0] = (static_cast<float>(geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
+                buffer._pos_size[1] = ((1.0f - static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
                 buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
                 buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
 

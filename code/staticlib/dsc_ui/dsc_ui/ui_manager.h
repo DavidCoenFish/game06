@@ -51,6 +51,30 @@ namespace DscText
 	class TextRun;
 }
 
+/*
+layout calculation summary
+root node is paired with an externally supplied UiRenderTaget, which could be created from  the backbuffer or an arbitary texture, that is the initial avalaible size for the layout
+
+avaliable size:
+a child node makes an avaliable size based on the parent avalable size, if it has child slot data, use that, if it has padding, use that to effect the avaliable size
+
+desired size:
+the child node uses that calculated avaliable size to make a desired size which is based on content, like the bounds of a text block, or the max of all children (geometry offset + size)
+
+geometry size: 
+based on the parent component type, canvas geometry size is the avaliable size for the child. for a stack, it is the desired size. 
+
+geometry offset:
+relative to the parent top left, where to position the gaometry to draw on parent
+
+render request size:
+what size to request a render target to draw the child onto, max of desired and geometry size
+
+scroll:
+if the desired size is bigger than the the geometry size, automatically scroll the visible area of the child in the parent geometry window, can also be scrolled manually
+
+note, some of the steps may feel redundant, but breaking up the steps so that a parent like a stack, can use the children geometry size in it's desired size caculation, based on it's own avaliable ise handed down to the children
+*/
 namespace DscUi
 {
 	class IUiComponent;
@@ -94,6 +118,28 @@ namespace DscUi
 			VectorUiCoord2 _child_pivot = {};
 			VectorUiCoord2 _attach_point = {};
 
+			bool _has_padding = false;
+			UiCoord _padding_left = {};
+			UiCoord _padding_top = {};
+			UiCoord _padding_right = {};
+			UiCoord _padding_bottom = {};
+
+			// gap between items for stack
+			bool _has_gap = false;
+			UiCoord _gap = {};
+
+			bool _has_stack_attach = false;
+			UiCoord _stack_pivot = {};
+			UiCoord _stack_parent_attach_point = {};
+
+			bool _desired_size_from_children_max = false; // otherwise from text? or matches avaliable
+
+			// canvas- geometry size is avaliable
+			// stack- geometry size is max (avaliable, desired)
+
+			// canvas - geometry offset is from child slot
+			// stack - geometry offset is from prev child plus gap, else from top left
+
 			TComponentConstructionHelper& SetClearColour(
 				const DscCommon::VectorFloat4& in_clear_colour
 			)
@@ -101,7 +147,7 @@ namespace DscUi
 				_clear_colour = in_clear_colour;
 				return *this;
 			}
-			TComponentConstructionHelper& SetCanvasSlot(
+			TComponentConstructionHelper& SetChildSlot(
 				const VectorUiCoord2& in_child_size,
 				const VectorUiCoord2& in_child_pivot,
 				const VectorUiCoord2& in_attach_point
@@ -111,6 +157,20 @@ namespace DscUi
 				_child_size = in_child_size;
 				_child_pivot = in_child_pivot;
 				_attach_point = in_attach_point;
+				return *this;
+			}
+			TComponentConstructionHelper& SetPadding(
+				const UiCoord& in_padding_left,
+				const UiCoord& in_padding_top,
+				const UiCoord& in_padding_right,
+				const UiCoord& in_padding_bottom
+				)
+			{
+				_has_padding = true;
+				_padding_left = in_padding_left;
+				_padding_top = in_padding_top;
+				_padding_right = in_padding_right;
+				_padding_bottom = in_padding_bottom;
 				return *this;
 			}
 		};
@@ -146,6 +206,11 @@ namespace DscUi
 			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
 		);
+
+		/// also destroys all children, 
+		//void DestroyRootNode(UiRootNodeGroup& in_root_node_group);
+		/// we destoy the child, as it is not in a good way after being removed, a lot of it's links will be broken
+		//void RemoveAndDestroyChild(const UiNodeGroup& in_parent, const UiNodeGroup& in_child)
 
 		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
 

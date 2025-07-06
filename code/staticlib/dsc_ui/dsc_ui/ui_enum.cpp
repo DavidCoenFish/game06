@@ -123,8 +123,8 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	}
 	case DscUi::TUiNodeGroup::TGeometryOffset: // public so parent can panel draw this node
 	{
-		// does this need to be a float so we can animate move?
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat2) };
+		// does this need to be a float so we can animate move? dont animate via this value, used for layout
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TGeometrySize:
@@ -222,6 +222,28 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
 		return s_meta_data;
 	}
+
+	case DscUi::TUiComponentResourceNodeGroup::TPaddingLeft:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TPaddingTop:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TPaddingRight:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TPaddingBottom:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
+
 	}
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
