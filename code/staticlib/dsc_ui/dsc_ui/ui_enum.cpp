@@ -160,15 +160,15 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	default:
 		DSC_ASSERT_ALWAYS("invalid switch");
 		break;
-	//case DscUi::TUiComponentResourceNodeGroup::TArrayOwnedNodes:
-	//{
-	//	static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
-	//	return s_meta_data;
-	//}
 
 	case DscUi::TUiComponentResourceNodeGroup::TClearColour:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TUiScale:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(float) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TFillColour:
@@ -181,6 +181,16 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::shared_ptr<DscRenderResource::ShaderResource>) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TText:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiComponentTextData) };
+		return s_meta_data;
+	}
+	//case DscUi::TUiComponentResourceNodeGroup::TWidthUiScale:
+	//{
+	//	static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiComponentWidthUiScale) };
+	//	return s_meta_data;
+	//}
 	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
@@ -206,7 +216,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
-
 	case DscUi::TUiComponentResourceNodeGroup::TChildSlotSize:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
@@ -222,7 +231,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
 		return s_meta_data;
 	}
-
 	case DscUi::TUiComponentResourceNodeGroup::TPaddingLeft:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };

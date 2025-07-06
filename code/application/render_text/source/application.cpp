@@ -34,7 +34,7 @@ namespace
 
         if (0 == image_data.size())
         {
-            DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "zero size image:", in_path.c_str());
+            DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "zero size image:%s\n", in_path.c_str());
             return -1;
         }
 

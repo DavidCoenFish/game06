@@ -8,6 +8,12 @@ namespace DscDag
 	class DagGroup;
 }
 
+namespace DscText
+{
+	class TextManager;
+	class TextRun;
+}
+
 namespace DscUi
 {
 	enum class TUiFlow : uint8
@@ -35,7 +41,8 @@ namespace DscUi
 		TDebugGrid,
 		TFill,
 		TImage,
-		TCanvas
+		TCanvas,
+		TText
 	};
 
 
@@ -45,6 +52,7 @@ namespace DscUi
 		TDebugGrid,
 		TFill,
 		TImage,
+		TText,
 		TEffectDropShadow,
 		TEffectInnerShadow,
 		TEffectCorner,
@@ -117,6 +125,17 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 
 namespace DscUi
 {
+	struct TUiComponentTextData
+	{
+		std::shared_ptr<DscText::TextRun> _text_run = {};
+		DscText::TextManager* _text_manager = nullptr;
+	};
+	//struct TUiComponentWidthUiScale
+	//{
+	//	int32 _scale_width_low_threashhold = 0; // example 800
+	//	float _scale_factor = 0.0f; // 0.0015789 for scale of 4.8 when width is 3040 more than 800,
+	//};
+
 	//this is ment as the data store for a UiComponent, but we replaced the UiComponent with a dag node/ node group...
 	enum class TUiComponentResourceNodeGroup : uint8
 	{
@@ -125,8 +144,13 @@ namespace DscUi
 		//TUiRenderTarget, // the root has a token for this, but nothing else directly need this, just have node ownership into the TArrayOwnedNodes, and ref by required draw nodes
 		// don't animate ClearColour, is used as the clear colour value with the render target texture. make better to animate a effect tint param?
 		TClearColour,
+		TUiScale, // either a ref to the root ui scale, or a UiScale created by the TWidthUiScale
 		TFillColour,
 		TTexture,
+
+		TText,
+		//TWidthUiScale,
+
 		TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
 		THasManualScrollX,
 		TManualScrollX,

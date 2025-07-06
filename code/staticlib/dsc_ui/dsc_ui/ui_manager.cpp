@@ -23,6 +23,8 @@
 #include <dsc_render_resource\shader_pipeline_state_data.h>
 #include <dsc_render_resource\shader_resource.h>
 #include <dsc_render_resource\shader_resource_info.h>
+#include <dsc_text\text_manager.h>
+#include <dsc_text\text_run.h>
 
 namespace
 {
@@ -49,6 +51,8 @@ namespace
             return DscUi::TUiDrawType::TImage;
         case DscUi::TUiComponentType::TCanvas:
             return DscUi::TUiDrawType::TUiPanel;
+        case DscUi::TUiComponentType::TText:
+            return DscUi::TUiDrawType::TText;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -287,7 +291,9 @@ namespace
 
     DscUi::UiComponentResourceNodeGroup MakeComponentResourceGroup(
         DscDag::DagCollection& in_dag_collection,
-        const DscUi::UiManager::TComponentConstructionHelper& in_construction_helper
+        const DscUi::UiManager::TComponentConstructionHelper& in_construction_helper,
+        DscDag::NodeToken in_ui_scale,
+        DscDag::NodeToken in_avaliable_size
         )
     {
         DscUi::UiComponentResourceNodeGroup component_resource_group;
@@ -319,6 +325,44 @@ namespace
                     DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function,
                     &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "texture")));
+        }
+
+        if (nullptr != in_construction_helper._text_run)
+        {
+            DSC_ASSERT(nullptr != in_construction_helper._text_manager, "invalid state");
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TText,
+                in_dag_collection.CreateValue(
+                    DscUi::TUiComponentTextData({ in_construction_helper._text_run , in_construction_helper._text_manager }),
+                    DscDag::CallbackOnSetValue<DscUi::TUiComponentTextData>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "text")));
+        }
+
+        if (true == in_construction_helper._has_ui_scale_by_avaliable_width)
+        {
+            const int32 scale_width_low_threashhold = in_construction_helper._scale_width_low_threashhold;
+            const float scale_factor = in_construction_helper._scale_factor;
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TUiScale,
+                in_dag_collection.CreateCalculate<float>([scale_width_low_threashhold, scale_factor](float& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                    const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+                    if (scale_width_low_threashhold < avaliable_size.GetX())
+                    {
+                        ui_scale = (1.0f + (static_cast<float>(avaliable_size.GetX() - scale_width_low_threashhold) * scale_factor));
+                    }
+
+                    value = ui_scale;
+                },
+                & component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "ui scale from width")));
+            DscDag::DagCollection::LinkIndexNodes(0, in_ui_scale, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
+            DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
+        }
+        else
+        {
+            component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale, in_ui_scale);
         }
 
         if (true == in_construction_helper._has_child_slot_data)
@@ -438,6 +482,7 @@ namespace
             DscDag::DagCollection::LinkIndexNodes(4, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingRight), node);
             DscDag::DagCollection::LinkIndexNodes(5, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingBottom), node);
         }
+
         return node;
     }
 
@@ -456,7 +501,7 @@ namespace
         DSC_UNUSED(in_resource_node_group);
         DSC_UNUSED(in_ui_scale);
         DscDag::NodeToken node = in_avaliable_size;
-        //if text, get text bounds size
+
         if (true == in_desired_size_from_children_max)
         {
             node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
@@ -479,6 +524,32 @@ namespace
                 DSC_DEBUG_ONLY(DSC_COMMA "desired size max children"));
 
             DscDag::DagCollection::LinkIndexNodes(0, in_array_child_node_group, node);
+        }
+        else if (nullptr != in_resource_node_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TText))        //if text, get text bounds size
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                    const DscUi::TUiComponentTextData& text_data = DscDag::DagCollection::GetValueType<DscUi::TUiComponentTextData>(in_input_array[1]);
+                    const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+
+                    DscText::TextRun* const text_run_raw = text_data._text_run.get();
+                    if (nullptr != text_run_raw)
+                    {
+                        text_run_raw->SetWidthLimit(
+                            text_run_raw->GetWidthLimitEnabled(),
+                            avaliable_size.GetX()
+                        );
+                        text_run_raw->SetUIScale(ui_scale);
+
+                        value = text_run_raw->GetTextBounds();
+                    }
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "desired size text"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_avaliable_size, node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_resource_node_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TText), node);
+            DscDag::DagCollection::LinkIndexNodes(2, in_resource_node_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale), node);
         }
 
         return node;
@@ -952,6 +1023,19 @@ DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentCa
     return result;
 }
 
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentText(
+    const std::shared_ptr<DscText::TextRun>& in_text_run,
+    DscText::TextManager* const in_text_manager,
+    const DscCommon::VectorFloat4& in_clear_colour
+)
+{
+    TComponentConstructionHelper result({ TUiComponentType::TText });
+    result._text_run = in_text_run;
+    result._text_manager = in_text_manager;
+    result._clear_colour = in_clear_colour;
+    return result;
+}
+
 DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
     const TComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
@@ -1028,6 +1112,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
+    component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TUiScale, result.GetNodeToken(TUiRootNodeGroup::TUiScale));
 
     auto draw_node = MakeDrawStack(
         in_construction_helper,
@@ -1105,24 +1190,33 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 {
     UiNodeGroup result;
 
+    //TUiComponentResources
     result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<UiComponentResourceNodeGroup>(
-        MakeComponentResourceGroup(in_dag_collection, in_construction_helper),
+        MakeComponentResourceGroup(
+            in_dag_collection, 
+            in_construction_helper,
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
+            in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize) // ok, this was ment to be the local avaliable size, but have some dependency order issues here
+            ),
         DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "component resource node group")));
 
+    //TUiComponentType
     result.SetNodeToken(TUiNodeGroup::TUiComponentType, in_dag_collection.CreateValue(
         in_construction_helper._component_type,
         DscDag::CallbackOnValueChange<TUiComponentType>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
 
+    // TArrayChildUiNodeGroup
     result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue(
         std::vector<UiNodeGroup>(),
         DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
+    //TUiPanelShaderConstantBuffer
     {
         auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
         result.SetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer, in_dag_collection.CreateValue(
@@ -1132,6 +1226,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
             DSC_DEBUG_ONLY(DSC_COMMA "ui panel shader constant buffer")));
     }
 
+    //TArrayChildUiNodeGroup
     result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
         std::vector<UiNodeGroup>(),
         DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
@@ -1148,6 +1243,13 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
             DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
             result
         ));
+
+    // more of a order of construction issue than a circular dependency
+    if (true == in_construction_helper._has_ui_scale_by_avaliable_width)
+    {
+        UiComponentResourceNodeGroup& component_resource = DscDag::DagCollection::GetValueNonConstRef<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources), false);
+        DscDag::DagCollection::LinkIndexNodes(1, result.GetNodeToken(TUiNodeGroup::TAvaliableSize), component_resource.GetNodeToken(TUiComponentResourceNodeGroup::TUiScale));
+    }
 
     // calculate our desired size (for stack, this is all the contents, for text, the text render size (if width limit, limit is the avaliable size width))
     DscDag::NodeToken desired_size = MakeDesiredSize(
@@ -1184,7 +1286,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
             result
         ));
         
-    // calculate our render request size (max desired and geometry size)
+    //TRenderRequestSize calculate our render request size (max desired and geometry size)
     result.SetNodeToken(TUiNodeGroup::TRenderRequestSize,
         MakeRenderRequestSize(
             in_dag_collection,
@@ -1622,6 +1724,39 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DSC_ASSERT(nullptr != in_child_array_node_or_null, "invalid state");
         DscDag::DagCollection::LinkIndexNodes(2, in_child_array_node_or_null, result_node);
+    }
+    break;
+    case TUiDrawType::TText:
+    {
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                DscRenderResource::Frame& frame = *DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+                //DSC_ASSERT(nullptr != frame, "invalid state");
+                const auto& ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
+                DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+                const TUiComponentTextData& text_data = DscDag::DagCollection::GetValueType<TUiComponentTextData>(in_input_array[2]);
+
+                ui_render_target->ActivateRenderTarget(frame);
+                DscText::TextRun* text_run_raw = text_data._text_run.get();
+                if (nullptr != text_run_raw)
+                {
+                    text_run_raw->SetTextContainerSize(ui_render_target->GetViewportSize());
+
+                    auto geometry = text_run_raw->GetGeometry(&frame.GetDrawSystem(), &frame);
+                    DSC_ASSERT(nullptr != text_data._text_manager, "invalid state");
+                    auto shader = text_data._text_manager->GetShader(&frame.GetDrawSystem(), &frame);
+                    frame.SetShader(shader);
+                    frame.Draw(geometry);
+                }
+
+                out_value = ui_render_target.get();
+            },
+            &in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TText), result_node);
+
     }
     break;
     case TUiDrawType::TEffectCorner:

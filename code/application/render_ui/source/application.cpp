@@ -17,7 +17,13 @@
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_render_target.h>
 #include <dsc_ui/ui_input_state.h>
+#include <dsc_locale/dsc_locale.h>
 #include <dsc_png/dsc_png.h>
+#include <dsc_text/text_manager.h>
+#include <dsc_text/text_run.h>
+#include <dsc_text/text_run_text.h>
+#include <dsc_text/glyph_collection_text.h>
+
 
 namespace
 {
@@ -73,6 +79,115 @@ namespace
         return result;
     }
 */
+
+    const int32 AddIconToTextManager(DscText::TextManager& in_text_manager, DscCommon::FileSystem& in_file_system, const std::string& in_path, const int32 in_bearing)
+    {
+        std::vector<uint8_t> image_data = {};
+        int32_t byte_per_pixel = 0;
+        DscCommon::VectorInt2 image_size;
+
+        DscPng::LoadPng(
+            image_data,
+            byte_per_pixel,
+            image_size,
+            in_file_system,
+            in_path
+        );
+
+        if (0 == image_data.size())
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "zero size image:%s\n", in_path.c_str());
+            return -1;
+        }
+
+        const int32 index = in_text_manager.AddIcon(image_size, in_bearing, image_data.data());
+        return index;
+    }
+
+    std::shared_ptr<DscText::TextRun> MakeTextRun(DscText::TextManager& in_text_manager, DscCommon::FileSystem& in_file_system)
+    {
+        const int32 icon_a = AddIconToTextManager(in_text_manager, in_file_system, DscCommon::FileSystem::JoinPath("data", "sample_png", "a.png"), 54);
+        const int32 icon_b = AddIconToTextManager(in_text_manager, in_file_system, DscCommon::FileSystem::JoinPath("data", "sample_png", "b.png"), 54);
+        DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+        DscCommon::VectorInt2 container_size(100, 100);
+        const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+
+        //https://r12a.github.io/app-conversion/
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "Non fixed width layout with working word wrap.\nAnd newlines\nin text.\nLocale:" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
+            pLocale,
+            font,
+            64,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+            //, 48
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "red",
+            pLocale,
+            font,
+            80,
+            DscCommon::Math::ConvertColourToInt(255, 0, 0, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "green",
+            pLocale,
+            font,
+            64,
+            DscCommon::Math::ConvertColourToInt(0, 255, 0, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "blue.\n",
+            pLocale,
+            font,
+            48,
+            DscCommon::Math::ConvertColourToInt(0, 0, 255, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "RGBA icons:",
+            pLocale,
+            font,
+            64,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataIcon(
+            icon_a,
+            in_text_manager.GetIconFont(),
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            " (mixed with text",
+            pLocale,
+            font,
+            64,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataIcon(
+            icon_b,
+            in_text_manager.GetIconFont(),
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+        ));
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            ")",
+            pLocale,
+            font,
+            64,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+        ));
+
+        const int32 current_width = 800;
+        auto text_run = std::make_shared<DscText::TextRun>(
+            std::move(text_run_array),
+            container_size,
+            true,
+            current_width,
+            DscText::THorizontalAlignment::TNone,
+            DscText::TVerticalAlignment::TTop
+            //, 24
+            );
+        return text_run;
+    }
 }
 
 Application::Resources::Resources()
@@ -124,9 +239,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         _resources->_ui_manager->AddChildNode(
             DscUi::UiManager::MakeComponentFill(DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f)).SetChildSlot(
-                DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(128, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(512, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
-                DscUi::VectorUiCoord2(DscUi::UiCoord(64, 0.0f), DscUi::UiCoord(192, 0.0f))
+                DscUi::VectorUiCoord2(DscUi::UiCoord(32, 0.0f), DscUi::UiCoord(192, 0.0f))
                 ),
             *_draw_system,
             *_resources->_dag_collection,
@@ -135,6 +250,25 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
             );
+
+        _resources->_ui_manager->AddChildNode(
+            DscUi::UiManager::MakeComponentText(
+                MakeTextRun(*_resources->_text_manager, *_file_system),
+                _resources->_text_manager.get(),
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.25f)
+            ).SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(512 + 128 + 64, 0.0f), DscUi::UiCoord(512, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(64, 0.0f), DscUi::UiCoord(64, 0.0f))
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            root_as_parent,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "child two")
+        );
+
     }
 
     return;

@@ -53,6 +53,7 @@
     .DataCopyPath = {
         "$RootPath$/../data/font",
         "$RootPath$/../data/background",
+        "$RootPath$/../data/sample_png",
         }
     .DoDataCopy = true
 

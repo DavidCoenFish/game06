@@ -113,6 +113,14 @@ namespace DscUi
 
 			std::shared_ptr<DscRenderResource::ShaderResource> _texture;
 
+			// we could use move semantics to have the text run as a unique_ptr, but kind of throwing around the TComponentConstructionHelper by copy
+			std::shared_ptr<DscText::TextRun> _text_run = {};
+			DscText::TextManager* _text_manager = nullptr;
+
+			bool _has_ui_scale_by_avaliable_width = false;
+			int32 _scale_width_low_threashhold = 0; // example 800
+			float _scale_factor = 0.0f; // 0.0015789 for scale of 4.8 when width is 3040 more than 800,
+
 			bool _has_child_slot_data = false;
 			VectorUiCoord2 _child_size = {};
 			VectorUiCoord2 _child_pivot = {};
@@ -173,11 +181,27 @@ namespace DscUi
 				_padding_bottom = in_padding_bottom;
 				return *this;
 			}
+
+			TComponentConstructionHelper& SetUiScaleByWidth(
+				const int32 in_scale_width_low_threashhold,
+				const float in_scale_factor
+			)
+			{
+				_has_ui_scale_by_avaliable_width = true;
+				_scale_width_low_threashhold = in_scale_width_low_threashhold;
+				_scale_factor = in_scale_factor;
+				return *this;
+			}
 		};
 		static TComponentConstructionHelper MakeComponentDebugGrid();
 		static TComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
 		static TComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
 		static TComponentConstructionHelper MakeComponentCanvas(const DscCommon::VectorFloat4& in_clear_colour);
+		static TComponentConstructionHelper MakeComponentText(
+			const std::shared_ptr<DscText::TextRun>& in_text_run,
+			DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
+			const DscCommon::VectorFloat4& in_clear_colour = DscCommon::VectorFloat4::s_zero
+			);
 
 		struct TEffectConstructionHelper
 		{
