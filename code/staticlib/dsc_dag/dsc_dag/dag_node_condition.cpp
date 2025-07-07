@@ -27,11 +27,9 @@ void DscDag::DagNodeCondition::Update()
 {
 	if (true == _dirty)
 	{
-		// we dont set dirty on setting input
-		_dirty = false;
-
 		if (nullptr == _condition)
 		{
+			_dirty = false;
 			return;
 		}
 
@@ -79,7 +77,9 @@ void DscDag::DagNodeCondition::Update()
 			}
 		}
 
-		DSC_ASSERT(false == _dirty, "Cyclic conditional dirty");
+		// linking/ unlinking the source to us will dirty us, so defer unmarking dirty flag till AFTER linking source
+		//DSC_ASSERT(false == _dirty, "Cyclic conditional dirty");
+		_dirty = false;
 	}
 
 	return;

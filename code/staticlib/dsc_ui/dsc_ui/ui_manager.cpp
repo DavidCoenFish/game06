@@ -307,6 +307,41 @@ namespace
                 &component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
 
+        if (true == in_construction_helper._has_scroll)
+        {
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::THasManualScrollX,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._has_manual_scroll_x,
+                    DscDag::CallbackOnValueChange<bool>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll x")));
+
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TManualScrollX,
+                in_dag_collection.CreateValue(
+                    0.0f,
+                    DscDag::CallbackOnValueChange<float>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "manual scroll x")));
+
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::THasManualScrollY,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._has_manual_scroll_y,
+                    DscDag::CallbackOnValueChange<bool>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll y")));
+
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TManualScrollY,
+                in_dag_collection.CreateValue(
+                    0.0f,
+                    DscDag::CallbackOnValueChange<float>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "manual scroll y")));
+        }
+
         if (true == in_construction_helper._has_fill)
         {
             component_resource_group.SetNodeToken(
@@ -876,6 +911,151 @@ namespace
         return node;
     }
 
+    DscDag::NodeToken MakeNodePixelTraversal(
+        DscDag::DagCollection& in_dag_collection, 
+        DscDag::NodeToken in_geometry_size, 
+        DscDag::NodeToken in_render_request_size,
+        DscUi::UiNodeGroup& in_owner_group
+        )
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                DscCommon::VectorInt2 geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                DscCommon::VectorInt2 render_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+
+                value.Set(
+                    std::max(0, render_size.GetX() - geometry_size.GetX()),
+                    std::max(0, render_size.GetY() - geometry_size.GetY())
+                );
+            },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "pixel traversal"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_geometry_size, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_render_request_size, node);
+
+        return node;
+    }
+
+    constexpr float s_scroll_pixels_per_second = 32.0f;
+    constexpr float s_wrap_threashold = 1.0f; // was considering 1.25f for threashold and 2.5 for ping pong step, but only pauses at one end of the anim
+    constexpr float s_wrap_step_ping_pong = 2.0f;
+    DscDag::NodeToken MakeNodeScrollValue(
+        DscDag::DagCollection& in_dag_collection,
+        const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        DscDag::NodeToken in_time_delta,
+        DscDag::NodeToken in_pixel_traversal_node,
+        DscUi::UiNodeGroup& in_owner_group
+    )
+    {
+        DscDag::NodeToken condition_x = in_dag_collection.CreateCalculate<bool>([](bool& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                // if manual scroll is false and the 0 < pixel traversal, return true
+                const bool has_manual_scroll = DscDag::DagCollection::GetValueType<bool>(in_input_array[0]);
+                const DscCommon::VectorInt2& pixel_traversal = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+
+                out_value = ((false == has_manual_scroll) && (0 < pixel_traversal.GetX()));
+            },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll condition x"));
+        DscDag::DagCollection::LinkIndexNodes(0, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::THasManualScrollX), condition_x);
+        DscDag::DagCollection::LinkIndexNodes(1, in_pixel_traversal_node, condition_x);
+
+        DscDag::NodeToken condition_y = in_dag_collection.CreateCalculate<bool>([](bool& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                // if manual scroll is false and the 0 < pixel traversal, return true
+                const bool has_manual_scroll = DscDag::DagCollection::GetValueType<bool>(in_input_array[0]);
+                const DscCommon::VectorInt2& pixel_traversal = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+
+                out_value = ((false == has_manual_scroll) && (0 < pixel_traversal.GetY()));
+            },
+            & in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll condition y"));
+        DscDag::DagCollection::LinkIndexNodes(0, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::THasManualScrollY), condition_y);
+        DscDag::DagCollection::LinkIndexNodes(1, in_pixel_traversal_node, condition_y);
+
+        DscDag::NodeToken tick_scroll_x = in_dag_collection.CreateCalculate<float>([](float& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const float time_delta = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                const float time_delta_clamped = std::max(0.0f, std::min(1.0f, time_delta));
+                const int32 pixel_traversal = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]).GetX();
+
+                if (0 < pixel_traversal)
+                {
+                    // the max of the divisor is to avoid things bouncing too quickly on small values of pixel_traversal
+                    out_value += time_delta_clamped * s_scroll_pixels_per_second / std::max(s_scroll_pixels_per_second, static_cast<float>(pixel_traversal));
+                    while (s_wrap_threashold < out_value)
+                    {
+                        out_value -= s_wrap_step_ping_pong; // pingpong, consumer of the value applies std::abs
+                    }
+                }
+            },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll condition x"));
+        DscDag::DagCollection::LinkIndexNodes(0, in_time_delta, tick_scroll_x);
+        DscDag::DagCollection::LinkIndexNodes(1, in_pixel_traversal_node, tick_scroll_x);
+
+        DscDag::NodeToken tick_scroll_y = in_dag_collection.CreateCalculate<float>([](float& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const float time_delta = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                const float time_delta_clamped = std::max(0.0f, std::min(1.0f, time_delta));
+                const int32 pixel_traversal = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]).GetY();
+
+                if (0 < pixel_traversal)
+                {
+                    // the max of the divisor is to avoid things bouncing too quickly on small values of pixel_traversal
+                    out_value += time_delta_clamped * s_scroll_pixels_per_second / std::max(s_scroll_pixels_per_second, static_cast<float>(pixel_traversal));
+                    while (s_wrap_threashold < out_value)
+                    {
+                        out_value -= s_wrap_step_ping_pong; // pingpong, consumer of the value applies std::abs
+                    }
+                }
+            },
+            & in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll condition y"));
+        DscDag::DagCollection::LinkIndexNodes(0, in_time_delta, tick_scroll_y);
+        DscDag::DagCollection::LinkIndexNodes(1, in_pixel_traversal_node, tick_scroll_y);
+
+        // something to hold the scroll value output
+        DscDag::NodeToken scroll_x = in_dag_collection.CreateValue(
+            0.0f, 
+            DscDag::CallbackOnValueChange<float>::Function,
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll x"));
+        DscDag::NodeToken scroll_y = in_dag_collection.CreateValue(
+            0.0f,
+            DscDag::CallbackOnValueChange<float>::Function,
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "scroll y"));
+
+        in_dag_collection.CreateCondition(
+            condition_x,
+            tick_scroll_x, 
+            in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TManualScrollX),
+            scroll_x, 
+            scroll_x,
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "conditional scroll x")
+        );
+        in_dag_collection.CreateCondition(
+            condition_y,
+            tick_scroll_y,
+            in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TManualScrollY),
+            scroll_y,
+            scroll_y,
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "conditional scroll y")
+        );
+
+        DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscCommon::VectorFloat2>([](DscCommon::VectorFloat2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const float x = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                const float y = DscDag::DagCollection::GetValueType<float>(in_input_array[1]);
+
+                value.Set(x, y);
+            },
+            &in_owner_group
+        DSC_DEBUG_ONLY(DSC_COMMA "scroll"));
+        DscDag::DagCollection::LinkIndexNodes(0, scroll_x, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, scroll_y, result_node);
+
+        return result_node;
+    }
+
 } // namespace
 
 DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
@@ -1244,19 +1424,22 @@ DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentCa
 
 DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentText(
     const std::shared_ptr<DscText::TextRun>& in_text_run,
-    DscText::TextManager* const in_text_manager
+    DscText::TextManager* const in_text_manager,
+    const bool in_has_scroll
 )
 {
     TComponentConstructionHelper result({ TUiComponentType::TText });
     result._text_run = in_text_run;
     result._text_manager = in_text_manager;
+    result._has_scroll = in_has_scroll;
     return result;
 }
 
 DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentStack(
     const TUiFlow in_flow_direction,
     const UiCoord& in_gap,
-    const bool in_desired_size_from_children_max
+    const bool in_desired_size_from_children_max,
+    const bool in_has_scroll
 )
 {
     TComponentConstructionHelper result({ TUiComponentType::TStack });
@@ -1264,6 +1447,7 @@ DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentSt
     result._has_gap = true;
     result._gap = in_gap;
     result._desired_size_from_children_max = in_desired_size_from_children_max;
+    result._has_scroll = in_has_scroll;
     return result;
 }
 
@@ -1529,11 +1713,38 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         ));
 
     //TScrollPos, // where is the geometry size quad is on the render target texture
-    result.SetNodeToken(TUiNodeGroup::TScrollPos, in_dag_collection.CreateValue(
-        DscCommon::VectorFloat2(0, 0), //DscCommon::VectorInt2::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
+    {
+        const auto& resource_group = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources));
+        if ((nullptr != resource_group.GetNodeToken(TUiComponentResourceNodeGroup::THasManualScrollX)) &&
+            (nullptr != resource_group.GetNodeToken(TUiComponentResourceNodeGroup::THasManualScrollY)) &&
+            (nullptr != resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TManualScrollX)) &&
+            (nullptr != resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TManualScrollY)))
+        {
+            DscDag::NodeToken pixel_traversal_node = MakeNodePixelTraversal(
+                in_dag_collection,
+                result.GetNodeToken(TUiNodeGroup::TGeometrySize),
+                result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
+                result
+            );
+
+            result.SetNodeToken(TUiNodeGroup::TScrollPos,
+                MakeNodeScrollValue(
+                    in_dag_collection,
+                    DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+                    in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta),
+                    pixel_traversal_node,
+                    result
+                ));
+        }
+        else
+        {
+            result.SetNodeToken(TUiNodeGroup::TScrollPos, in_dag_collection.CreateValue(
+                DscCommon::VectorFloat2(0, 0),
+                DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
+                &result
+                DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
+        }
+    }
 
     //TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
     result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(

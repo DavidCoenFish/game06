@@ -109,6 +109,10 @@ namespace DscUi
 			TUiComponentType _component_type;
 			DscCommon::VectorFloat4 _clear_colour;
 
+			bool _has_scroll = false;
+			bool _has_manual_scroll_x = false;
+			bool _has_manual_scroll_y = false;
+
 			bool _has_fill = false;
 			DscCommon::VectorFloat4 _fill;
 
@@ -217,12 +221,14 @@ namespace DscUi
 		static TComponentConstructionHelper MakeComponentCanvas();
 		static TComponentConstructionHelper MakeComponentText(
 			const std::shared_ptr<DscText::TextRun>& in_text_run,
-			DscText::TextManager* const in_text_manager // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
+			DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
+			const bool in_has_scroll = true
 			);
 		static TComponentConstructionHelper MakeComponentStack(
 			const TUiFlow in_flow_direction,
 			const UiCoord& in_gap,
-			const bool in_desired_size_from_children_max = true
+			const bool in_desired_size_from_children_max = true,
+			const bool in_has_scroll = true
 			);
 
 		struct TEffectConstructionHelper
@@ -304,7 +310,7 @@ namespace DscUi
 
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored
-		std::unique_ptr < DscDagRender::DagResource> _dag_resource = {};
+		std::unique_ptr<DscDagRender::DagResource> _dag_resource = {};
 
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
