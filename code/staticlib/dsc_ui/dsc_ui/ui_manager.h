@@ -84,6 +84,7 @@ namespace DscUi
 	class UiInputState;
 	class UiRenderTarget;
 	class VectorUiCoord2;
+	struct ComponentConstructionHelper;
 
 	class UiManager
 	{
@@ -105,133 +106,6 @@ namespace DscUi
 			const bool in_allow_clear_on_draw
 			);
 
-		struct TComponentConstructionHelper
-		{
-			TUiComponentType _component_type;
-			DscCommon::VectorFloat4 _clear_colour;
-
-			bool _has_scroll = false;
-			bool _has_manual_scroll_x = false;
-			bool _has_manual_scroll_y = false;
-
-			bool _has_fill = false;
-			DscCommon::VectorFloat4 _fill;
-
-			std::shared_ptr<DscRenderResource::ShaderResource> _texture;
-
-			// we could use move semantics to have the text run as a unique_ptr, but kind of throwing around the TComponentConstructionHelper by copy
-			std::shared_ptr<DscText::TextRun> _text_run = {};
-			DscText::TextManager* _text_manager = nullptr;
-
-			// possibly more than just the stack component will use this
-			TUiFlow _flow_direction = TUiFlow::TCount;
-
-			bool _has_ui_scale_by_avaliable_width = false;
-			int32 _scale_width_low_threashhold = 0; // example 800
-			float _scale_factor = 0.0f; // 0.0015789 for scale of 4.8 when width is 3040 more than 800,
-
-			bool _has_child_slot_data = false;
-			VectorUiCoord2 _child_size = {};
-			VectorUiCoord2 _child_pivot = {};
-			VectorUiCoord2 _attach_point = {};
-
-			bool _has_padding = false;
-			UiCoord _padding_left = {};
-			UiCoord _padding_top = {};
-			UiCoord _padding_right = {};
-			UiCoord _padding_bottom = {};
-
-			// gap between items for stack
-			bool _has_gap = false;
-			UiCoord _gap = {};
-
-			bool _has_child_stack_data = false; // size data for child of stack
-			UiCoord _stack_size = {};
-			UiCoord _stack_pivot = {};
-			UiCoord _stack_parent_attach_point = {};
-
-			bool _desired_size_from_children_max = false; // otherwise from text? or matches avaliable
-
-			// canvas- geometry size is avaliable
-			// stack- geometry size is max (avaliable, desired)
-
-			// canvas - geometry offset is from child slot
-			// stack - geometry offset is from prev child plus gap, else from top left
-
-			TComponentConstructionHelper& SetClearColour(
-				const DscCommon::VectorFloat4& in_clear_colour
-			)
-			{
-				_clear_colour = in_clear_colour;
-				return *this;
-			}
-			TComponentConstructionHelper& SetChildSlot(
-				const VectorUiCoord2& in_child_size,
-				const VectorUiCoord2& in_child_pivot,
-				const VectorUiCoord2& in_attach_point
-				)
-			{
-				_has_child_slot_data = true;
-				_child_size = in_child_size;
-				_child_pivot = in_child_pivot;
-				_attach_point = in_attach_point;
-				return *this;
-			}
-			TComponentConstructionHelper& SetPadding(
-				const UiCoord& in_padding_left,
-				const UiCoord& in_padding_top,
-				const UiCoord& in_padding_right,
-				const UiCoord& in_padding_bottom
-				)
-			{
-				_has_padding = true;
-				_padding_left = in_padding_left;
-				_padding_top = in_padding_top;
-				_padding_right = in_padding_right;
-				_padding_bottom = in_padding_bottom;
-				return *this;
-			}
-
-			TComponentConstructionHelper& SetUiScaleByWidth(
-				const int32 in_scale_width_low_threashhold,
-				const float in_scale_factor
-			)
-			{
-				_has_ui_scale_by_avaliable_width = true;
-				_scale_width_low_threashhold = in_scale_width_low_threashhold;
-				_scale_factor = in_scale_factor;
-				return *this;
-			}
-
-			TComponentConstructionHelper& SetChildStackData(
-				const UiCoord& in_stack_size,
-				const UiCoord& in_stack_pivot,
-				const UiCoord& in_stack_parent_attach_point
-			)
-			{
-				_has_child_stack_data = true;
-				_stack_size = in_stack_size;
-				_stack_pivot = in_stack_pivot;
-				_stack_parent_attach_point = in_stack_parent_attach_point;
-				return *this;
-			}
-		};
-		static TComponentConstructionHelper MakeComponentDebugGrid();
-		static TComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
-		static TComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
-		static TComponentConstructionHelper MakeComponentCanvas();
-		static TComponentConstructionHelper MakeComponentText(
-			const std::shared_ptr<DscText::TextRun>& in_text_run,
-			DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
-			const bool in_has_scroll = true
-			);
-		static TComponentConstructionHelper MakeComponentStack(
-			const TUiFlow in_flow_direction,
-			const UiCoord& in_gap,
-			const bool in_desired_size_from_children_max = true,
-			const bool in_has_scroll = true
-			);
-
 		struct TEffectConstructionHelper
 		{
 			TUiEffectType _effect_type;
@@ -239,7 +113,7 @@ namespace DscUi
 			DscCommon::VectorFloat4 _effect_param_tint;
 		};
 		UiRootNodeGroup MakeRootNode(
-			const TComponentConstructionHelper& in_construction_helper,
+			const ComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
@@ -251,7 +125,7 @@ namespace DscUi
 			);
 
 		UiNodeGroup AddChildNode(
-			const TComponentConstructionHelper& in_construction_helper,
+			const ComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			const UiRootNodeGroup& in_root_node_group,
@@ -293,7 +167,7 @@ namespace DscUi
 
 		// so, if MakeDrawStack creates a UiRenderTaget, how does that get back into the parent, TUiNodeGroup::TUiRenderTarget
 		DscDag::NodeToken MakeDrawStack(
-			const TComponentConstructionHelper& in_construction_helper,
+			const ComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			const std::vector<TEffectConstructionHelper>& in_effect_array,
@@ -307,7 +181,7 @@ namespace DscUi
 
 		DscDag::NodeToken MakeDrawNode(
 			const TUiDrawType in_type,
-			const TComponentConstructionHelper* const in_construction_helper_or_null,
+			const ComponentConstructionHelper* const in_construction_helper_or_null,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::vector<DscDag::NodeToken>& in_array_input_stack,

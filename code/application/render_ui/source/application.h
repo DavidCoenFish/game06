@@ -87,4 +87,5 @@ private:
     };
     std::unique_ptr<Resources> _resources;
 
+    bool _keep_running = false;
 };

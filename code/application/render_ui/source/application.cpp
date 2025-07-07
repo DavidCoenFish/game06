@@ -16,6 +16,7 @@
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
 #include <dsc_ui/ui_enum.h>
+#include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_render_target.h>
 #include <dsc_ui/ui_input_param.h>
@@ -68,6 +69,8 @@ Application::Resources::Resources()
 Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)
     : DscWindows::IWindowApplication(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight)
 {
+    _keep_running = true;
+
     _file_system = std::make_unique<DscCommon::FileSystem>();
     _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.0f));
 
@@ -90,7 +93,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
 
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
-            DscUi::UiManager::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
+            DscUi::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
             *_draw_system,
             *_resources->_dag_collection,
             top_texture
@@ -99,7 +102,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*_resources->_dag_collection, _resources->_ui_root_node_group);
 
         _resources->_ui_manager->AddChildNode(
-            DscUi::UiManager::MakeComponentDebugGrid().SetChildSlot(
+            DscUi::MakeComponentDebugGrid().SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
@@ -113,7 +116,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         );
 
         auto stack_node = _resources->_ui_manager->AddChildNode(
-            DscUi::UiManager::MakeComponentStack(
+            DscUi::MakeComponentStack(
                 DscUi::TUiFlow::TVertical,
                 DscUi::UiCoord(16, 0.0f)
                 ).SetClearColour(
@@ -140,7 +143,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         for (int32 index = 0; index < 8; ++index)
         {
             _resources->_ui_manager->AddChildNode(
-                DscUi::UiManager::MakeComponentText(
+                DscUi::MakeComponentText(
                     MakeTextRun(*_resources->_text_manager, *_file_system, std::string("hello world ") + std::to_string(index)),
                     _resources->_text_manager.get()
                 ).SetClearColour(
@@ -228,8 +231,9 @@ const bool Application::Update()
         }
     }
 
-    return true;
+    return _keep_running;
 }
+
 void Application::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale)
 {
     BaseType::OnWindowSizeChanged(in_size, in_monitor_scale);

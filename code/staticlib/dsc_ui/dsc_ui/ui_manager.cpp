@@ -1,4 +1,6 @@
 #include "ui_manager.h"
+
+#include "component_construction_helper.h"
 #include "screen_quad.h"
 #include "ui_enum.h"
 #include "ui_render_target.h"
@@ -295,7 +297,7 @@ namespace
 
     DscUi::UiComponentResourceNodeGroup MakeComponentResourceGroup(
         DscDag::DagCollection& in_dag_collection,
-        const DscUi::UiManager::TComponentConstructionHelper& in_construction_helper,
+        const DscUi::ComponentConstructionHelper& in_construction_helper,
         DscDag::NodeToken in_ui_scale,
         DscDag::NodeToken in_avaliable_size
         )
@@ -1538,63 +1540,8 @@ std::shared_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
     return std::make_shared<DscUi::UiRenderTarget>(in_render_target_texture, in_allow_clear_on_draw);
 }
 
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentDebugGrid()
-{
-    return TComponentConstructionHelper({ TUiComponentType::TDebugGrid});
-}
-
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentFill(const DscCommon::VectorFloat4& in_colour)
-{
-    TComponentConstructionHelper result({ TUiComponentType::TFill });
-    result._fill = in_colour;
-    result._has_fill = true;
-    return result;
-}
-
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture)
-{
-    TComponentConstructionHelper result({ TUiComponentType::TImage });
-    result._texture = in_texture;
-    return result;
-}
-
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentCanvas()
-{
-    TComponentConstructionHelper result({ TUiComponentType::TCanvas });
-    return result;
-}
-
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentText(
-    const std::shared_ptr<DscText::TextRun>& in_text_run,
-    DscText::TextManager* const in_text_manager,
-    const bool in_has_scroll
-)
-{
-    TComponentConstructionHelper result({ TUiComponentType::TText });
-    result._text_run = in_text_run;
-    result._text_manager = in_text_manager;
-    result._has_scroll = in_has_scroll;
-    return result;
-}
-
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentStack(
-    const TUiFlow in_flow_direction,
-    const UiCoord& in_gap,
-    const bool in_desired_size_from_children_max,
-    const bool in_has_scroll
-)
-{
-    TComponentConstructionHelper result({ TUiComponentType::TStack });
-    result._flow_direction = in_flow_direction;
-    result._has_gap = true;
-    result._gap = in_gap;
-    result._desired_size_from_children_max = in_desired_size_from_children_max;
-    result._has_scroll = in_has_scroll;
-    return result;
-}
-
 DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
-    const TComponentConstructionHelper& in_construction_helper,
+    const ComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
@@ -1736,7 +1683,7 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
 }
 
 DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
-    const TComponentConstructionHelper& in_construction_helper,
+    const ComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     const UiRootNodeGroup& in_root_node_group,
@@ -2021,7 +1968,7 @@ void DscUi::UiManager::UpdateRootViewportSize(
 }
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
-    const TComponentConstructionHelper& in_construction_helper,
+    const ComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     const std::vector<TEffectConstructionHelper>& in_effect_array,
@@ -2158,7 +2105,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     const TUiDrawType in_type,
-    const TComponentConstructionHelper* const in_construction_helper_or_null,
+    const ComponentConstructionHelper* const in_construction_helper_or_null,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
     std::vector<DscDag::NodeToken>& in_array_input_stack,
