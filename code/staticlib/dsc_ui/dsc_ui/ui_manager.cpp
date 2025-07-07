@@ -147,13 +147,13 @@ namespace
         DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader, in_input_texture_count](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 DscRenderResource::Frame* const frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
                 DSC_ASSERT(nullptr != frame, "invalid state");
-                auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);
+                const auto& ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);
                 DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-                auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+                const auto& shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
                 DSC_ASSERT(nullptr != shader_buffer, "invalid state");
                 const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[3]);
-                const DscCommon::VectorFloat4 effect_param = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
-                const DscCommon::VectorFloat4 effect_tint = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
+                const DscCommon::VectorFloat4& effect_param = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
+                const DscCommon::VectorFloat4& effect_tint = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
 
                 const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
 
@@ -921,8 +921,8 @@ namespace
         )
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-                DscCommon::VectorInt2 geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
-                DscCommon::VectorInt2 render_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                const DscCommon::VectorInt2& render_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
 
                 value.Set(
                     std::max(0, render_size.GetX() - geometry_size.GetX()),
@@ -1126,7 +1126,7 @@ namespace
                 );
             },
             &in_owner_group
-            DSC_DEBUG_ONLY(DSC_COMMA "pixel traversal"));
+            DSC_DEBUG_ONLY(DSC_COMMA "screen space"));
 
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_screen_space, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_parent_render_request_size, node);
