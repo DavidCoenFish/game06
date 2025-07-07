@@ -186,11 +186,16 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiComponentTextData) };
 		return s_meta_data;
 	}
-	//case DscUi::TUiComponentResourceNodeGroup::TWidthUiScale:
-	//{
-	//	static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiComponentWidthUiScale) };
-	//	return s_meta_data;
-	//}
+	case DscUi::TUiComponentResourceNodeGroup::TFlow:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiFlow) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TGap:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
 	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
@@ -252,6 +257,21 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		return s_meta_data;
 	}
 
+	case DscUi::TUiComponentResourceNodeGroup::TChildStackSize:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TChildStackPivot:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
+		return s_meta_data;
+	}
 	}
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };

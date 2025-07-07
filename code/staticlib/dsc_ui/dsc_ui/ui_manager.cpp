@@ -53,6 +53,8 @@ namespace
             return DscUi::TUiDrawType::TUiPanel;
         case DscUi::TUiComponentType::TText:
             return DscUi::TUiDrawType::TText;
+        case DscUi::TUiComponentType::TStack:
+            return DscUi::TUiDrawType::TUiPanel;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -422,21 +424,120 @@ namespace
                     DSC_DEBUG_ONLY(DSC_COMMA "padding bottom")));
         }
 
+        if (true == in_construction_helper._has_gap)
+        {
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TGap,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._gap,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "gap")));
+        }
+
+        if (DscUi::TUiFlow::TCount != in_construction_helper._flow_direction)
+        {
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TFlow,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._flow_direction,
+                    DscDag::CallbackOnValueChange<DscUi::TUiFlow>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "flow direction")));
+        }
+
+        if (true == in_construction_helper._has_child_stack_data)
+        {
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TChildStackSize,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._stack_size,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TChildStackPivot,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._stack_pivot,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach,
+                in_dag_collection.CreateValue(
+                    in_construction_helper._stack_parent_attach_point,
+                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
+        }
 
         return component_resource_group;
     }
-
 
     DscDag::NodeToken MakeAvaliableSize(
         DscDag::DagCollection& in_dag_collection,
         DscDag::NodeToken in_parent_avaliable_size,
         DscDag::NodeToken in_ui_scale,
         const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        const DscUi::UiComponentResourceNodeGroup& in_parent_component_resource_group,
         DscUi::UiNodeGroup& in_owner_group
     )
     {
         DscDag::NodeToken node = in_parent_avaliable_size;
-        if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
+        if (nullptr != in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow)) // slot child
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                    const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[1]);
+                    const DscUi::TUiFlow flow = DscDag::DagCollection::GetValueType<DscUi::TUiFlow>(in_input_array[2]);
+                    DscCommon::VectorInt2 result = {};
+
+                    if (3 < in_input_array.size())
+                    {
+                        const DscUi::UiCoord& child_size = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[3]);
+                        switch(flow)
+                        {
+                        default:
+                            DSC_ASSERT_ALWAYS("invalid switch case");
+                            break;
+                        case DscUi::TUiFlow::THorizontal:
+                            result[1] = child_size.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale);
+                            break;
+                        case DscUi::TUiFlow::TVertical:
+                            result[0] = child_size.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        switch (flow)
+                        {
+                        default:
+                            DSC_ASSERT_ALWAYS("invalid switch case");
+                            break;
+                        case DscUi::TUiFlow::THorizontal:
+                            result[1] = parent_avaliable_size.GetY();
+                            break;
+                        case DscUi::TUiFlow::TVertical:
+                            result[0] = parent_avaliable_size.GetX();
+                            break;
+                        }
+                    }
+
+                    value = result;
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "avaliable size child stack"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_parent_avaliable_size, node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
+            DscDag::DagCollection::LinkIndexNodes(2, in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow), node);
+            if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackSize))
+            {
+                DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackSize), node);
+            }
+        }
+        else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize)) // canvas child
         {
             node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                     const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
@@ -452,7 +553,7 @@ namespace
             DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
             DscDag::DagCollection::LinkIndexNodes(2, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize), node);
         }
-        else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft))
+        else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft)) // padding child
         {
             node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                     const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
@@ -564,7 +665,7 @@ namespace
     {
         DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 const DscCommon::VectorInt2& desired_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
-                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
 
                 value.Set(
                     std::max(desired_size.GetX(), geometry_size.GetX()),
@@ -581,8 +682,8 @@ namespace
 
     DscDag::NodeToken MakeGeometrySize(
         DscDag::DagCollection& in_dag_collection,
-        //const DscUi::TUiComponentType in_parent_ui_component_type,
         const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        const DscUi::UiComponentResourceNodeGroup& in_parent_component_resource_group,
         DscDag::NodeToken in_desired_size,
         DscDag::NodeToken in_avaliable_size,
         DscUi::UiNodeGroup& in_owner_group
@@ -596,8 +697,39 @@ namespace
             // if we have a child slot, presume we are behaving like a canvas that has the geometry size the same as the avaliable size
             node = in_avaliable_size;
         }
-        // todo: how to detect if we are a stack like child node
-        // node = desired_size;
+        else if (nullptr != in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow))
+        {
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscUi::TUiFlow flow = DscDag::DagCollection::GetValueType<DscUi::TUiFlow>(in_input_array[0]);
+                    const DscCommon::VectorInt2& desired_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+                    const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[2]);
+
+                    switch (flow)
+                    {
+                    default:
+                        value = {}; //.Set(0, 0);
+                        DSC_ASSERT_ALWAYS("invalid switch case");
+                        break;
+                    case DscUi::TUiFlow::THorizontal:
+                        value.Set(
+                            desired_size.GetX(),
+                            avaliable_size.GetY()
+                        );
+                    case DscUi::TUiFlow::TVertical:
+                        value.Set(
+                            avaliable_size.GetX(),
+                            desired_size.GetY()
+                        );
+                    }
+                },
+                &in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "geometry size flow child"));
+
+            DscDag::DagCollection::LinkIndexNodes(0, in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow), node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_desired_size, node);
+            DscDag::DagCollection::LinkIndexNodes(2, in_avaliable_size, node);
+
+        }
 
         DSC_ASSERT(nullptr != node, "invalid state");
         return node;
@@ -605,16 +737,16 @@ namespace
 
     DscDag::NodeToken MakeGeometryOffset(
         DscDag::DagCollection& in_dag_collection,
-        //const DscUi::TUiComponentType in_parent_ui_component_type,
         const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+        const DscUi::UiComponentResourceNodeGroup& in_parent_component_resource_group,
         DscDag::NodeToken in_parent_avaliable_size,
         DscDag::NodeToken in_ui_scale,
         DscDag::NodeToken in_geometry_size,
-        DscDag::NodeToken in_array_child_ui_node_group,
+        DscDag::NodeToken in_parent_array_child_ui_node_group,
         DscUi::UiNodeGroup& in_owner_group
     )
     {
-        DSC_UNUSED(in_array_child_ui_node_group);
+        DSC_UNUSED(in_parent_array_child_ui_node_group);
 
         DscDag::NodeToken node = nullptr;
         if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
@@ -643,6 +775,94 @@ namespace
             DscDag::DagCollection::LinkIndexNodes(2, in_geometry_size, node); // should this be avaliable size or geometry size
             DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot), node);
             DscDag::DagCollection::LinkIndexNodes(4, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach), node);
+        }
+        else if (nullptr != in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow))
+        {
+            // this is a bit bad, we don't have an easy way of knowing what array child index we are of our parent (in a fashion resiliant to array size change) 
+            // we could use the geoemtry size node as a token to identify ourself since we have that node on hand...
+            //TUiNodeGroup::TGeometrySize
+            node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscDag::NodeToken self_geometry_size = in_input_array[0];
+                    const std::vector<DscUi::UiNodeGroup>& parent_child_array = DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_input_array[1]);
+                    const DscUi::UiCoord& gap = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[2]);
+                    const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[3]);
+                    const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[4]);
+                    const DscUi::TUiFlow flow = DscDag::DagCollection::GetValueType<DscUi::TUiFlow>(in_input_array[5]);
+
+                    value = {};
+                    int32 trace = 0;
+                    for (const auto& item : parent_child_array)
+                    {
+                        if (self_geometry_size == item.GetNodeToken(DscUi::TUiNodeGroup::TGeometrySize))
+                        {
+                            break;
+                        }
+                        const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(item.GetNodeToken(DscUi::TUiNodeGroup::TGeometrySize));
+                        switch (flow)
+                        {
+                        default:
+                            break;
+                        case DscUi::TUiFlow::THorizontal:
+                            trace += geometry_size.GetX();
+                            trace += gap.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale);
+                            break;
+                        case DscUi::TUiFlow::TVertical:
+                            trace += geometry_size.GetY();
+                            trace += gap.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale);
+                            break;
+                        }
+                    }
+
+                    const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(self_geometry_size);
+                    switch (flow)
+                    {
+                    default:
+                        break;
+                    case DscUi::TUiFlow::THorizontal:
+                    {
+                        int32 offset = 0;
+                        if (7 < in_input_array.size())
+                        { 
+                            const DscUi::UiCoord& pivot = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[6]);
+                            const DscUi::UiCoord& parent_attach = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[7]);
+                            offset = parent_attach.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale) -
+                                pivot.Evaluate(geometry_size.GetY(), geometry_size.GetX(), ui_scale);
+                        }
+                        value.Set(trace, offset);
+                    }
+                    break;
+                    case DscUi::TUiFlow::TVertical:
+                    {
+                        int32 offset = 0;
+                        if (7 < in_input_array.size())
+                        {
+                            const DscUi::UiCoord& pivot = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[6]);
+                            const DscUi::UiCoord& parent_attach = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[7]);
+                            offset = parent_attach.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale) -
+                                pivot.Evaluate(geometry_size.GetX(), geometry_size.GetY(), ui_scale);
+                        }
+                        value.Set(offset, trace);
+                    }
+                    break;
+                    }
+
+                    return;
+                },
+                & in_owner_group
+                DSC_DEBUG_ONLY(DSC_COMMA "geometry offset child stack"));
+            DscDag::DagCollection::LinkIndexNodes(0, in_geometry_size, node);
+            DscDag::DagCollection::LinkIndexNodes(1, in_parent_array_child_ui_node_group, node);
+            DSC_ASSERT(nullptr != in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TGap), "parent stack is obliged to have a gap node");
+            DscDag::DagCollection::LinkIndexNodes(2, in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TGap), node);
+            DscDag::DagCollection::LinkIndexNodes(3, in_parent_avaliable_size, node);
+            DscDag::DagCollection::LinkIndexNodes(4, in_ui_scale, node);
+            DscDag::DagCollection::LinkIndexNodes(5, in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow), node);
+            if ((nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackPivot)) &&
+                (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach)))
+            {
+                DscDag::DagCollection::LinkIndexNodes(6, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackPivot), node);
+                DscDag::DagCollection::LinkIndexNodes(7, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach), node);
+            }
         }
         else
         {
@@ -1016,23 +1236,34 @@ DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentIm
     return result;
 }
 
-DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentCanvas(const DscCommon::VectorFloat4& in_clear_colour)
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentCanvas()
 {
     TComponentConstructionHelper result({ TUiComponentType::TCanvas });
-    result._clear_colour = in_clear_colour;
     return result;
 }
 
 DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentText(
     const std::shared_ptr<DscText::TextRun>& in_text_run,
-    DscText::TextManager* const in_text_manager,
-    const DscCommon::VectorFloat4& in_clear_colour
+    DscText::TextManager* const in_text_manager
 )
 {
     TComponentConstructionHelper result({ TUiComponentType::TText });
     result._text_run = in_text_run;
     result._text_manager = in_text_manager;
-    result._clear_colour = in_clear_colour;
+    return result;
+}
+
+DscUi::UiManager::TComponentConstructionHelper DscUi::UiManager::MakeComponentStack(
+    const TUiFlow in_flow_direction,
+    const UiCoord& in_gap,
+    const bool in_desired_size_from_children_max
+)
+{
+    TComponentConstructionHelper result({ TUiComponentType::TStack });
+    result._flow_direction = in_flow_direction;
+    result._has_gap = true;
+    result._gap = in_gap;
+    result._desired_size_from_children_max = in_desired_size_from_children_max;
     return result;
 }
 
@@ -1241,6 +1472,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
             in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize),
             in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
             DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+            DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(in_parent.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
             result
         ));
 
@@ -1268,21 +1500,22 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         MakeGeometrySize(
             in_dag_collection,
             DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+            DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(in_parent.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
             desired_size,
             result.GetNodeToken(TUiNodeGroup::TAvaliableSize),
             result
         ));
 
-    //TGeometryOffset
+    //TGeometryOffset (after TGeometrySize as canvas child uses geometry size for attach point)
     result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
         MakeGeometryOffset(
             in_dag_collection,
-            //DscDag::DagCollection::GetValueType<TUiComponentType>(in_parent.GetNodeToken(TUiNodeGroup::TUiComponentType)),
             DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
+            DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(in_parent.GetNodeToken(TUiNodeGroup::TUiComponentResources)),
             in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize),
             in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
             result.GetNodeToken(TUiNodeGroup::TGeometrySize),
-            result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
+            in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
             result
         ));
         

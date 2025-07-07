@@ -42,7 +42,8 @@ namespace DscUi
 		TFill,
 		TImage,
 		TCanvas,
-		TText
+		TText,
+		TStack,
 	};
 
 
@@ -149,9 +150,12 @@ namespace DscUi
 		TTexture,
 
 		TText,
-		//TWidthUiScale,
+
+		TFlow,
+		TGap,
 
 		TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
+
 		THasManualScrollX,
 		TManualScrollX,
 		THasManualScrollY,
@@ -167,6 +171,11 @@ namespace DscUi
 		TPaddingTop,
 		TPaddingRight,
 		TPaddingBottom,
+
+		// child stack data
+		TChildStackSize,
+		TChildStackPivot,
+		TChildStackParentAttach,
 
 		TCount
 	};

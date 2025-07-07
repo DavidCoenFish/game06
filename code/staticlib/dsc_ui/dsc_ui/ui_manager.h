@@ -53,19 +53,19 @@ namespace DscText
 
 /*
 layout calculation summary
-root node is paired with an externally supplied UiRenderTaget, which could be created from  the backbuffer or an arbitary texture, that is the initial avalaible size for the layout
+root node is paired with an externally supplied UiRenderTaget, which could be created from the backbuffer or an arbitary render texture, which provides the initial avalaible size for the layout
 
 avaliable size:
 a child node makes an avaliable size based on the parent avalable size, if it has child slot data, use that, if it has padding, use that to effect the avaliable size
 
 desired size:
-the child node uses that calculated avaliable size to make a desired size which is based on content, like the bounds of a text block, or the max of all children (geometry offset + size)
+the child node uses that calculated avaliable size to make a desired size which is based on content, like the bounds of a text block, or the max of all children (geometry offset + geometry size)
 
 geometry size: 
-based on the parent component type, canvas geometry size is the avaliable size for the child. for a stack, it is the desired size. 
+based on the parent component type, canvas geometry size is the avaliable size for the child. for a stack, it is the desired size for certain axis and avalaible size for other axis
 
 geometry offset:
-relative to the parent top left, where to position the gaometry to draw on parent
+relative to the parent top left, where to position the geometry to draw on parent
 
 render request size:
 what size to request a render target to draw the child onto, max of desired and geometry size
@@ -73,7 +73,8 @@ what size to request a render target to draw the child onto, max of desired and 
 scroll:
 if the desired size is bigger than the the geometry size, automatically scroll the visible area of the child in the parent geometry window, can also be scrolled manually
 
-note, some of the steps may feel redundant, but breaking up the steps so that a parent like a stack, can use the children geometry size in it's desired size caculation, based on it's own avaliable ise handed down to the children
+note, some of the steps may feel redundant, but breaking up the steps so that a parent like a stack, can use the children geometry size in it's desired size caculation, based on it's own avaliable size handed down to the children
+so trying to keep the steps descrete as to any avoid cyclic dependencies on various permutations of ui component types
 */
 namespace DscUi
 {
@@ -117,6 +118,9 @@ namespace DscUi
 			std::shared_ptr<DscText::TextRun> _text_run = {};
 			DscText::TextManager* _text_manager = nullptr;
 
+			// possibly more than just the stack component will use this
+			TUiFlow _flow_direction = TUiFlow::TCount;
+
 			bool _has_ui_scale_by_avaliable_width = false;
 			int32 _scale_width_low_threashhold = 0; // example 800
 			float _scale_factor = 0.0f; // 0.0015789 for scale of 4.8 when width is 3040 more than 800,
@@ -136,7 +140,8 @@ namespace DscUi
 			bool _has_gap = false;
 			UiCoord _gap = {};
 
-			bool _has_stack_attach = false;
+			bool _has_child_stack_data = false; // size data for child of stack
+			UiCoord _stack_size = {};
 			UiCoord _stack_pivot = {};
 			UiCoord _stack_parent_attach_point = {};
 
@@ -192,15 +197,32 @@ namespace DscUi
 				_scale_factor = in_scale_factor;
 				return *this;
 			}
+
+			TComponentConstructionHelper& SetChildStackData(
+				const UiCoord& in_stack_size,
+				const UiCoord& in_stack_pivot,
+				const UiCoord& in_stack_parent_attach_point
+			)
+			{
+				_has_child_stack_data = true;
+				_stack_size = in_stack_size;
+				_stack_pivot = in_stack_pivot;
+				_stack_parent_attach_point = in_stack_parent_attach_point;
+				return *this;
+			}
 		};
 		static TComponentConstructionHelper MakeComponentDebugGrid();
 		static TComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
 		static TComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
-		static TComponentConstructionHelper MakeComponentCanvas(const DscCommon::VectorFloat4& in_clear_colour);
+		static TComponentConstructionHelper MakeComponentCanvas();
 		static TComponentConstructionHelper MakeComponentText(
 			const std::shared_ptr<DscText::TextRun>& in_text_run,
-			DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
-			const DscCommon::VectorFloat4& in_clear_colour = DscCommon::VectorFloat4::s_zero
+			DscText::TextManager* const in_text_manager // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
+			);
+		static TComponentConstructionHelper MakeComponentStack(
+			const TUiFlow in_flow_direction,
+			const UiCoord& in_gap,
+			const bool in_desired_size_from_children_max = true
 			);
 
 		struct TEffectConstructionHelper
@@ -231,7 +253,7 @@ namespace DscUi
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
 		);
 
-		/// also destroys all children, 
+		/// also destroys all children
 		//void DestroyRootNode(UiRootNodeGroup& in_root_node_group);
 		/// we destoy the child, as it is not in a good way after being removed, a lot of it's links will be broken
 		//void RemoveAndDestroyChild(const UiNodeGroup& in_parent, const UiNodeGroup& in_child)
@@ -245,6 +267,7 @@ namespace DscUi
 			const bool in_force_draw,
 			const float in_time_delta,
 			const UiInputState& in_input_state,
+			// for convienience, a pointer to what may be the backbuffer to uppdate the the main UiRenderTarget, possibly better to not have this in the draw, but convienience...
 			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
 			);
 
