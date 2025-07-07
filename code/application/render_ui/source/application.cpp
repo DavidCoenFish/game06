@@ -177,13 +177,18 @@ const bool Application::Update()
 
         if (_resources->_ui_manager)
         {
+            _resources->_ui_manager->Update(
+                _resources->_ui_root_node_group,
+                time_delta,
+                DscUi::UiInputState(),
+                _draw_system->GetRenderTargetBackBuffer()
+            );
+
             _resources->_ui_manager->Draw(
                 _resources->_ui_root_node_group,
                 *_resources->_dag_collection,
                 *frame,
                 true, //false,
-                time_delta,
-                DscUi::UiInputState(),
                 _draw_system->GetRenderTargetBackBuffer()
             );
         }

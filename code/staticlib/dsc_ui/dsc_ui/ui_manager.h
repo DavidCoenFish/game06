@@ -266,18 +266,30 @@ namespace DscUi
 
 		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
 
+		/// if multiple calls to update need to start being called with non zero time delta, need to set up frame node to accept
+		/// a null frame ptr and call update, and skip all steps that needed frame? (but update auto scroll anim, ect)?
+		/// otherwise, just call Update at least once for every Draw?
+		/// things that are not drawn may not animatate correctly either... nodes would be marked dirty, but not ticked unless needed to be drawn?
+		void Update(
+			const UiRootNodeGroup& in_root_node_group,
+			const float in_time_delta,
+			const UiInputState& in_input_state,
+			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
+		);
+
 		void Draw(
 			const UiRootNodeGroup& in_root_node_group,
 			DscDag::DagCollection& in_dag_collection,
 			DscRenderResource::Frame& in_frame,
 			const bool in_force_draw,
-			const float in_time_delta,
-			const UiInputState& in_input_state,
-			// for convienience, a pointer to what may be the backbuffer to uppdate the the main UiRenderTarget, possibly better to not have this in the draw, but convienience...
 			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
 			);
 
 	private:
+		void UpdateRootViewportSize(
+			const UiRootNodeGroup& in_root_node_group
+		);
+
 		// so, if MakeDrawStack creates a UiRenderTaget, how does that get back into the parent, TUiNodeGroup::TUiRenderTarget
 		DscDag::NodeToken MakeDrawStack(
 			const TComponentConstructionHelper& in_construction_helper,

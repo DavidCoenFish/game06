@@ -87,27 +87,30 @@ void DscUi::UiRenderTarget::UpdateRenderTargetPool(
 
 // call SetRenderTarget or SetRenderTargetTexture depending on if we have a _external_render_target or a _render_target_pool_texture
 // asserts if neither is set
-void DscUi::UiRenderTarget::ActivateRenderTarget(
+const bool DscUi::UiRenderTarget::ActivateRenderTarget(
 	DscRenderResource::Frame& in_frame
 )
 {
 	if (nullptr != _external_render_target)
 	{
 		in_frame.SetRenderTarget(_external_render_target, _allow_clear_on_draw);
+		return true;
 	}
 	else if (nullptr != _render_target_pool_texture)
 	{
 		in_frame.SetRenderTargetTexture(_render_target_pool_texture->_render_target_texture, _allow_clear_on_draw);
+		return true;
 	}
 	else if (nullptr != _render_target_texture)
 	{
 		in_frame.SetRenderTargetTexture(_render_target_texture, _allow_clear_on_draw);
+		return true;
 	}
-	else
-	{
-		DSC_ASSERT_ALWAYS("invalid state");
-	}
-	return;
+
+	// so, if the request size is zero or smaller in any dimention, _render_target_pool_texture can be null
+	// so we now return true and false for if there was a valid render target set to the frame, and let client code deal
+	//DSC_ASSERT_ALWAYS("invalid state");
+	return false;
 }
 
 const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetTextureSize() const

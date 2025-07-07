@@ -194,11 +194,12 @@ namespace
                     shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
                 }
 
-                ui_render_target->ActivateRenderTarget(*frame);
-                frame->SetShader(shader, shader_buffer);
-                frame->Draw(weak_geometry.lock());
-                frame->SetRenderTarget(nullptr);
-
+                if (true == ui_render_target->ActivateRenderTarget(*frame))
+                {
+                    frame->SetShader(shader, shader_buffer);
+                    frame->Draw(weak_geometry.lock());
+                    frame->SetRenderTarget(nullptr);
+                }
                 out_value = ui_render_target.get();
             },
             &in_component_resource_group
@@ -1784,39 +1785,48 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
     return result;
 }
 
-void DscUi::UiManager::Draw(
+void DscUi::UiManager::Update(
     const UiRootNodeGroup& in_root_node_group,
-    DscDag::DagCollection& in_dag_collection,
-    DscRenderResource::Frame& in_frame,
-    const bool in_force_draw,
     const float in_time_delta,
     const UiInputState& in_input_state,
     DscRender::IRenderTarget* const in_external_render_target_or_null
 )
 {
-    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame), &in_frame);
-    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TForceDraw), in_force_draw);
-    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta), in_time_delta);
-    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TInputState), in_input_state);
+    DSC_UNUSED(in_input_state);
 
+    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta), in_time_delta);
+
+    if (in_external_render_target_or_null)
     {
         DscDag::NodeToken node = in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget);
         auto render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(node);
         DSC_ASSERT(nullptr != render_target, "invalid state");
-        if (in_external_render_target_or_null)
-        {
-            render_target->UpdateExternalRenderTarget(in_external_render_target_or_null);
-        }
-
-        const DscCommon::VectorInt2 viewport_size = render_target->GetViewportSize();
-        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), viewport_size);
-        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize), DscCommon::VectorFloat4(
-            0.0f,
-            0.0f,
-            static_cast<float>(viewport_size.GetX()),
-            static_cast<float>(viewport_size.GetY())
-            ));
+        render_target->UpdateExternalRenderTarget(in_external_render_target_or_null);
     }
+    UpdateRootViewportSize(in_root_node_group);
+
+    //todo: travers node hierarcy with the in_input_state updating a UiInputInternal to effect state/ button clicks/ rollover
+}
+
+void DscUi::UiManager::Draw(
+    const UiRootNodeGroup& in_root_node_group,
+    DscDag::DagCollection& in_dag_collection,
+    DscRenderResource::Frame& in_frame,
+    const bool in_force_draw,
+    DscRender::IRenderTarget* const in_external_render_target_or_null
+)
+{
+    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame), &in_frame);
+    DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TForceDraw), in_force_draw);
+
+    if (in_external_render_target_or_null)
+    {
+        DscDag::NodeToken node = in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget);
+        auto render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(node);
+        DSC_ASSERT(nullptr != render_target, "invalid state");
+        render_target->UpdateExternalRenderTarget(in_external_render_target_or_null);
+    }
+    UpdateRootViewportSize(in_root_node_group);
 
     in_dag_collection.ResolveDirtyConditionNodes();
 
@@ -1824,6 +1834,29 @@ void DscUi::UiManager::Draw(
 
     return;
 }
+
+void DscUi::UiManager::UpdateRootViewportSize(
+    const UiRootNodeGroup& in_root_node_group
+    )
+{
+    DscDag::NodeToken node = in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiRenderTarget);
+    auto render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(node);
+    DSC_ASSERT(nullptr != render_target, "invalid state");
+
+    if (nullptr != render_target)
+    {
+        const DscCommon::VectorInt2 viewport_size = render_target->GetViewportSize();
+        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), viewport_size);
+        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize), DscCommon::VectorFloat4(
+            0.0f,
+            0.0f,
+            static_cast<float>(viewport_size.GetX()),
+            static_cast<float>(viewport_size.GetY())
+        ));
+    }
+    return;
+}
+
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     const TComponentConstructionHelper& in_construction_helper,
@@ -2009,10 +2042,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
             buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
 
-            ui_render_target->ActivateRenderTarget(*frame);
-            frame->SetShader(weak_shader.lock(), shader_buffer);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
+            if (true == ui_render_target->ActivateRenderTarget(*frame))
+            {
+                frame->SetShader(weak_shader.lock(), shader_buffer);
+                frame->Draw(weak_geometry.lock());
+                frame->SetRenderTarget(nullptr);
+            }
 
             out_value = ui_render_target.get();
         },
@@ -2050,10 +2085,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             buffer._colour[2] = fill_colour.GetZ();
             buffer._colour[3] = fill_colour.GetW();
 
-            ui_render_target->ActivateRenderTarget(*frame);
-            frame->SetShader(weak_shader.lock(), shader_buffer);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
+            if (true == ui_render_target->ActivateRenderTarget(*frame))
+            {
+                frame->SetShader(weak_shader.lock(), shader_buffer);
+                frame->Draw(weak_geometry.lock());
+                frame->SetRenderTarget(nullptr);
+            }
 
             out_value = ui_render_target.get();
         },
@@ -2085,12 +2122,14 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
             auto shader_resource = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderResource>>(in_input_array[2]);
 
-            ui_render_target->ActivateRenderTarget(*frame);
-            auto shader = weak_shader.lock();
-            shader->SetShaderResourceViewHandle(0, shader_resource->GetHeapWrapperItem());
-            frame->SetShader(shader);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
+            if (true == ui_render_target->ActivateRenderTarget(*frame))
+            {
+                auto shader = weak_shader.lock();
+                shader->SetShaderResourceViewHandle(0, shader_resource->GetHeapWrapperItem());
+                frame->SetShader(shader);
+                frame->Draw(weak_geometry.lock());
+                frame->SetRenderTarget(nullptr);
+            }
 
             out_value = ui_render_target.get();
         },
@@ -2121,42 +2160,49 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
             const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[2]);
 
-            ui_render_target->ActivateRenderTarget(*frame);
-            auto shader = weak_shader.lock();
-            auto geometry = weak_geometry.lock();
-            const DscCommon::VectorInt2 parent_render_size = ui_render_target->GetViewportSize();
-
-            for (const auto& child : child_array)
+            if (true == ui_render_target->ActivateRenderTarget(*frame))
             {
-                DscUi::UiRenderTarget* child_render_target = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(child.GetNodeToken(TUiNodeGroup::TDrawNode));
-                DSC_ASSERT(nullptr != child_render_target, "invalid state");
+                auto shader = weak_shader.lock();
+                auto geometry = weak_geometry.lock();
+                const DscCommon::VectorInt2 parent_render_size = ui_render_target->GetViewportSize();
 
-                const auto& shader_constant_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(child.GetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer));
+                for (const auto& child : child_array)
+                {
+                    DscUi::UiRenderTarget* child_render_target = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(child.GetNodeToken(TUiNodeGroup::TDrawNode));
+                    DSC_ASSERT(nullptr != child_render_target, "invalid state");
+                    auto child_texture = child_render_target->GetTexture();
+                    if (nullptr == child_texture)
+                    {
+                        continue;
+                    }
 
-                auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
-                //float _pos_size[4]; // _pos_x_y_size_width_height;
-                // geometry is in range [-1 ... 1], but we want the offset relative to top left
-                const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
-                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
-                buffer._pos_size[0] = (static_cast<float>(geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
-                buffer._pos_size[1] = ((1.0f - static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
-                buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
-                buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
+                    const auto& shader_constant_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(child.GetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer));
 
-                //float _uv_size[4]; // _ui_x_y_size_width_height;
-                const DscCommon::VectorFloat2& scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TScrollPos));
-                const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
-                const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
-                const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
-                buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_texture_size.GetX());
-                const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetY())));
-                buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * scroll_y / static_cast<float>(render_texture_size.GetY());
-                buffer._uv_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_texture_size.GetX());
-                buffer._uv_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_texture_size.GetY());
+                    auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
+                    //float _pos_size[4]; // _pos_x_y_size_width_height;
+                    // geometry is in range [-1 ... 1], but we want the offset relative to top left
+                    const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
+                    const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
+                    buffer._pos_size[0] = (static_cast<float>(geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
+                    buffer._pos_size[1] = ((1.0f - static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
+                    buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
+                    buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
 
-                shader->SetShaderResourceViewHandle(0, child_render_target->GetTexture());
-                frame->SetShader(shader, shader_constant_buffer);
-                frame->Draw(geometry);
+                    //float _uv_size[4]; // _ui_x_y_size_width_height;
+                    const DscCommon::VectorFloat2& scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TScrollPos));
+                    const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
+                    const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
+                    const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
+                    buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_texture_size.GetX());
+                    const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetY())));
+                    buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * scroll_y / static_cast<float>(render_texture_size.GetY());
+                    buffer._uv_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_texture_size.GetX());
+                    buffer._uv_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_texture_size.GetY());
+
+                    shader->SetShaderResourceViewHandle(0, child_texture);
+                    frame->SetShader(shader, shader_constant_buffer);
+                    frame->Draw(geometry);
+                }
             }
 
             out_value = ui_render_target.get();
@@ -2179,17 +2225,19 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                 DSC_ASSERT(nullptr != ui_render_target, "invalid state");
                 const TUiComponentTextData& text_data = DscDag::DagCollection::GetValueType<TUiComponentTextData>(in_input_array[2]);
 
-                ui_render_target->ActivateRenderTarget(frame);
-                DscText::TextRun* text_run_raw = text_data._text_run.get();
-                if (nullptr != text_run_raw)
+                if (true == ui_render_target->ActivateRenderTarget(frame))
                 {
-                    text_run_raw->SetTextContainerSize(ui_render_target->GetViewportSize());
+                    DscText::TextRun* text_run_raw = text_data._text_run.get();
+                    if (nullptr != text_run_raw)
+                    {
+                        text_run_raw->SetTextContainerSize(ui_render_target->GetViewportSize());
 
-                    auto geometry = text_run_raw->GetGeometry(&frame.GetDrawSystem(), &frame);
-                    DSC_ASSERT(nullptr != text_data._text_manager, "invalid state");
-                    auto shader = text_data._text_manager->GetShader(&frame.GetDrawSystem(), &frame);
-                    frame.SetShader(shader);
-                    frame.Draw(geometry);
+                        auto geometry = text_run_raw->GetGeometry(&frame.GetDrawSystem(), &frame);
+                        DSC_ASSERT(nullptr != text_data._text_manager, "invalid state");
+                        auto shader = text_data._text_manager->GetShader(&frame.GetDrawSystem(), &frame);
+                        frame.SetShader(shader);
+                        frame.Draw(geometry);
+                    }
                 }
 
                 out_value = ui_render_target.get();

@@ -117,6 +117,12 @@ std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> Ds
 	const DscCommon::VectorInt2& in_size
 )
 {
+	if ((in_size.GetX() <= 0) ||
+		(in_size.GetY() <= 0))
+	{
+		return nullptr;
+	}
+
 	if (nullptr != in_pool_texture)
 	{
 		DscCommon::VectorFloat4 clear_colour;
@@ -147,6 +153,12 @@ std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> Ds
 	const DscCommon::VectorInt2& in_size
 )
 {
+	if ((in_size.GetX() <= 0) ||
+		(in_size.GetY() <= 0))
+	{
+		return nullptr;
+	}
+
 	const DscCommon::VectorInt2 ceiling_size(DscCommon::Math::Ceiling(in_size.GetX(), _pixel_alignment), DscCommon::Math::Ceiling(in_size.GetY(), _pixel_alignment));
 	const uint32 size_hash = ((ceiling_size.GetX() & 0xffff) << 16) | (in_size.GetY() & 0xffff);
 	const std::size_t param_hash = MakeHash(in_target_format_data_array, in_target_depth_data);

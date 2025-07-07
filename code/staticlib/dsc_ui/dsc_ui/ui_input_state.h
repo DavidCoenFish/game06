@@ -29,8 +29,12 @@ namespace DscUi
 		const bool operator!=(const UiInputState& in_rhs) const;
 	private:
 		//array of touch data
-	
+		struct TouchData
+		{
 
+		};
+
+		std::vector<TouchData> _touch_data_array = {};
 
 	};
 }

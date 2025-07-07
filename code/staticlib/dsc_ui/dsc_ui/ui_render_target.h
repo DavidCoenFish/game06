@@ -61,7 +61,7 @@ namespace DscUi
 
 		// call SetRenderTarget or SetRenderTargetTexture depending on if we have a _external_render_target or a _render_target_pool_texture
 		// asserts if neither is set
-		void ActivateRenderTarget(
+		const bool ActivateRenderTarget(
 			DscRenderResource::Frame& in_frame
 			);
 		// or just set the render target on the frame to nullptr
