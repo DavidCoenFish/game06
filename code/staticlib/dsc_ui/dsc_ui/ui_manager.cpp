@@ -1101,6 +1101,29 @@ namespace
                     parent_screen_space._screen_space[1] + ((geometry_pivot[1] + static_cast<float>(render_request_size.GetY())) * parent_scale[1])
                     );
 
+                const DscCommon::VectorFloat2 geometry_coverage(
+                    static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_request_size.GetX()),
+                    static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_request_size.GetY())
+                    );
+
+                const DscCommon::VectorFloat2 geometry_size_valid(
+                    value._screen_space[2] - value._screen_space[0],
+                    value._screen_space[3] - value._screen_space[1]
+                    );
+
+                const DscCommon::VectorFloat4 geometry_valid(
+                    value._screen_space[0] + (geometry_size_valid[0] * ((1.0f - geometry_coverage[0]) * std::abs(scroll.GetX()))),
+                    value._screen_space[1] + (geometry_size_valid[1] * ((1.0f - geometry_coverage[1]) * std::abs(scroll.GetY()))),
+                    value._screen_space[0] + (geometry_size_valid[0] * (geometry_coverage[0] + ((1.0f - geometry_coverage[0]) * std::abs(scroll.GetX())))),
+                    value._screen_space[1] + (geometry_size_valid[1] * (geometry_coverage[1] + ((1.0f - geometry_coverage[1]) * std::abs(scroll.GetY()))))
+                    );
+
+                value._screen_valid.Set(
+                    std::max(parent_screen_space._screen_valid[0], geometry_valid[0]),
+                    std::max(parent_screen_space._screen_valid[1], geometry_valid[1]),
+                    std::min(parent_screen_space._screen_valid[2], geometry_valid[2]),
+                    std::min(parent_screen_space._screen_valid[3], geometry_valid[3])
+                );
             },
             &in_owner_group
             DSC_DEBUG_ONLY(DSC_COMMA "pixel traversal"));
@@ -1133,6 +1156,16 @@ namespace
             outside = true;
         }
         if ((y < screen_space._screen_space[1]) || (screen_space._screen_space[3] < y))
+        {
+            outside = true;
+        }
+
+        // valid check
+        if ((x < screen_space._screen_valid[0]) || (screen_space._screen_valid[2] < x))
+        {
+            outside = true;
+        }
+        if ((y < screen_space._screen_valid[1]) || (screen_space._screen_valid[3] < y))
         {
             outside = true;
         }
@@ -1986,7 +2019,6 @@ void DscUi::UiManager::UpdateRootViewportSize(
     }
     return;
 }
-
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     const TComponentConstructionHelper& in_construction_helper,
