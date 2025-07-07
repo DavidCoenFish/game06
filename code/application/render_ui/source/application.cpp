@@ -18,13 +18,14 @@
 #include <dsc_ui/ui_enum.h>
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_render_target.h>
-#include <dsc_ui/ui_input_state.h>
+#include <dsc_ui/ui_input_param.h>
 #include <dsc_locale/dsc_locale.h>
 #include <dsc_png/dsc_png.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_text/text_run.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
+#include <dsc_windows/window_helper.h>
 
 namespace
 {
@@ -41,7 +42,9 @@ namespace
             pLocale,
             font,
             16,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            32,
+            16
         ));
 
         const int32 current_width = 0;
@@ -128,20 +131,26 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
 
-        for (int32 index = 0; index < 30; ++index)
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array;
+        effect_array.push_back({ 
+            DscUi::TUiEffectType::TEffectTint, 
+            DscCommon::VectorFloat4::s_zero, 
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f) 
+            });
+        for (int32 index = 0; index < 8; ++index)
         {
             _resources->_ui_manager->AddChildNode(
                 DscUi::UiManager::MakeComponentText(
                     MakeTextRun(*_resources->_text_manager, *_file_system, std::string("hello world ") + std::to_string(index)),
                     _resources->_text_manager.get()
                 ).SetClearColour(
-                    DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+                    DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
                 ),
                 *_draw_system,
                 *_resources->_dag_collection,
                 _resources->_ui_root_node_group,
                 stack_node,
-                std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+                effect_array
                 DSC_DEBUG_ONLY(DSC_COMMA "stack child")
             );
         }
@@ -175,12 +184,31 @@ const bool Application::Update()
             time_delta = _resources->_timer->GetDeltaSeconds();
         }
 
+        DscUi::UiInputParam input_param = {};
+        {
+            DscCommon::VectorInt2 pos = {};
+            bool left_button = false;
+            bool right_button = false;
+
+            DscWindows::GetMouseState(
+                GetHwnd(),
+                pos,
+                left_button,
+                right_button
+            );
+            input_param.SetMouseTouch(
+                pos,
+                left_button,
+                right_button
+                );
+        }
+
         if (_resources->_ui_manager)
         {
             _resources->_ui_manager->Update(
                 _resources->_ui_root_node_group,
                 time_delta,
-                DscUi::UiInputState(),
+                input_param,
                 _draw_system->GetRenderTargetBackBuffer()
             );
 

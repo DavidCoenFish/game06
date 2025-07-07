@@ -23,6 +23,28 @@ namespace DscUi
 		TCount
 	};
 
+	/// will these need to be flags, allow "shift control right click"? start with simple
+	enum class TUiTouchFlavour : uint8
+	{
+		TNone,
+		TMouseLeft,
+		TMouseRight,
+	};
+
+	/// should this just be changed to directly using windows virtual key id? or vaugely allow remapping
+	/// This was intended for ui navigation control, but what if we want general key presses to be comunicated with some component
+	enum class TUiNavigationType : uint8
+	{
+		TNone,
+		TLeft, // keys have amount 1?
+		TRight,
+		TUp,
+		TDown,
+		TScroll, //mouse scroll has an ammount? or just add an amount to everything, allows dpad?
+		TDpadHorizontal,
+		TDpadVertical
+	};
+
 	enum class TUiComponentBehaviour : uint32
 	{
 		TNone = 0,
@@ -72,6 +94,17 @@ namespace DscUi
 		TEffectTint
 	};
 
+	struct ScreenSpace
+	{
+		/// top left, top right, bottom left, bottom right in mouse coord relative to ui root top left
+		/// if our nodes' geometry size was full size on screen, where would it be. ie, easily test if touch intersects with node
+		DscCommon::VectorFloat4 _screen_space = {};
+		// the [top left, top right, bottom left, bottom right] bounds of valid screen area (
+		DscCommon::VectorFloat4 _screen_valid = {};
+
+		const bool operator==(const ScreenSpace& in_rhs) const;
+	};
+
 	enum class TUiRootNodeGroup : uint8
 	{
 		TDrawNode,
@@ -80,12 +113,12 @@ namespace DscUi
 		TArrayChildUiNodeGroup,
 		TForceDraw, // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
 		TRenderTargetViewportSize,
-		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint
+		TScreenSpace, // struct ScreenSpace
 		TUiScale,
 
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
-		TInputState, // dirty if 
+		TInputState, // hold state of what node had click down started, 
 
 		TUiRenderTarget, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
 
@@ -111,7 +144,7 @@ namespace DscUi
 		TGeometryOffset, // public so parent can panel draw this node
 		TGeometrySize, // public so parent can panel draw this node
 		TScrollPos, // where is the geometry size quad is on the render target texture
-		TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
+		TScreenSpace, // struct ScreenSpace
 		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiComponentResourceNodeGroup or TUiNodeGroup?
 		// trying to have everything to do with layout, or for parent to draw, in the TUiNodeGroup layer
 		// for everything else, put into the TUiComponentResources UiComponentResourceNodeGroup

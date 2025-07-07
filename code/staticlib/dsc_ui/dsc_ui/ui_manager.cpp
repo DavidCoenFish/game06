@@ -2,6 +2,7 @@
 #include "screen_quad.h"
 #include "ui_enum.h"
 #include "ui_render_target.h"
+#include "ui_input_param.h"
 #include "ui_input_state.h"
 #include <dsc_common\data_helper.h>
 #include <dsc_common\file_system.h>
@@ -937,6 +938,9 @@ namespace
         return node;
     }
 
+    /// note: the automatic scroll, to do pingpoing without state, traverses a range of [-1 ... 1] and is passed through an abs() function
+    /// otherwise would need state of going up or going down and swap at [0, 1]
+    /// this works, but manual scroll needs to clamp it's range [0 ... 1] else in negative domain, will be pingpong to positive....
     constexpr float s_scroll_pixels_per_second = 32.0f;
     constexpr float s_wrap_threashold = 1.0f; // was considering 1.25f for threashold and 2.5 for ping pong step, but only pauses at one end of the anim
     constexpr float s_wrap_step_ping_pong = 2.0f;
@@ -1056,6 +1060,110 @@ namespace
 
         return result_node;
     }
+
+    DscDag::NodeToken MakeScreenSpace(
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::NodeToken in_parent_screen_space,
+        DscDag::NodeToken in_parent_render_request_size,
+        DscDag::NodeToken in_geometry_size,
+        DscDag::NodeToken in_geometry_offset,
+        DscDag::NodeToken in_render_request_size,
+        DscDag::NodeToken in_scroll,
+        DscUi::UiNodeGroup& in_owner_group
+    )
+    {
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscUi::ScreenSpace>([](DscUi::ScreenSpace& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const DscUi::ScreenSpace& parent_screen_space = DscDag::DagCollection::GetValueType<DscUi::ScreenSpace>(in_input_array[0]);
+                const DscCommon::VectorInt2& parent_render_request_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+                const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[2]);
+                const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[3]);
+                const DscCommon::VectorInt2& render_request_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[4]);
+                const DscCommon::VectorFloat2& scroll = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(in_input_array[5]);
+
+                const DscCommon::VectorFloat2 parent_size(
+                    parent_screen_space._screen_space[2] - parent_screen_space._screen_space[0],
+                    parent_screen_space._screen_space[3] - parent_screen_space._screen_space[1]
+                    );
+                const DscCommon::VectorFloat2 parent_scale(
+                    parent_size.GetX() / static_cast<float>(parent_render_request_size.GetX()),
+                    parent_size.GetY() / static_cast<float>(parent_render_request_size.GetY())
+                );
+
+                const DscCommon::VectorFloat2 geometry_pivot(
+                    static_cast<float>(geometry_offset.GetX()) - (static_cast<float>(render_request_size.GetX() - geometry_size.GetX()) * std::abs(scroll.GetX())),
+                    static_cast<float>(geometry_offset.GetY()) - (static_cast<float>(render_request_size.GetY() - geometry_size.GetY()) * std::abs(scroll.GetY()))
+                    );
+
+                value._screen_space.Set(
+                    parent_screen_space._screen_space[0] + (geometry_pivot[0] * parent_scale[0]),
+                    parent_screen_space._screen_space[1] + (geometry_pivot[1] * parent_scale[1]),
+                    parent_screen_space._screen_space[0] + ((geometry_pivot[0] + static_cast<float>(render_request_size.GetX())) * parent_scale[0]),
+                    parent_screen_space._screen_space[1] + ((geometry_pivot[1] + static_cast<float>(render_request_size.GetY())) * parent_scale[1])
+                    );
+
+            },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "pixel traversal"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_parent_screen_space, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_parent_render_request_size, node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_geometry_offset, node);
+        DscDag::DagCollection::LinkIndexNodes(3, in_geometry_size, node);
+        DscDag::DagCollection::LinkIndexNodes(4, in_render_request_size, node);
+        DscDag::DagCollection::LinkIndexNodes(5, in_scroll, node);
+
+        return node;
+    }
+
+    void TraverseHierarchyInput(
+        const DscUi::UiInputParam::TouchData& in_touch,
+        DscDag::NodeToken in_screen_space,
+        DscDag::NodeToken in_array_child_ui_node_group,
+        DscDag::NodeToken in_component_resources
+    )
+    {
+        const float x = static_cast<float>(in_touch._root_relative_pos.GetX());
+        const float y = static_cast<float>(in_touch._root_relative_pos.GetY());
+        const DscUi::ScreenSpace& screen_space = DscDag::DagCollection::GetValueType<DscUi::ScreenSpace>(in_screen_space);
+
+        // bounds check
+        bool outside = false;
+        if ((x < screen_space._screen_space[0]) || (screen_space._screen_space[2] < x))
+        {
+            outside = true;
+        }
+        if ((y < screen_space._screen_space[1]) || (screen_space._screen_space[3] < y))
+        {
+            outside = true;
+        }
+
+        const DscUi::UiComponentResourceNodeGroup& resource_group = DscDag::DagCollection::GetValueType< DscUi::UiComponentResourceNodeGroup>(in_component_resources);
+        if (nullptr != resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TEffectParamArray))
+        {
+            const std::vector<DscDag::NodeToken>& effect_param_array = DscDag::DagCollection::GetValueType<std::vector<DscDag::NodeToken>>(resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TEffectParamArray));
+            int32 trace = 0;
+            for (const auto& node : effect_param_array)
+            {
+                if (0 != (trace & 1))
+                {
+                    DscDag::DagCollection::SetValueType(node, DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, outside ? 0.5f : 1.0f));
+                }
+                trace += 1;
+            }
+        }
+
+        const auto& array_children = DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_array_child_ui_node_group);
+        for (const auto& child : array_children)
+        {
+            TraverseHierarchyInput(
+                in_touch,
+                child.GetNodeToken(DscUi::TUiNodeGroup::TScreenSpace),
+                child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup),
+                child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources)
+                );
+        }
+    }
+
 
 } // namespace
 
@@ -1516,11 +1624,11 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "render target size")));
 
-    result.SetNodeToken(TUiRootNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(
-        DscCommon::VectorFloat4::s_zero,
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+    result.SetNodeToken(TUiRootNodeGroup::TScreenSpace, in_dag_collection.CreateValue(
+        DscUi::ScreenSpace(),
+        DscDag::CallbackOnValueChange<DscUi::ScreenSpace>::Function,
         &result
-        DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
+        DSC_DEBUG_ONLY(DSC_COMMA "screen space")));
 
     UiComponentResourceNodeGroup component_resource_node_group;
     component_resource_node_group.SetNodeToken(TUiComponentResourceNodeGroup::TClearColour, in_dag_collection.CreateValue(
@@ -1574,7 +1682,7 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
     result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup));
     result.SetNodeToken(TUiNodeGroup::TAvaliableSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TRenderRequestSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
-    result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize));
+    result.SetNodeToken(TUiNodeGroup::TScreenSpace, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpace));
     result.SetNodeToken(TUiNodeGroup::TGeometrySize, in_ui_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize));
     result.SetNodeToken(TUiNodeGroup::TGeometryOffset, 
         in_dag_collection.CreateValue(
@@ -1748,11 +1856,16 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
     }
 
     //TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
-    result.SetNodeToken(TUiNodeGroup::TScreenSpaceSize, in_dag_collection.CreateValue(
-        DscCommon::VectorFloat4(0, 0, 0, 0),
-        DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "screen space size")));
+    result.SetNodeToken(TUiNodeGroup::TScreenSpace, MakeScreenSpace(
+        in_dag_collection,
+        in_parent.GetNodeToken(TUiNodeGroup::TScreenSpace),
+        in_parent.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
+        result.GetNodeToken(TUiNodeGroup::TGeometrySize),
+        result.GetNodeToken(TUiNodeGroup::TGeometryOffset),
+        result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
+        result.GetNodeToken(TUiNodeGroup::TScrollPos),
+        result
+        ));
 
     UiComponentResourceNodeGroup& component_resource_node_group = DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(result.GetNodeToken(TUiNodeGroup::TUiComponentResources), false);
     auto draw_node = MakeDrawStack(
@@ -1788,11 +1901,11 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 void DscUi::UiManager::Update(
     const UiRootNodeGroup& in_root_node_group,
     const float in_time_delta,
-    const UiInputState& in_input_state,
+    const UiInputParam& in_input_param,
     DscRender::IRenderTarget* const in_external_render_target_or_null
 )
 {
-    DSC_UNUSED(in_input_state);
+    DSC_UNUSED(in_input_param);
 
     DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta), in_time_delta);
 
@@ -1806,6 +1919,15 @@ void DscUi::UiManager::Update(
     UpdateRootViewportSize(in_root_node_group);
 
     //todo: travers node hierarcy with the in_input_state updating a UiInputInternal to effect state/ button clicks/ rollover
+    for (const auto& touch : in_input_param._touch_data_array)
+    {
+        TraverseHierarchyInput(
+            touch,
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpace),
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup),
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources)
+            );
+    }
 }
 
 void DscUi::UiManager::Draw(
@@ -1847,12 +1969,20 @@ void DscUi::UiManager::UpdateRootViewportSize(
     {
         const DscCommon::VectorInt2 viewport_size = render_target->GetViewportSize();
         DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize), viewport_size);
-        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpaceSize), DscCommon::VectorFloat4(
+
+        DscUi::ScreenSpace screen_space({ DscCommon::VectorFloat4(
             0.0f,
             0.0f,
             static_cast<float>(viewport_size.GetX()),
             static_cast<float>(viewport_size.GetY())
-        ));
+        ), DscCommon::VectorFloat4(
+            0.0f,
+            0.0f,
+            static_cast<float>(viewport_size.GetX()),
+            static_cast<float>(viewport_size.GetY())
+        ) });
+
+        DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpace), screen_space);
     }
     return;
 }

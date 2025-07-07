@@ -80,6 +80,7 @@ namespace DscUi
 {
 	class IUiComponent;
 	class UiCoord;
+	class UiInputParam;
 	class UiInputState;
 	class UiRenderTarget;
 	class VectorUiCoord2;
@@ -273,7 +274,7 @@ namespace DscUi
 		void Update(
 			const UiRootNodeGroup& in_root_node_group,
 			const float in_time_delta,
-			const UiInputState& in_input_state,
+			const UiInputParam& in_input_param,
 			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
 		);
 

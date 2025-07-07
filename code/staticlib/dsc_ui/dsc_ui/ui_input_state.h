@@ -8,6 +8,13 @@ namespace DscCommon
 	typedef Vector2<int32> VectorInt2;
 }
 
+namespace DscDag
+{
+	class DagCollection;
+	class IDagNode;
+	typedef IDagNode* NodeToken;
+}
+
 namespace DscUi
 {
 	class UiInputState
@@ -15,26 +22,13 @@ namespace DscUi
 	public:
 		UiInputState();
 
-		// mouse pos in pixels, relative to 
-		void SetMouseTouch(
-			const DscCommon::VectorInt2& in_pos,
-			const bool in_left_button_down,
-			const bool in_right_button_down
-			);
-
-		// return true if values changed
-		const bool Update(const UiInputState& in_ui_input_state);
-
-		const bool operator==(const UiInputState& in_rhs) const;
-		const bool operator!=(const UiInputState& in_rhs) const;
 	private:
-		//array of touch data
-		struct TouchData
+		struct TouchState
 		{
-
+			int32 _id = 0;
+			DscDag::NodeToken _node_under_touch_start = nullptr;
 		};
-
-		std::vector<TouchData> _touch_data_array = {};
+		std::vector<TouchState> _touch_state = {};
 
 	};
 }

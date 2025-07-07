@@ -13,6 +13,7 @@
 #include "screen_quad.h"
 #include "ui_coord.h"
 #include "ui_enum.h"
+#include "ui_input_param.h"
 #include "ui_input_state.h"
 #include "ui_manager.h"
 #include "ui_render_target.h"

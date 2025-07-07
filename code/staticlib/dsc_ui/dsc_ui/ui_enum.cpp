@@ -53,9 +53,9 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
 		return s_meta_data;
 	}
-	case DscUi::TUiRootNodeGroup::TScreenSpaceSize:
+	case DscUi::TUiRootNodeGroup::TScreenSpace:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::ScreenSpace) };
 		return s_meta_data;
 	}
 	case DscUi::TUiRootNodeGroup::TUiScale:
@@ -137,9 +137,9 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat2) };
 		return s_meta_data;
 	}
-	case DscUi::TUiNodeGroup::TScreenSpaceSize:
+	case DscUi::TUiNodeGroup::TScreenSpace:
 	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat4) };
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::ScreenSpace) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TUiPanelShaderConstantBuffer:
@@ -276,4 +276,19 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;
+}
+
+const bool DscUi::ScreenSpace::operator==(const ScreenSpace& in_rhs) const
+{
+	if (_screen_space != in_rhs._screen_space)
+	{
+		return false;
+	}
+
+	if (_screen_valid != in_rhs._screen_valid)
+	{
+		return false;
+	}
+
+	return true;
 }
