@@ -21,6 +21,7 @@
         "dsc_common", 
         "dsc_dag", 
         "dsc_version", 
+        "dsc_onscreen_version", 
         "dsc_windows", 
         "dsc_render", 
         "dsc_render_resource", 
@@ -28,6 +29,7 @@
         "dsc_text", 
         "dsc_locale",
         "dsc_png",
+        "dsc_version",
         "dsc_ui",
         }
     .LinkerAdditionalDependency = {
@@ -49,7 +51,9 @@
     .AdditionalIncludePaths = {}
 
     .DataCopyPath = {
-        "$RootPath$/../data/font"
+        "$RootPath$/../data/font",
+        "$RootPath$/../data/background",
+        "$RootPath$/../data/sample_png",
         }
     .DoDataCopy = true
 
@@ -64,8 +68,8 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_unit_test" .WindowExeParam)
+DscVsprojectWindowExe("render_ui_stack" .WindowExeParam)
 
-.SolutionProjects + "render_unit_test_project"
-.SolutionItemsApplicationProject + "render_unit_test_project"
-//.SolutionBuildProject = "render_unit_test_project"
+.SolutionProjects + "render_ui_stack_project"
+.SolutionItemsApplicationProject + "render_ui_stack_project"
+//.SolutionBuildProject = "render_ui_stack_project"
