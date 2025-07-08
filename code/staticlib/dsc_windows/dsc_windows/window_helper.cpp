@@ -264,15 +264,18 @@ namespace
 
 } // namespace
 
-const bool DscWindows::UpdateApplication(const HWND in_hwnd)
+void DscWindows::UpdateApplication(const HWND in_hwnd)
 {
-	bool _continue = false; // true; // there may be cycles at startup where pApplication is null, else set _continue as false?
 	DscWindows::IWindowApplication* const pApplication = GetWindowApplication(in_hwnd);
 	if (nullptr != pApplication)
 	{
-		_continue = pApplication->Update();
+		if (false == pApplication->Update())
+		{
+			DestroyWindow(in_hwnd);
+		}
 	}
-	return _continue;
+
+	return;
 }
 
 const HWND DscWindows::WindowHelper(

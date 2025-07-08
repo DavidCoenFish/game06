@@ -16,7 +16,8 @@ namespace DscWindows
 	//The return raw pointer IApplication is because ownership is placed under operating system SetWindowLongPtr(hWnd, GWLP_USERDATA,..)
 	typedef std::function< IWindowApplication* const (const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight) > TWindowApplicationFactory;
 
-	const bool UpdateApplication(const HWND in_hwnd);
+	// don't return a keep going flag, as application destruction may not be called if we exit via non WM_CLOSE -> DestroyWindow -> WM_QUIT
+	void UpdateApplication(const HWND in_hwnd);
 
 	// return the handel of the created window, or NULL on error
 	const HWND WindowHelper(
