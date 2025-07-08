@@ -1,5 +1,246 @@
 #include "component_construction_helper.h"
 
+DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
+    DscDag::DagCollection& in_dag_collection,
+    const DscUi::ComponentConstructionHelper& in_construction_helper,
+    DscDag::NodeToken in_ui_scale,
+    DscDag::NodeToken in_avaliable_size
+)
+{
+    DscUi::UiComponentResourceNodeGroup component_resource_group;
+    component_resource_group.SetNodeToken(
+        DscUi::TUiComponentResourceNodeGroup::TClearColour,
+        in_dag_collection.CreateValue(
+            in_construction_helper._clear_colour,
+            DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+            &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
+
+    if (true == in_construction_helper._has_scroll)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::THasManualScrollX,
+            in_dag_collection.CreateValue(
+                in_construction_helper._has_manual_scroll_x,
+                DscDag::CallbackOnValueChange<bool>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll x")));
+
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TManualScrollX,
+            in_dag_collection.CreateValue(
+                0.0f,
+                DscDag::CallbackOnValueChange<float>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "manual scroll x")));
+
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::THasManualScrollY,
+            in_dag_collection.CreateValue(
+                in_construction_helper._has_manual_scroll_y,
+                DscDag::CallbackOnValueChange<bool>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll y")));
+
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TManualScrollY,
+            in_dag_collection.CreateValue(
+                0.0f,
+                DscDag::CallbackOnValueChange<float>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "manual scroll y")));
+    }
+
+    if (true == in_construction_helper._has_fill)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TFillColour,
+            in_dag_collection.CreateValue(
+                in_construction_helper._fill,
+                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "fill colour")));
+    }
+
+    if (nullptr != in_construction_helper._texture)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TTexture,
+            in_dag_collection.CreateValue(
+                in_construction_helper._texture,
+                DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "texture")));
+    }
+
+    if (nullptr != in_construction_helper._text_run)
+    {
+        DSC_ASSERT(nullptr != in_construction_helper._text_manager, "invalid state");
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TText,
+            in_dag_collection.CreateValue(
+                DscUi::TUiComponentTextData({ in_construction_helper._text_run , in_construction_helper._text_manager }),
+                DscDag::CallbackOnSetValue<DscUi::TUiComponentTextData>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "text")));
+    }
+
+    if (true == in_construction_helper._has_ui_scale_by_avaliable_width)
+    {
+        const int32 scale_width_low_threashhold = in_construction_helper._scale_width_low_threashhold;
+        const float scale_factor = in_construction_helper._scale_factor;
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TUiScale,
+            in_dag_collection.CreateCalculate<float>([scale_width_low_threashhold, scale_factor](float& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+            const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+            if (scale_width_low_threashhold < avaliable_size.GetX())
+            {
+                ui_scale = (1.0f + (static_cast<float>(avaliable_size.GetX() - scale_width_low_threashhold) * scale_factor));
+            }
+
+            value = ui_scale;
+        },
+                &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "ui scale from width")));
+        DscDag::DagCollection::LinkIndexNodes(0, in_ui_scale, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
+        DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
+    }
+    else
+    {
+        component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale, in_ui_scale);
+    }
+
+    if (true == in_construction_helper._has_child_slot_data)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TChildSlotSize,
+            in_dag_collection.CreateValue(
+                in_construction_helper._child_size,
+                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "child slot size")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot,
+            in_dag_collection.CreateValue(
+                in_construction_helper._child_pivot,
+                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "child slot pivot")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach,
+            in_dag_collection.CreateValue(
+                in_construction_helper._attach_point,
+                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "child slot parent attach")));
+    }
+
+    if (true == in_construction_helper._has_padding)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TPaddingLeft,
+            in_dag_collection.CreateValue(
+                in_construction_helper._padding_left,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "padding left")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TPaddingTop,
+            in_dag_collection.CreateValue(
+                in_construction_helper._padding_top,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "padding top")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TPaddingRight,
+            in_dag_collection.CreateValue(
+                in_construction_helper._padding_right,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "padding right")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TPaddingBottom,
+            in_dag_collection.CreateValue(
+                in_construction_helper._padding_bottom,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "padding bottom")));
+    }
+
+    if (true == in_construction_helper._has_gap)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TGap,
+            in_dag_collection.CreateValue(
+                in_construction_helper._gap,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "gap")));
+    }
+
+    if (DscUi::TUiFlow::TCount != in_construction_helper._flow_direction)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TFlow,
+            in_dag_collection.CreateValue(
+                in_construction_helper._flow_direction,
+                DscDag::CallbackOnValueChange<DscUi::TUiFlow>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "flow direction")));
+    }
+
+    if (true == in_construction_helper._has_child_stack_data)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TChildStackSize,
+            in_dag_collection.CreateValue(
+                in_construction_helper._stack_size,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TChildStackPivot,
+            in_dag_collection.CreateValue(
+                in_construction_helper._stack_pivot,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "child stack pivot")));
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach,
+            in_dag_collection.CreateValue(
+                in_construction_helper._stack_parent_attach_point,
+                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "child stack parent attach")));
+    }
+
+    if (true == in_construction_helper._has_input)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TInputStateFlag,
+            in_dag_collection.CreateValue(
+                DscUi::TUiInputStateFlag::TNone,
+                DscDag::CallbackOnValueChange<DscUi::TUiInputStateFlag>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "input state flag")));
+
+        if (nullptr != in_construction_helper._input_click_callback)
+        {
+            component_resource_group.SetNodeToken(
+                DscUi::TUiComponentResourceNodeGroup::TInputData,
+                in_dag_collection.CreateValue(
+                    DscUi::TUiComponentInputData({ in_construction_helper._input_click_callback}),
+                    DscDag::CallbackNever<DscUi::TUiComponentInputData>::Function,
+                    &component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "input data")));
+        }
+
+    }
+
+    return component_resource_group;
+}
+
 DscUi::ComponentConstructionHelper DscUi::MakeComponentDebugGrid()
 {
     return ComponentConstructionHelper({ TUiComponentType::TDebugGrid});

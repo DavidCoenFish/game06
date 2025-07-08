@@ -140,6 +140,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscCommon::VectorFloat4::s_zero, 
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f) 
             });
+
         for (int32 index = 0; index < 8; ++index)
         {
             _resources->_ui_manager->AddChildNode(
@@ -157,6 +158,25 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 DSC_DEBUG_ONLY(DSC_COMMA "stack child")
             );
         }
+
+        _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentText(
+                MakeTextRun(*_resources->_text_manager, *_file_system, "Exit"),
+                _resources->_text_manager.get()
+            ).SetClearColour(
+                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
+            ).SetInputData([this](const DscUi::UiComponentResourceNodeGroup&) {
+                this->_keep_running = false;
+                }
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            stack_node,
+            effect_array
+            DSC_DEBUG_ONLY(DSC_COMMA "stack child")
+        );
+
     }
 
     return;

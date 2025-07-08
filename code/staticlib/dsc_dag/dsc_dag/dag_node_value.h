@@ -10,6 +10,8 @@
 
 namespace DscDag
 {
+	// note: these are in structs as to make them easy to pass into template param
+	// however, we are not using them as template param as for dynamic casting to work, you need to know all the template param, and we just use type for methods like get value...
 	template <typename IN_TYPE>
 	struct CallbackOnSetValue {
 		static void Function(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE&)

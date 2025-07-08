@@ -31,6 +31,21 @@ namespace DscUi
 		TMouseRight,
 	};
 
+	enum class TUiInputStateFlag : uint8
+	{
+		TNone,
+		TRollover = 1 << 0,
+		TClick = 1 << 1,
+		// is this the frame the click started, should also have TClick set
+		TClickStart = 1 << 2,
+		// did click end this frame, can be true without TClick set
+		TClickEnd = 1 << 3
+	};
+}
+const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
+
+namespace DscUi
+{
 	/// should this just be changed to directly using windows virtual key id? or vaugely allow remapping
 	/// This was intended for ui navigation control, but what if we want general key presses to be comunicated with some component
 	enum class TUiNavigationType : uint8
@@ -45,19 +60,6 @@ namespace DscUi
 		TDpadVertical
 	};
 
-	enum class TUiComponentBehaviour : uint32
-	{
-		TNone = 0,
-		//TVisible = 1 << 0, ? why have the node in the tree if it is invisible? convienience? or use UiComponentSwitch/ UiComponentCrossfade for that?
-		THasManualScrollX = 1 << 0,
-		THasManualScrollY = 1 << 1,
-
-		TDisabled = 1 << 2,
-		// or are these inputs/ state?
-		//TRollover = 1 << 3,
-		//TClicked = 1 << 4
-	};
-
 	enum class TUiComponentType : uint8
 	{
 		TDebugGrid,
@@ -67,7 +69,6 @@ namespace DscUi
 		TText,
 		TStack,
 	};
-
 
 	enum class TUiDrawType : uint8
 	{
@@ -164,11 +165,6 @@ namespace DscUi
 		std::shared_ptr<DscText::TextRun> _text_run = {};
 		DscText::TextManager* _text_manager = nullptr;
 	};
-	//struct TUiComponentWidthUiScale
-	//{
-	//	int32 _scale_width_low_threashhold = 0; // example 800
-	//	float _scale_factor = 0.0f; // 0.0015789 for scale of 4.8 when width is 3040 more than 800,
-	//};
 
 	//this is ment as the data store for a UiComponent, but we replaced the UiComponent with a dag node/ node group...
 	enum class TUiComponentResourceNodeGroup : uint8
@@ -210,6 +206,9 @@ namespace DscUi
 		TChildStackPivot,
 		TChildStackParentAttach,
 
+		TInputStateFlag,
+		TInputData,
+
 		TCount
 	};
 	typedef DscDag::DagGroup<TUiComponentResourceNodeGroup, static_cast<std::size_t>(TUiComponentResourceNodeGroup::TCount)> UiComponentResourceNodeGroup;
@@ -218,3 +217,20 @@ namespace DscUi
 template <>
 const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUiComponentResourceNodeGroup in_value);
 
+
+namespace DscUi
+{
+	struct TUiComponentInputData
+	{
+		std::function<void(const UiComponentResourceNodeGroup&)> _click_callback = {};
+		//std::function<void(const VectorFloat4&, const VectorFloat2&)> _drag_callback = {};
+		//DscCommon::VectorInt2 _screen_touch_pos_click_start = {};
+		//DscCommon::VectorFloat4 _node_screen_space_click_start = {};
+
+		// use a different node for TUiInputStateFlag
+		//bool _rollover = false;
+		//// is there a click active on this node
+		//bool _active_click = false;
+		//bool _first_frame_click = false;
+	};
+} // DscUi

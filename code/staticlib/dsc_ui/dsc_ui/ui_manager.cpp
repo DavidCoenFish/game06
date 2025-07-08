@@ -9,6 +9,7 @@
 #include <dsc_common\data_helper.h>
 #include <dsc_common\file_system.h>
 #include <dsc_common\log_system.h>
+#include <dsc_common\math.h>
 #include <dsc_common\vector_float2.h>
 #include <dsc_dag\dag_array_helper.h>
 #include <dsc_dag\dag_collection.h>
@@ -293,224 +294,6 @@ namespace
             array_shader_resource_info,
             array_shader_constants_info
             );
-    }
-
-    DscUi::UiComponentResourceNodeGroup MakeComponentResourceGroup(
-        DscDag::DagCollection& in_dag_collection,
-        const DscUi::ComponentConstructionHelper& in_construction_helper,
-        DscDag::NodeToken in_ui_scale,
-        DscDag::NodeToken in_avaliable_size
-        )
-    {
-        DscUi::UiComponentResourceNodeGroup component_resource_group;
-        component_resource_group.SetNodeToken(
-            DscUi::TUiComponentResourceNodeGroup::TClearColour,
-            in_dag_collection.CreateValue(
-                in_construction_helper._clear_colour,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
-
-        if (true == in_construction_helper._has_scroll)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::THasManualScrollX,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._has_manual_scroll_x,
-                    DscDag::CallbackOnValueChange<bool>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll x")));
-
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TManualScrollX,
-                in_dag_collection.CreateValue(
-                    0.0f,
-                    DscDag::CallbackOnValueChange<float>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "manual scroll x")));
-
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::THasManualScrollY,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._has_manual_scroll_y,
-                    DscDag::CallbackOnValueChange<bool>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll y")));
-
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TManualScrollY,
-                in_dag_collection.CreateValue(
-                    0.0f,
-                    DscDag::CallbackOnValueChange<float>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "manual scroll y")));
-        }
-
-        if (true == in_construction_helper._has_fill)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TFillColour,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._fill,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "fill colour")));
-        }
-
-        if (nullptr != in_construction_helper._texture)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TTexture,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._texture,
-                    DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "texture")));
-        }
-
-        if (nullptr != in_construction_helper._text_run)
-        {
-            DSC_ASSERT(nullptr != in_construction_helper._text_manager, "invalid state");
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TText,
-                in_dag_collection.CreateValue(
-                    DscUi::TUiComponentTextData({ in_construction_helper._text_run , in_construction_helper._text_manager }),
-                    DscDag::CallbackOnSetValue<DscUi::TUiComponentTextData>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "text")));
-        }
-
-        if (true == in_construction_helper._has_ui_scale_by_avaliable_width)
-        {
-            const int32 scale_width_low_threashhold = in_construction_helper._scale_width_low_threashhold;
-            const float scale_factor = in_construction_helper._scale_factor;
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TUiScale,
-                in_dag_collection.CreateCalculate<float>([scale_width_low_threashhold, scale_factor](float& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-                    float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
-                    const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
-                    if (scale_width_low_threashhold < avaliable_size.GetX())
-                    {
-                        ui_scale = (1.0f + (static_cast<float>(avaliable_size.GetX() - scale_width_low_threashhold) * scale_factor));
-                    }
-
-                    value = ui_scale;
-                },
-                & component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "ui scale from width")));
-            DscDag::DagCollection::LinkIndexNodes(0, in_ui_scale, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
-            DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
-        }
-        else
-        {
-            component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale, in_ui_scale);
-        }
-
-        if (true == in_construction_helper._has_child_slot_data)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TChildSlotSize,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._child_size,
-                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "child slot size")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._child_pivot,
-                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "child slot pivot")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._attach_point,
-                    DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "child slot parent attach")));
-        }
-
-        if (true == in_construction_helper._has_padding)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TPaddingLeft,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._padding_left,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "padding left")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TPaddingTop,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._padding_top,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "padding top")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TPaddingRight,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._padding_right,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "padding right")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TPaddingBottom,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._padding_bottom,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "padding bottom")));
-        }
-
-        if (true == in_construction_helper._has_gap)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TGap,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._gap,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "gap")));
-        }
-
-        if (DscUi::TUiFlow::TCount != in_construction_helper._flow_direction)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TFlow,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._flow_direction,
-                    DscDag::CallbackOnValueChange<DscUi::TUiFlow>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "flow direction")));
-        }
-
-        if (true == in_construction_helper._has_child_stack_data)
-        {
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TChildStackSize,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._stack_size,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TChildStackPivot,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._stack_pivot,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
-            component_resource_group.SetNodeToken(
-                DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach,
-                in_dag_collection.CreateValue(
-                    in_construction_helper._stack_parent_attach_point,
-                    DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
-        }
-
-        return component_resource_group;
     }
 
     DscDag::NodeToken MakeAvaliableSize(
@@ -1142,64 +925,86 @@ namespace
 
     void TraverseHierarchyInput(
         const DscUi::UiInputParam::TouchData& in_touch,
-        DscDag::NodeToken in_screen_space,
-        DscDag::NodeToken in_array_child_ui_node_group,
-        DscDag::NodeToken in_component_resources
+        const DscUi::ScreenSpace& in_screen_space,
+        const DscUi::UiComponentResourceNodeGroup& in_resource_group,
+        const std::vector<DscUi::UiNodeGroup>& in_array_children,
+        DscUi::UiInputState::TouchState& in_touch_data,
+        bool& in_out_consumed
     )
     {
         const float x = static_cast<float>(in_touch._root_relative_pos.GetX());
         const float y = static_cast<float>(in_touch._root_relative_pos.GetY());
-        const DscUi::ScreenSpace& screen_space = DscDag::DagCollection::GetValueType<DscUi::ScreenSpace>(in_screen_space);
 
-        // bounds check
-        bool outside = false;
-        if ((x < screen_space._screen_space[0]) || (screen_space._screen_space[2] < x))
-        {
-            outside = true;
-        }
-        if ((y < screen_space._screen_space[1]) || (screen_space._screen_space[3] < y))
-        {
-            outside = true;
-        }
+        const bool inside = DscCommon::Math::InsideBounds(x, y, in_screen_space._screen_valid); 
+            //&& DscCommon::Math::InsideBounds(x, y, in_screen_space._screen_space);
 
-        // valid check
-        if ((x < screen_space._screen_valid[0]) || (screen_space._screen_valid[2] < x))
+        DscDag::NodeToken input_state_flag = in_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag);
+        if (nullptr != input_state_flag)
         {
-            outside = true;
-        }
-        if ((y < screen_space._screen_valid[1]) || (screen_space._screen_valid[3] < y))
-        {
-            outside = true;
-        }
-
-        const DscUi::UiComponentResourceNodeGroup& resource_group = DscDag::DagCollection::GetValueType< DscUi::UiComponentResourceNodeGroup>(in_component_resources);
-        if (nullptr != resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TEffectParamArray))
-        {
-            const std::vector<DscDag::NodeToken>& effect_param_array = DscDag::DagCollection::GetValueType<std::vector<DscDag::NodeToken>>(resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TEffectParamArray));
-            int32 trace = 0;
-            for (const auto& node : effect_param_array)
+            bool clicked = false;
+            DscUi::TUiInputStateFlag flag = inside ? DscUi::TUiInputStateFlag::TRollover : DscUi::TUiInputStateFlag::TNone;
+            if ((false == in_out_consumed) && (true == inside))
             {
-                if (0 != (trace & 1))
+                if (true == in_touch._active)
                 {
-                    DscDag::DagCollection::SetValueType(node, DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, outside ? 0.5f : 1.0f));
+                    in_out_consumed = true;
+                    if (in_touch_data._click_start)
+                    {
+                        flag |= DscUi::TUiInputStateFlag::TClickStart;
+                       in_touch_data._node_under_click_start = input_state_flag;
+                    }
                 }
-                trace += 1;
+                else if ((true == in_touch_data._click_end) &&
+                    (input_state_flag == in_touch_data._node_under_click_start))
+                {
+                    in_out_consumed = true;
+                    // we have a click
+                    flag |= DscUi::TUiInputStateFlag::TClickEnd;
+                    clicked = true;
+                }
+            }
+
+            // slightly pull this out of the above condition, saves doing it top level of callstack
+            if (input_state_flag == in_touch_data._node_under_click_start)
+            {
+                if (in_touch._active)
+                {
+                    flag |= DscUi::TUiInputStateFlag::TClick;
+                }
+                else
+                {
+                    in_touch_data._node_under_click_start = nullptr;
+                }
+            }
+
+            DscDag::DagCollection::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
+
+            if (true == clicked)
+            {
+                DscDag::NodeToken input_data_node = in_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputData);
+                if (nullptr != input_data_node)
+                {
+                    const DscUi::TUiComponentInputData& input_data = DscDag::DagCollection::GetValueType<DscUi::TUiComponentInputData>(input_data_node);
+                    if (nullptr != input_data._click_callback)
+                    {
+                        input_data._click_callback(in_resource_group);
+                    }
+                }
             }
         }
 
-        const auto& array_children = DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_array_child_ui_node_group);
-        for (const auto& child : array_children)
+        for (const auto& child : in_array_children)
         {
             TraverseHierarchyInput(
                 in_touch,
-                child.GetNodeToken(DscUi::TUiNodeGroup::TScreenSpace),
-                child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup),
-                child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources)
+                DscDag::DagCollection::GetValueType<DscUi::ScreenSpace>(child.GetNodeToken(DscUi::TUiNodeGroup::TScreenSpace)),
+                DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources)),
+                DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup)),
+                in_touch_data,
+                in_out_consumed
                 );
         }
     }
-
-
 } // namespace
 
 DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
@@ -1898,14 +1703,19 @@ void DscUi::UiManager::Update(
     }
     UpdateRootViewportSize(in_root_node_group);
 
+    UiInputState& input_state = DscDag::DagCollection::GetValueNonConstRef<UiInputState>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TInputState), false);
+
     //todo: travers node hierarcy with the in_input_state updating a UiInputInternal to effect state/ button clicks/ rollover
     for (const auto& touch : in_input_param._touch_data_array)
     {
+        bool consumed = false;
         TraverseHierarchyInput(
             touch,
-            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpace),
-            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup),
-            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources)
+            DscDag::DagCollection::GetValueType<DscUi::ScreenSpace>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TScreenSpace)),
+            DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources)),
+            DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup)),
+            input_state.GetTouchState(touch),
+            consumed
             );
     }
 }
@@ -2101,7 +1911,6 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
 
     return last_draw_node;
 }
-
 
 DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     const TUiDrawType in_type,

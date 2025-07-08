@@ -100,6 +100,9 @@ namespace DscUi
 
 		bool _desired_size_from_children_max = false; // otherwise from text? or matches avaliable
 
+		bool _has_input = false;
+		std::function<void(const UiComponentResourceNodeGroup&)> _input_click_callback = {};
+
 		// canvas- geometry size is avaliable
 		// stack- geometry size is max (avaliable, desired)
 
@@ -163,7 +166,24 @@ namespace DscUi
 			_stack_parent_attach_point = in_stack_parent_attach_point;
 			return *this;
 		}
+
+		ComponentConstructionHelper& SetInputData(
+			const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {}
+		)
+		{
+			_has_input = true;
+			_input_click_callback = in_click_callback_or_none;
+			return *this;
+		}
 	};
+
+	UiComponentResourceNodeGroup MakeComponentResourceGroup(
+		DscDag::DagCollection& in_dag_collection,
+		const ComponentConstructionHelper& in_construction_helper,
+		DscDag::NodeToken in_ui_scale,
+		DscDag::NodeToken in_avaliable_size
+	);
+
 	ComponentConstructionHelper MakeComponentDebugGrid();
 	ComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
 	ComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);

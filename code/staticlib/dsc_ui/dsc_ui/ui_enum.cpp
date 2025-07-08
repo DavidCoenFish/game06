@@ -6,6 +6,13 @@
 #include <dsc_render_resource/shader_resource.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
 
+const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs)
+{
+	const int32 temp = static_cast<int32>(in_out_lhs) | static_cast<int32>(in_rhs);
+	in_out_lhs = static_cast<DscUi::TUiInputStateFlag>(temp);
+	return in_out_lhs;
+}
+
 template class DscDag::DagGroup<DscUi::TUiRootNodeGroup, static_cast<std::size_t>(DscUi::TUiRootNodeGroup::TCount)>;
 
 template class DscDag::DagGroup<DscUi::TUiNodeGroup, static_cast<std::size_t>(DscUi::TUiNodeGroup::TCount)>;
@@ -272,7 +279,18 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TInputStateFlag:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiInputStateFlag) };
+		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TInputData:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiComponentInputData) };
+		return s_meta_data;
+	}
+	}
+
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;

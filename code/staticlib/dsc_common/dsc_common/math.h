@@ -35,5 +35,7 @@ namespace Math
 	/// map [0 ... 255] -> [0.0f ... 1.0f]
 	const float ConvertByteToFloat(const uint8 in_value);
 
+	const bool InsideBounds(const float in_x, const float in_y, const VectorFloat4& in_bounds);
+
 }
 }
