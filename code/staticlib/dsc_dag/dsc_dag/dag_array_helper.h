@@ -101,6 +101,32 @@ namespace DscDag
 			return;
 		}
 
+		template <typename IN_TYPE>
+		static void Remove(NodeToken in_input, const IN_TYPE& in_value, const bool in_set_dirty = true)
+		{
+			DSC_ASSERT(nullptr != in_input, "invalid param");
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetArraySize in_input:%s IN_TYPE:%s\n", in_input->GetTypeInfo().name(), typeid(std::vector<IN_TYPE>).name());
+			DSC_ASSERT(typeid(std::vector<IN_TYPE>) == in_input->GetTypeInfo(), "invalid param");
+			auto value_node = dynamic_cast<DagNodeValue<std::vector<IN_TYPE>>*>(in_input);
+			if (nullptr != value_node)
+			{
+				auto& array = value_node->GetValueNonConst(in_set_dirty);
+				array.erase(std::remove(array.begin(), array.end(), in_input), array.end());
+				return;
+			}
+
+			auto value_unique_node = dynamic_cast<DagNodeValueUnique<std::vector<IN_TYPE>>*>(in_input);
+			if (nullptr != value_unique_node)
+			{
+				std::vector<IN_TYPE>* array = value_unique_node->GetValue(true);
+				array->erase(std::remove(array->begin(), array->end(), in_input), array->end());
+				return;
+			}
+
+			DSC_ASSERT_ALWAYS("invalid code path");
+			return;
+		}
+
 		//pop
 		//set
 		template <typename IN_TYPE>

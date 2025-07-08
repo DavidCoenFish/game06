@@ -39,14 +39,13 @@ DscWindows::IWindowApplication* const ApplicationUi::Factory(const HWND in_hwnd,
 ApplicationUi::ApplicationUi(const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)
     : DscWindows::IWindowApplication(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight)
 {
-    _keep_running = true;
-
     _file_system = std::make_unique<DscCommon::FileSystem>();
     _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.0f));
 
     bool ok = true;
 
-    ok &= SanityTest();
+    ok &= TestCreateDeleteRootAndChild();
+    ok &= TestRemoveChild();
 
     SetExitCode(ok ? 1 : 0);
 
@@ -84,7 +83,7 @@ void ApplicationUi::OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, co
     return;
 }
 
-const bool ApplicationUi::SanityTest()
+const bool ApplicationUi::TestCreateDeleteRootAndChild()
 {
     bool ok = true;
 
@@ -137,4 +136,72 @@ const bool ApplicationUi::SanityTest()
     return ok;
 }
 
+const bool ApplicationUi::TestRemoveChild()
+{
+    bool ok = true;
+
+    std::unique_ptr<DscDag::DagCollection> dag_collection = std::make_unique<DscDag::DagCollection>();
+    std::unique_ptr<DscUi::UiManager> ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *dag_collection);
+    DscUi::UiRootNodeGroup ui_root_node_group = {};
+
+    {
+        auto top_texture = ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
+        ui_root_node_group = ui_manager->MakeRootNode(
+            DscUi::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
+            *_draw_system,
+            *dag_collection,
+            top_texture
+        );
+    }
+    auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*dag_collection, ui_root_node_group);
+
+    {
+        ui_manager->AddChildNode(
+            DscUi::MakeComponentDebugGrid().SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
+            ),
+            *_draw_system,
+            *dag_collection,
+            ui_root_node_group,
+            root_as_parent,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "child one")
+        );
+    }
+
+    DscUi::UiNodeGroup child_to_remove = {};
+    const int dag_node_count_before = dag_collection->GetNodeCount();
+    {
+        child_to_remove = ui_manager->AddChildNode(
+            DscUi::MakeComponentDebugGrid().SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
+            ),
+            *_draw_system,
+            *dag_collection,
+            ui_root_node_group,
+            root_as_parent,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "child two")
+        );
+    }
+    ui_manager->RemoveAndDestroyChild(
+        *dag_collection,
+        root_as_parent,
+        child_to_remove
+    );
+
+    const int dag_node_count_after = dag_collection->GetNodeCount();
+
+    // allow resources to get off the gpu before shutdown of ui_manager
+    _draw_system->WaitForGpu();
+
+    ok = TEST_UTIL_EQUAL(ok, dag_node_count_before, dag_node_count_after);
+
+    return ok;
+
+}
 

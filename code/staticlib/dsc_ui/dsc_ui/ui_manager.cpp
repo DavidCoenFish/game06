@@ -970,6 +970,47 @@ void DscUi::UiManager::DestroyRootNode(
     return;
 }
 
+void DscUi::UiManager::RemoveAndDestroyChild(
+    DscDag::DagCollection& in_dag_collection,
+    const UiNodeGroup& in_parent,
+    UiNodeGroup& in_child
+)
+{
+    // unlink the draw nodes
+    DscDag::DagCollection::UnlinkNodes(
+        in_child.GetNodeToken(TUiNodeGroup::TDrawNode),
+        in_parent.GetNodeToken(TUiNodeGroup::TDrawNode)
+    );
+
+    // remove the child from the parent child array. slight issue is that we are passing around UiNodeGroups by copy, the nodes they contain may by unique, but the container may be a copy
+    std::vector<UiNodeGroup>& parent_array_children = DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_parent.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), false);
+    std::vector<UiNodeGroup> temp = {};
+    std::swap(parent_array_children, temp); // does this work?
+    auto child_draw_node = in_child.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode);
+    for (auto& item: temp)
+    {
+        if (child_draw_node != item.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode))
+        {
+            parent_array_children.push_back(item);
+        }
+    }
+
+    TraverseHierarchyUnlink(
+        DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(in_child.GetNodeToken(TUiNodeGroup::TUiComponentResources), false),
+        DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_child.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), false)
+    );
+    in_child.UnlinkOwned();
+
+    TraverseHierarchyDestroy(
+        in_dag_collection,
+        DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(in_child.GetNodeToken(TUiNodeGroup::TUiComponentResources), false),
+        DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_child.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), false)
+    );
+    in_child.DeleteOwned(in_dag_collection);
+
+    return;
+}
+
 void DscUi::UiManager::Update(
     const UiRootNodeGroup& in_root_node_group,
     const float in_time_delta,

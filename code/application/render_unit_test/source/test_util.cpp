@@ -91,6 +91,7 @@ const bool TestUtil::RunTests(
 	}
 
 	DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "UNIT TEST: Passed:%d of tests:%d\n", count_pass, count_total);
-
+	// give output debug string a second to cominicate with debugger (if present, then let app shutdown)
+	Sleep(1000);
 	return (count_total == count_pass);
 }

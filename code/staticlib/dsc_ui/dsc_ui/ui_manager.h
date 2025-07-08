@@ -139,8 +139,13 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			UiRootNodeGroup& in_root_node_group
 			);
+
 		/// we destoy the child, as it is not in a good way after being removed, a lot of it's links will be broken
-		//void RemoveAndDestroyChild(const UiNodeGroup& in_parent, const UiNodeGroup& in_child)
+		void RemoveAndDestroyChild(
+			DscDag::DagCollection& in_dag_collection,
+			const UiNodeGroup& in_parent,
+			UiNodeGroup& in_child
+		);
 
 		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
 

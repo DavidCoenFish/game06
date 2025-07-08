@@ -57,12 +57,11 @@ private:
     virtual const bool Update() override;
     virtual void OnWindowSizeChanged(const DscCommon::VectorInt2& in_size, const float in_monitor_scale) override;
 
-    const bool SanityTest();
+    const bool TestCreateDeleteRootAndChild();
+    const bool TestRemoveChild();
 
 private:
     typedef DscWindows::IWindowApplication BaseType;
     std::unique_ptr<DscCommon::FileSystem> _file_system;
     std::unique_ptr<DscRender::DrawSystem> _draw_system;
-
-    bool _keep_running = false;
 };
