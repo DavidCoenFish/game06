@@ -31,7 +31,7 @@ const bool TestOrder()
 	++iter;
 	ok = TEST_UTIL_EQUAL(ok, std::string("six"), *iter);
 
-	return true;
+	return ok;
 }
 	*/
 

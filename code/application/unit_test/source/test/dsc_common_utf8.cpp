@@ -14,7 +14,7 @@ const bool TestSanity()
 	bool ok = true;
 	ok = TEST_UTIL_EQUAL_STRING(ok, step0, step2);
 
-	return true;
+	return ok;
 }
 
 }//namespace

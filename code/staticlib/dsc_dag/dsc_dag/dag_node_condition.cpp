@@ -134,6 +134,18 @@ void DscDag::DagNodeCondition::RemoveInput(NodeToken in_nodeID)
 	_input.erase(in_nodeID);
 }
 
+void DscDag::DagNodeCondition::UnlinkInputs()
+{
+	for (const auto& item : _input)
+	{
+		if (nullptr != item)
+		{
+			item->RemoveOutput(this);
+		}
+	}
+	_input.clear();
+}
+
 const std::type_info& DscDag::DagNodeCondition::GetTypeInfo() const
 {
 	return typeid(bool);

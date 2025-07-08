@@ -103,6 +103,11 @@ DscDag::NodeToken DscDag::DagCollection::FetchNodeName(const std::string& in_nam
 	return nullptr;
 }
 
+const int32 DscDag::DagCollection::GetNodeCount() const
+{
+	return static_cast<int32>(_nodes.size());
+}
+
 void DscDag::DagCollection::LinkNodes(NodeToken in_input, NodeToken in_output)
 {
 	DSC_ASSERT(nullptr != in_input, "invalid param");

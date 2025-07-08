@@ -60,13 +60,15 @@ namespace
 
 		case WM_DESTROY:
 		{
+			int32 exit_code = 0;
 			if (nullptr != application)
 			{
+				exit_code = application->GetExitCode();
 				delete application;
 			}
 			SetWindowApplication(in_hwnd, nullptr);
 			//WM_QUIT is never sent to window, but you can pull it out of the GetMessage/PeekMessage
-			PostQuitMessage(0);
+			PostQuitMessage(exit_code);
 		}
 		break;
 

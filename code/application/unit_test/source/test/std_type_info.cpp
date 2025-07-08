@@ -9,7 +9,7 @@ const bool TestSanity()
 	bool ok = true;
 	ok = TEST_UTIL_EQUAL(ok, true, typeid(int) == typeid(int));
 
-	return true;
+	return ok;
 }
 
 }//namespace

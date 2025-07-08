@@ -17,7 +17,10 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_dag"}
+    .LibraryBaseNameDependency = {
+        "dsc_common", 
+        "dsc_dag"
+        }
     .AdditionalIncludePaths = {}
 ]
 DscVsprojectConsoleExe("unit_test" .Param)

@@ -232,6 +232,41 @@ namespace
                 );
         }
     }
+
+    void TraverseHierarchyUnlink(
+        DscUi::UiComponentResourceNodeGroup& in_resource_group,
+        std::vector<DscUi::UiNodeGroup>& in_array_children
+        )
+    {
+        for (auto& child : in_array_children)
+        {
+            TraverseHierarchyUnlink(
+                DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources), false),
+                DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup), false)
+            );
+            child.UnlinkOwned();
+        }
+        in_resource_group.UnlinkOwned();
+    }
+
+    void TraverseHierarchyDestroy(
+        DscDag::DagCollection& in_dag_collection,
+        DscUi::UiComponentResourceNodeGroup& in_resource_group,
+        std::vector<DscUi::UiNodeGroup>& in_array_children
+        )
+    {
+        for (auto& child : in_array_children)
+        {
+            TraverseHierarchyDestroy(
+                in_dag_collection,
+                DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources), false),
+                DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup), false)
+            );
+            child.DeleteOwned(in_dag_collection);
+        }
+        in_resource_group.DeleteOwned(in_dag_collection);
+    }
+
 } // namespace
 
 DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
@@ -683,7 +718,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
 
 DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
     DscDag::DagCollection& in_dag_collection,
-    const UiRootNodeGroup& in_ui_root_node_group
+    UiRootNodeGroup& in_ui_root_node_group
 )
 {
     UiNodeGroup result;
@@ -700,13 +735,15 @@ DscUi::UiNodeGroup DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(
         in_dag_collection.CreateValue(
             DscCommon::VectorInt2::s_zero,
             DscDag::CallbackNever<DscCommon::VectorInt2>::Function,
-            &result
+            // use the root and not the result as owner, the result may be thrown away, is just a step to add children to the root...
+            &in_ui_root_node_group 
             DSC_DEBUG_ONLY(DSC_COMMA "geometry offset")));
     result.SetNodeToken(TUiNodeGroup::TScrollPos,
         in_dag_collection.CreateValue(
             DscCommon::VectorFloat2::s_zero,
             DscDag::CallbackNever<DscCommon::VectorFloat2>::Function,
-            &result
+            // use the root and not the result as owner, the result may be thrown away, is just a step to add children to the root...
+            &in_ui_root_node_group
             DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
 
     result.Validate();
@@ -863,7 +900,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
                 DscCommon::VectorFloat2(0, 0),
                 DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
                 &result
-                DSC_DEBUG_ONLY(DSC_COMMA "scroll pos")));
+                DSC_DEBUG_ONLY(DSC_COMMA "scroll pos child")));
         }
     }
 
@@ -908,6 +945,29 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
     }
 
     return result;
+}
+
+
+void DscUi::UiManager::DestroyRootNode(
+    DscDag::DagCollection& in_dag_collection,
+    UiRootNodeGroup& in_root_node_group
+    )
+{
+    TraverseHierarchyUnlink(
+        DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources), false),
+        DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup), false)
+    );
+    in_root_node_group.UnlinkOwned();
+
+    TraverseHierarchyDestroy(
+        in_dag_collection,
+        DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources), false),
+        DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup), false)
+    );
+    in_root_node_group.DeleteOwned(in_dag_collection);
+
+    in_root_node_group = {};
+    return;
 }
 
 void DscUi::UiManager::Update(

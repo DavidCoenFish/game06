@@ -121,7 +121,7 @@ namespace DscUi
 			);
 		static UiNodeGroup ConvertRootNodeGroupToNodeGroup(
 			DscDag::DagCollection& in_dag_collection,
-			const UiRootNodeGroup& in_ui_root_node_group
+			UiRootNodeGroup& in_ui_root_node_group
 			);
 
 		UiNodeGroup AddChildNode(
@@ -135,7 +135,10 @@ namespace DscUi
 		);
 
 		/// also destroys all children
-		//void DestroyRootNode(UiRootNodeGroup& in_root_node_group);
+		void DestroyRootNode(
+			DscDag::DagCollection& in_dag_collection,
+			UiRootNodeGroup& in_root_node_group
+			);
 		/// we destoy the child, as it is not in a good way after being removed, a lot of it's links will be broken
 		//void RemoveAndDestroyChild(const UiNodeGroup& in_parent, const UiNodeGroup& in_child)
 

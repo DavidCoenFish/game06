@@ -23,7 +23,7 @@ const bool TestDowncastAssign()
 	bool ok = true;
 	ok = TEST_UTIL_EQUAL(ok, true, nullptr != basePtr.get());
 
-	return true;
+	return ok;
 }
 
 }//namespace

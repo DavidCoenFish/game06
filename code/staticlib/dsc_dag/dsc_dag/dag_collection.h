@@ -92,6 +92,8 @@ namespace DscDag
 		void RemoveNodeName(const std::string& in_name);
 		NodeToken FetchNodeName(const std::string& in_name);
 
+		const int32 GetNodeCount() const;
+
 		static void LinkNodes(NodeToken in_input, NodeToken in_output);
 		static void LinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output);
 

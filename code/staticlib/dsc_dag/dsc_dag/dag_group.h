@@ -112,6 +112,23 @@ namespace DscDag
 			return;
 		}
 
+		void UnlinkOwned()
+		{
+			for (const auto& item : _node_ownership_group)
+			{
+				item->UnlinkInputs();
+			}
+		}
+
+		void DeleteOwned(DagCollection& in_dag_node)
+		{
+			for (const auto& item : _node_ownership_group)
+			{
+				in_dag_node.DeleteNode(item);
+			}
+			_node_ownership_group.clear();
+		}
+
 	private:
 		// move this to an interface and have the DagCollection create functions support it
 		virtual void AddOwnership(NodeToken in_node_token) override

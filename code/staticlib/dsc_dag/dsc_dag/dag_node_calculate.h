@@ -134,6 +134,26 @@ namespace DscDag
 			return true;
 		}
 
+		virtual void UnlinkInputs() override
+		{
+			for (const auto& item : _index_input)
+			{
+				if (nullptr != item)
+				{
+					item->RemoveOutput(this);
+				}
+			}
+			_index_input.clear();
+			for (const auto& item : _input)
+			{
+				if (nullptr != item)
+				{
+					item->RemoveOutput(this);
+				}
+			}
+			_input.clear();
+		}
+
 		virtual const std::type_info& GetTypeInfo() const override
 		{
 			return typeid(IN_TYPE);

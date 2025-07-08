@@ -15,7 +15,7 @@ const bool TestFoundValueChange()
 	bool ok = true;
 	ok = TEST_UTIL_EQUAL(ok, 1, map[0]);
 
-	return true;
+	return ok;
 }
 
 }//namespace

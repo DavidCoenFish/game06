@@ -44,6 +44,13 @@ void DscDag::IDagNode::RemoveInput(NodeToken)
 	DSC_ASSERT_ALWAYS("invalid code path");
 }
 
+void DscDag::IDagNode::UnlinkInputs()
+{
+	// harmless to call on a DagValue?
+	//nop
+}
+
+
 void DscDag::IDagNode::SetFromNode(IDagNode* const)
 {
 	DSC_ASSERT_ALWAYS("invalid code path");

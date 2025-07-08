@@ -14,7 +14,7 @@ const bool TestValue(const float value0)
 	bool ok = true;
 	ok = TEST_UTIL_ALMOST_EQUAL(ok, valueRad0, valueRad1);
 
-	return true;
+	return ok;
 }
 
 }//namespace

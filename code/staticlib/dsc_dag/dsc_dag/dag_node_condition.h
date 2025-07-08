@@ -41,6 +41,7 @@ namespace DscDag
 		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override;
 		virtual void AddInput(NodeToken in_nodeID) override;
 		virtual void RemoveInput(NodeToken in_nodeID) override;
+		virtual void UnlinkInputs() override;
 		virtual const std::type_info& GetTypeInfo() const override;
 
 #if defined(_DEBUG)

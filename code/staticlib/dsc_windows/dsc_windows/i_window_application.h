@@ -58,15 +58,22 @@ namespace DscWindows
 
 		HWND GetHwnd() const { return _hwnd; }
 
+		void SetExitCode(const int in_exit_code) {
+			_exit_code = in_exit_code;
+		}
+		const int GetExitCode() const { return _exit_code; }
+
 	private:
 		HWND _hwnd;
 		const int _defaultWidth;
 		const int _defaultHeight;
 
-		bool _sizemove;
-		bool _suspend;
-		bool _minimized;
-		bool _full_screen;
+		bool _sizemove = false;
+		bool _suspend = false;
+		bool _minimized = false;
+		bool _full_screen = false;
+
+		int _exit_code = 0;
 
 	};
 

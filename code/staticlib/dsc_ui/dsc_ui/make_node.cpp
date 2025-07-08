@@ -387,7 +387,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeRenderRequestSize(
                 );
         },
         &in_owner_group
-        DSC_DEBUG_ONLY(DSC_COMMA "avaliable size child slot"));
+        DSC_DEBUG_ONLY(DSC_COMMA "render request size"));
 
     DscDag::DagCollection::LinkIndexNodes(0, in_desired_size, node);
     DscDag::DagCollection::LinkIndexNodes(1, in_geometry_size_size, node);

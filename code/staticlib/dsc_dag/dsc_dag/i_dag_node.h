@@ -24,8 +24,8 @@ namespace DscDag
 		virtual void RemoveOutput(NodeToken in_nodeID);
 
 		virtual const bool GetHasNoLinks() const = 0;
-		// do we need a recurcive version of this?
-		//virtual void UnlinkInputs();
+
+		virtual void UnlinkInputs();
 
 		virtual const std::type_info& GetTypeInfo() const = 0;
 
