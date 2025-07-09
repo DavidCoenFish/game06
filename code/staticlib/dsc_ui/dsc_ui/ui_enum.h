@@ -34,12 +34,13 @@ namespace DscUi
 	enum class TUiInputStateFlag : uint8
 	{
 		TNone,
-		TRollover = 1 << 0,
+		TRollover = 1 << 0, // use rollover for keyboard navigation?
 		TClick = 1 << 1,
+		TSelection = 1 << 2
 		// is this the frame the click started, should also have TClick set
-		TClickStart = 1 << 2,
+		//TClickStart = 1 << 2,
 		// did click end this frame, can be true without TClick set
-		TClickEnd = 1 << 3
+		//TClickEnd = 1 << 3
 	};
 }
 const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
@@ -99,7 +100,9 @@ namespace DscUi
 		TEffectInnerShadow,
 		TEffectCorner,
 		TEffectStroke,
-		TEffectTint
+		TEffectTint,
+
+		TCount
 	};
 
 	struct ScreenSpace

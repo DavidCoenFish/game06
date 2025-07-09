@@ -133,3 +133,36 @@ namespace DscCommon
 //	return !operator==(in_rhs, in_lhs);
 //}
 //
+
+template <typename IN_TYPE>
+const DscCommon::Vector4<IN_TYPE> operator + (const DscCommon::Vector4<IN_TYPE>& in_lhs, const DscCommon::Vector4<IN_TYPE>& in_rhs)
+{
+	return DscCommon::Vector4<IN_TYPE>(
+		in_lhs[0] + in_rhs[0],
+		in_lhs[1] + in_rhs[1],
+		in_lhs[2] + in_rhs[2],
+		in_lhs[3] + in_rhs[3]
+		);
+}
+
+template <typename IN_TYPE>
+const DscCommon::Vector4<IN_TYPE> operator - (const DscCommon::Vector4<IN_TYPE>& in_lhs, const DscCommon::Vector4<IN_TYPE>& in_rhs)
+{
+	return DscCommon::Vector4<IN_TYPE>(
+		in_lhs[0] - in_rhs[0],
+		in_lhs[1] - in_rhs[1],
+		in_lhs[2] - in_rhs[2],
+		in_lhs[3] - in_rhs[3]
+		);
+}
+
+template <typename IN_TYPE>
+const DscCommon::Vector4<IN_TYPE> operator * (const DscCommon::Vector4<IN_TYPE>& in_lhs, const IN_TYPE in_rhs)
+{
+	return DscCommon::Vector4<IN_TYPE>(
+		in_lhs[0] * in_rhs,
+		in_lhs[1] * in_rhs,
+		in_lhs[2] * in_rhs,
+		in_lhs[3] * in_rhs
+		);
+}

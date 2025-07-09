@@ -888,3 +888,29 @@ DscDag::NodeToken DscUi::MakeNode::MakeScreenSpace(
 
     return node;
 }
+
+
+DscDag::NodeToken DscUi::MakeNode::MakeLerpFloat4(
+    DscDag::DagCollection& in_dag_collection,
+    DscDag::NodeToken in_amount,
+    DscDag::NodeToken in_value_0,
+    DscDag::NodeToken in_value_1,
+    DscDag::IDagGroup& in_owner_group
+)
+{
+    DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const float amount = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+            const DscCommon::VectorFloat4& value_0 = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[1]);
+            const DscCommon::VectorFloat4& value_1 = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[2]);
+
+            value = value_0 + ((value_1 - value_0) * amount);
+        },
+        & in_owner_group
+        DSC_DEBUG_ONLY(DSC_COMMA "screen space"));
+
+    DscDag::DagCollection::LinkIndexNodes(0, in_amount, node);
+    DscDag::DagCollection::LinkIndexNodes(1, in_value_0, node);
+    DscDag::DagCollection::LinkIndexNodes(2, in_value_1, node);
+
+    return node;
+}

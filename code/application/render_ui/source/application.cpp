@@ -84,11 +84,14 @@ namespace
         const DscUi::UiCoord padding_ammount_top(0, 0.0f);
         const DscUi::UiCoord padding_ammount(16, 0.0f);
 
-        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_effect_constructor_helper = {};
-        array_effect_constructor_helper.push_back({
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_button_effect = {};
+        array_button_effect.push_back({
             DscUi::TUiEffectType::TEffectDropShadow,
             DscCommon::VectorFloat4(2.0f, 8.0f, 6.0f, 0.0f),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+            true,
+            DscCommon::VectorFloat4(1.0f, 4.0f, 0.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.8f)
             });
 
         auto button_node_group = in_ui_manager.AddChildNode(
@@ -104,7 +107,7 @@ namespace
             in_dag_collection,
             in_ui_root_node_group,
             in_parent_node_group,
-            array_effect_constructor_helper
+            array_button_effect
             DSC_DEBUG_ONLY(DSC_COMMA "button")
             );
 
@@ -174,27 +177,6 @@ namespace
         );
 
         in_ui_manager.AddChildNode(
-            DscUi::MakeComponentFill(
-               DscCommon::VectorFloat4(0.996f, 0.757f, 0.525f, 1.0f)
-            ).SetForInputStateFlag(
-                DscUi::TUiInputStateFlag::TRollover | DscUi::TUiInputStateFlag::TClick | DscUi::TUiInputStateFlag::TClickStart
-            ).SetPadding(
-                padding_ammount,
-                padding_ammount_top,
-                padding_ammount,
-                padding_ammount
-                //).SetClearColour(
-                //    DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
-            ),
-            in_draw_system,
-            in_dag_collection,
-            in_ui_root_node_group,
-            button_node_group,
-            array_fill_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "button fill click start")
-        );
-
-        in_ui_manager.AddChildNode(
             DscUi::MakeComponentGradientFill(
                 {
                     {0.0f, 0.75f, 1.0f, 1.1f},
@@ -246,27 +228,6 @@ namespace
             button_node_group,
             array_fill_effect
             DSC_DEBUG_ONLY(DSC_COMMA "button fill click")
-        );
-
-        in_ui_manager.AddChildNode(
-            DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(0.996f, 0.757f, 0.525f, 1.0f)
-            ).SetForInputStateFlag(
-                DscUi::TUiInputStateFlag::TRollover | DscUi::TUiInputStateFlag::TClickEnd
-            ).SetPadding(
-                padding_ammount,
-                padding_ammount_top,
-                padding_ammount,
-                padding_ammount
-                //).SetClearColour(
-                //    DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
-            ),
-            in_draw_system,
-            in_dag_collection,
-            in_ui_root_node_group,
-            button_node_group,
-            array_fill_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "button fill click start")
         );
 
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_text_effect = {};
@@ -351,8 +312,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::MakeComponentStack(
                 DscUi::TUiFlow::TVertical,
                 DscUi::UiCoord(0, 0.0f)
-                ).SetClearColour(
-                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
+                //).SetClearColour(
+                //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
                 ).SetChildSlot(
                     DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(0, 0.5f)),
                     DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),

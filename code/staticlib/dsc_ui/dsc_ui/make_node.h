@@ -165,6 +165,14 @@ namespace DscUi
             DscUi::UiNodeGroup& in_owner_group
         );
 
+        DscDag::NodeToken MakeLerpFloat4(
+            DscDag::DagCollection& in_dag_collection,
+            DscDag::NodeToken in_amount,
+            DscDag::NodeToken in_value_0,
+            DscDag::NodeToken in_value_1,
+            DscDag::IDagGroup& in_owner_group
+        );
+
 	} // Make Node
 } // DscUi
 

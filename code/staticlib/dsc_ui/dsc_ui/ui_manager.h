@@ -114,9 +114,12 @@ namespace DscUi
 
 		struct TEffectConstructionHelper
 		{
-			TUiEffectType _effect_type;
-			DscCommon::VectorFloat4 _effect_param;
-			DscCommon::VectorFloat4 _effect_param_tint;
+			TUiEffectType _effect_type = TUiEffectType::TCount;
+			DscCommon::VectorFloat4 _effect_param = {};
+			DscCommon::VectorFloat4 _effect_param_tint = {};
+			bool _use_rollover_param_lerp = false;
+			DscCommon::VectorFloat4 _effect_param_rollover = {};
+			DscCommon::VectorFloat4 _effect_param_tint_rollover = {};
 		};
 		UiRootNodeGroup MakeRootNode(
 			const ComponentConstructionHelper& in_construction_helper,

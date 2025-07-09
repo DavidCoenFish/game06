@@ -288,11 +288,11 @@ namespace
                 float value = DscDag::DagCollection::GetValueType<float>(rollover_accumulate);
                 if (true == rollover)
                 {
-                    value = std::min(1.0f, value + in_time_delta * 2.0f);
+                    value = std::min(1.0f, value + in_time_delta * 3.0f);
                 }
                 else
                 {
-                    value = std::max(0.0f, value - in_time_delta * 0.5f);
+                    value = std::max(0.0f, value - in_time_delta * 2.5f);
                 }
                 DscDag::DagCollection::SetValueType<float>(rollover_accumulate, value);
             }
@@ -1321,18 +1321,69 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             }
 
             const auto& effect_data = in_effect_array[index];
-            DscDag::NodeToken effect_param = in_dag_collection.CreateValue(
-                effect_data._effect_param,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                &in_component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
-            effect_param_array.push_back(effect_param);
-            DscDag::NodeToken effect_tint = in_dag_collection.CreateValue(
-                effect_data._effect_param_tint,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                &in_component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
-            effect_param_array.push_back(effect_tint);
+            DscDag::NodeToken effect_param = nullptr;
+            DscDag::NodeToken effect_tint = nullptr;
+            if (true == effect_data._use_rollover_param_lerp)
+            {
+                DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputRolloverAccumulate), "invalid state");
+
+                DscDag::NodeToken effect_param_0 = in_dag_collection.CreateValue(
+                    effect_data._effect_param,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect param 0"));
+                effect_param_array.push_back(effect_param_0);
+                DscDag::NodeToken effect_tint_0 = in_dag_collection.CreateValue(
+                    effect_data._effect_param_tint,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint 0"));
+                effect_param_array.push_back(effect_tint_0);
+                DscDag::NodeToken effect_param_1 = in_dag_collection.CreateValue(
+                    effect_data._effect_param_rollover,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect param 1"));
+                effect_param_array.push_back(effect_param_1);
+                DscDag::NodeToken effect_tint_1 = in_dag_collection.CreateValue(
+                    effect_data._effect_param_tint_rollover,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint 1"));
+                effect_param_array.push_back(effect_tint_1);
+
+                effect_param = MakeNode::MakeLerpFloat4(
+                    in_dag_collection,
+                    in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputRolloverAccumulate),
+                    effect_param_0,
+                    effect_param_1,
+                    in_component_resource_group
+                    );
+
+                effect_tint = MakeNode::MakeLerpFloat4(
+                    in_dag_collection,
+                    in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputRolloverAccumulate),
+                    effect_tint_0,
+                    effect_tint_1,
+                    in_component_resource_group
+                );
+
+            }
+            else
+            {
+                effect_param = in_dag_collection.CreateValue(
+                    effect_data._effect_param,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
+                effect_param_array.push_back(effect_param);
+                effect_tint = in_dag_collection.CreateValue(
+                    effect_data._effect_param_tint,
+                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
+                    &in_component_resource_group
+                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
+                effect_param_array.push_back(effect_tint);
+            }
 
             last_draw_node = MakeDrawNode(
                 GetDrawTypeFromEffectType(effect_data._effect_type),
