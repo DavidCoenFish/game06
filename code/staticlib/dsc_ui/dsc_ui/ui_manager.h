@@ -76,6 +76,12 @@ if the desired size is bigger than the the geometry size, automatically scroll t
 note, some of the steps may feel redundant, but breaking up the steps so that a parent like a stack, can use the children geometry size in it's desired size caculation, based on it's own avaliable size handed down to the children
 so trying to keep the steps descrete as to any avoid cyclic dependencies on various permutations of ui component types
 */
+/*
+if this ends up having performance issues on cost of the dynamic casts, then could remove the casts. 
+could change the root node group to derrive of node group and make them solid classes with members of known type
+additionally the Dag graph could be replaced by something similar with a base class with the dirty and output array but not virtual, and just implement a class for each variation
+may be a bit of a mess for some of the switch functionality paths...
+*/
 namespace DscUi
 {
 	class IUiComponent;
@@ -124,6 +130,7 @@ namespace DscUi
 			UiRootNodeGroup& in_ui_root_node_group
 			);
 
+		// what about when we want a child to be at an index? set child of "application layer set"? put optional index in construction helper
 		UiNodeGroup AddChildNode(
 			const ComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
@@ -211,6 +218,7 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _image_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _fill_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _gradient_fill_shader = {};
 
 		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_drop_shadow_shader = {};

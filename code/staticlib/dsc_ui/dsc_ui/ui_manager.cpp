@@ -52,6 +52,8 @@ namespace
             return DscUi::TUiDrawType::TDebugGrid;
         case DscUi::TUiComponentType::TFill:
             return DscUi::TUiDrawType::TFill;
+        case DscUi::TUiComponentType::TGradientFill:
+            return DscUi::TUiDrawType::TGradientFill;
         case DscUi::TUiComponentType::TImage:
             return DscUi::TUiDrawType::TImage;
         case DscUi::TUiComponentType::TCanvas:
@@ -60,6 +62,8 @@ namespace
             return DscUi::TUiDrawType::TText;
         case DscUi::TUiComponentType::TStack:
             return DscUi::TUiDrawType::TUiPanel;
+        case DscUi::TUiComponentType::TButton:
+            return DscUi::TUiDrawType::TButton;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -150,12 +154,41 @@ namespace
             );
     }
 
+    void CalculatePanelConstantBuffer(
+        DscUi::TUiPanelShaderConstantBuffer& out_buffer,
+        const DscCommon::VectorInt2& parent_render_size,
+        const DscCommon::VectorInt2& geometry_offset,
+        const DscCommon::VectorInt2& geometry_size,
+        const DscCommon::VectorFloat2& scroll_value,
+        const DscCommon::VectorInt2& render_viewport_size,
+        const DscCommon::VectorInt2& render_texture_size
+    )
+    {
+        //float _pos_size[4]; // _pos_x_y_size_width_height;
+        // geometry is in range [-1 ... 1], but we want the offset relative to top left
+        out_buffer._pos_size[0] = (static_cast<float>(geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
+        out_buffer._pos_size[1] = ((1.0f - static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
+        out_buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
+        out_buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
+
+        //float _uv_size[4]; // _ui_x_y_size_width_height;
+        const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
+        out_buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_texture_size.GetX());
+        const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetY())));
+        out_buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * scroll_y / static_cast<float>(render_texture_size.GetY());
+        out_buffer._uv_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_texture_size.GetX());
+        out_buffer._uv_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_texture_size.GetY());
+
+        return;
+    }
+
     void TraverseHierarchyInput(
         const DscUi::UiInputParam::TouchData& in_touch,
         const DscUi::ScreenSpace& in_screen_space,
         const DscUi::UiComponentResourceNodeGroup& in_resource_group,
         const std::vector<DscUi::UiNodeGroup>& in_array_children,
         DscUi::UiInputState::TouchState& in_touch_data,
+        const bool in_clear_flag,
         bool& in_out_consumed
     )
     {
@@ -204,6 +237,11 @@ namespace
                 }
             }
 
+            if (false == in_clear_flag)
+            {
+                flag |= DscDag::DagCollection::GetValueType<DscUi::TUiInputStateFlag>(input_state_flag);
+                DscDag::DagCollection::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
+            }
             DscDag::DagCollection::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
 
             if (true == clicked)
@@ -228,10 +266,48 @@ namespace
                 DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources)),
                 DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup)),
                 in_touch_data,
+                in_clear_flag,
                 in_out_consumed
                 );
         }
     }
+
+    void TraverseHierarchyRolloverAccumulate(
+        const DscUi::UiComponentResourceNodeGroup& in_resource_group,
+        const std::vector<DscUi::UiNodeGroup>& in_array_children,
+        const float in_time_delta
+        )
+    {
+        DscDag::NodeToken input_state_flag = in_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag);
+        if (nullptr != input_state_flag)
+        {
+            DscDag::NodeToken rollover_accumulate = in_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate);
+            if (nullptr != rollover_accumulate)
+            {
+                const bool rollover = (0 != (DscDag::DagCollection::GetValueType<DscUi::TUiInputStateFlag>(input_state_flag) & DscUi::TUiInputStateFlag::TRollover));
+                float value = DscDag::DagCollection::GetValueType<float>(rollover_accumulate);
+                if (true == rollover)
+                {
+                    value = std::min(1.0f, value + in_time_delta * 2.0f);
+                }
+                else
+                {
+                    value = std::max(0.0f, value - in_time_delta * 0.5f);
+                }
+                DscDag::DagCollection::SetValueType<float>(rollover_accumulate, value);
+            }
+        }
+
+        for (const auto& child : in_array_children)
+        {
+            TraverseHierarchyRolloverAccumulate(
+                DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(child.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources)),
+                DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(child.GetNodeToken(DscUi::TUiNodeGroup::TArrayChildUiNodeGroup)),
+                in_time_delta
+            );
+        }
+    }
+
 
     void TraverseHierarchyUnlink(
         DscUi::UiComponentResourceNodeGroup& in_resource_group,
@@ -535,6 +611,48 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
             )
         );
         _fill_shader = std::make_shared<DscRenderResource::Shader>(
+            &in_draw_system,
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>>(),
+            array_shader_constants_info
+            );
+    }
+
+    //_gradient_fill_shader
+    {
+        std::vector<uint8> vertex_shader_data;
+        if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "gradient_fill_vs.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to load triangle vertex shader\n");
+        }
+        std::vector<uint8> pixel_shader_data;
+        if (false == in_file_system.LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "gradient_fill_ps.cso")))
+        {
+            DSC_LOG_ERROR(LOG_TOPIC_DSC_UI, "failed to triangle load pixel shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            ScreenQuad::GetInputElementDesc(),
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),  //CD3DX12_BLEND_DESC(D3D12_DEFAULT),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+        );
+        std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(
+                TGradientFillConstantBuffer(),
+                D3D12_SHADER_VISIBILITY_PIXEL
+            )
+        );
+        _gradient_fill_shader = std::make_shared<DscRenderResource::Shader>(
             &in_draw_system,
             shader_pipeline_state_data,
             vertex_shader_data,
@@ -1018,8 +1136,6 @@ void DscUi::UiManager::Update(
     DscRender::IRenderTarget* const in_external_render_target_or_null
 )
 {
-    DSC_UNUSED(in_input_param);
-
     DscDag::DagCollection::SetValueType(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta), in_time_delta);
 
     if (in_external_render_target_or_null)
@@ -1033,7 +1149,10 @@ void DscUi::UiManager::Update(
 
     UiInputState& input_state = DscDag::DagCollection::GetValueNonConstRef<UiInputState>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TInputState), false);
 
-    //todo: travers node hierarcy with the in_input_state updating a UiInputInternal to effect state/ button clicks/ rollover
+    //travers node hierarcy with the in_input_state updating a UiInputInternal to effect state/ button clicks/ rollover
+    //multiple touches may also be the keyboard navigation? 
+    //if there is only going to be one touch, then combine TraverseHierarchyInput and TraverseHierarchyRolloverAccumulate
+    bool first = true;
     for (const auto& touch : in_input_param._touch_data_array)
     {
         bool consumed = false;
@@ -1043,9 +1162,19 @@ void DscUi::UiManager::Update(
             DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources)),
             DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup)),
             input_state.GetTouchState(touch),
+            first,
             consumed
             );
+        first = false;
     }
+
+    TraverseHierarchyRolloverAccumulate(
+        DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources)),
+        DscDag::DagCollection::GetValueType<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup)),
+        in_time_delta
+    );
+
+    return;
 }
 
 void DscUi::UiManager::Draw(
@@ -1323,7 +1452,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
             auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
             DSC_ASSERT(nullptr != shader_buffer, "invalid state");
-            DscCommon::VectorFloat4 fill_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[3]);
+            const DscCommon::VectorFloat4& fill_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[3]);
 
             auto& buffer = shader_buffer->GetConstant<TFillConstantBuffer>(0);
             buffer._colour[0] = fill_colour.GetX();
@@ -1343,7 +1472,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             & in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 
-        auto shader_buffer = _debug_grid_shader->MakeShaderConstantBuffer(&in_draw_system);
+        auto shader_buffer = _fill_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
             shader_buffer,
             DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
@@ -1355,6 +1484,46 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
         DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TFillColour), "invalid state");
         DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TFillColour), result_node);
+    }
+    break;
+    case TUiDrawType::TGradientFill:
+    {
+        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
+        std::weak_ptr<DscRenderResource::Shader> weak_shader = _gradient_fill_shader;
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            DSC_ASSERT(nullptr != frame, "invalid state");
+            auto ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
+            DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+            auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+            DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+
+            shader_buffer->GetConstant<TGradientFillConstantBuffer>(0) = DscDag::DagCollection::GetValueType<TGradientFillConstantBuffer>(in_input_array[3]);
+
+            if (true == ui_render_target->ActivateRenderTarget(*frame))
+            {
+                frame->SetShader(weak_shader.lock(), shader_buffer);
+                frame->Draw(weak_geometry.lock());
+                frame->SetRenderTarget(nullptr);
+            }
+
+            out_value = ui_render_target.get();
+        },
+            &in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+
+        auto shader_buffer = _gradient_fill_shader->MakeShaderConstantBuffer(&in_draw_system);
+        auto shader_buffer_node = in_dag_collection.CreateValue(
+            shader_buffer,
+            DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
+            &in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "shader constant"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
+        DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TGradienFill), "invalid state");
+        DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TGradienFill), result_node);
     }
     break;
     case TUiDrawType::TImage:
@@ -1425,25 +1594,21 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                     const auto& shader_constant_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(child.GetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer));
 
                     auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
-                    //float _pos_size[4]; // _pos_x_y_size_width_height;
-                    // geometry is in range [-1 ... 1], but we want the offset relative to top left
                     const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
                     const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
-                    buffer._pos_size[0] = (static_cast<float>(geometry_offset.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f) - 1.0f;
-                    buffer._pos_size[1] = ((1.0f - static_cast<float>(geometry_offset.GetY()) / static_cast<float>(parent_render_size.GetY())) * 2.0f) - 1.0f;
-                    buffer._pos_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(parent_render_size.GetX()) * 2.0f;
-                    buffer._pos_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(parent_render_size.GetY()) * 2.0f;
-
-                    //float _uv_size[4]; // _ui_x_y_size_width_height;
                     const DscCommon::VectorFloat2& scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TScrollPos));
                     const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
                     const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
-                    const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetX())));
-                    buffer._uv_size[0] = static_cast<float>(render_viewport_size.GetX() - geometry_size.GetX()) * scroll_x / static_cast<float>(render_texture_size.GetX());
-                    const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_value.GetY())));
-                    buffer._uv_size[1] = static_cast<float>(render_viewport_size.GetY() - geometry_size.GetY()) * scroll_y / static_cast<float>(render_texture_size.GetY());
-                    buffer._uv_size[2] = static_cast<float>(geometry_size.GetX()) / static_cast<float>(render_texture_size.GetX());
-                    buffer._uv_size[3] = static_cast<float>(geometry_size.GetY()) / static_cast<float>(render_texture_size.GetY());
+
+                    CalculatePanelConstantBuffer(
+                        buffer,
+                        parent_render_size,
+                        geometry_offset,
+                        geometry_size,
+                        scroll_value,
+                        render_viewport_size,
+                        render_texture_size
+                        );
 
                     shader->SetShaderResourceViewHandle(0, child_texture);
                     frame->SetShader(shader, shader_constant_buffer);
@@ -1460,6 +1625,83 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DSC_ASSERT(nullptr != in_child_array_node_or_null, "invalid state");
         DscDag::DagCollection::LinkIndexNodes(2, in_child_array_node_or_null, result_node);
+    }
+    break;
+    case TUiDrawType::TButton: // like TUiPanel, but we filter the draw of the children if they have a TForInputStateFlag not matching the currents nodes TInputStateFlag
+    {
+        std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _ui_panel_geometry;
+        std::weak_ptr<DscRenderResource::Shader> weak_shader = _ui_panel_shader;
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            auto frame = DscDag::DagCollection::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
+            DSC_ASSERT(nullptr != frame, "invalid state");
+            const auto& ui_render_target = DscDag::DagCollection::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
+            DSC_ASSERT(nullptr != ui_render_target, "invalid state");
+            const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[2]);
+            const TUiInputStateFlag input_state_flag = DscDag::DagCollection::GetValueType<TUiInputStateFlag>(in_input_array[3]);
+
+            if (true == ui_render_target->ActivateRenderTarget(*frame))
+            {
+                auto shader = weak_shader.lock();
+                auto geometry = weak_geometry.lock();
+                const DscCommon::VectorInt2 parent_render_size = ui_render_target->GetViewportSize();
+
+                for (const auto& child : child_array)
+                {
+                    //bail if the child has a non matching input_state_flag, if it has one
+                    const UiComponentResourceNodeGroup& child_resource_group = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(child.GetNodeToken(TUiNodeGroup::TUiComponentResources));
+                    DscDag::NodeToken for_input_state_node = child_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TForInputStateFlag);
+                    if (nullptr != for_input_state_node)
+                    {
+                        const TUiInputStateFlag child_input_state_flag = DscDag::DagCollection::GetValueType<TUiInputStateFlag>(for_input_state_node);
+                        if (input_state_flag != child_input_state_flag)
+                        {
+                            continue;
+                        }
+                    }
+
+                    DscUi::UiRenderTarget* child_render_target = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(child.GetNodeToken(TUiNodeGroup::TDrawNode));
+                    DSC_ASSERT(nullptr != child_render_target, "invalid state");
+                    auto child_texture = child_render_target->GetTexture();
+                    if (nullptr == child_texture)
+                    {
+                        continue;
+                    }
+
+                    const auto& shader_constant_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(child.GetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer));
+
+                    auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
+                    const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
+                    const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
+                    const DscCommon::VectorFloat2& scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TScrollPos));
+                    const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
+                    const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
+
+                    CalculatePanelConstantBuffer(
+                        buffer,
+                        parent_render_size,
+                        geometry_offset,
+                        geometry_size,
+                        scroll_value,
+                        render_viewport_size,
+                        render_texture_size
+                    );
+
+                    shader->SetShaderResourceViewHandle(0, child_texture);
+                    frame->SetShader(shader, shader_constant_buffer);
+                    frame->Draw(geometry);
+                }
+            }
+
+            out_value = ui_render_target.get();
+        },
+            &in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
+        DSC_ASSERT(nullptr != in_child_array_node_or_null, "invalid state");
+        DscDag::DagCollection::LinkIndexNodes(2, in_child_array_node_or_null, result_node);
+        DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputStateFlag), result_node);
     }
     break;
     case TUiDrawType::TText:

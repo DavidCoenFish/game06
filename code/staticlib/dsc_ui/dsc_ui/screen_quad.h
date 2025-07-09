@@ -22,6 +22,7 @@ namespace DscUi
 	class ScreenQuad
 	{
 	public:
+		// pos, uv
 		static const std::vector<D3D12_INPUT_ELEMENT_DESC>& GetInputElementDesc();
 
 		explicit ScreenQuad(

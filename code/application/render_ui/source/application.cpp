@@ -30,7 +30,10 @@
 
 namespace
 {
-    std::shared_ptr<DscText::TextRun> MakeTextRun(DscText::TextManager& in_text_manager, DscCommon::FileSystem& in_file_system, const std::string& in_message)
+    std::shared_ptr<DscText::TextRun> MakeTextRun(
+        DscText::TextManager& in_text_manager, 
+        DscCommon::FileSystem& in_file_system, 
+        const std::string& in_message)
     {
         DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
 
@@ -58,6 +61,124 @@ namespace
             DscText::TVerticalAlignment::TTop
             );
         return text_run;
+    }
+
+    void AddButton(
+        DscUi::UiManager& in_ui_manager,
+        DscText::TextManager& in_text_manager,
+        DscCommon::FileSystem& in_file_system,
+        DscRender::DrawSystem& in_draw_system,
+        DscDag::DagCollection& in_dag_collection,
+        DscUi::UiRootNodeGroup& in_ui_root_node_group,
+        DscUi::UiNodeGroup& in_parent_node_group,
+        const std::string& in_message
+    )
+    {
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_effect_constructor_helper = {};
+        array_effect_constructor_helper.push_back({
+            DscUi::TUiEffectType::TEffectDropShadow,
+            DscCommon::VectorFloat4(4.0f, 2.0f, 4.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+            });
+        auto button_node_group = in_ui_manager.AddChildNode(
+            DscUi::MakeComponentButton(
+                nullptr,
+                true
+            ).SetDesiredSize(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(64, 0.0f))
+            ).SetClearColour(
+                DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_ui_root_node_group,
+            in_parent_node_group,
+            array_effect_constructor_helper
+            );
+
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_fill_effect = {};
+        array_fill_effect.push_back({
+            DscUi::TUiEffectType::TEffectCorner,
+            DscCommon::VectorFloat4(8.0f, 8.0f, 8.0f, 8.0f)
+            });
+
+        const DscUi::TGradientFillConstantBuffer grad0 = {
+            {0.0f, 0.33f, 0.66f, 1.0f},
+            {1.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 1.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 1.0f, 1.0f},
+            {1.0f, 1.0f, 1.0f, 1.0f}
+        };
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentGradientFill(
+                grad0
+            ).SetForInputStateFlag(
+                DscUi::TUiInputStateFlag::TNone
+            ).SetPadding(
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f)
+            ).SetClearColour(
+                DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f)
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_ui_root_node_group,
+            button_node_group,
+            array_fill_effect
+            DSC_DEBUG_ONLY(DSC_COMMA "button fill 0")
+        );
+
+        const DscUi::TGradientFillConstantBuffer grad1 = {
+            {0.0f, 0.33f, 0.66f, 1.0f},
+            {1.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 1.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 1.0f, 1.0f},
+            {1.0f, 0.0f, 0.0f, 1.0f}
+        };
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentGradientFill(
+                grad1
+            ).SetForInputStateFlag(
+                DscUi::TUiInputStateFlag::TRollover
+            ).SetPadding(
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f)
+            ).SetClearColour(
+                DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_ui_root_node_group,
+            button_node_group,
+            array_fill_effect
+            DSC_DEBUG_ONLY(DSC_COMMA "button fill 1")
+        );
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentText(
+                MakeTextRun(in_text_manager, in_file_system, in_message),
+                &in_text_manager
+            ).SetPadding(
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(8, 0.0f)
+            ).SetClearColour(
+                DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_ui_root_node_group,
+            button_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "button text")
+            );
     }
 }
 
@@ -122,7 +243,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 ).SetClearColour(
                     DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
                 ).SetChildSlot(
-                    DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(512, 0.0f)),
+                    DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(0, 1.0f)),
                     DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                     DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
                 ),
@@ -134,49 +255,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
 
-        std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array;
-        effect_array.push_back({ 
-            DscUi::TUiEffectType::TEffectTint, 
-            DscCommon::VectorFloat4::s_zero, 
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f) 
-            });
-
-        for (int32 index = 0; index < 8; ++index)
-        {
-            _resources->_ui_manager->AddChildNode(
-                DscUi::MakeComponentText(
-                    MakeTextRun(*_resources->_text_manager, *_file_system, std::string("hello world ") + std::to_string(index)),
-                    _resources->_text_manager.get()
-                ).SetClearColour(
-                    DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
-                ),
-                *_draw_system,
-                *_resources->_dag_collection,
-                _resources->_ui_root_node_group,
-                stack_node,
-                effect_array
-                DSC_DEBUG_ONLY(DSC_COMMA "stack child")
-            );
-        }
-
-        _resources->_ui_manager->AddChildNode(
-            DscUi::MakeComponentText(
-                MakeTextRun(*_resources->_text_manager, *_file_system, "Exit"),
-                _resources->_text_manager.get()
-            ).SetClearColour(
-                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
-            ).SetInputData([this](const DscUi::UiComponentResourceNodeGroup&) {
-                this->_keep_running = false;
-                }
-            ),
+        AddButton(
+            *_resources->_ui_manager,
+            *_resources->_text_manager,
+            *_file_system,
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
             stack_node,
-            effect_array
-            DSC_DEBUG_ONLY(DSC_COMMA "stack child")
-        );
-
+            "Button Zero"
+            );
     }
 
     return;

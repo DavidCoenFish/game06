@@ -43,6 +43,8 @@ namespace DscUi
 	};
 }
 const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
+const DscUi::TUiInputStateFlag operator& (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs);
+const bool operator!= (const int32 in_lhs, const DscUi::TUiInputStateFlag in_rhs);
 
 namespace DscUi
 {
@@ -64,10 +66,12 @@ namespace DscUi
 	{
 		TDebugGrid,
 		TFill,
+		TGradientFill,
 		TImage,
 		TCanvas,
 		TText,
 		TStack,
+		TButton, // has input, filter draw of children for input flag if they have a for_input_flag node
 	};
 
 	enum class TUiDrawType : uint8
@@ -75,8 +79,10 @@ namespace DscUi
 		TUiPanel, // array of chlidren
 		TDebugGrid,
 		TFill,
+		TGradientFill,
 		TImage,
 		TText,
+		TButton,
 		TEffectDropShadow,
 		TEffectInnerShadow,
 		TEffectCorner,
@@ -183,6 +189,8 @@ namespace DscUi
 		TFlow,
 		TGap,
 
+		TGradienFill,
+
 		TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
 
 		THasManualScrollX,
@@ -194,6 +202,8 @@ namespace DscUi
 		TChildSlotSize,
 		TChildSlotPivot,
 		TChildSlotParentAttach,
+
+		TDesiredSize,
 
 		// lower priority than child slots, but still modify the avaliable(layout) size handed down by the parent
 		TPaddingLeft,
@@ -208,6 +218,9 @@ namespace DscUi
 
 		TInputStateFlag,
 		TInputData,
+		TInputRolloverAccumulate, // [0.0 ... 1.0] over some time period while acumulates to 1 when node is rolled over and drain back to zero when not rolled over
+
+		TForInputStateFlag, // this is a child node intended to be drawn when the parent is of a given matching input state
 
 		TCount
 	};

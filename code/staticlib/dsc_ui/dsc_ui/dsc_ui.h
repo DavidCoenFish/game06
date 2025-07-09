@@ -43,12 +43,30 @@ namespace DscUi
 		float _width_height[4]; // _width_height_screen_left_offset_top_offset (ui coords are top left relative)
 	};
 
-	// for debug fill, of move debug fill to the ffect shader
 	struct TFillConstantBuffer
 	{
 		float _colour[4];
 	};
 
+	struct TGradientFillConstantBuffer
+	{
+		// if there is transparency, it will blend with the clear clour of the render target
+		// focus is [0...1]  is the expected locations of the colour stops, example [0.0, 0.33, 0.66, 1.0], 
+		// expect focus values to be monically increacing and NO COINCIDENT (not equal to each other) can be outside [0...1]
+		float _focus[4];
+		float _colour_0[4];
+		float _colour_1[4];
+		float _colour_2[4];
+		float _colour_3[4];
+		// direction scale not implement, so currently hardcoded to be equivalent to [0, 1, 0, 1]
+		//float direction_scale[4]; // vx, vy, d1, d2 -> focus_needle = (dot(uv, [vx, vy]) - d1) / (d2 - d1)
+	};
+} // DscUi
+
+const bool operator==(const DscUi::TGradientFillConstantBuffer& in_lhs, const DscUi::TGradientFillConstantBuffer& in_rhs);
+
+namespace DscUi
+{
 	struct TEffectConstantBuffer
 	{
 		float _width_height[4]; // _width height, screen left offset, // todo: top offset (ui coords are top left relative)

@@ -13,6 +13,17 @@ const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs
 	return in_out_lhs;
 }
 
+const DscUi::TUiInputStateFlag operator& (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs)
+{
+	const int32 temp = static_cast<int32>(in_lhs) & static_cast<int32>(in_rhs);
+	return static_cast<DscUi::TUiInputStateFlag>(temp);
+}
+
+const bool operator!= (const int32 in_lhs, const DscUi::TUiInputStateFlag in_rhs)
+{
+	return in_lhs != static_cast<int32>(in_rhs);
+}
+
 template class DscDag::DagGroup<DscUi::TUiRootNodeGroup, static_cast<std::size_t>(DscUi::TUiRootNodeGroup::TCount)>;
 
 template class DscDag::DagGroup<DscUi::TUiNodeGroup, static_cast<std::size_t>(DscUi::TUiNodeGroup::TCount)>;
@@ -203,6 +214,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TGradienFill:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TGradientFillConstantBuffer) };
+		return s_meta_data;
+	}
 	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
@@ -239,6 +255,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TDesiredSize:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::VectorUiCoord2) };
 		return s_meta_data;
@@ -289,8 +310,17 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiComponentInputData) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
 	}
-
+	case DscUi::TUiComponentResourceNodeGroup::TForInputStateFlag:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiInputStateFlag) };
+		return s_meta_data;
+	}
+	}
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;

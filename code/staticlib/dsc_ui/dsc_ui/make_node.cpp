@@ -340,6 +340,23 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
 
         DscDag::DagCollection::LinkIndexNodes(0, in_array_child_node_group, node);
     }
+    else if (nullptr != in_resource_node_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TDesiredSize))
+    {
+        node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const DscUi::VectorUiCoord2& desired_size_coord = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[0]);
+                const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+                const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+
+                value = desired_size_coord.EvalueUICoord(avaliable_size, ui_scale);
+            },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "desired size resource group"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_resource_node_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TDesiredSize), node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_ui_scale, node);
+        
+    }
     else if (nullptr != in_resource_node_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TText))        //if text, get text bounds size
     {
         node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
@@ -406,12 +423,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeGeometrySize(
     DSC_UNUSED(in_dag_collection);
     DSC_UNUSED(in_owner_group);
     DscDag::NodeToken node = in_desired_size;
-    if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
-    {
-        // if we have a child slot, presume we are behaving like a canvas that has the geometry size the same as the avaliable size
-        node = in_avaliable_size;
-    }
-    else if (nullptr != in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow))
+    if (nullptr != in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow))
     {
         node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 const DscUi::TUiFlow flow = DscDag::DagCollection::GetValueType<DscUi::TUiFlow>(in_input_array[0]);
@@ -443,7 +455,17 @@ DscDag::NodeToken DscUi::MakeNode::MakeGeometrySize(
         DscDag::DagCollection::LinkIndexNodes(1, in_desired_size, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_avaliable_size, node);
 
+    } 
+    // do we need to reduce the geoemtry size for the padding?
+    else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize))
+        //((nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize)) ||
+        //(nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft)))
+    {
+        // if we have a child slot, presume we are behaving like a canvas that has the geometry size the same as the avaliable size
+        node = in_avaliable_size;
     }
+
+    else
 
     DSC_ASSERT(nullptr != node, "invalid state");
     return node;
@@ -577,6 +599,29 @@ DscDag::NodeToken DscUi::MakeNode::MakeGeometryOffset(
             DscDag::DagCollection::LinkIndexNodes(6, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackPivot), node);
             DscDag::DagCollection::LinkIndexNodes(7, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach), node);
         }
+    }
+    else if ((nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft)) &&
+        (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingTop)))
+    {
+        // using Parent avaliable size to match what is done in the other usage of padding
+        node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[1]);
+            const DscUi::UiCoord& padding_left = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[2]);
+            const DscUi::UiCoord& padding_top = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[3]);
+
+            value.Set(
+                padding_left.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale),
+                padding_top.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale)
+            );
+        },
+        &in_owner_group
+        DSC_DEBUG_ONLY(DSC_COMMA "geometry offset padding"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_parent_avaliable_size, node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingLeft), node);
+        DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingTop), node);
     }
     else
     {

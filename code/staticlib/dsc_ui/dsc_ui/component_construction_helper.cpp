@@ -136,6 +136,17 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 DSC_DEBUG_ONLY(DSC_COMMA "child slot parent attach")));
     }
 
+    if (true == in_construction_helper._has_desired_size)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TDesiredSize,
+            in_dag_collection.CreateValue(
+                in_construction_helper._desired_size,
+                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "desired size")));
+    }
+
     if (true == in_construction_helper._has_padding)
     {
         component_resource_group.SetNodeToken(
@@ -177,6 +188,17 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
                 &component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "gap")));
+    }
+
+    if (true == in_construction_helper._has_gradient_fill)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TGradienFill,
+            in_dag_collection.CreateValue(
+                in_construction_helper._gradient_fill_constant_buffer,
+                DscDag::CallbackOnValueChange<DscUi::TGradientFillConstantBuffer>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "gradient fill")));
     }
 
     if (DscUi::TUiFlow::TCount != in_construction_helper._flow_direction)
@@ -235,7 +257,28 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                     &component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "input data")));
         }
+    }
 
+    if (true == in_construction_helper._has_input_rollover_accumulate)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate,
+            in_dag_collection.CreateValue(
+                0.0f,
+                DscDag::CallbackOnValueChange<float>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "input rollover accumulate")));
+    }
+
+    if (true == in_construction_helper._has_for_input_flag)
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TForInputStateFlag,
+            in_dag_collection.CreateValue(
+                in_construction_helper._for_input_state_flag,
+                DscDag::CallbackOnValueChange<DscUi::TUiInputStateFlag>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "for input state flag")));
     }
 
     return component_resource_group;
@@ -251,6 +294,28 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentFill(const DscCommon::Vec
     ComponentConstructionHelper result({ TUiComponentType::TFill });
     result._fill = in_colour;
     result._has_fill = true;
+    return result;
+}
+
+DscUi::ComponentConstructionHelper DscUi::MakeComponentGradientFill(
+    const TGradientFillConstantBuffer& in_gradient_fill
+)
+{
+    ComponentConstructionHelper result({ TUiComponentType::TGradientFill });
+    result._has_gradient_fill = true;
+    result._gradient_fill_constant_buffer = in_gradient_fill;
+    return result;
+}
+
+DscUi::ComponentConstructionHelper DscUi::MakeComponentButton(
+    const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none,
+    const bool in_has_input_rollover_accumulate
+)
+{
+    ComponentConstructionHelper result({ TUiComponentType::TButton });
+    result._has_input = true;
+    result._input_click_callback = in_click_callback_or_none;
+    result._has_input_rollover_accumulate = in_has_input_rollover_accumulate;
     return result;
 }
 

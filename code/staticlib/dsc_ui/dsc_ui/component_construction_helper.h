@@ -83,6 +83,9 @@ namespace DscUi
 		VectorUiCoord2 _child_pivot = {};
 		VectorUiCoord2 _attach_point = {};
 
+		bool _has_desired_size = false;
+		VectorUiCoord2 _desired_size = {};
+
 		bool _has_padding = false;
 		UiCoord _padding_left = {};
 		UiCoord _padding_top = {};
@@ -93,6 +96,9 @@ namespace DscUi
 		bool _has_gap = false;
 		UiCoord _gap = {};
 
+		bool _has_gradient_fill = false;
+		TGradientFillConstantBuffer _gradient_fill_constant_buffer = {};
+
 		bool _has_child_stack_data = false; // size data for child of stack
 		UiCoord _stack_size = {};
 		UiCoord _stack_pivot = {};
@@ -102,12 +108,12 @@ namespace DscUi
 
 		bool _has_input = false;
 		std::function<void(const UiComponentResourceNodeGroup&)> _input_click_callback = {};
+		bool _has_input_rollover_accumulate = false;
+		bool _has_for_input_flag = false;
+		TUiInputStateFlag _for_input_state_flag = TUiInputStateFlag::TNone;
 
-		// canvas- geometry size is avaliable
-		// stack- geometry size is max (avaliable, desired)
-
-		// canvas - geometry offset is from child slot
-		// stack - geometry offset is from prev child plus gap, else from top left
+		bool _has_parent_index = false;
+		int32 _parent_index = 0; // what happens to the existing child if you overwrite a child
 
 		ComponentConstructionHelper& SetClearColour(
 			const DscCommon::VectorFloat4& in_clear_colour
@@ -126,6 +132,15 @@ namespace DscUi
 			_child_size = in_child_size;
 			_child_pivot = in_child_pivot;
 			_attach_point = in_attach_point;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetDesiredSize(
+			const VectorUiCoord2& in_desired_size
+		)
+		{
+			_has_desired_size = true;
+			_desired_size = in_desired_size;
 			return *this;
 		}
 		ComponentConstructionHelper& SetPadding(
@@ -168,11 +183,40 @@ namespace DscUi
 		}
 
 		ComponentConstructionHelper& SetInputData(
-			const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {}
+			const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {},
+			const bool in_has_input_rollover_accumulate = false
 		)
 		{
 			_has_input = true;
 			_input_click_callback = in_click_callback_or_none;
+			_has_input_rollover_accumulate = in_has_input_rollover_accumulate;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetForInputStateFlag(
+			const TUiInputStateFlag in_for_input_state_flag
+		)
+		{
+			_has_for_input_flag = true;
+			_for_input_state_flag = in_for_input_state_flag;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetParentIndex(
+			const int32 in_parent_index
+		)
+		{
+			_has_parent_index = true;
+			_parent_index = in_parent_index;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetGradientFill(
+			const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer
+		)
+		{
+			_has_gradient_fill = true;
+			_gradient_fill_constant_buffer = in_gradient_fill_constant_buffer;
 			return *this;
 		}
 	};
@@ -183,9 +227,15 @@ namespace DscUi
 		DscDag::NodeToken in_ui_scale,
 		DscDag::NodeToken in_avaliable_size
 	);
-
 	ComponentConstructionHelper MakeComponentDebugGrid();
 	ComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
+	ComponentConstructionHelper MakeComponentGradientFill(
+		const TGradientFillConstantBuffer& in_gradient_fill
+		);
+	ComponentConstructionHelper MakeComponentButton(
+		const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {},
+		const bool in_has_input_rollover_accumulate = false
+		);
 	ComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
 	ComponentConstructionHelper MakeComponentCanvas();
 	ComponentConstructionHelper MakeComponentText(
@@ -199,4 +249,5 @@ namespace DscUi
 		const bool in_desired_size_from_children_max = true,
 		const bool in_has_scroll = true
 		);
+
 }
