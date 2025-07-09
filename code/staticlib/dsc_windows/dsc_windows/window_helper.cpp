@@ -46,41 +46,62 @@ namespace
 
 		switch (in_message)
 		{
+		default:
+			return DefWindowProc(in_hwnd, in_message, in_wparam, in_lparam);
+
 		case WM_CREATE:
-		{
-			auto data = (LPCREATESTRUCTA)(in_lparam);
-			TCreateFunction* create_function = data ? (TCreateFunction*)(data->lpCreateParams) : nullptr;
-			if (create_function)
 			{
-				auto application_new = (*create_function)(in_hwnd);
-				SetWindowApplication(in_hwnd, application_new);
+				auto data = (LPCREATESTRUCTA)(in_lparam);
+				TCreateFunction* create_function = data ? (TCreateFunction*)(data->lpCreateParams) : nullptr;
+				if (create_function)
+				{
+					auto application_new = (*create_function)(in_hwnd);
+					SetWindowApplication(in_hwnd, application_new);
+				}
 			}
-		}
-		break;
+			break;
 
 		case WM_DESTROY:
-		{
-			int32 exit_code = 0;
-			if (nullptr != application)
 			{
-				exit_code = application->GetExitCode();
-				delete application;
+				int32 exit_code = 0;
+				if (nullptr != application)
+				{
+					exit_code = application->GetExitCode();
+					delete application;
+				}
+				SetWindowApplication(in_hwnd, nullptr);
+				//WM_QUIT is never sent to window, but you can pull it out of the GetMessage/PeekMessage
+				PostQuitMessage(exit_code);
 			}
-			SetWindowApplication(in_hwnd, nullptr);
-			//WM_QUIT is never sent to window, but you can pull it out of the GetMessage/PeekMessage
-			PostQuitMessage(exit_code);
-		}
-		break;
+			break;
+
+		//https://stackoverflow.com/questions/69715610/how-to-initialize-the-background-color-of-win32-app-to-something-other-than-whit
+		case WM_SHOWWINDOW:
+			{
+				if (!GetLayeredWindowAttributes(in_hwnd, NULL, NULL, NULL))
+				{
+					SetLayeredWindowAttributes(in_hwnd, 0, 0, LWA_ALPHA);
+					DefWindowProc(in_hwnd, WM_ERASEBKGND, (WPARAM)GetDC(in_hwnd), in_lparam);
+					SetLayeredWindowAttributes(in_hwnd, 0, 255, LWA_ALPHA);
+					AnimateWindow(in_hwnd, 1, AW_ACTIVATE | AW_BLEND);
+					return 0;
+				}
+				return DefWindowProc(in_hwnd, in_message, in_wparam, in_lparam);
+			}
+			break;
 
 		case WM_PAINT:
 			if (nullptr != application)
 			{
-				application->Update();
+				//application->Update();
 				PAINTSTRUCT ps;
 				(void)BeginPaint(in_hwnd, &ps);
 				EndPaint(in_hwnd, &ps);
 			}
-			return 0;
+			break;
+
+		case WM_ERASEBKGND:
+			return TRUE;
 
 		case WM_MOVE:
 			if (nullptr != application)
@@ -261,7 +282,7 @@ namespace
 			return MAKELRESULT(0, MNC_CLOSE);
 		}
 
-		return DefWindowProc(in_hwnd, in_message, in_wparam, in_lparam);
+		return 0; 
 	}
 
 } // namespace
@@ -337,7 +358,15 @@ const HWND DscWindows::WindowHelper(
 			return NULL;
 		}
 
+#if 1
+		// frame of white
 		ShowWindow(hwnd, in_fullScreen ? SW_SHOWMAXIMIZED : in_cmd_show);
+#else
+		DSC_UNUSED(in_cmd_show);
+		//https://stackoverflow.com/questions/69715610/how-to-initialize-the-background-color-of-win32-app-to-something-other-than-whit
+		ShowWindow(hwnd, SW_SHOWMINIMIZED);
+		ShowWindow(hwnd, in_fullScreen ? SW_SHOWMAXIMIZED : SW_RESTORE);
+#endif
 		UpdateWindow(hwnd);
 	}
 
