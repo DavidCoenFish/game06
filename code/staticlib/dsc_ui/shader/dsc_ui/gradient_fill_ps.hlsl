@@ -7,11 +7,11 @@ struct Pixel
 
 cbuffer ConstantBuffer : register(b0)
 {
-	float _focus[4];
-	float _colour_0[4];
-	float _colour_1[4];
-	float _colour_2[4];
-	float _colour_3[4];
+	float4 _focus;
+	float4 _colour_0;
+	float4 _colour_1;
+	float4 _colour_2;
+	float4 _colour_3;
 };
 
 float4 CaculateWeight(float in_value)
@@ -49,18 +49,23 @@ Pixel main(Interpolant in_input)
 
 	float4 weight = CaculateWeight(in_input._uv[1]);
 
-	//result._colour =
-	//	(_colour_0 * weight[0]) +
-	//	(_colour_1 * weight[1]) +
-	//	(_colour_2 * weight[2]) +
-	//	(_colour_3 * weight[3]);
+	result._colour =
+		(_colour_0 * weight[0]) +
+		(_colour_1 * weight[1]) +
+		(_colour_2 * weight[2]) +
+		(_colour_3 * weight[3]);
 
-	result._colour = float4(
-		(_colour_0[0] * weight[0]) + (_colour_1[0] * weight[0]) + (_colour_2[0] * weight[0]) + (_colour_3[3] * weight[0]),
-		(_colour_0[1] * weight[1]) + (_colour_1[1] * weight[1]) + (_colour_2[1] * weight[1]) + (_colour_3[3] * weight[1]),
-		(_colour_0[2] * weight[2]) + (_colour_1[2] * weight[2]) + (_colour_2[2] * weight[2]) + (_colour_3[3] * weight[2]),
-		(_colour_0[3] * weight[3]) + (_colour_1[3] * weight[3]) + (_colour_2[3] * weight[3]) + (_colour_3[3] * weight[3])
-		);
+	//result._colour = float4(
+	//	(_colour_0[0] * weight[0]) + (_colour_1[0] * weight[0]) + (_colour_2[0] * weight[0]) + (_colour_3[3] * weight[0]),
+	//	(_colour_0[1] * weight[1]) + (_colour_1[1] * weight[1]) + (_colour_2[1] * weight[1]) + (_colour_3[3] * weight[1]),
+	//	(_colour_0[2] * weight[2]) + (_colour_1[2] * weight[2]) + (_colour_2[2] * weight[2]) + (_colour_3[3] * weight[2]),
+	//	(_colour_0[3] * weight[3]) + (_colour_1[3] * weight[3]) + (_colour_2[3] * weight[3]) + (_colour_3[3] * weight[3])
+	//	);
+	//result._colour = float4(in_input._uv[1], in_input._uv[1], in_input._uv[1], 1.0);
+	//result._colour = float4(weight[0], weight[1], weight[2], 1.0);
+	//result._colour = float4(weight[3], weight[3], weight[3], 1.0);
+	//result._colour = float4(_focus[3], _focus[3], _focus[3], 1.0);
+	//result._colour = _colour_0;
 
     return result;
 }

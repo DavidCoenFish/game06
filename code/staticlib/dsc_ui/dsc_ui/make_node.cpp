@@ -206,36 +206,46 @@ DscDag::NodeToken DscUi::MakeNode::MakeAvaliableSize(
                 const DscUi::TUiFlow flow = DscDag::DagCollection::GetValueType<DscUi::TUiFlow>(in_input_array[2]);
                 DscCommon::VectorInt2 result = {};
 
-                if (3 < in_input_array.size())
+                switch (flow)
                 {
-                    const DscUi::UiCoord& child_size = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[3]);
-                    switch(flow)
+                default:
+                    DSC_ASSERT_ALWAYS("invalid switch case");
+                    break;
+                case DscUi::TUiFlow::THorizontal:
+                {
+                    if (nullptr != in_input_array[3])
                     {
-                    default:
-                        DSC_ASSERT_ALWAYS("invalid switch case");
-                        break;
-                    case DscUi::TUiFlow::THorizontal:
+                        const DscUi::UiCoord& child_size = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[3]);
                         result[1] = child_size.Evaluate(parent_avaliable_size.GetY(), parent_avaliable_size.GetX(), ui_scale);
-                        break;
-                    case DscUi::TUiFlow::TVertical:
-                        result[0] = child_size.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale);
-                        break;
+                    }
+                    else
+                    {
+                        result[1] = parent_avaliable_size.GetY();
+                    }
+                    if (nullptr != in_input_array[4])
+                    {
+                        const DscUi::VectorUiCoord2& desired_size_coord = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[4]);
+                        result[0] = desired_size_coord.EvalueUICoord(parent_avaliable_size, ui_scale).GetX();
                     }
                 }
-                else
+                break;
+                case DscUi::TUiFlow::TVertical:
                 {
-                    switch (flow)
+                    if (nullptr != in_input_array[3])
                     {
-                    default:
-                        DSC_ASSERT_ALWAYS("invalid switch case");
-                        break;
-                    case DscUi::TUiFlow::THorizontal:
-                        result[1] = parent_avaliable_size.GetY();
-                        break;
-                    case DscUi::TUiFlow::TVertical:
-                        result[0] = parent_avaliable_size.GetX();
-                        break;
+                        const DscUi::UiCoord& child_size = DscDag::DagCollection::GetValueType<DscUi::UiCoord>(in_input_array[3]);
+                        result[0] = child_size.Evaluate(parent_avaliable_size.GetX(), parent_avaliable_size.GetY(), ui_scale);
                     }
+                    else
+                    {
+                        result[0] = parent_avaliable_size.GetX();
+                    }
+                    if (nullptr != in_input_array[4])
+                    {
+                        const DscUi::VectorUiCoord2& desired_size_coord = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[4]);
+                        result[1] = desired_size_coord.EvalueUICoord(parent_avaliable_size, ui_scale).GetY();
+                    }
+                }
                 }
 
                 value = result;
@@ -246,10 +256,9 @@ DscDag::NodeToken DscUi::MakeNode::MakeAvaliableSize(
         DscDag::DagCollection::LinkIndexNodes(0, in_parent_avaliable_size, node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_scale, node);
         DscDag::DagCollection::LinkIndexNodes(2, in_parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TFlow), node);
-        if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackSize))
-        {
-            DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackSize), node);
-        }
+        DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildStackSize), node);
+        DscDag::DagCollection::LinkIndexNodes(4, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TDesiredSize), node);
+
     }
     else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TChildSlotSize)) // canvas child
     {
@@ -297,7 +306,30 @@ DscDag::NodeToken DscUi::MakeNode::MakeAvaliableSize(
         DscDag::DagCollection::LinkIndexNodes(4, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingRight), node);
         DscDag::DagCollection::LinkIndexNodes(5, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TPaddingBottom), node);
     }
+    else if (nullptr != in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TDesiredSize))
+    {
+        // so, flow set one axis of a avaliable size to zero
+        // we can't have child layout use desired size, as that can shring to children, but we can inflate the avalaible size of nodes with desired size...
+        node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const DscUi::VectorUiCoord2& desired_size_coord = DscDag::DagCollection::GetValueType<DscUi::VectorUiCoord2>(in_input_array[0]);
+            const DscCommon::VectorInt2& parent_avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+            const float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
 
+            // desired size is usually based on the node avalaible, not the parent, but the default case for avaliable is the parent
+            const DscCommon::VectorInt2 desired_size = desired_size_coord.EvalueUICoord(parent_avaliable_size, ui_scale);
+            value.Set(
+                std::max(desired_size.GetX(), parent_avaliable_size.GetX()),
+                std::max(desired_size.GetY(), parent_avaliable_size.GetY())
+                );
+        },
+            &in_owner_group
+            DSC_DEBUG_ONLY(DSC_COMMA "avaliable size desired size"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TDesiredSize), node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_parent_avaliable_size, node);
+        DscDag::DagCollection::LinkIndexNodes(2, in_ui_scale, node);
+
+    }
     return node;
 }
 

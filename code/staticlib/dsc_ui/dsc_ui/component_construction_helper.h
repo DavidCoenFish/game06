@@ -123,9 +123,9 @@ namespace DscUi
 			return *this;
 		}
 		ComponentConstructionHelper& SetChildSlot(
-			const VectorUiCoord2& in_child_size,
-			const VectorUiCoord2& in_child_pivot,
-			const VectorUiCoord2& in_attach_point
+			const VectorUiCoord2& in_child_size = VectorUiCoord2(UiCoord(0, 1.0f), UiCoord(0, 1.0f)),
+			const VectorUiCoord2& in_child_pivot = VectorUiCoord2(UiCoord(0, 0.0f), UiCoord(0, 0.0f)),
+			const VectorUiCoord2& in_attach_point = VectorUiCoord2(UiCoord(0, 0.0f), UiCoord(0, 0.0f))
 			)
 		{
 			_has_child_slot_data = true;

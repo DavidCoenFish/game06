@@ -169,11 +169,19 @@ namespace DscDag
 			result += "\"";
 			result += " type:";
 			result += typeid(IN_TYPE).name();
-			//result += " value:" + IN_DEBUG_PRINT::Function(_value);
+			if (nullptr != _s_debug_print_value)
+			{
+				result += " value:";
+				result += _s_debug_print_value(_value);
+			}
 			result += "\n";
 
 			return result;
 		}
+
+public:
+	typedef std::function<std::string(const IN_TYPE&)> TDebugPrintValue;
+	static inline TDebugPrintValue _s_debug_print_value = {};
 #endif //#if defined(_DEBUG)
 
 	private:

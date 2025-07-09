@@ -122,6 +122,16 @@ void DscDag::DagCollection::LinkNodes(NodeToken in_input, NodeToken in_output)
 
 void DscDag::DagCollection::LinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output)
 {
+#if 1
+	if ((nullptr != in_input) && (nullptr != in_output))
+	{
+		in_input->AddOutput(in_output);
+	}
+	if (nullptr != in_output)
+	{ 
+		in_output->SetIndexInput(in_index, in_input);
+	}
+#else
 	DSC_ASSERT(nullptr != in_input, "invalid param");
 	DSC_ASSERT(nullptr != in_output, "invalid param");
 	if ((nullptr != in_input) && (nullptr != in_output))
@@ -129,6 +139,7 @@ void DscDag::DagCollection::LinkIndexNodes(int32 in_index, NodeToken in_input, N
 		in_input->AddOutput(in_output);
 		in_output->SetIndexInput(in_index, in_input);
 	}
+#endif
 	return;
 }
 

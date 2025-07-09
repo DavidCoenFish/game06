@@ -193,7 +193,7 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
     if (true == in_construction_helper._has_gradient_fill)
     {
         component_resource_group.SetNodeToken(
-            DscUi::TUiComponentResourceNodeGroup::TGradienFill,
+            DscUi::TUiComponentResourceNodeGroup::TGradientFill,
             in_dag_collection.CreateValue(
                 in_construction_helper._gradient_fill_constant_buffer,
                 DscDag::CallbackOnValueChange<DscUi::TGradientFillConstantBuffer>::Function,

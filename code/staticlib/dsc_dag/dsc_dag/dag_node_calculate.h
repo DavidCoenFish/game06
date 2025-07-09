@@ -5,7 +5,8 @@
 
 namespace DscDag
 {
-	template <typename IN_TYPE DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
+	//template <typename IN_TYPE DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
+	template <typename IN_TYPE>
 	class DagNodeCalculate : public IDagNode
 	{
 	public:
@@ -96,8 +97,11 @@ namespace DscDag
 			{
 				_index_input.resize(in_index + 1);
 			}
-			_index_input[in_index] = in_nodeID;
-			MarkDirty();
+			if (_index_input[in_index] != in_nodeID)
+			{
+				_index_input[in_index] = in_nodeID;
+				MarkDirty();
+			}
 		}
 
 		virtual void AddInput(NodeToken in_nodeID) override
@@ -169,12 +173,16 @@ namespace DscDag
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += " type:";
 			result += typeid(IN_TYPE).name();
-			result += " value:" + IN_DEBUG_PRINT::Function(_value);
+			if (nullptr != _s_debug_print_value)
+			{
+				result += " value:";
+				result += _s_debug_print_value(_value);
+			}
 			result += "\n";
 
 			if (0 < _input.size())
 			{
-				result = DscCommon::DebugPrint::TabDepth(in_depth + 1);
+				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "input:\n";
 				for (NodeToken item : _input)
 				{
@@ -187,7 +195,7 @@ namespace DscDag
 
 			if (0 < _index_input.size())
 			{
-				result = DscCommon::DebugPrint::TabDepth(in_depth + 1);
+				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "indexInput:\n";
 				for (NodeToken item : _index_input)
 				{
@@ -200,6 +208,9 @@ namespace DscDag
 
 			return result;
 		}
+public:
+	typedef std::function<std::string(const IN_TYPE&)> TDebugPrintValue;
+	static inline TDebugPrintValue _s_debug_print_value = {};
 #endif //#if defined(_DEBUG)
 
 	private:

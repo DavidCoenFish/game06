@@ -210,7 +210,7 @@ namespace
                     in_out_consumed = true;
                     if (in_touch_data._click_start)
                     {
-                        flag |= DscUi::TUiInputStateFlag::TClickStart;
+                        //flag |= DscUi::TUiInputStateFlag::TClickStart;
                        in_touch_data._node_under_click_start = input_state_flag;
                     }
                 }
@@ -219,7 +219,7 @@ namespace
                 {
                     in_out_consumed = true;
                     // we have a click
-                    flag |= DscUi::TUiInputStateFlag::TClickEnd;
+                    //flag |= DscUi::TUiInputStateFlag::TClickEnd;
                     clicked = true;
                 }
             }
@@ -1498,7 +1498,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             auto shader_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
             DSC_ASSERT(nullptr != shader_buffer, "invalid state");
 
-            shader_buffer->GetConstant<TGradientFillConstantBuffer>(0) = DscDag::DagCollection::GetValueType<TGradientFillConstantBuffer>(in_input_array[3]);
+            const TGradientFillConstantBuffer& gradient_fill = DscDag::DagCollection::GetValueType<TGradientFillConstantBuffer>(in_input_array[3]);
+            shader_buffer->GetConstant<TGradientFillConstantBuffer>(0) = gradient_fill;
 
             if (true == ui_render_target->ActivateRenderTarget(*frame))
             {
@@ -1522,8 +1523,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::DagCollection::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::DagCollection::LinkIndexNodes(2, shader_buffer_node, result_node);
-        DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TGradienFill), "invalid state");
-        DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TGradienFill), result_node);
+        DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TGradientFill), "invalid state");
+        DscDag::DagCollection::LinkIndexNodes(3, in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TGradientFill), result_node);
     }
     break;
     case TUiDrawType::TImage:

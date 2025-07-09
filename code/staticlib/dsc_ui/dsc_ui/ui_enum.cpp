@@ -13,6 +13,12 @@ const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs
 	return in_out_lhs;
 }
 
+const DscUi::TUiInputStateFlag operator | (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs)
+{
+	const int32 temp = static_cast<int32>(in_lhs) | static_cast<int32>(in_rhs);
+	return static_cast<DscUi::TUiInputStateFlag>(temp);
+}
+
 const DscUi::TUiInputStateFlag operator& (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs)
 {
 	const int32 temp = static_cast<int32>(in_lhs) & static_cast<int32>(in_rhs);
@@ -214,7 +220,7 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::UiCoord) };
 		return s_meta_data;
 	}
-	case DscUi::TUiComponentResourceNodeGroup::TGradienFill:
+	case DscUi::TUiComponentResourceNodeGroup::TGradientFill:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TGradientFillConstantBuffer) };
 		return s_meta_data;

@@ -43,6 +43,7 @@ namespace DscUi
 	};
 }
 const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
+const DscUi::TUiInputStateFlag operator | (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs);
 const DscUi::TUiInputStateFlag operator& (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs);
 const bool operator!= (const int32 in_lhs, const DscUi::TUiInputStateFlag in_rhs);
 
@@ -189,7 +190,7 @@ namespace DscUi
 		TFlow,
 		TGap,
 
-		TGradienFill,
+		TGradientFill,
 
 		TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
 
@@ -203,7 +204,7 @@ namespace DscUi
 		TChildSlotPivot,
 		TChildSlotParentAttach,
 
-		TDesiredSize,
+		TDesiredSize, // name too close to the TUiNodeGroup? but it doesnt have a desired size
 
 		// lower priority than child slots, but still modify the avaliable(layout) size handed down by the parent
 		TPaddingLeft,
