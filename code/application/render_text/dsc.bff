@@ -33,6 +33,7 @@
         "D3d12.lib", 
         "DXGI.lib", 
         "dxguid.lib", 
+        "Gdi32.lib",
 #if DEBUG_SDK
         "freetyped.lib",
         "libpng16d.lib",

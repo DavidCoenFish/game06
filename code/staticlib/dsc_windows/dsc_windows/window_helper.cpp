@@ -75,6 +75,7 @@ namespace
 			}
 			break;
 
+		// custom show window to avoid a frame of white, possibly a time slice between window shown and erase/paint being called
 		//https://stackoverflow.com/questions/69715610/how-to-initialize-the-background-color-of-win32-app-to-something-other-than-whit
 		case WM_SHOWWINDOW:
 			{
@@ -320,6 +321,16 @@ const HWND DscWindows::WindowHelper(
 	const std::wstring className(DscCommon::Utf8::Utf8ToUtf16(in_application_name + std::string("Class")));
 	const std::wstring name(DscCommon::Utf8::Utf8ToUtf16(in_application_name));
 
+	//static HBRUSH s_background_brush = NULL;
+	//if (NULL == s_background_brush)
+	//{
+	//	LOGBRUSH lb = {};
+	//	lb.lbStyle = BS_HOLLOW; // Or BS_HATCHED, BS_PATTERN, etc.
+	//	lb.lbColor = RGB(0, 0, 0); // Red color
+	//	lb.lbHatch = 0; // Not used for solid brush
+	//	s_background_brush = CreateBrushIndirect(&lb);
+	//}
+
 	// Register class
 	{
 		WNDCLASSEXW wcex = {};
@@ -329,7 +340,10 @@ const HWND DscWindows::WindowHelper(
 		wcex.hInstance = in_instance;
 		wcex.hIcon = LoadIconW(in_instance, L"IDI_ICON");
 		wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-		wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+		//wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+		//wcex.hbrBackground = s_background_brush;
+		wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(HOLLOW_BRUSH));
+
 		wcex.lpszClassName = className.c_str();
 		wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
 		if (!RegisterClassExW(&wcex))

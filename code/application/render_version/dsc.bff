@@ -33,8 +33,9 @@
         "Shcore.lib",
         "D3d12.lib", 
         "DXGI.lib", 
-        "dxguid.lib", 
-        "freetype.lib", 
+        "dxguid.lib",
+        "Gdi32.lib",
+        "freetype.lib",
         "harfbuzz.lib"
         }
 

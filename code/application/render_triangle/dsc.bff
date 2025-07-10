@@ -12,7 +12,7 @@
 }
 
 .LibraryDependencyArray = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource" }
-.LinkerAdditionalDependency = {"user32.lib", "Shcore.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib"}
+.LinkerAdditionalDependency = {"user32.lib", "Shcore.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "Gdi32.lib"}
 .WindowExeParam = [
     .RootPath = ^_WORKING_DIR_
     .RelativePath = ^_CURRENT_BFF_DIR_

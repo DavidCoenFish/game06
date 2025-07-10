@@ -38,13 +38,14 @@ typedef unsigned __int64 uint64;
 #include <sdkddkver.h>
 #define NOMINMAX // Use the C++ standard templated min/max
 #define NODRAWTEXT
-#define NOGDI // DirectX apps don't need GDI
+//#define NOGDI // DirectX apps don't need GDI. but want to use GetStockObject(HOLLOW_BRUSH)
 #define NOBITMAP
 #define NOMCX // Include <mcx.h> if you need this
 #define NOSERVICE // Include <winsvc.h> if you need this
 #define NOHELP // WinHelp is deprecated
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <wingdi.h> // Included for the LOGBRUSH structure definition
 #include <shellscalingapi.h>
 #include <shtypes.h>
 #include <cassert>
