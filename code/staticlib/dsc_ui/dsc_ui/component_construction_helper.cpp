@@ -4,7 +4,8 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
     DscDag::DagCollection& in_dag_collection,
     const DscUi::ComponentConstructionHelper& in_construction_helper,
     DscDag::NodeToken in_ui_scale,
-    DscDag::NodeToken in_avaliable_size
+    //DscDag::NodeToken in_avaliable_size
+    const UiNodeGroup& in_parent
 )
 {
     DscUi::UiComponentResourceNodeGroup component_resource_group;
@@ -104,7 +105,9 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 &component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA "ui scale from width")));
         DscDag::DagCollection::LinkIndexNodes(0, in_ui_scale, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
-        DscDag::DagCollection::LinkIndexNodes(1, in_avaliable_size, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
+        //in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize), // ok, this was ment to be the local avaliable size, but have some dependency order issues here
+        DscDag::NodeToken avaliable_size = in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize);
+        DscDag::DagCollection::LinkIndexNodes(1, avaliable_size, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
     }
     else
     {
@@ -201,6 +204,43 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 DSC_DEBUG_ONLY(DSC_COMMA "gradient fill")));
     }
 
+    if (true == in_construction_helper._has_multi_gradient_fill)
+    {
+        std::vector<DscUi::TGradientFillConstantBuffer> gradient_array = {};
+        for (int32 index = 0; index < _multi_gradient_fill_array_size; ++index)
+        {
+            gradient_array.push_back(in_construction_helper._multi_gradient_fill_constant_buffer[index]);
+        }
+        DscDag::NodeToken data_node = in_dag_collection.CreateValue(
+            gradient_array,
+            DscDag::CallbackNever<std::vector<DscUi::TGradientFillConstantBuffer>>::Function,
+            &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "multi gradient fill"));
+        
+        DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscUi::TGradientFillConstantBuffer>([](DscUi::TGradientFillConstantBuffer& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                if (nullptr == in_input_array[0])
+                {
+                    return;
+                }
+                const TUiInputStateFlag input_state = DscDag::DagCollection::GetValueType<TUiInputStateFlag>(in_input_array[0]);
+                const std::vector<DscUi::TGradientFillConstantBuffer>& array_gradient = DscDag::DagCollection::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_input_array[1]);
+
+                const int32 index = static_cast<int32>(input_state);
+                DSC_ASSERT((0 <= index) && (index < static_cast<int32>(array_gradient.size())), "invalid state");
+                value = array_gradient[index];
+            },
+            &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "gradient fill calculate"));
+
+        const DscUi::UiComponentResourceNodeGroup& parent_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources));
+        DscDag::DagCollection::LinkIndexNodes(0, parent_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputStateFlag), node); // set with the parent TUiInputStateFlag
+        DscDag::DagCollection::LinkIndexNodes(1, data_node, node);
+
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TGradientFill,
+            node);
+    }
+
     if (DscUi::TUiFlow::TCount != in_construction_helper._flow_direction)
     {
         component_resource_group.SetNodeToken(
@@ -270,17 +310,6 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 DSC_DEBUG_ONLY(DSC_COMMA "input rollover accumulate")));
     }
 
-    if (true == in_construction_helper._has_for_input_flag)
-    {
-        component_resource_group.SetNodeToken(
-            DscUi::TUiComponentResourceNodeGroup::TForInputStateFlag,
-            in_dag_collection.CreateValue(
-                in_construction_helper._for_input_state_flag,
-                DscDag::CallbackOnValueChange<DscUi::TUiInputStateFlag>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "for input state flag")));
-    }
-
     return component_resource_group;
 }
 
@@ -307,15 +336,28 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentGradientFill(
     return result;
 }
 
-DscUi::ComponentConstructionHelper DscUi::MakeComponentButton(
-    const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none,
-    const bool in_has_input_rollover_accumulate
+DscUi::ComponentConstructionHelper DscUi::MakeComponentMultiGradientFill(
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_none,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_selection,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_selection,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click_selection,
+    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click_selection
 )
 {
-    ComponentConstructionHelper result({ TUiComponentType::TButton });
-    result._has_input = true;
-    result._input_click_callback = in_click_callback_or_none;
-    result._has_input_rollover_accumulate = in_has_input_rollover_accumulate;
+    ComponentConstructionHelper result({ TUiComponentType::TGradientFill });
+    result._has_multi_gradient_fill = true;
+    result._multi_gradient_fill_constant_buffer[0] = in_gradient_fill_constant_buffer_none;
+    result._multi_gradient_fill_constant_buffer[1] = in_gradient_fill_constant_buffer_rollover;
+    result._multi_gradient_fill_constant_buffer[2] = in_gradient_fill_constant_buffer_click;
+    result._multi_gradient_fill_constant_buffer[3] = in_gradient_fill_constant_buffer_rollover_click;
+    result._multi_gradient_fill_constant_buffer[4] = in_gradient_fill_constant_buffer_selection;
+    result._multi_gradient_fill_constant_buffer[5] = in_gradient_fill_constant_buffer_rollover_selection;
+    result._multi_gradient_fill_constant_buffer[6] = in_gradient_fill_constant_buffer_click_selection;
+    result._multi_gradient_fill_constant_buffer[7] = in_gradient_fill_constant_buffer_rollover_click_selection;
+
     return result;
 }
 

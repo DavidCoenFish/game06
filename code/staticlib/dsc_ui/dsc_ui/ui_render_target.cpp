@@ -91,6 +91,11 @@ const bool DscUi::UiRenderTarget::ActivateRenderTarget(
 	DscRenderResource::Frame& in_frame
 )
 {
+	if (false == _enabled)
+	{
+		return false;
+	}
+
 	if (nullptr != _external_render_target)
 	{
 		in_frame.SetRenderTarget(_external_render_target, _allow_clear_on_draw);
@@ -115,6 +120,11 @@ const bool DscUi::UiRenderTarget::ActivateRenderTarget(
 
 const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetTextureSize() const
 {
+	if (false == _enabled)
+	{
+		return DscCommon::VectorInt2::s_zero;
+	}
+
 	if (nullptr != _external_render_target)
 	{
 		return _external_render_target->GetSize();
@@ -133,6 +143,11 @@ const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetTextureSize() const
 
 const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetViewportSize() const
 {
+	if (false == _enabled)
+	{
+		return DscCommon::VectorInt2::s_zero;
+	}
+
 	if (nullptr != _external_render_target)
 	{
 		return _external_render_target->GetViewportSize();
@@ -152,6 +167,11 @@ const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetViewportSize() const
 // null if we dont have a reference to a render target
 std::shared_ptr<DscRender::HeapWrapperItem> DscUi::UiRenderTarget::GetTexture()
 {
+	if (false == _enabled)
+	{
+		return nullptr;
+	}
+
 	if (nullptr != _render_target_pool_texture)
 	{
 		return _render_target_pool_texture->_render_target_texture->GetShaderResourceHeapWrapperItem(0);

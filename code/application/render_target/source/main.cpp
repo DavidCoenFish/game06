@@ -41,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
         }
         else
         {
-            _continue = DscWindows::UpdateApplication(hwnd);
+            DscWindows::UpdateApplication(hwnd);
         }
     }
 

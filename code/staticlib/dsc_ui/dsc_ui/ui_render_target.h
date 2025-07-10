@@ -74,8 +74,18 @@ namespace DscUi
 		// null if we dont have a reference to a render target
 		std::shared_ptr<DscRender::HeapWrapperItem> GetTexture();
 
+		void SetEnabled(const bool in_enabled) 
+		{
+			_enabled = in_enabled;
+		}
+		const bool GetEnabled() const 
+		{
+			return _enabled;
+		}
+
 	private:
 		bool _allow_clear_on_draw = false;
+		bool _enabled = true;
 
 		DscRender::IRenderTarget* _external_render_target = {};
 		std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> _render_target_pool_texture = {};

@@ -37,10 +37,12 @@ namespace DscUi
 		TRollover = 1 << 0, // use rollover for keyboard navigation?
 		TClick = 1 << 1,
 		TSelection = 1 << 2
+
+		// flashing white on click start/ end seems like a good idear but looks kind of flashy, won't do this for now
 		// is this the frame the click started, should also have TClick set
-		//TClickStart = 1 << 2,
+		//TClickStart = 1 << 3,
 		// did click end this frame, can be true without TClick set
-		//TClickEnd = 1 << 3
+		//TClickEnd = 1 << 4
 	};
 }
 const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
@@ -69,11 +71,12 @@ namespace DscUi
 		TDebugGrid,
 		TFill,
 		TGradientFill,
+		TGradientFillForInputState,
 		TImage,
 		TCanvas,
 		TText,
 		TStack,
-		TButton, // has input, filter draw of children for input flag if they have a for_input_flag node
+		//TButton, // has input, filter draw of children for input flag if they have a for_input_flag node
 	};
 
 	enum class TUiDrawType : uint8
@@ -84,7 +87,7 @@ namespace DscUi
 		TGradientFill,
 		TImage,
 		TText,
-		TButton,
+		//TButton,
 		TEffectDropShadow,
 		TEffectInnerShadow,
 		TEffectCorner,
@@ -119,6 +122,7 @@ namespace DscUi
 	enum class TUiRootNodeGroup : uint8
 	{
 		TDrawNode,
+		TDrawBaseNode, // TDrawNode may be the ui component or an effect, if we want to add a dependency, it needs to be to the base of the draw chain
 		TUiComponentType,
 		TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
 		TArrayChildUiNodeGroup,
@@ -147,6 +151,7 @@ namespace DscUi
 	enum class TUiNodeGroup : uint8
 	{
 		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
+		TDrawBaseNode, // TDrawNode may be the ui component or an effect, if we want to add a dependency, it needs to be to the base of the draw chain
 		TUiComponentType,
 		TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
 		TArrayChildUiNodeGroup, // so, there is an issue with this, handing around a COPY of a UiNodeGroup is a slight risk of stale data if reference is held elsewhere, use with care
@@ -223,8 +228,6 @@ namespace DscUi
 		TInputStateFlag,
 		TInputData,
 		TInputRolloverAccumulate, // [0.0 ... 1.0] over some time period while acumulates to 1 when node is rolled over and drain back to zero when not rolled over
-
-		TForInputStateFlag, // this is a child node intended to be drawn when the parent is of a given matching input state
 
 		TCount
 	};

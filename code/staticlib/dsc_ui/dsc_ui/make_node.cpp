@@ -135,23 +135,27 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
             if (0 < in_input_texture_count)
             {
                 DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
+                //ui_render_target->SetEnabled(input_texture->GetEnabled());
                 const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
                 buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
                 buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
                 const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
                 buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
                 buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
+                shader->SetShaderResourceViewHandle(0, nullptr);
                 shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
             }
-            if (1 < in_input_texture_count)
+            if (1 < in_input_texture_count) //&& (true == ui_render_target->GetEnabled()))
             {
                 DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
+                //ui_render_target->SetEnabled(input_texture->GetEnabled());
                 const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
                 buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
                 buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
                 const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
                 buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
                 buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
+                shader->SetShaderResourceViewHandle(1, nullptr);
                 shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
             }
 
@@ -161,10 +165,11 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
                 frame->Draw(weak_geometry.lock());
                 frame->SetRenderTarget(nullptr);
             }
+
             out_value = ui_render_target.get();
         },
         &in_component_resource_group
-    DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + "Draw"));
+    DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
 
     auto shader_buffer = in_shader->MakeShaderConstantBuffer(&in_draw_system);
     auto shader_buffer_node = in_dag_collection.CreateValue(

@@ -53,6 +53,8 @@ namespace DscText
 
 namespace DscUi
 {
+	constexpr int32 _multi_gradient_fill_array_size = 8;
+
 	struct ComponentConstructionHelper
 	{
 		TUiComponentType _component_type;
@@ -99,6 +101,9 @@ namespace DscUi
 		bool _has_gradient_fill = false;
 		TGradientFillConstantBuffer _gradient_fill_constant_buffer = {};
 
+		bool _has_multi_gradient_fill = false;
+		TGradientFillConstantBuffer _multi_gradient_fill_constant_buffer[_multi_gradient_fill_array_size] = {};
+
 		bool _has_child_stack_data = false; // size data for child of stack
 		UiCoord _stack_size = {};
 		UiCoord _stack_pivot = {};
@@ -109,12 +114,11 @@ namespace DscUi
 		bool _has_input = false;
 		std::function<void(const UiComponentResourceNodeGroup&)> _input_click_callback = {};
 		bool _has_input_rollover_accumulate = false;
-		bool _has_for_input_flag = false;
-		TUiInputStateFlag _for_input_state_flag = TUiInputStateFlag::TNone;
 
 		bool _has_parent_index = false;
 		int32 _parent_index = 0; // what happens to the existing child if you overwrite a child
 
+	public:
 		ComponentConstructionHelper& SetClearColour(
 			const DscCommon::VectorFloat4& in_clear_colour
 		)
@@ -193,15 +197,6 @@ namespace DscUi
 			return *this;
 		}
 
-		ComponentConstructionHelper& SetForInputStateFlag(
-			const TUiInputStateFlag in_for_input_state_flag
-		)
-		{
-			_has_for_input_flag = true;
-			_for_input_state_flag = in_for_input_state_flag;
-			return *this;
-		}
-
 		ComponentConstructionHelper& SetParentIndex(
 			const int32 in_parent_index
 		)
@@ -210,32 +205,30 @@ namespace DscUi
 			_parent_index = in_parent_index;
 			return *this;
 		}
-
-		ComponentConstructionHelper& SetGradientFill(
-			const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer
-		)
-		{
-			_has_gradient_fill = true;
-			_gradient_fill_constant_buffer = in_gradient_fill_constant_buffer;
-			return *this;
-		}
 	};
 
 	UiComponentResourceNodeGroup MakeComponentResourceGroup(
 		DscDag::DagCollection& in_dag_collection,
 		const ComponentConstructionHelper& in_construction_helper,
 		DscDag::NodeToken in_ui_scale,
-		DscDag::NodeToken in_avaliable_size
+		const UiNodeGroup& in_parent
 	);
+
 	ComponentConstructionHelper MakeComponentDebugGrid();
 	ComponentConstructionHelper MakeComponentFill(const DscCommon::VectorFloat4& in_colour);
 	ComponentConstructionHelper MakeComponentGradientFill(
 		const TGradientFillConstantBuffer& in_gradient_fill
-		);
-	ComponentConstructionHelper MakeComponentButton(
-		const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {},
-		const bool in_has_input_rollover_accumulate = false
-		);
+	);
+	ComponentConstructionHelper MakeComponentMultiGradientFill(
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_none,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_selection,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_selection,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click_selection,
+		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click_selection
+	);
 	ComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
 	ComponentConstructionHelper MakeComponentCanvas();
 	ComponentConstructionHelper MakeComponentText(

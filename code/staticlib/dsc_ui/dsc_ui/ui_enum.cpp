@@ -47,6 +47,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
 		return s_meta_data;
 	}
+	case DscUi::TUiRootNodeGroup::TDrawBaseNode:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
+		return s_meta_data;
+	}
 	case DscUi::TUiRootNodeGroup::TUiComponentType:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::TUiComponentType) };
@@ -116,6 +121,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		DSC_ASSERT_ALWAYS("invalid switch");
 		break;
 	case DscUi::TUiNodeGroup::TDrawNode:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
+		return s_meta_data;
+	}
+	case DscUi::TUiNodeGroup::TDrawBaseNode:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
 		return s_meta_data;
@@ -319,11 +329,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	case DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
-		return s_meta_data;
-	}
-	case DscUi::TUiComponentResourceNodeGroup::TForInputStateFlag:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TUiInputStateFlag) };
 		return s_meta_data;
 	}
 	}

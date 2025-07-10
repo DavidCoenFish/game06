@@ -4,6 +4,7 @@
 #include <dsc_windows/i_window_application.h>
 #include <dsc_dag/dag_group.h>
 #include <dsc_ui/ui_enum.h>
+#include <dsc_render_resource/render_target_pool.h>
 
 #define LOG_TOPIC_APPLICATION "APPLICATION"
 
@@ -78,13 +79,19 @@ private:
         Resources& operator=(const Resources&) = delete;
         Resources(const Resources&) = delete;
 
-        std::unique_ptr<DscCommon::Timer> _timer = {};
-        std::unique_ptr<DscText::TextManager> _text_manager = {};
-        std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
-        DscUi::UiRootNodeGroup _ui_root_node_group;
-        DscUi::UiNodeGroup _ui_node_group_gradient_owner;
+
+        std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> _gradient_render_target_texture = {};
+        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _gradient_constant_buffer = {};
+
+        std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> _button_render_target_texture = {};
+        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _button_constant_buffer = {};
+
+        std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> _effect_render_target_texture = {};
+        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _effect_constant_buffer = {};
+
+        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _root_constant_buffer = {};
     };
     std::unique_ptr<Resources> _resources;
 

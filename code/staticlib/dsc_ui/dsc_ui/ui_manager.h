@@ -178,6 +178,29 @@ namespace DscUi
 			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
 			);
 
+
+		// test code wants access to some of the internals
+#if defined(_DEBUG)
+		std::shared_ptr<DscRenderResource::Shader>& GetUiPanelShader() {
+			return _ui_panel_shader;
+		}
+		std::shared_ptr<DscRenderResource::Shader>& GetGradientFillShader() {
+			return _gradient_fill_shader;
+		}
+		std::shared_ptr<DscRenderResource::Shader>& GetEffectDropShadowShader() {
+			return  _effect_drop_shadow_shader;
+		}
+
+		std::shared_ptr<DscRenderResource::GeometryGeneric>& GetGeometryFullQuadPosUv() {
+			return  _full_quad_pos_uv;
+		}
+		std::shared_ptr<DscRenderResource::GeometryGeneric>& GetGeometryUiPanel() {
+			return  _ui_panel_geometry;
+		}
+		DscRenderResource::RenderTargetPool& GetRenderTargetPool() {
+			return *_render_target_pool;
+		}
+#endif //_debug
 	private:
 		void UpdateRootViewportSize(
 			const UiRootNodeGroup& in_root_node_group
@@ -193,7 +216,8 @@ namespace DscUi
 			DscDag::NodeToken in_last_render_target_or_null,
 			DscDag::NodeToken in_render_request_size,
 			DscDag::NodeToken in_child_array_node_or_null,
-			UiComponentResourceNodeGroup& in_component_resource_group
+			UiComponentResourceNodeGroup& in_component_resource_group,
+			DscDag::NodeToken& out_draw_base_node
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 

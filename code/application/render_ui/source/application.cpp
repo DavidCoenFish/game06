@@ -64,7 +64,6 @@ namespace
             );
         return text_run;
     }
-#endif
 
     void AddButton(
         DscUi::UiManager& in_ui_manager,
@@ -95,7 +94,7 @@ namespace
             });
 
         auto button_node_group = in_ui_manager.AddChildNode(
-            DscUi::MakeComponentButton(
+            DscUi::MakeComponentCanvas().SetInputData(
                 nullptr,
                 true
             ).SetDesiredSize(
@@ -123,16 +122,52 @@ namespace
             });
 
         in_ui_manager.AddChildNode(
-            DscUi::MakeComponentGradientFill(
+            DscUi::MakeComponentMultiGradientFill(
+                //in_gradient_fill_constant_buffer_none,
                 {
                     {0.0f, 0.1f, 0.5f, 1.0f},
                     {0.557f, 0.314f, 0.208f, 1.0f},
                     {0.733f, 0.439f, 0.286f, 1.0f},
                     {0.941f, 0.627f, 0.396f, 1.0f},
                     {0.996f, 0.757f, 0.525f, 1.0f}
-                }
-            ).SetForInputStateFlag(
-                DscUi::TUiInputStateFlag::TNone
+                },
+                //in_gradient_fill_constant_buffer_rollover,
+                {
+                    {0.0f, 0.5f, 0.9f, 1.0f},
+                    {0.557f, 0.314f, 0.208f, 1.0f},
+                    {0.733f, 0.439f, 0.286f, 1.0f},
+                    {0.941f, 0.627f, 0.396f, 1.0f},
+                    {0.996f, 0.757f, 0.525f, 1.0f}
+                },
+                //in_gradient_fill_constant_buffer_click,
+                {
+                    //{0.0f, 0.7f, 0.9f, 1.0f},
+                    //{0.839f, 0.529f, 0.361f, 1.0f},
+                    //{0.525f, 0.306f, 0.196f, 1.0f},
+                    //{0.255f, 0.098f, 0.051f, 1.0f},
+                    //{0.341f, 0.063f, 0.055f, 1.0f}
+                    {0.0f, 0.75f, 1.0f, 1.1f},
+                    {0.839f, 0.529f, 0.361f, 1.0f},
+                    {0.525f, 0.306f, 0.196f, 1.0f},
+                    {0.255f, 0.098f, 0.051f, 1.0f},
+                    {0.341f, 0.063f, 0.055f, 1.0f}
+                },
+                //in_gradient_fill_constant_buffer_rollover_click,
+                {
+                    {0.0f, 0.9f, 1.5f, 1.6f},
+                    {0.839f, 0.529f, 0.361f, 1.0f},
+                    {0.525f, 0.306f, 0.196f, 1.0f},
+                    {0.255f, 0.098f, 0.051f, 1.0f},
+                    {0.341f, 0.063f, 0.055f, 1.0f}
+                },
+                //in_gradient_fill_constant_buffer_selection,
+                {},
+                //in_gradient_fill_constant_buffer_rollover_selection,
+                {},
+                //in_gradient_fill_constant_buffer_click_selection,
+                {},
+                //in_gradient_fill_constant_buffer_rollover_click_selection
+                {}
             ).SetPadding(
                 padding_ammount,
                 padding_ammount_top,
@@ -146,88 +181,7 @@ namespace
             in_ui_root_node_group,
             button_node_group,
             array_fill_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "button fill")
-        );
-
-        in_ui_manager.AddChildNode(
-            DscUi::MakeComponentGradientFill(
-                {
-                    {0.0f, 0.5f, 0.9f, 1.0f},
-                    {0.557f, 0.314f, 0.208f, 1.0f},
-                    {0.733f, 0.439f, 0.286f, 1.0f},
-                    {0.941f, 0.627f, 0.396f, 1.0f},
-                    {0.996f, 0.757f, 0.525f, 1.0f}
-                }
-            ).SetForInputStateFlag(
-                DscUi::TUiInputStateFlag::TRollover
-            ).SetPadding(
-                padding_ammount,
-                padding_ammount_top,
-                padding_ammount,
-                padding_ammount
-            //).SetClearColour(
-            //    DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
-            ),
-            in_draw_system,
-            in_dag_collection,
-            in_ui_root_node_group,
-            button_node_group,
-            array_fill_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "button fill rollover")
-        );
-
-        in_ui_manager.AddChildNode(
-            DscUi::MakeComponentGradientFill(
-                {
-                    {0.0f, 0.75f, 1.0f, 1.1f},
-                    {0.839f, 0.529f, 0.361f, 1.0f},
-                    {0.525f, 0.306f, 0.196f, 1.0f},
-                    {0.255f, 0.098f, 0.051f, 1.0f},
-                    {0.341f, 0.063f, 0.055f, 1.0f}
-                }
-            ).SetForInputStateFlag(
-                DscUi::TUiInputStateFlag::TRollover | DscUi::TUiInputStateFlag::TClick
-            ).SetPadding(
-                padding_ammount,
-                padding_ammount_top,
-                padding_ammount,
-                padding_ammount
-                //).SetClearColour(
-                //    DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
-            ),
-            in_draw_system,
-            in_dag_collection,
-            in_ui_root_node_group,
-            button_node_group,
-            array_fill_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "button fill rollover click")
-        );
-
-        in_ui_manager.AddChildNode(
-            DscUi::MakeComponentGradientFill(
-                {
-                    {0.0f, 0.7f, 0.9f, 1.0f},
-                    {0.839f, 0.529f, 0.361f, 1.0f},
-                    {0.525f, 0.306f, 0.196f, 1.0f},
-                    {0.255f, 0.098f, 0.051f, 1.0f},
-                    {0.341f, 0.063f, 0.055f, 1.0f}
-                }
-            ).SetForInputStateFlag(
-                DscUi::TUiInputStateFlag::TClick
-            ).SetPadding(
-                padding_ammount,
-                padding_ammount_top,
-                padding_ammount,
-                padding_ammount
-                //).SetClearColour(
-                //    DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
-            ),
-            in_draw_system,
-            in_dag_collection,
-            in_ui_root_node_group,
-            button_node_group,
-            array_fill_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "button fill click")
+            DSC_DEBUG_ONLY(DSC_COMMA "button multi fill")
         );
 
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_text_effect = {};
@@ -252,6 +206,7 @@ namespace
             DSC_DEBUG_ONLY(DSC_COMMA "button text")
             );
     }
+#endif
 }
 
 Application::Resources::Resources()
@@ -284,7 +239,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     {
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
-
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
             DscUi::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
             *_draw_system,
@@ -370,7 +324,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             stack_node,
             "Button Three"
         );
-
     }
 
     return;
@@ -433,19 +386,9 @@ const bool Application::Update()
                 _resources->_ui_root_node_group,
                 *_resources->_dag_collection,
                 *frame,
-                true, //false,
+                true,
                 _draw_system->GetRenderTargetBackBuffer()
             );
-        }
-
-#if defined(_DEBUG)
-        //DscDag::DagCollection::DebugDumpNode(_resources->_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawNode));
-#endif//#if defined(_DEBUG)
-
-        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer(), false);
-        if (_resources->_onscreen_version)
-        {
-            _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
     }
 
