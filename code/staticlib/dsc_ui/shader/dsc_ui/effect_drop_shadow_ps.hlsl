@@ -13,7 +13,7 @@ cbuffer ConstantBuffer : register(b0)
     float4 _width_height;
     float4 _effect_param;
     float4 _tint;
-    float4 _texture_param_0;
+    float4 _texture_param_0; // viewport size xy, texture size zw. the ui can draw to viewports/ subset areas of textures
 };
 
 float2 SampleAtOffset(
