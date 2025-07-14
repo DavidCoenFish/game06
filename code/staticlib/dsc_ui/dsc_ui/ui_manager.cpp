@@ -1888,7 +1888,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_array_input_stack,
             1,
             in_component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " blur"));
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " desaturate"));
         break;
 
     }
