@@ -87,6 +87,14 @@ namespace
             return DscUi::TUiDrawType::TEffectStroke;
         case DscUi::TUiEffectType::TEffectTint:
             return DscUi::TUiDrawType::TEffectTint;
+        case DscUi::TUiEffectType::TEffectBlur:
+            return DscUi::TUiDrawType::TEffectBlur;
+        case DscUi::TUiEffectType::TEffectDesaturate:
+            return DscUi::TUiDrawType::TEffectDesaturate;
+        case DscUi::TUiEffectType::TEffectBurnBlot:
+            return DscUi::TUiDrawType::TEffectBurnBlot;
+        case DscUi::TUiEffectType::TEffectBurnPresent:
+            return DscUi::TUiDrawType::TEffectBurnPresent;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -157,7 +165,7 @@ namespace
     }
 
     void CalculatePanelConstantBuffer(
-        DscUi::TUiPanelShaderConstantBuffer& out_buffer,
+        DscUi::TUiPanelShaderConstantBufferVS& out_buffer,
         const DscCommon::VectorInt2& parent_render_size,
         const DscCommon::VectorInt2& geometry_offset,
         const DscCommon::VectorInt2& geometry_size,
@@ -515,8 +523,14 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         std::vector<std::shared_ptr<DscRenderResource::ConstantBufferInfo>> array_shader_constants_info;
         array_shader_constants_info.push_back(
             DscRenderResource::ConstantBufferInfo::Factory(
-                TUiPanelShaderConstantBuffer(),
+                TUiPanelShaderConstantBufferVS(),
                 D3D12_SHADER_VISIBILITY_VERTEX
+            )
+        );
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(
+                TUiPanelShaderConstantBufferPS(),
+                D3D12_SHADER_VISIBILITY_PIXEL
             )
         );
         std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
@@ -703,6 +717,42 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
         "effect_tint_ps.cso",
         true
     );
+
+    //std::shared_ptr<DscRenderResource::Shader> _effect_burn_blot_shader = {};
+    _effect_burn_blot_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_burn_blot_vs.cso",
+        "effect_burn_blot_ps.cso",
+        true,
+        2
+    );
+
+    _effect_burn_present_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_burn_present_vs.cso",
+        "effect_burn_present_ps.cso",
+        true,
+        2
+    );
+
+    _effect_blur_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_blur_vs.cso",
+        "effect_blur_ps.cso",
+        false
+    );
+
+    _effect_desaturate_shader = CreateEffectShader(
+        in_draw_system,
+        in_file_system,
+        "effect_desaturate_vs.cso",
+        "effect_desaturate_ps.cso",
+        true
+    );
+
 }
 
 DscUi::UiManager::~UiManager()
@@ -1656,7 +1706,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 
                     const auto& shader_constant_buffer = DscDag::DagCollection::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(child.GetNodeToken(TUiNodeGroup::TUiPanelShaderConstantBuffer));
 
-                    auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBuffer>(0);
+                    auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferVS>(0);
                     const DscCommon::VectorInt2& geometry_offset = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometryOffset));
                     const DscCommon::VectorInt2& geometry_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(child.GetNodeToken(TUiNodeGroup::TGeometrySize));
                     const DscCommon::VectorFloat2& scroll_value = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(child.GetNodeToken(TUiNodeGroup::TScrollPos));
@@ -1807,6 +1857,38 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             1,
             in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " tint"));
+        break;
+    case TUiDrawType::TEffectBlur:
+        result_node = MakeNode::MakeEffectDrawNode(
+            _full_quad_pos_uv,
+            _effect_blur_shader,
+            in_dag_collection,
+            in_draw_system,
+            in_frame_node,
+            in_ui_render_target_node,
+            in_ui_scale,
+            in_effect_param_or_null,
+            in_effect_tint_or_null,
+            in_array_input_stack,
+            1,
+            in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " blur"));
+        break;
+    case TUiDrawType::TEffectDesaturate:
+        result_node = MakeNode::MakeEffectDrawNode(
+            _full_quad_pos_uv,
+            _effect_desaturate_shader,
+            in_dag_collection,
+            in_draw_system,
+            in_frame_node,
+            in_ui_render_target_node,
+            in_ui_scale,
+            in_effect_param_or_null,
+            in_effect_tint_or_null,
+            in_array_input_stack,
+            1,
+            in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " blur"));
         break;
 
     }

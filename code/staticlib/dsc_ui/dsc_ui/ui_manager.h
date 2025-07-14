@@ -252,6 +252,10 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _effect_inner_shadow_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_stroke_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_tint_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_burn_blot_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_burn_present_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_blur_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _effect_desaturate_shader = {};
 
 		// a full quad is of pos range [-1 ... 1] and uv range of [0 ... 1]
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_quad_pos_uv = {};

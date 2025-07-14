@@ -76,11 +76,15 @@ namespace DscUi
 		float _texture_param_1[4]; // viewport width height, texture width height (ui viewport can be smaller than the texture size)
 	};
 
-	struct TUiPanelShaderConstantBuffer
+	struct TUiPanelShaderConstantBufferVS
 	{
 		float _pos_size[4]; // _pos_x_y_size_width_height;
 		float _uv_size[4]; // _ui_x_y_size_width_height;
-		//float _tint_colour[4];
 	};
+	struct TUiPanelShaderConstantBufferPS
+	{
+		float _tint_colour[4];
+	};
+
 }
 

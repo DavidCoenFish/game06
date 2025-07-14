@@ -1,13 +1,17 @@
 #include "effect_burn_present_interpolant.hlsli"
 
-// the text or other linework
+// the text or other linework, non alphaed areas should propergate burn/ blot faster
 Texture2D g_texture_0 : register(t0);
 SamplerState g_sampler_state_0 : register(s0);
+
 
 // the burn blot state
 Texture2D g_texture_1 : register(t1);
 SamplerState g_sampler_state_1 : register(s1);
 
+/*
+pixel output is intended to be premultiply alpha type blended with initial source linework image
+*/
 
 struct Pixel
 {
@@ -16,27 +20,42 @@ struct Pixel
 
 cbuffer ConstantBuffer : register(b0)
 {
+    float4 _width_height;
+    float4 _effect_param;
+    float4 _tint;
     float4 _texture_param_0; // viewport size xy, texture size zw. the ui can draw to viewports/ subset areas of textures
     float4 _texture_param_1; // viewport size xy, texture size zw. the ui can draw to viewports/ subset areas of textures
-    //float4 _size; // output pixel size, width, height
 };
 
 Pixel main(Interpolant in_input)
 {
-    // the source pixel at the equivalent location we are about to return from this shader
     float2 uv_0 = in_input._uv.xy * _texture_param_0.xy / _texture_param_0.zw;
-    float4 texel_0 = g_texture_0.Sample(g_sampler_state_0, uv_0);
+    float4 source_texel = g_texture_0.Sample(g_sampler_state_0, uv_0);
 
     // accumulating burn in red, time burning in green, time since rollover in blue?
+
     float2 uv_1 = in_input._uv.xy * _texture_param_1.xy / _texture_param_1.zw;
-    float4 burn = g_texture_1.Sample(g_sampler_state_1, uv_1);
+    float4 blot_texel = g_texture_1.Sample(g_sampler_state_1, uv_1);
+    float burn_amount = blot_texel.r;
+    float burn_time = blot_texel.g;
+    float burn_alpha = blot_texel.b;
 
+    Pixel result;
+    result._colour = source_texel;
 
-
-    result._colour =
-        float4(texel.rgb + (shadow_colour.rgb * (1.0 - texel.a)),
-            texel.a + ((1.0 - texel.a) * shadow_colour.a)
+    if (1.0 <= burn_amount)
+    {
+        float temp1 = clamp((2.0 - (10.0 * burn_time)) * (burn_alpha + 0.5), 0.0, 1.0);
+        float temp2 = clamp((1.5 - (5.0 * burn_time)) * (burn_alpha + 0.5), 0.0, 1.0);
+        float4 burn_colour = float4(
+            temp1,
+            temp2,
+            temp2,
+            burn_alpha
             );
+
+        //blend alpha
+    }
 
     return result;
 }

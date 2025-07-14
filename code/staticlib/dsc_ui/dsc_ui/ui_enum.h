@@ -93,6 +93,11 @@ namespace DscUi
 		TEffectCorner,
 		TEffectStroke,
 		TEffectTint,
+		TEffectBurnBlot,
+		TEffectBurnPresent,
+		TEffectBlur,
+		TEffectDesaturate,
+
 
 		TCount
 	};
@@ -104,6 +109,10 @@ namespace DscUi
 		TEffectCorner,
 		TEffectStroke,
 		TEffectTint,
+		TEffectBurnBlot,
+		TEffectBurnPresent,
+		TEffectBlur,
+		TEffectDesaturate,
 
 		TCount
 	};
