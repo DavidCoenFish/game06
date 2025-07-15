@@ -217,6 +217,7 @@ namespace DscUi
 			DscDag::NodeToken in_render_request_size,
 			DscDag::NodeToken in_child_array_node_or_null,
 			UiComponentResourceNodeGroup& in_component_resource_group,
+			const UiNodeGroup* const in_parent,
 			DscDag::NodeToken& out_draw_base_node
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
@@ -229,6 +230,7 @@ namespace DscUi
 			std::vector<DscDag::NodeToken>& in_array_input_stack,
 			DscDag::NodeToken in_frame_node,
 			DscDag::NodeToken in_ui_render_target_node,
+			DscDag::NodeToken in_ui_render_target_node_b,
 			DscDag::NodeToken in_ui_scale,
 			DscDag::NodeToken in_effect_param_or_null,
 			DscDag::NodeToken in_effect_tint_or_null,

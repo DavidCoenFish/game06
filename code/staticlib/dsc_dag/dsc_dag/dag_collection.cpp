@@ -122,24 +122,18 @@ void DscDag::DagCollection::LinkNodes(NodeToken in_input, NodeToken in_output)
 
 void DscDag::DagCollection::LinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output)
 {
-#if 1
-	if ((nullptr != in_input) && (nullptr != in_output))
-	{
-		in_input->AddOutput(in_output);
-	}
+	bool outputs_input_changed = false;
 	if (nullptr != in_output)
 	{ 
-		in_output->SetIndexInput(in_index, in_input);
+		outputs_input_changed = in_output->SetIndexInput(in_index, in_input);
 	}
-#else
-	DSC_ASSERT(nullptr != in_input, "invalid param");
-	DSC_ASSERT(nullptr != in_output, "invalid param");
-	if ((nullptr != in_input) && (nullptr != in_output))
+
+	// trying to allow redundant calls to LinkIndexNodes, this is not idea, as REPLACING a link could end up with a linkage leak...?
+	if ((true == outputs_input_changed) && (nullptr != in_input) && (nullptr != in_output))
 	{
 		in_input->AddOutput(in_output);
-		in_output->SetIndexInput(in_index, in_input);
 	}
-#endif
+
 	return;
 }
 

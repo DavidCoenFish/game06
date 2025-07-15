@@ -38,7 +38,7 @@ namespace DscDag
 		// if dirty, flush dirty flags from input, check condition, set appropriate output
 		virtual void Update() override;
 		virtual const bool GetHasNoLinks() const override;
-		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override;
+		virtual const bool SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override;
 		virtual void AddInput(NodeToken in_nodeID) override;
 		virtual void RemoveInput(NodeToken in_nodeID) override;
 		virtual void UnlinkInputs() override;

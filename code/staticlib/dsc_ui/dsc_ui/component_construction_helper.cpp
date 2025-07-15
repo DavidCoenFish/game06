@@ -209,6 +209,8 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
         DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscUi::TGradientFillConstantBuffer>([](DscUi::TGradientFillConstantBuffer& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 if (nullptr == in_input_array[0])
                 {
+                    // do we need a warning
+                    DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "multi gradent without a parent input state");
                     return;
                 }
                 const TUiInputStateFlag input_state = DscDag::DagCollection::GetValueType<TUiInputStateFlag>(in_input_array[0]);
@@ -301,6 +303,28 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 DscDag::CallbackOnValueChange<float>::Function,
                 &component_resource_group
                 DSC_DEBUG_ONLY(DSC_COMMA "input rollover accumulate")));
+    }
+
+    if (true == in_construction_helper._has_input_active_touch_pos)
+    {
+        component_resource_group.SetNodeToken(
+        DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos,
+        in_dag_collection.CreateValue(
+            DscCommon::VectorFloat2::s_zero,
+            // possibly not ideal, dont want render made dirty by mouse movement OUTSIDE a button, but want to react to rollover
+            // better would be to unlink depending on a conditional like for rollover accumulate, but being laze and just not updating on change
+            //DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
+            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function,
+            &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "input rollover accumulate")));
+
+        //  or, we could use the TInputRolloverAccumulate. or both
+        // hook up the 
+        //const DscUi::UiComponentResourceNodeGroup& parent_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources));
+        //DscDag::NodeToken parent_input_state = parent_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputStateFlag);
+        //DSC_ASSERT(nullptr != parent_input_state, "invalid state");
+        // can we just link to the parent input state?
+        //component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag, parent_input_state);
     }
 
     return component_resource_group;

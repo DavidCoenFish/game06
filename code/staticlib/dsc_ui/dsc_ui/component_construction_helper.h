@@ -116,6 +116,7 @@ namespace DscUi
 		bool _has_input = false;
 		std::function<void(const UiComponentResourceNodeGroup&)> _input_click_callback = {};
 		bool _has_input_rollover_accumulate = false;
+		bool _has_input_active_touch_pos = false;
 
 		bool _has_parent_index = false;
 		int32 _parent_index = 0; // what happens to the existing child if you overwrite a child
@@ -190,12 +191,14 @@ namespace DscUi
 
 		ComponentConstructionHelper& SetInputData(
 			const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {},
-			const bool in_has_input_rollover_accumulate = false
+			const bool in_has_input_rollover_accumulate = false,
+			const bool in_has_input_active_touch_pos = false
 		)
 		{
 			_has_input = true;
 			_input_click_callback = in_click_callback_or_none;
 			_has_input_rollover_accumulate = in_has_input_rollover_accumulate;
+			_has_input_active_touch_pos = in_has_input_active_touch_pos;
 			return *this;
 		}
 

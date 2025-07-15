@@ -181,6 +181,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TUiPanelTint:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
+		return s_meta_data;
+	}
 	}
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;
@@ -324,6 +329,11 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 	case DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat2) };
 		return s_meta_data;
 	}
 	}

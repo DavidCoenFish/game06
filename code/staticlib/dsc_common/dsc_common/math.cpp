@@ -63,8 +63,8 @@ const float DscCommon::Math::ConvertByteToFloat(const uint8 in_value)
 
 const bool DscCommon::Math::InsideBounds(const float in_x, const float in_y, const VectorFloat4& in_bounds)
 {
-	return ((in_bounds[0] <= in_x) &&
-		(in_bounds[1] <= in_y) &&
+	return ((in_bounds[0] < in_x) &&
+		(in_bounds[1] < in_y) &&
 		(in_x < in_bounds[2]) &&
-		(in_y <= in_bounds[3]));
+		(in_y < in_bounds[3]));
 }

@@ -266,6 +266,18 @@ namespace
                     }
                 }
             }
+
+            DscDag::NodeToken active_touch_pos = in_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos);
+            if (nullptr != active_touch_pos)
+            {
+                //in_screen_space, origin top left?
+                //in_touch_data origin, top left
+                const DscCommon::VectorFloat2 relative_mouse_pos(
+                    x - in_screen_space._screen_space[0],
+                    y - in_screen_space._screen_space[1]
+                    );
+                DscDag::DagCollection::SetValueType(active_touch_pos, relative_mouse_pos);
+            }
         }
 
         for (const auto& child : in_array_children)
@@ -865,6 +877,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         result.GetNodeToken(TUiRootNodeGroup::TRenderTargetViewportSize),
         result.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group,
+        nullptr,
         base_node
         DSC_DEBUG_ONLY(DSC_COMMA "root draw")
     );
@@ -1102,6 +1115,7 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         result.GetNodeToken(TUiNodeGroup::TRenderRequestSize),
         result.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group,
+        &in_parent,
         base_node
         DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " draw")
     );
@@ -1303,6 +1317,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     DscDag::NodeToken in_render_request_size_node,
     DscDag::NodeToken in_child_array_node_or_null,
     UiComponentResourceNodeGroup& in_component_resource_group,
+    const UiNodeGroup* const in_parent,
     DscDag::NodeToken& out_base_node
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
@@ -1339,6 +1354,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             array_draw_nodes,
             in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame),
             ui_render_target_node,
+            nullptr,
             in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
             nullptr,
             nullptr,
@@ -1354,7 +1370,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
         for (size_t index = 0; index < in_effect_array.size(); ++index)
         {
             DscDag::NodeToken ui_render_target_node = nullptr;
-            if ((index == in_effect_array.size() - 1) && (nullptr != in_last_render_target_or_null))
+            DscDag::NodeToken ui_render_target_node_b = nullptr;
+            const auto& effect_data = in_effect_array[index];
+            if ((index == in_effect_array.size() - 1) && 
+                (nullptr != in_last_render_target_or_null) &&
+                (TUiEffectType::TEffectBurnBlot != effect_data._effect_type)
+                )
             {
                 ui_render_target_node = in_last_render_target_or_null;
             }
@@ -1366,9 +1387,6 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));
 
-                // you could put this in the effect_param_array, but then the stride of the effect param could be weird
-                // could also put it in in_component_resource_group? have it's own array of 
-
                 ui_render_target_node = MakeNode::MakeUiRenderTargetNode(
                     in_draw_system, 
                     *_render_target_pool, 
@@ -1377,65 +1395,46 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     in_render_request_size_node,
                     in_component_resource_group
                     );
+
+                if (TUiEffectType::TEffectBurnBlot == effect_data._effect_type)
+                {
+                    ui_render_target_node_b = MakeNode::MakeUiRenderTargetNode(
+                        in_draw_system,
+                        *_render_target_pool,
+                        in_dag_collection,
+                        effect_clear_colour,
+                        in_render_request_size_node,
+                        in_component_resource_group
+                    );
+                }
             }
 
-            const auto& effect_data = in_effect_array[index];
             DscDag::NodeToken effect_param = nullptr;
             DscDag::NodeToken effect_tint = nullptr;
-            if (true == effect_data._use_rollover_param_lerp)
+
+            // x. rolled over [0 ... 1] (1 == rolled over), y. time delta [0 ...], zw. mouse pos relative to shader in pixels, uv coords bottom left is 0,0
+            if (TUiEffectType::TEffectBurnBlot == effect_data._effect_type)
             {
-                DSC_ASSERT(nullptr != in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputRolloverAccumulate), "invalid state");
-
-                DscDag::NodeToken effect_param_0 = in_dag_collection.CreateValue(
-                    effect_data._effect_param,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &in_component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect param 0"));
-                DscDag::NodeToken effect_tint_0 = in_dag_collection.CreateValue(
-                    effect_data._effect_param_tint,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &in_component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint 0"));
-                DscDag::NodeToken effect_param_1 = in_dag_collection.CreateValue(
-                    effect_data._effect_param_rollover,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &in_component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect param 1"));
-                DscDag::NodeToken effect_tint_1 = in_dag_collection.CreateValue(
-                    effect_data._effect_param_tint_rollover,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &in_component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint 1"));
-
-                effect_param = MakeNode::MakeLerpFloat4(
+                DSC_ASSERT(nullptr != in_parent, "invalid state");
+                MakeNode::MakeEffectParamTintBlotNode(
+                    effect_param,
+                    effect_tint,
                     in_dag_collection,
-                    in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputRolloverAccumulate),
-                    effect_param_0,
-                    effect_param_1,
-                    in_component_resource_group
-                    );
-
-                effect_tint = MakeNode::MakeLerpFloat4(
-                    in_dag_collection,
-                    in_component_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputRolloverAccumulate),
-                    effect_tint_0,
-                    effect_tint_1,
-                    in_component_resource_group
+                    in_root_node_group,
+                    *in_parent,
+                    in_component_resource_group,
+                    effect_data
                 );
-
             }
             else
             {
-                effect_param = in_dag_collection.CreateValue(
-                    effect_data._effect_param,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &in_component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
-                effect_tint = in_dag_collection.CreateValue(
-                    effect_data._effect_param_tint,
-                    DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                    &in_component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
+                MakeNode::MakeEffectParamTintNode(
+                    effect_param,
+                    effect_tint,
+                    in_dag_collection,
+                    in_component_resource_group,
+                    effect_data
+                    );
             }
 
             last_draw_node = MakeDrawNode(
@@ -1446,6 +1445,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 array_draw_nodes,
                 in_root_node_group.GetNodeToken(TUiRootNodeGroup::TFrame),
                 ui_render_target_node,
+                ui_render_target_node_b,
                 in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
                 effect_param,
                 effect_tint,
@@ -1470,6 +1470,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     std::vector<DscDag::NodeToken>& in_array_input_stack,
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
+    DscDag::NodeToken in_ui_render_target_node_b,
     DscDag::NodeToken in_ui_scale,
     DscDag::NodeToken in_effect_param_or_null,
     DscDag::NodeToken in_effect_tint_or_null,
@@ -1705,10 +1706,22 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                         );
 
                     auto& buffer_tint = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
-                    buffer_tint._tint_colour[0] = 1.0f;
-                    buffer_tint._tint_colour[1] = 1.0f;
-                    buffer_tint._tint_colour[2] = 1.0f;
-                    buffer_tint._tint_colour[3] = 1.0f;
+                    DscDag::NodeToken tint_token_node = child.GetNodeToken(DscUi::TUiNodeGroup::TUiPanelTint);
+                    if (nullptr != tint_token_node)
+                    {
+                        const DscCommon::VectorFloat4& tint_colour = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(tint_token_node);
+                        buffer_tint._tint_colour[0] = tint_colour.GetX();
+                        buffer_tint._tint_colour[1] = tint_colour.GetY();
+                        buffer_tint._tint_colour[2] = tint_colour.GetZ();
+                        buffer_tint._tint_colour[3] = tint_colour.GetW();
+                    }
+                    else
+                    {
+                        buffer_tint._tint_colour[0] = 1.0f;
+                        buffer_tint._tint_colour[1] = 1.0f;
+                        buffer_tint._tint_colour[2] = 1.0f;
+                        buffer_tint._tint_colour[3] = 1.0f;
+                    }
 
                     shader->SetShaderResourceViewHandle(0, child_texture);
                     frame->SetShader(shader, shader_constant_buffer);
@@ -1876,6 +1889,39 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             1,
             in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " desaturate"));
+        break;
+    case TUiDrawType::TEffectBurnBlot:
+    {
+        result_node = MakeNode::MakeEffectBurnBlotDrawNode(
+            _full_quad_pos_uv,
+            _effect_burn_blot_shader,
+            in_dag_collection,
+            in_draw_system,
+            in_frame_node,
+            in_ui_render_target_node,
+            in_ui_render_target_node_b,
+            in_effect_param_or_null,
+            in_effect_tint_or_null,
+            in_array_input_stack,
+            in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " burn blot"));
+    }
+        break;
+    case TUiDrawType::TEffectBurnPresent:
+        result_node = MakeNode::MakeEffectDrawNode(
+            _full_quad_pos_uv,
+            _effect_burn_present_shader,
+            in_dag_collection,
+            in_draw_system,
+            in_frame_node,
+            in_ui_render_target_node,
+            in_ui_scale,
+            in_effect_param_or_null,
+            in_effect_tint_or_null,
+            in_array_input_stack,
+            2,
+            in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA in_debug_name + " burn present"));
         break;
 
     }

@@ -96,6 +96,7 @@ namespace
         auto button_node_group = in_ui_manager.AddChildNode(
             DscUi::MakeComponentCanvas().SetInputData(
                 nullptr,
+                true,
                 true
             ).SetDesiredSize(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(48, 0.0f))
@@ -209,11 +210,18 @@ namespace
         );
 
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_text_effect = {};
+        //array_text_effect.push_back({
+        //    DscUi::TUiEffectType::TEffectDropShadow,
+        //    DscCommon::VectorFloat4(0.0f, 0.0f, 4.0f, 0.0f),
+        //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.25f)
+        //    });
         array_text_effect.push_back({
-            DscUi::TUiEffectType::TEffectDropShadow,
-            DscCommon::VectorFloat4(0.0f, 0.0f, 4.0f, 0.0f),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.25f)
+            DscUi::TUiEffectType::TEffectBurnBlot
             });
+        //array_text_effect.push_back({
+        //    DscUi::TUiEffectType::TEffectBurnPresent
+        //    });
+
         in_ui_manager.AddChildNode(
             DscUi::MakeComponentText(
                 MakeTextRun(in_text_manager, in_file_system, in_message),
@@ -315,7 +323,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             stack_node,
             "Button Zero"
         );
-
+#if 0
         AddButton(
             *_resources->_ui_manager,
             *_resources->_text_manager,
@@ -348,6 +356,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             stack_node,
             "Button Three"
         );
+#endif
     }
 
     return;

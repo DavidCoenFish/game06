@@ -29,9 +29,10 @@ void DscDag::IDagNode::RemoveOutput(NodeToken)
 	DSC_ASSERT_ALWAYS("invalid code path");
 }
 
-void DscDag::IDagNode::SetIndexInput(const int32, NodeToken)
+const bool DscDag::IDagNode::SetIndexInput(const int32, NodeToken)
 {
 	DSC_ASSERT_ALWAYS("invalid code path");
+	return false;
 }
 
 void DscDag::IDagNode::AddInput(NodeToken)

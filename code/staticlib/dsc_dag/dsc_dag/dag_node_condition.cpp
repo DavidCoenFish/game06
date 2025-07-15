@@ -44,9 +44,13 @@ void DscDag::DagNodeCondition::Update()
 					DagCollection::LinkNodes(_true_source, this);
 				}
 
-				if ((true == _condition_false) && (nullptr != _false_source))
+				if (true == _condition_false)
 				{
-					DagCollection::UnlinkNodes(_false_source, this);
+					if (nullptr != _false_source)
+					{
+						DagCollection::UnlinkNodes(_false_source, this);
+					}
+					_condition_false = false;
 				}
 			}
 
@@ -65,9 +69,13 @@ void DscDag::DagNodeCondition::Update()
 					DagCollection::LinkNodes(_false_source, this);
 				}
 
-				if ((true == _condition_true) && (nullptr != _true_source))
+				if (true == _condition_true)
 				{
-					DagCollection::UnlinkNodes(_true_source, this);
+					if (nullptr != _true_source)
+					{
+						DagCollection::UnlinkNodes(_true_source, this);
+					}
+					_condition_true = false;
 				}
 			}
 
@@ -106,18 +114,23 @@ const bool DscDag::DagNodeCondition::GetHasNoLinks() const
 		);
 }
 
-void DscDag::DagNodeCondition::SetIndexInput(const int32 in_index, NodeToken in_nodeID)
+const bool DscDag::DagNodeCondition::SetIndexInput(const int32 in_index, NodeToken in_nodeID)
 {
+	bool result = false;
 	switch (in_index)
 	{
 	default:
 		DSC_ASSERT_ALWAYS("invalid switch case");
 		break;
 	case 0:
-		_condition = in_nodeID;
+		if (_condition != in_nodeID)
+		{
+			_condition = in_nodeID;
+			result = true;
+		}
 		break;
 	}
-	return;
+	return result;
 }
 
 void DscDag::DagNodeCondition::AddInput(NodeToken in_nodeID)

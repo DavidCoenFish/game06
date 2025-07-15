@@ -17,7 +17,8 @@ namespace DscDag
 		virtual void MarkDirty();
 		// regenerate value/ remove dirty flag as a side effect?
 		virtual void Update();
-		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
+		// return true if data changed, ie, in_nodeID != what was already set at that index
+		virtual const bool SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
 		virtual void AddInput(NodeToken in_nodeID);
 		virtual void RemoveInput(NodeToken in_nodeID);
 		virtual void AddOutput(NodeToken in_nodeID);

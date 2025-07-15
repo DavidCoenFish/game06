@@ -2,6 +2,7 @@
 #include "dsc_ui.h"
 #include "ui_enum.h"
 #include "ui_coord.h"
+#include "ui_manager.h"
 #include "vector_ui_coord2.h"
 #include <dsc_common\vector_float4.h>
 
@@ -88,6 +89,20 @@ namespace DscUi
             DscUi::UiComponentResourceNodeGroup& in_component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name));
 
+        DscDag::NodeToken MakeEffectBurnBlotDrawNode(
+            const std::shared_ptr<DscRenderResource::GeometryGeneric>& in_geometry,
+            const std::shared_ptr<DscRenderResource::Shader>& in_shader,
+            DscDag::DagCollection& in_dag_collection,
+            DscRender::DrawSystem& in_draw_system,
+            DscDag::NodeToken in_frame_node,
+            DscDag::NodeToken in_ui_render_target_node,
+            DscDag::NodeToken in_ui_render_target_node_b,
+            DscDag::NodeToken in_effect_param,
+            DscDag::NodeToken in_effect_tint,
+            const std::vector<DscDag::NodeToken>& in_array_input_stack,
+            DscUi::UiComponentResourceNodeGroup& in_component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name));
+
         DscDag::NodeToken MakeAvaliableSize(
             DscDag::DagCollection& in_dag_collection,
             DscDag::NodeToken in_parent_avaliable_size,
@@ -171,6 +186,24 @@ namespace DscUi
             DscDag::NodeToken in_value_0,
             DscDag::NodeToken in_value_1,
             DscDag::IDagGroup& in_owner_group
+        );
+
+        void MakeEffectParamTintBlotNode(
+            DscDag::NodeToken& out_effect_param,
+            DscDag::NodeToken& out_effect_tint,
+            DscDag::DagCollection& in_dag_collection,
+            const DscUi::UiRootNodeGroup& in_root_node_group,
+            const DscUi::UiNodeGroup& in_parent_node_group,
+            DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+            const UiManager::TEffectConstructionHelper& in_effect_data
+        );
+
+        void MakeEffectParamTintNode(
+            DscDag::NodeToken& out_effect_param,
+            DscDag::NodeToken& out_effect_tint,
+            DscDag::DagCollection& in_dag_collection,
+            DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+            const UiManager::TEffectConstructionHelper& in_effect_data
         );
 
 	} // Make Node

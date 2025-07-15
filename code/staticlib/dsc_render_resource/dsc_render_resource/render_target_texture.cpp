@@ -221,7 +221,10 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 	)
 {
 	_array_render_target_descriptors.clear();
-	_current_state_render_target = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	// what happens if a render target is used as a shader resource (texture) before being written to, that is actually a valid path, init render target as ready for texture usage (read)
+	//_current_state_render_target = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	_current_state_render_target = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	auto heap_properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 	for (auto iter : _target_resource_array)
 	{
@@ -259,7 +262,11 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 			iter->_shader_resource_view_descriptor->GetCPUHandleFrame()
 			);
 	}
-	_current_state_depth_resource = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+
+	// start in read mode, if we are set to be a render target, there is a state transition for that
+	//_current_state_depth_resource = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	_current_state_depth_resource = D3D12_RESOURCE_STATE_DEPTH_READ;
+
 	if (nullptr != _depth_resource)
 	{
 		D3D12_RESOURCE_DESC depth_stencil_desc = CD3DX12_RESOURCE_DESC::Tex2D(

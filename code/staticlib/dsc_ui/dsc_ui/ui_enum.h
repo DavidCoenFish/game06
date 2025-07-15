@@ -173,6 +173,7 @@ namespace DscUi
 		TUiPanelShaderConstantBuffer, // keep on hand the resources for any child to draw in a parent canvas or similar, or should this be in TUiComponentResourceNodeGroup or TUiNodeGroup?
 		// trying to have everything to do with layout, or for parent to draw, in the TUiNodeGroup layer
 		// for everything else, put into the TUiComponentResources UiComponentResourceNodeGroup
+		TUiPanelTint, // for crossfade, start with a VectorFloat4, but may neet to change to a TUiPanelShaderConstantBufferPS?
 
 		TCount
 	};
@@ -239,6 +240,7 @@ namespace DscUi
 		TInputStateFlag,
 		TInputData,
 		TInputRolloverAccumulate, // [0.0 ... 1.0] over some time period while acumulates to 1 when node is rolled over and drain back to zero when not rolled over
+		TInputActiveTouchPos, // 
 
 		TCount
 	};

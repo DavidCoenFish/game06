@@ -89,7 +89,7 @@ namespace DscDag
 			_output.erase(in_nodeID);
 		}
 
-		virtual void SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override
+		virtual const bool SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override
 		{
 			DSC_ASSERT(0 <= in_index, "invalid param");
 			// null in_nodeID allowed
@@ -97,11 +97,14 @@ namespace DscDag
 			{
 				_index_input.resize(in_index + 1);
 			}
+			bool result = false;
 			if (_index_input[in_index] != in_nodeID)
 			{
+				result = true;
 				_index_input[in_index] = in_nodeID;
 				MarkDirty();
 			}
+			return result;
 		}
 
 		virtual void AddInput(NodeToken in_nodeID) override
