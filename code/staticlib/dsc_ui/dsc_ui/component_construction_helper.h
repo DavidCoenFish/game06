@@ -102,7 +102,9 @@ namespace DscUi
 		TGradientFillConstantBuffer _gradient_fill_constant_buffer = {};
 
 		bool _has_multi_gradient_fill = false;
-		TGradientFillConstantBuffer _multi_gradient_fill_constant_buffer[_multi_gradient_fill_array_size] = {};
+		//TGradientFillConstantBuffer _multi_gradient_fill_constant_buffer[_multi_gradient_fill_array_size] = {};
+		DscDag::NodeToken _multi_gradient_fill_node = {}; // type std::vector<TGradientFillConstantBuffer>
+		// move towards passing a node token, rather than a std::string to fetch a named node from the DagCollection? (for large chunks of data)
 
 		bool _has_child_stack_data = false; // size data for child of stack
 		UiCoord _stack_size = {};
@@ -220,14 +222,7 @@ namespace DscUi
 		const TGradientFillConstantBuffer& in_gradient_fill
 	);
 	ComponentConstructionHelper MakeComponentMultiGradientFill(
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_none,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_selection,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_selection,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click_selection,
-		const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click_selection
+		DscDag::NodeToken in_multi_gradient_fill_node
 	);
 	ComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
 	ComponentConstructionHelper MakeComponentCanvas();

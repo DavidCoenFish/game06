@@ -235,11 +235,6 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscUi::TGradientFillConstantBuffer) };
 		return s_meta_data;
 	}
-	case DscUi::TUiComponentResourceNodeGroup::TEffectParamArray:
-	{
-		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(std::vector<DscDag::NodeToken>) };
-		return s_meta_data;
-	}
 	case DscUi::TUiComponentResourceNodeGroup::THasManualScrollX:
 	{
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(bool) };

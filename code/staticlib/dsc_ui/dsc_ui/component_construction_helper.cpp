@@ -206,17 +206,6 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
 
     if (true == in_construction_helper._has_multi_gradient_fill)
     {
-        std::vector<DscUi::TGradientFillConstantBuffer> gradient_array = {};
-        for (int32 index = 0; index < _multi_gradient_fill_array_size; ++index)
-        {
-            gradient_array.push_back(in_construction_helper._multi_gradient_fill_constant_buffer[index]);
-        }
-        DscDag::NodeToken data_node = in_dag_collection.CreateValue(
-            gradient_array,
-            DscDag::CallbackNever<std::vector<DscUi::TGradientFillConstantBuffer>>::Function,
-            &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "multi gradient fill"));
-        
         DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscUi::TGradientFillConstantBuffer>([](DscUi::TGradientFillConstantBuffer& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 if (nullptr == in_input_array[0])
                 {
@@ -234,7 +223,11 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
 
         const DscUi::UiComponentResourceNodeGroup& parent_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources));
         DscDag::DagCollection::LinkIndexNodes(0, parent_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputStateFlag), node); // set with the parent TUiInputStateFlag
-        DscDag::DagCollection::LinkIndexNodes(1, data_node, node);
+
+        DSC_ASSERT(nullptr != in_construction_helper._multi_gradient_fill_node, "invalid param");
+        // is there a better way to check type?
+        DscDag::DagCollection::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_construction_helper._multi_gradient_fill_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_construction_helper._multi_gradient_fill_node, node);
 
         component_resource_group.SetNodeToken(
             DscUi::TUiComponentResourceNodeGroup::TGradientFill,
@@ -337,27 +330,12 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentGradientFill(
 }
 
 DscUi::ComponentConstructionHelper DscUi::MakeComponentMultiGradientFill(
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_none,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_selection,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_selection,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_click_selection,
-    const TGradientFillConstantBuffer& in_gradient_fill_constant_buffer_rollover_click_selection
+    DscDag::NodeToken in_multi_gradient_fill_node
 )
 {
     ComponentConstructionHelper result({ TUiComponentType::TGradientFill });
     result._has_multi_gradient_fill = true;
-    result._multi_gradient_fill_constant_buffer[0] = in_gradient_fill_constant_buffer_none;
-    result._multi_gradient_fill_constant_buffer[1] = in_gradient_fill_constant_buffer_rollover;
-    result._multi_gradient_fill_constant_buffer[2] = in_gradient_fill_constant_buffer_click;
-    result._multi_gradient_fill_constant_buffer[3] = in_gradient_fill_constant_buffer_rollover_click;
-    result._multi_gradient_fill_constant_buffer[4] = in_gradient_fill_constant_buffer_selection;
-    result._multi_gradient_fill_constant_buffer[5] = in_gradient_fill_constant_buffer_rollover_selection;
-    result._multi_gradient_fill_constant_buffer[6] = in_gradient_fill_constant_buffer_click_selection;
-    result._multi_gradient_fill_constant_buffer[7] = in_gradient_fill_constant_buffer_rollover_click_selection;
-
+    result._multi_gradient_fill_node = in_multi_gradient_fill_node;
     return result;
 }
 

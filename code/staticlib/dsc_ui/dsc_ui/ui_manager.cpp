@@ -1351,8 +1351,6 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     }
     if (0 < in_effect_array.size())
     {
-        std::vector<DscDag::NodeToken> array_effect_param_nodes;
-
         for (size_t index = 0; index < in_effect_array.size(); ++index)
         {
             DscDag::NodeToken ui_render_target_node = nullptr;
@@ -1393,25 +1391,21 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect param 0"));
-                effect_param_array.push_back(effect_param_0);
                 DscDag::NodeToken effect_tint_0 = in_dag_collection.CreateValue(
                     effect_data._effect_param_tint,
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect tint 0"));
-                effect_param_array.push_back(effect_tint_0);
                 DscDag::NodeToken effect_param_1 = in_dag_collection.CreateValue(
                     effect_data._effect_param_rollover,
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect param 1"));
-                effect_param_array.push_back(effect_param_1);
                 DscDag::NodeToken effect_tint_1 = in_dag_collection.CreateValue(
                     effect_data._effect_param_tint_rollover,
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect tint 1"));
-                effect_param_array.push_back(effect_tint_1);
 
                 effect_param = MakeNode::MakeLerpFloat4(
                     in_dag_collection,
@@ -1437,13 +1431,11 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect param"));
-                effect_param_array.push_back(effect_param);
                 effect_tint = in_dag_collection.CreateValue(
                     effect_data._effect_param_tint,
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect tint"));
-                effect_param_array.push_back(effect_tint);
             }
 
             last_draw_node = MakeDrawNode(
@@ -1463,17 +1455,6 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             );
             array_draw_nodes.push_back(last_draw_node);
         }
-    }
-
-    if (0 < effect_param_array.size())
-    {
-        in_component_resource_group.SetNodeToken(TUiComponentResourceNodeGroup::TEffectParamArray,
-            in_dag_collection.CreateValue(
-                effect_param_array,
-                DscDag::CallbackNever<std::vector<DscDag::NodeToken>>::Function,
-                &in_component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "effect param array")
-            ));
     }
 
     DSC_ASSERT(nullptr != last_draw_node, "invalid state");
@@ -1722,6 +1703,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                         render_viewport_size,
                         render_texture_size
                         );
+
+                    auto& buffer_tint = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
+                    buffer_tint._tint_colour[0] = 1.0f;
+                    buffer_tint._tint_colour[1] = 1.0f;
+                    buffer_tint._tint_colour[2] = 1.0f;
+                    buffer_tint._tint_colour[3] = 1.0f;
 
                     shader->SetShaderResourceViewHandle(0, child_texture);
                     frame->SetShader(shader, shader_constant_buffer);

@@ -209,7 +209,9 @@ namespace DscUi
 
 		TGradientFill,
 
-		TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
+		// moving away from this, we hook things up if needed, not search for things latter
+		// ie, if we have an animated effect param, we hook it up to the flag to turn the animation on/ off, and when on, link to the time delta
+		//TEffectParamArray, // only if there are effects, currently "n x [effect param, effect tint]"
 
 		THasManualScrollX,
 		TManualScrollX,

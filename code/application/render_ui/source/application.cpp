@@ -121,8 +121,11 @@ namespace
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
             });
 
-        in_ui_manager.AddChildNode(
-            DscUi::MakeComponentMultiGradientFill(
+        DscDag::NodeToken multi_gradient = in_dag_collection.FetchNodeName("multi_gradient");
+        if (nullptr == multi_gradient)
+        {
+            std::vector<DscUi::TGradientFillConstantBuffer> multi_gradient_data = {};
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_none,
                 {
                     {0.0f, 0.1f, 0.5f, 1.0f},
@@ -130,7 +133,9 @@ namespace
                     {0.733f, 0.439f, 0.286f, 1.0f},
                     {0.941f, 0.627f, 0.396f, 1.0f},
                     {0.996f, 0.757f, 0.525f, 1.0f}
-                },
+                }
+            );
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_rollover,
                 {
                     {0.0f, 0.5f, 0.9f, 1.0f},
@@ -138,7 +143,9 @@ namespace
                     {0.733f, 0.439f, 0.286f, 1.0f},
                     {0.941f, 0.627f, 0.396f, 1.0f},
                     {0.996f, 0.757f, 0.525f, 1.0f}
-                },
+                }
+            );
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_click,
                 {
                     {0.0f, 0.75f, 1.0f, 1.1f},
@@ -146,7 +153,9 @@ namespace
                     {0.525f, 0.306f, 0.196f, 1.0f},
                     {0.255f, 0.098f, 0.051f, 1.0f},
                     {0.341f, 0.063f, 0.055f, 1.0f}
-                },
+                }
+            );
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_rollover_click,
                 {
                     {0.0f, 0.9f, 1.5f, 1.6f},
@@ -154,15 +163,35 @@ namespace
                     {0.525f, 0.306f, 0.196f, 1.0f},
                     {0.255f, 0.098f, 0.051f, 1.0f},
                     {0.341f, 0.063f, 0.055f, 1.0f}
-                },
+                }
+            );
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_selection,
-                {},
+                {}
+                );
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_rollover_selection,
-                {},
+                {}
+            );
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_click_selection,
-                {},
+                {});
+            multi_gradient_data.push_back(
                 //in_gradient_fill_constant_buffer_rollover_click_selection
                 {}
+            );
+
+            multi_gradient = in_dag_collection.CreateValue(
+                multi_gradient_data,
+                DscDag::CallbackNever<std::vector<DscUi::TGradientFillConstantBuffer>>::Function,
+                nullptr
+                DSC_DEBUG_ONLY(DSC_COMMA "multi gadient data"));
+            in_dag_collection.AddNodeName(multi_gradient, "multi_gradient");
+        }
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentMultiGradientFill(
+                multi_gradient
             ).SetPadding(
                 padding_ammount,
                 padding_ammount_top,
