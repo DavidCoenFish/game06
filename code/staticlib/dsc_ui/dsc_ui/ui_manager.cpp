@@ -1382,7 +1382,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             else
             {
                 DscDag::NodeToken effect_clear_colour = in_dag_collection.CreateValue(
-                    DscCommon::VectorFloat4::s_zero,
+                    //DscCommon::VectorFloat4::s_zero,
+                    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f),
                     DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
                     &in_component_resource_group
                     DSC_DEBUG_ONLY(DSC_COMMA "effect clear colour"));

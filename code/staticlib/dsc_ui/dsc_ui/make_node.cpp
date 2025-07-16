@@ -231,11 +231,11 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectBurnBlotDrawNode(
         const DscCommon::VectorFloat4& effect_param = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
         const DscCommon::VectorFloat4& effect_tint = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
 
-        const int32 other_index = state._index;
-        state._index ^= 1;
+        const int32 other_index = state._index;// will be used as blot input
+        state._index ^= 1;// will be used as shader output
         DscUi::UiRenderTarget* blot[2];
-        blot[other_index] = ui_render_target_b.get(); // will be used as blot input
-        blot[state._index] = ui_render_target_a.get(); // will be used as shader output
+        blot[0] = ui_render_target_b.get(); 
+        blot[1] = ui_render_target_a.get(); 
 
         const DscCommon::VectorInt2 viewport_size = blot[state._index]->GetViewportSize();
 
@@ -265,21 +265,22 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectBurnBlotDrawNode(
             const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
             buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
             buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
-            shader->SetShaderResourceViewHandle(0, nullptr);
             shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
         }
 
         // texture one, the previous blot texture
         {
-            DscUi::UiRenderTarget* const input_texture = blot[other_index];
-            const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
+            DscUi::UiRenderTarget* const input_texture_b = blot[other_index];
+            //DscUi::UiRenderTarget* const input_texture = DscDag::DagCollection::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
+            const DscCommon::VectorInt2 input_texture_viewport_size = input_texture_b->GetViewportSize();
             buffer._texture_param_1[0] = static_cast<float>(input_texture_viewport_size.GetX());
             buffer._texture_param_1[1] = static_cast<float>(input_texture_viewport_size.GetY());
-            const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
+            const DscCommon::VectorInt2 input_texture_size = input_texture_b->GetTextureSize();
             buffer._texture_param_1[2] = static_cast<float>(input_texture_size.GetX());
             buffer._texture_param_1[3] = static_cast<float>(input_texture_size.GetY());
-            shader->SetShaderResourceViewHandle(1, nullptr);
-            shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
+            auto texture = input_texture_b->GetTexture();
+            DSC_ASSERT(nullptr != texture, "invalid state");
+            shader->SetShaderResourceViewHandle(1, texture);
         }
 
         if (true == blot[state._index]->ActivateRenderTarget(*frame))
@@ -1057,7 +1058,6 @@ void DscUi::MakeNode::MakeEffectParamTintBlotNode(
         &in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA "effect tint burn blot"));
 
-#if 1
     // if rollover amount changes, we want to hook up the effect param to time delta
     const DscUi::UiComponentResourceNodeGroup& parent_component_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent_node_group.GetNodeToken(TUiNodeGroup::TUiComponentResources));
     DscDag::NodeToken condition_node = in_dag_collection.CreateCalculate<bool>([](bool& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
@@ -1114,75 +1114,6 @@ void DscUi::MakeNode::MakeEffectParamTintBlotNode(
     DSC_ASSERT(nullptr != active_touch_pos_node, "invalid state");
     DscDag::DagCollection::LinkIndexNodes(2, active_touch_pos_node, out_effect_param);
 
-#else
-    // if rollover changes, we and to hook up the param to time delta, 
-    const DscUi::UiComponentResourceNodeGroup& parent_component_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent_node_group.GetNodeToken(TUiNodeGroup::TUiComponentResources));
-    out_effect_param = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            if (nullptr == in_input_array[0])
-            {
-                return;
-            }
-            const float time_delta = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
-            const DscUi::TUiInputStateFlag input_state_flag = DscDag::DagCollection::GetValueType<DscUi::TUiInputStateFlag>(in_input_array[1]);
-            const float rollover_flag = (0 != (input_state_flag & DscUi::TUiInputStateFlag::TRollover)) ? 1.0f : 0.0f;
-            const DscCommon::VectorFloat2& touch_pos = DscDag::DagCollection::GetValueType<DscCommon::VectorFloat2>(in_input_array[2]);
-
-            // x. rolled over [0 ... 1] (1 == rolled over), y. time delta [0 ...], zw. mouse pos relative to shader in pixels, uv coords bottom left is 0,0
-            value.Set(
-                rollover_flag,
-                time_delta,
-                touch_pos.GetX(),
-                touch_pos.GetY()
-                );
-        },
-        &in_component_resource_group
-        DSC_DEBUG_ONLY(DSC_COMMA "effect param burn blot"));
-
-    // index zero is the time delta, needs to be set for out_effect_param to be valid
-    //component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag, parent_input_state);
-    DscDag::NodeToken input_state_node = parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag);
-    DSC_ASSERT(nullptr != input_state_node, "invalid state");
-    DscDag::DagCollection::LinkIndexNodes(1, input_state_node, out_effect_param);
-    DscDag::NodeToken active_touch_pos_node = parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos);
-    DSC_ASSERT(nullptr != active_touch_pos_node, "invalid state");
-    DscDag::DagCollection::LinkIndexNodes(2, active_touch_pos_node, out_effect_param);
-
-
-    auto time_delta_node = in_dag_collection.CreateValue(
-        in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta),
-        DscDag::CallbackOnValueChange<DscDag::NodeToken>::Function,
-        &in_component_resource_group
-        DSC_DEBUG_ONLY(DSC_COMMA "time delta node"));
-
-    auto effect_param_node = in_dag_collection.CreateValue(
-        out_effect_param,
-        DscDag::CallbackOnValueChange<DscDag::NodeToken>::Function,
-        &in_component_resource_group
-        DSC_DEBUG_ONLY(DSC_COMMA "effect param node"));
-
-    DscDag::NodeToken hook_up_tick_on_rollover_node = in_dag_collection.CreateCalculate<bool>([](bool&, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            const float rollover_amount = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
-            DscDag::NodeToken time_delta_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[1]);
-            DscDag::NodeToken effect_param_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[2]);
-            if (0.0f == rollover_amount) // unlink
-            {
-                DscDag::DagCollection::UnlinkIndexNodes(0, time_delta_node, effect_param_node);
-            }
-            else // ensure linked
-            {
-                DscDag::DagCollection::LinkIndexNodes(0, time_delta_node, effect_param_node);
-            }
-        },
-        & in_component_resource_group
-        DSC_DEBUG_ONLY(DSC_COMMA "hook up tick on rollover node"));
-
-    // so, this could be the input flag state, but feels like we want the animation to extend AFTER the rollover finishes, so use the accumulate value
-    DscDag::NodeToken rollover_accumulate_node = parent_component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate);
-    DSC_ASSERT(nullptr != rollover_accumulate_node, "invalid state");
-    DscDag::DagCollection::LinkIndexNodes(0, rollover_accumulate_node, hook_up_tick_on_rollover_node);
-    DscDag::DagCollection::LinkIndexNodes(1, time_delta_node, hook_up_tick_on_rollover_node);
-    DscDag::DagCollection::LinkIndexNodes(2, effect_param_node, hook_up_tick_on_rollover_node);
-#endif
     return;
 }
 

@@ -57,6 +57,8 @@ float GetFurtherMaxBurn(float2 in_uv, float2 in_pixel_step)
 
 Pixel main(Interpolant in_input)
 {
+    Pixel result;
+
     // the source pixel at the equivalent location we are about to return from this shader
     float2 pixel_step_0 = _texture_param_0.xy / _texture_param_0.zw;
     float2 uv_0 = in_input._uv.xy * pixel_step_0;
@@ -73,13 +75,14 @@ Pixel main(Interpolant in_input)
     float burn_time = blot_texel.g;
     float rollover_accumulate = blot_texel.b;
 
+    //0.00390625 = 1 / 256
     if (0.0 < rollover)
     {
-        rollover_accumulate += (rollover * 10.0 * time_delta);
+        rollover_accumulate += clamp((rollover * time_delta), 0.004, 1.0f);
     }
     else
     {
-        rollover_accumulate -= (rollover * 3.0 * time_delta);
+        rollover_accumulate -= clamp((rollover * time_delta), 0.004, 1.0f);
     }
     rollover_accumulate = clamp(rollover_accumulate, 0.0, 1.0);
 
@@ -94,8 +97,8 @@ Pixel main(Interpolant in_input)
 
     // if we are near the mouse cursor, start burning
     float2 pixel_uv_to_cursor = (in_input._uv.xy * _width_height.xy) - touch;
-    //float burn_seed = clamp((1.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
-    float burn_seed = clamp((10.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
+    float burn_seed = clamp((1.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
+    //float burn_seed = clamp((10.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
     burn_accumulate += (burn_seed * rollover * time_delta * 4.0);
 
     // if we are near burning pixels, start burning
@@ -121,20 +124,11 @@ Pixel main(Interpolant in_input)
     burn_accumulate -= ((1.0 - rollover) * time_delta * 2.0f);
     burn_time *= rollover;
 
-    Pixel result;
     result._colour = float4(
         clamp(burn_accumulate, 0.0, 1.0),
         clamp(burn_time, 0.0, 1.0),
         rollover_accumulate, 
         1.0);
-
-    //float distance_mouse = (distance(touch, (in_input._uv.xy * _width_height.xy))) / 100.0f;
-    result._colour = float4(
-        uv_1.x * 1.0 + blot_texel.r,
-        uv_1.x * 1.0,
-        uv_1.x * 1.0,
-        1.0f
-        );
 
     return result;
 }
