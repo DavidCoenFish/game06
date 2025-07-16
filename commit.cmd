@@ -3,7 +3,7 @@ PUSHD %~dp0
 
 CLS
 
-ECHO %time% %~nx0 %~1
+ECHO %time% %~nx0 %*
 
 SET GIT="git.exe"
 
@@ -49,7 +49,12 @@ IF 0 NEQ %ERRORLEVEL% (
   exit /b -1
 )
 
+IF "%*" == "" (
 SET COMMIT_ARGS="%TIMESTAMP% %HOST_NAME%"
+) ELSE (
+SET COMMIT_ARGS="%TIMESTAMP% %HOST_NAME% %*"
+)
+
 ECHO %GIT% commit -m %COMMIT_ARGS%
 %GIT% commit -m %COMMIT_ARGS%
 IF 0 NEQ %ERRORLEVEL% (
