@@ -45,17 +45,30 @@ Pixel main(Interpolant in_input)
 
     if (1.0 <= burn_amount)
     {
-        float temp1 = clamp((2.0 - (10.0 * burn_time)) * (burn_alpha + 0.5), 0.0, 1.0);
-        float temp2 = clamp((1.5 - (5.0 * burn_time)) * (burn_alpha + 0.5), 0.0, 1.0);
+        //float temp1 = clamp((1.0 - (20.0 * burn_time)), 0.0, 1.0);
+        //float temp2 = clamp((1.0 - (17.0 * burn_time)), 0.0, 1.0);
+        //float temp3 = clamp((1.1 - (10.0 * burn_time)), 0.0, 1.0);
+
+        float temp1 = clamp((1.0 - (13.0 * burn_time)), 0.0, 1.0);
+        float temp2 = clamp((1.0 - (11.0 * burn_time)), 0.0, 1.0);
+        float temp3 = clamp((1.1 - (6.5 * burn_time)), 0.0, 1.0);
+
         float4 burn_colour = float4(
+            temp3,
+            temp2,
             temp1,
-            temp2,
-            temp2,
-            burn_alpha
+            burn_alpha //* source_texel.a
             );
 
         //blend alpha
+        //https://microsoft.github.io/Win2D/WinUI3/html/PremultipliedAlpha.htm
+        //result = source.RGB + (dest.RGB * (1 - source.A))
+        //result._colour += (burn_colour * (1.0 - source_texel.a));
+        //result._colour += burn_colour;
+        result._colour.rgb = (source_texel.rgb * (1.0 - burn_alpha)) + (burn_colour.rgb * burn_alpha * source_texel.a);
+        //result._colour += (burn_colour * 0.04);
     }
+    //result._colour = source_texel;
 
     return result;
 }

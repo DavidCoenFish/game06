@@ -46,11 +46,11 @@ namespace
             in_message,
             pLocale,
             font,
-            16,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
-            8,
-            8,
-            -4
+            20,
+            DscCommon::Math::ConvertColourToInt(111, 28, 11, 255),
+            10,
+            10,
+            -2
         ));
 
         const int32 current_width = 0;
@@ -210,17 +210,17 @@ namespace
         );
 
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_text_effect = {};
-        //array_text_effect.push_back({
-        //    DscUi::TUiEffectType::TEffectDropShadow,
-        //    DscCommon::VectorFloat4(0.0f, 0.0f, 4.0f, 0.0f),
-        //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.25f)
-        //    });
         array_text_effect.push_back({
             DscUi::TUiEffectType::TEffectBurnBlot
             });
-        //array_text_effect.push_back({
-        //    DscUi::TUiEffectType::TEffectBurnPresent
-        //    });
+        array_text_effect.push_back({
+            DscUi::TUiEffectType::TEffectBurnPresent
+            });
+        array_text_effect.push_back({
+            DscUi::TUiEffectType::TEffectDropShadow,
+            DscCommon::VectorFloat4(0.0f, 0.0f, 2.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.25f)
+            });
 
         in_ui_manager.AddChildNode(
             DscUi::MakeComponentText(
@@ -323,7 +323,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             stack_node,
             "Button Zero"
         );
-#if 0
+#if 1
         AddButton(
             *_resources->_ui_manager,
             *_resources->_text_manager,

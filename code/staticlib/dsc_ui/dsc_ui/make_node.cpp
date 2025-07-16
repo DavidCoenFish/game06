@@ -188,7 +188,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
     for (int32 index = 0; index < in_input_texture_count; ++index)
     {
         DSC_ASSERT(index < static_cast<int32>(in_array_input_stack.size()), "invalid state");
-        DscDag::DagCollection::LinkIndexNodes(6 + index, in_array_input_stack[in_array_input_stack.size() - 1 - index], result_node);
+        DscDag::DagCollection::LinkIndexNodes(6 + index, in_array_input_stack[in_array_input_stack.size() - in_input_texture_count +  index], result_node);
     }
 
     return result_node;
@@ -1102,6 +1102,7 @@ void DscUi::MakeNode::MakeEffectParamTintBlotNode(
             touch_pos.GetX(),
             touch_pos.GetY()
         );
+        //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "%f %f %f %f\n", value[0], value[1], value[2], value[3]);
     },
         &in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA "effect param burn blot"));

@@ -33,25 +33,30 @@ cbuffer ConstantBuffer : register(b0)
     float4 _texture_param_1; // viewport size xy, texture size zw. the ui can draw to viewports/ subset areas of textures
 };
 
+float2 ClampUv(float2 in_uv, float2 in_pixel_step, float2 in_delta)
+{
+    return clamp(in_uv + (in_pixel_step * in_delta), 0.0, 1.0);
+}
+
 float GetAdjacentBurn(float2 in_uv, float2 in_pixel_step)
 {
-    float result = g_texture_0.Sample(g_sampler_state_0, in_uv + float2(in_pixel_step.x, 0.0)).x;
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv - float2(in_pixel_step.x, 0.0)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + float2(0.0, in_pixel_step.y)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv - float2(0.0, in_pixel_step.y)).x);
+    float result = g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(1.0, 0.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(-1.0, 0.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(0.0, 1.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(0.0, -1.0))).x;
     return result;
 }
 
 float GetFurtherMaxBurn(float2 in_uv, float2 in_pixel_step)
 {
-    float result = g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(2.0, 0.0) * in_pixel_step)).x;
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(1.0, 1.0) * in_pixel_step)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(0.0, 2.0) * in_pixel_step)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(-1.0, 1.0) * in_pixel_step)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(-2.0, 0.0) * in_pixel_step)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(-1.0, -1.0) * in_pixel_step)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(0.0, -2.0) * in_pixel_step)).x);
-    result = max(result, g_texture_0.Sample(g_sampler_state_0, in_uv + (float2(1.0, -1.0) * in_pixel_step)).x);
+    float result = g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(2.0, 0.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(1.0, 1.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(0.0, 2.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(-1.0, 1.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(-2.0, 0.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(-1.0, -1.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(0.0, -2.0))).x
+        + g_texture_1.Sample(g_sampler_state_1, ClampUv(in_uv, in_pixel_step, float2(1.0, -1.0))).x;
     return result;
 }
 
@@ -60,8 +65,9 @@ Pixel main(Interpolant in_input)
     Pixel result;
 
     // the source pixel at the equivalent location we are about to return from this shader
-    float2 pixel_step_0 = _texture_param_0.xy / _texture_param_0.zw;
-    float2 uv_0 = in_input._uv.xy * pixel_step_0;
+    //float2 uv_scale_0 = _texture_param_0.xy / _texture_param_0.zw;
+    //float2 pixel_step_0 = 1.0 / _texture_param_0.zw;
+    float2 uv_0 = in_input._uv.xy * _texture_param_0.xy / _texture_param_0.zw;
     float4 source_texel = g_texture_0.Sample(g_sampler_state_0, uv_0);
 
     float rollover = _effect_param.x;
@@ -69,6 +75,7 @@ Pixel main(Interpolant in_input)
     float2 touch = _effect_param.zw;
 
     // the previous state of this pixel, accumulating burn in red
+    float2 pixel_step_1 = 1.0 / _texture_param_1.zw;
     float2 uv_1 = in_input._uv.xy * _texture_param_1.xy / _texture_param_1.zw;
     float4 blot_texel = g_texture_1.Sample(g_sampler_state_1, uv_1);
     float burn_accumulate = blot_texel.r;
@@ -76,13 +83,13 @@ Pixel main(Interpolant in_input)
     float rollover_accumulate = blot_texel.b;
 
     //0.00390625 = 1 / 256
-    if (0.0 < rollover)
+    if (0.5 < rollover)
     {
-        rollover_accumulate += clamp((rollover * time_delta), 0.004, 1.0f);
+        rollover_accumulate += clamp(2.0 * time_delta, 0.004, 1.0f);
     }
     else
     {
-        rollover_accumulate -= clamp((rollover * time_delta), 0.004, 1.0f);
+        rollover_accumulate -= clamp(3.0 * time_delta, 0.004, 1.0f);
     }
     rollover_accumulate = clamp(rollover_accumulate, 0.0, 1.0);
 
@@ -102,17 +109,17 @@ Pixel main(Interpolant in_input)
     burn_accumulate += (burn_seed * rollover * time_delta * 4.0);
 
     // if we are near burning pixels, start burning
-    float adjacent_max_burn = GetAdjacentBurn(uv_0, pixel_step_0);
+    float adjacent_max_burn = GetAdjacentBurn(uv_1, pixel_step_1);
     if (1.0 <= adjacent_max_burn)
     {
-        burn_accumulate += (rollover * time_delta * 4.0);
+        burn_accumulate += (rollover * time_delta * 16.0 * adjacent_max_burn);
     }
 
     // if we are on non zero alpha of the source texture, add burn from slightly further
-    float further_max_burn = GetFurtherMaxBurn(uv_0, pixel_step_0);
+    float further_max_burn = GetFurtherMaxBurn(uv_1, pixel_step_1);
     if (1.0 <= further_max_burn)
     {
-        burn_accumulate += (rollover * time_delta * 4.0 * source_texel.a);
+        burn_accumulate += (rollover * time_delta * 32.0 * further_max_burn * source_texel.a);
     }
 
     if (1.0 <= burn_accumulate)
@@ -121,8 +128,8 @@ Pixel main(Interpolant in_input)
     }
 
     // if we are not in rollover, degrade the burn accumulation
-    burn_accumulate -= ((1.0 - rollover) * time_delta * 2.0f);
-    burn_time *= rollover;
+    //burn_accumulate -= ((1.0 - rollover) * time_delta * 2.0f);
+    burn_time *= rollover_accumulate;
 
     result._colour = float4(
         clamp(burn_accumulate, 0.0, 1.0),
