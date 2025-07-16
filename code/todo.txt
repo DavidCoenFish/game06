@@ -1,13 +1,7 @@
 - ?ui
-	Button
-		input, how to get screen pos of component, does each node have a VectorInt4 of screen pos?
-		button rollover
-		button click
-	CrossFade
-	Exit
-	Locale
 	ScreenTemplates
-	DagGroupNode type meta data (type info, optional)
+	CrossFade
+	Locale
 	MainMenu Screen
 	Option Screen
 	Character Screen
@@ -17,7 +11,7 @@
 
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 
-//rts? legendary quest roman sandbox?
+//legendary quest sandbox?
 // minimal release of rpg/ proof of concept
 	- character editor
 	- scenario editor
@@ -25,7 +19,7 @@ what is our target project, jank, 2d anime shirow anime draw, subuccus life, leg
 		- encounter
 		- map
 	- combat
-	- local network play/ p2p. one person hosts as dm? or let computer be dm?
+	- local network play/ coop. one person hosts as dm? or let computer be dm?
 
 
 slightly rounded main menu buttons in middle, middle stack, dull text, buttons with drop shadows
@@ -33,7 +27,7 @@ on roll over, burn out the text to black from mouse pos, fade back if cursor lea
 //full screen texture detecting full red pixels to simulate fire effect? (red -> fire then smoke, blue -> ice then mist, green to poision then rain)
 
 
-//rts: Legendary Quest, CRPG sandbox
+//Legendary Quest, CRPG sandbox
 roadmap
 	0.1 preprod
 	0.2 character sheet // and get a build up on steam

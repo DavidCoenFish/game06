@@ -100,4 +100,6 @@ IF 0 NEQ %ERRORLEVEL% (
 for /f "delims=" %%A in ('git describe --long') do set "var=%%A"
 echo "%var%">code\staticlib\dsc_version\dsc_version\git_revision.txt
 
+echo "%TIMESTAMP%">code\staticlib\dsc_version\dsc_version\timestamp.txt
+
 POPD

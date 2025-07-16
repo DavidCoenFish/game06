@@ -30,7 +30,6 @@
 
 namespace
 {
-#if 1
     std::shared_ptr<DscText::TextRun> MakeTextRun(
         DscText::TextManager& in_text_manager, 
         DscCommon::FileSystem& in_file_system, 
@@ -238,7 +237,6 @@ namespace
             DSC_DEBUG_ONLY(DSC_COMMA "button text")
             );
     }
-#endif
 }
 
 Application::Resources::Resources()
@@ -422,6 +420,11 @@ const bool Application::Update()
                 true,
                 _draw_system->GetRenderTargetBackBuffer()
             );
+        }
+
+        if (_resources->_onscreen_version)
+        {
+            _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
     }
 
