@@ -280,8 +280,9 @@ namespace
             }
         }
 
-        for (const auto& child : in_array_children)
+        for (auto iter = in_array_children.rbegin(); iter != in_array_children.rend(); ++iter)
         {
+            const DscUi::UiNodeGroup& child = *iter;
             TraverseHierarchyInput(
                 in_touch,
                 DscDag::DagCollection::GetValueType<DscUi::ScreenSpace>(child.GetNodeToken(DscUi::TUiNodeGroup::TScreenSpace)),
