@@ -35,7 +35,7 @@ cbuffer ConstantBuffer : register(b0)
 
 float2 ClampUv(float2 in_uv, float2 in_pixel_step, float2 in_delta)
 {
-    return clamp(in_uv + (in_pixel_step * in_delta), 0.0, 1.0);
+    return clamp(in_uv + (in_pixel_step * in_delta), in_pixel_step, 1.0 - in_pixel_step);
 }
 
 float GetAdjacentBurn(float2 in_uv, float2 in_pixel_step)
@@ -93,8 +93,11 @@ Pixel main(Interpolant in_input)
     }
     rollover_accumulate = clamp(rollover_accumulate, 0.0, 1.0);
 
-    // reduce the burn accumulate if we are not a full intensity
-    burn_accumulate *= rollover_accumulate;
+    // reduce the burn accumulate if we are not a full intensity, but only a bit, the fade out is pretty abbrupt
+    if (rollover_accumulate < 0.25)
+    {
+        burn_accumulate *= (rollover_accumulate + 0.25);
+    }
 
     // if we are burning, and in the rollover state, keep burning
     if (0.0 < burn_accumulate)
@@ -104,7 +107,8 @@ Pixel main(Interpolant in_input)
 
     // if we are near the mouse cursor, start burning
     float2 pixel_uv_to_cursor = (in_input._uv.xy * _width_height.xy) - touch;
-    float burn_seed = clamp((1.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
+    float burn_seed = clamp((5.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
+    //float burn_seed = clamp((1.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
     //float burn_seed = clamp((10.0 - dot(pixel_uv_to_cursor, pixel_uv_to_cursor)), 0.0, 1.0);
     burn_accumulate += (burn_seed * rollover * time_delta * 4.0);
 
@@ -129,7 +133,10 @@ Pixel main(Interpolant in_input)
 
     // if we are not in rollover, degrade the burn accumulation
     //burn_accumulate -= ((1.0 - rollover) * time_delta * 2.0f);
-    burn_time *= rollover_accumulate;
+    if (rollover_accumulate < 0.25)
+    {
+        burn_time *= (rollover_accumulate + 0.25);
+    }
 
     result._colour = float4(
         clamp(burn_accumulate, 0.0, 1.0),

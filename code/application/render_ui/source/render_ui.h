@@ -9,6 +9,7 @@
 #include "..\..\..\staticlib\dsc_windows\dsc_windows\dsc_windows.h"
 #include "..\..\..\staticlib\dsc_render\dsc_render\dsc_render.h"
 #include "..\..\..\staticlib\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
+#include "..\..\..\staticlib\dsc_render_resource_png\dsc_render_resource_png\dsc_render_resource_png.h"
 #include "..\..\..\staticlib\dsc_text\dsc_text\dsc_text.h"
 #include "..\..\..\staticlib\dsc_locale\dsc_locale\dsc_locale.h"
 #include "..\..\..\staticlib\dsc_png\dsc_png\dsc_png.h"

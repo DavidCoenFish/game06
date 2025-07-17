@@ -81,6 +81,8 @@ if this ends up having performance issues on cost of the dynamic casts, then cou
 could change the root node group to derrive of node group and make them solid classes with members of known type
 additionally the Dag graph could be replaced by something similar with a base class with the dirty and output array but not virtual, and just implement a class for each variation
 may be a bit of a mess for some of the switch functionality paths...
+
+the number of render targets could also be a resource cost, possibly need a less memory intensive way of drawing all the steps/ reusing render targets better
 */
 namespace DscUi
 {

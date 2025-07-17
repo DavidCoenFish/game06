@@ -20,6 +20,7 @@
 #include "dsc_png\dsc.bff"
 #include "dsc_render\dsc.bff"
 #include "dsc_render_resource\dsc.bff"
+#include "dsc_render_resource_png\dsc.bff"
 #include "dsc_text\dsc.bff"
 #include "dsc_ui\dsc.bff"
 #include "dsc_version\dsc.bff"

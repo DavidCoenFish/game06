@@ -13,6 +13,7 @@
 #include <dsc_render_resource/shader.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_render_resource/shader_resource.h>
+#include <dsc_render_resource_png/dsc_render_resource_png.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
 #include <dsc_ui/ui_enum.h>
@@ -63,6 +64,75 @@ namespace
             );
         return text_run;
     }
+
+    void AddBurnLineworkTest(
+        DscUi::UiManager& in_ui_manager,
+        DscCommon::FileSystem& in_file_system,
+        DscRender::DrawSystem& in_draw_system,
+        DscDag::DagCollection& in_dag_collection,
+        DscUi::UiRootNodeGroup& in_ui_root_node_group,
+        DscUi::UiNodeGroup& in_parent_node_group
+    )
+    {
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_container_effect = {};
+        //array_container_effect.push_back({
+        //    DscUi::TUiEffectType::TEffectDropShadow,
+        //    DscCommon::VectorFloat4(2.0f, 8.0f, 6.0f, 0.0f),
+        //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+        //    });
+
+        auto container_node_group = in_ui_manager.AddChildNode(
+            DscUi::MakeComponentCanvas().SetInputData(
+                nullptr,
+                true,
+                true
+            ).SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(800, 0.0f), DscUi::UiCoord(550, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 1.0f))
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_ui_root_node_group,
+            in_parent_node_group,
+            array_container_effect
+            DSC_DEBUG_ONLY(DSC_COMMA "burn line container")
+        );
+
+        auto shader_resource = DscRenderResourcePng::MakeShaderResource(
+            in_file_system,
+            in_draw_system,
+            DscCommon::FileSystem::JoinPath("data", "sample_png", "linework.png")
+        );
+
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_line_effect = {};
+        array_line_effect.push_back({
+            DscUi::TUiEffectType::TEffectBurnBlot
+            });
+        array_line_effect.push_back({
+            DscUi::TUiEffectType::TEffectBurnPresent
+            });
+        array_line_effect.push_back({
+            DscUi::TUiEffectType::TEffectDropShadow,
+            DscCommon::VectorFloat4(0.0f, 0.0f, 2.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.25f)
+            });
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentImage(
+                shader_resource
+            ).SetChildSlot(),
+            in_draw_system,
+            in_dag_collection,
+            in_ui_root_node_group,
+            container_node_group,
+            array_line_effect
+            DSC_DEBUG_ONLY(DSC_COMMA "line image")
+        );
+
+    }
+
+
 
     void AddButton(
         DscUi::UiManager& in_ui_manager,
@@ -291,6 +361,15 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
+
+        AddBurnLineworkTest(
+            *_resources->_ui_manager,
+            *_file_system,
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            root_as_parent
+            );
 
         auto stack_node = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentStack(

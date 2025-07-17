@@ -52,7 +52,14 @@ Pixel main(Interpolant in_input)
         //blend colour in place
         float alpha = burn_alpha * source_texel.a;
         result._colour.rgb = (source_texel.rgb * (1.0 - alpha)) + (burn_colour.rgb * alpha);
+
     }
+    // debug, show the blot texture on the side
+    //if (0.75 < uv_0.x)
+    //{
+    //    result._colour = blot_texel;
+    //    result._colour.a = 1.0;
+    //}
 
     return result;
 }

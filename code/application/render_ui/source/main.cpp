@@ -87,8 +87,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
         {
             return new Application(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight);
         },
-        800,
-        600,
+        1080/ 2,
+        1350 / 2,
         false,
         in_hInstance,
         "RenderUi",
