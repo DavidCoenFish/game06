@@ -1076,7 +1076,7 @@ void DscUi::MakeNode::MakeEffectParamTintBlotNode(
 
     auto effect_param_time_delta_node = in_dag_collection.CreateValue(
         0.0f,
-        DscDag::CallbackNoZero<float>::Function,
+        DscDag::CallbackNotZero<float>::Function,
         &in_component_resource_group
         DSC_DEBUG_ONLY(DSC_COMMA "effect blot time delta"));
 

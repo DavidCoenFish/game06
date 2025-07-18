@@ -40,7 +40,7 @@ namespace DscDag
 	};
 
 	template <typename IN_TYPE>
-	struct CallbackNoZero {
+	struct CallbackNotZero {
 		static void Function(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE& in_rhs)
 		{
 			out_dirty = 0 != in_rhs;

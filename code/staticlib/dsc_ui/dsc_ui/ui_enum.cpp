@@ -336,6 +336,22 @@ const DscDag::DagGroupNodeMetaData& DscDag::GetDagGroupMetaData(const DscUi::TUi
 		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat2) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TCrossfadeActiveChild:
+	{
+		// use the TDrawNode node to identify a UiNodeGroup, so the draw node (at the end of the draw chain for the ui hierarchy node) of the active child
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TCrossfadeNode:
+	{
+		static DscDag::DagGroupNodeMetaData s_meta_data = { true, typeid(bool) };
+		return s_meta_data;
+	}
 	}
 
 	static DscDag::DagGroupNodeMetaData s_dummy = { false, typeid(nullptr) };

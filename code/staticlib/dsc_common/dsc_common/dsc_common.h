@@ -51,6 +51,7 @@ typedef unsigned __int64 uint64;
 #include <cassert>
 
 //std lib
+#include <algorithm>
 #include <any>
 #include <array>
 #include <chrono>

@@ -106,6 +106,10 @@ namespace DscUi
 		DscDag::NodeToken _multi_gradient_fill_node = {}; // type std::vector<TGradientFillConstantBuffer>
 		// move towards passing a node token, rather than a std::string to fetch a named node from the DagCollection? (for large chunks of data)
 
+		DscDag::NodeToken _crossfade_active_child = {};
+		bool _has_crossfade_child_amount = false;
+		float _crossfade_child_amount = 0.0f;
+
 		bool _has_child_stack_data = false; // size data for child of stack
 		UiCoord _stack_size = {};
 		UiCoord _stack_pivot = {};
@@ -210,13 +214,25 @@ namespace DscUi
 			_parent_index = in_parent_index;
 			return *this;
 		}
+
+		ComponentConstructionHelper& SetCrossfadeChildAmount(
+			const float in_crossfade_child_amount
+		)
+		{
+			_has_crossfade_child_amount = true;
+			_crossfade_child_amount = in_crossfade_child_amount;
+			return *this;
+		}
 	};
 
+	// is passing tick and in_self overkill for the crossfade, should this be moved out~ but want the crossfade active child node
 	UiComponentResourceNodeGroup MakeComponentResourceGroup(
 		DscDag::DagCollection& in_dag_collection,
 		const ComponentConstructionHelper& in_construction_helper,
+		DscDag::NodeToken in_time_delta,
 		DscDag::NodeToken in_ui_scale,
-		const UiNodeGroup& in_parent
+		const UiNodeGroup& in_parent,
+		UiNodeGroup& in_self
 	);
 
 	ComponentConstructionHelper MakeComponentDebugGrid();
@@ -240,5 +256,10 @@ namespace DscUi
 		const bool in_desired_size_from_children_max = true,
 		const bool in_has_scroll = true
 		);
+
+	ComponentConstructionHelper MakeComponentCrossfade(
+		DscDag::NodeToken in_crossfade_active_child
+		);
+		// delete child on fade out flag?
 
 }

@@ -66,6 +66,8 @@ namespace
             return DscUi::TUiDrawType::TText;
         case DscUi::TUiComponentType::TStack:
             return DscUi::TUiDrawType::TUiPanel;
+        case DscUi::TUiComponentType::TCrossFade:
+            return DscUi::TUiDrawType::TUiPanel;
         }
         return DscUi::TUiDrawType::TCount;
     }
@@ -807,7 +809,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
 
     result.SetNodeToken(TUiRootNodeGroup::TTimeDelta, in_dag_collection.CreateValue<float>(
         0.0f,
-        DscDag::CallbackNoZero<float>::Function,
+        DscDag::CallbackNotZero<float>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "time delta")));
 
@@ -837,7 +839,7 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
 
     result.SetNodeToken(TUiRootNodeGroup::TForceDraw, in_dag_collection.CreateValue<bool>(
         false,
-        DscDag::CallbackNoZero<bool>::Function,
+        DscDag::CallbackNotZero<bool>::Function,
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "force draw")));
 
@@ -860,11 +862,15 @@ DscUi::UiRootNodeGroup DscUi::UiManager::MakeRootNode(
         DSC_DEBUG_ONLY(DSC_COMMA "screen space")));
 
     UiNodeGroup dummy_parent = {};
+    UiNodeGroup dummpy_self = {};
+
     UiComponentResourceNodeGroup component_resource_node_group = DscUi::MakeComponentResourceGroup(
         in_dag_collection,
         in_construction_helper,
+        result.GetNodeToken(TUiRootNodeGroup::TTimeDelta),
         result.GetNodeToken(TUiRootNodeGroup::TUiScale),
-        dummy_parent
+        dummy_parent,
+        dummpy_self
     );
 
     DscDag::NodeToken base_node = nullptr;
@@ -951,13 +957,22 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
 {
     UiNodeGroup result;
 
+    //TArrayChildUiNodeGroup (BEFORE TUiComponentResources)
+    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
+        std::vector<UiNodeGroup>(),
+        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
+        &result
+        DSC_DEBUG_ONLY(DSC_COMMA "array child")));
+
     //TUiComponentResources
     result.SetNodeToken(TUiNodeGroup::TUiComponentResources, in_dag_collection.CreateValue<UiComponentResourceNodeGroup>(
         MakeComponentResourceGroup(
             in_dag_collection, 
             in_construction_helper,
+            in_root_node_group.GetNodeToken(TUiRootNodeGroup::TTimeDelta),
             in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiScale),
-            in_parent
+            in_parent,
+            result
             ),
         DscDag::CallbackNever<DscUi::UiComponentResourceNodeGroup>::Function,
         &result
@@ -986,13 +1001,6 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
             &result
             DSC_DEBUG_ONLY(DSC_COMMA "ui panel shader constant buffer")));
     }
-
-    //TArrayChildUiNodeGroup
-    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue<std::vector<UiNodeGroup>>(
-        std::vector<UiNodeGroup>(),
-        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "array child")));
 
     //calculate our avaliable size
     result.SetNodeToken(
@@ -1134,6 +1142,12 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
             draw_node,
             in_parent.GetNodeToken(TUiNodeGroup::TDrawBaseNode)
             );
+    }
+
+    DscDag::NodeToken crossfade_node = component_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TCrossfadeNode);
+    if (nullptr != crossfade_node)
+    {
+        DscDag::DagCollection::LinkNodes(crossfade_node, base_node);
     }
 
     return result;

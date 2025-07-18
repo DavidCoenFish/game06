@@ -3,9 +3,11 @@
 DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
     DscDag::DagCollection& in_dag_collection,
     const DscUi::ComponentConstructionHelper& in_construction_helper,
+    DscDag::NodeToken in_time_delta,
     DscDag::NodeToken in_ui_scale,
     //DscDag::NodeToken in_avaliable_size
-    const UiNodeGroup& in_parent
+    const UiNodeGroup& in_parent,
+    UiNodeGroup& in_self
 )
 {
     DscUi::UiComponentResourceNodeGroup component_resource_group;
@@ -327,6 +329,113 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
         //component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag, parent_input_state);
     }
 
+    if (true == in_construction_helper._has_crossfade_child_amount) 
+    {
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount,
+            in_dag_collection.CreateValue(
+                in_construction_helper._crossfade_child_amount,
+                DscDag::CallbackOnValueChange<float>::Function,
+                &component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "crossfade child amount")));
+
+        in_self.SetNodeToken(
+            DscUi::TUiNodeGroup::TUiPanelTint,
+            in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const float amount = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                    value = DscCommon::VectorFloat4(amount, amount, amount, amount);
+                },
+                & component_resource_group
+                DSC_DEBUG_ONLY(DSC_COMMA "crossfade child panel tint")));
+
+        DscDag::DagCollection::LinkIndexNodes(0,
+            component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount),
+            in_self.GetNodeToken(DscUi::TUiNodeGroup::TUiPanelTint));
+    }
+
+    // the crossfade, on a change to TUiRootNodeGroup::TArrayChildUiNodeGroup, how do we set the child crossfade amount
+    // we need tick, child array, and the _crossfade_active_child node
+    if (nullptr != in_construction_helper._crossfade_active_child)
+    {
+        //condition node - if the state of the 
+        DscDag::NodeToken condition = in_dag_collection.CreateCalculate<bool>([](bool& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const DscDag::NodeToken child_active_draw_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[0]);
+                const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[1]);
+            
+                out_value = true;
+                for (const auto& child : child_array)
+                {
+                    const bool active = child.GetNodeToken(TUiNodeGroup::TDrawNode) == child_active_draw_node;
+                    const UiComponentResourceNodeGroup& child_resource_node_group = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(child.GetNodeToken(TUiNodeGroup::TUiComponentResources));
+                    DscDag::NodeToken child_crossfade_amount_node = child_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+                    const float cross_fade_amount = DscDag::DagCollection::GetValueType<float>(child_crossfade_amount_node);
+                    if (true == active)
+                    {
+                        out_value &= (1.0f == cross_fade_amount);
+                    }
+                    else
+                    {
+                        out_value &= (0.0f == cross_fade_amount);
+                    }
+                }
+            },
+            & component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "crossfade condition"));
+        DscDag::DagCollection::LinkIndexNodes(0, in_construction_helper._crossfade_active_child, condition);
+        DscDag::DagCollection::LinkIndexNodes(1, in_self.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), condition);
+
+        DscDag::NodeToken pass_along_tick = in_dag_collection.CreateValue<float>(
+            0.0f,
+            DscDag::CallbackNotZero<float>::Function,
+            &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "pass along tick"));
+
+        in_dag_collection.CreateCondition(
+            condition,
+            in_time_delta,
+            nullptr,
+            pass_along_tick,
+            nullptr,
+            &component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "crossfade condition node"));
+
+        DscDag::NodeToken crossfade_node = in_dag_collection.CreateCalculate<bool>([](bool& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const DscDag::NodeToken child_active_draw_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[0]);
+            const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[1]);
+            const float time_deta = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+
+            for (const auto& child : child_array)
+            {
+                const bool active = child.GetNodeToken(TUiNodeGroup::TDrawNode) == child_active_draw_node;
+                const UiComponentResourceNodeGroup& child_resource_node_group = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(child.GetNodeToken(TUiNodeGroup::TUiComponentResources));
+                DscDag::NodeToken child_crossfade_amount_node = child_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+                float cross_fade_amount = DscDag::DagCollection::GetValueType<float>(child_crossfade_amount_node);
+                cross_fade_amount += (active ? time_deta : -time_deta);
+                cross_fade_amount = std::clamp(cross_fade_amount, 0.0f, 1.0f);
+                DscDag::DagCollection::SetValueType<float>(child_crossfade_amount_node, cross_fade_amount);
+            }
+
+            value = true;
+        },
+            & component_resource_group
+            DSC_DEBUG_ONLY(DSC_COMMA "crossfade calculate child fade amount"));
+
+        DscDag::DagCollection::LinkIndexNodes(0, in_construction_helper._crossfade_active_child, crossfade_node);
+        DscDag::DagCollection::LinkIndexNodes(1, in_self.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), crossfade_node);
+        DscDag::DagCollection::LinkIndexNodes(2, pass_along_tick, crossfade_node);
+
+        component_resource_group.SetNodeToken(
+            DscUi::TUiComponentResourceNodeGroup::TCrossfadeNode,
+            crossfade_node
+            );
+
+        //CAN not do this yet, TDrawBaseNode not set
+        // set the cross fade as a dependency of the cross fade base draw. 
+        // Warning, this will dirty the CrossFade EVERY time tick is set. how can we do better? some sort of condition looking at if the cross fade needs to be updated, which hooks up the time delta?
+        //DscDag::DagCollection::LinkNodes(crossfade_node, in_self.GetNodeToken(TUiNodeGroup::TDrawBaseNode));
+
+    }
+
     return component_resource_group;
 }
 
@@ -404,3 +513,13 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentStack(
     result._has_scroll = in_has_scroll;
     return result;
 }
+
+DscUi::ComponentConstructionHelper DscUi::MakeComponentCrossfade(
+    DscDag::NodeToken in_crossfade_active_child
+    )
+{
+    ComponentConstructionHelper result({ TUiComponentType::TCrossFade });
+    result._crossfade_active_child = in_crossfade_active_child;
+    return result;
+}
+

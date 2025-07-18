@@ -86,9 +86,60 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
 
+        _resources->_crossfade_active_child = _resources->_dag_collection->CreateValue<DscDag::NodeToken>(
+            nullptr,
+            DscDag::CallbackOnValueChange<DscDag::NodeToken>::Function,
+            &_resources->_ui_root_node_group
+            DSC_DEBUG_ONLY(DSC_COMMA "active crossfade child node")
+            );
+
         // want a cross fade node, with two children that we can toggle activation on
         // how do we nominate the active child of the cross fade, have a Selected child 
+        DscUi::UiNodeGroup ui_crossfade_node_group = _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentCrossfade(
+                _resources->_crossfade_active_child
+            ).SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            ).SetClearColour(
+                DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            root_as_parent,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "crossfade")
+        );
 
+        _resources->_ui_crossfade_child_a = _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentFill(
+                DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f)
+            ).SetCrossfadeChildAmount(
+                1.0f
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            ui_crossfade_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "crossfade child a")
+        );
+
+        _resources->_ui_crossfade_child_b = _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentFill(
+                DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
+            ).SetCrossfadeChildAmount(
+                0.0f
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            ui_crossfade_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "crossfade child b")
+        );
     }
 
     return;
@@ -117,6 +168,28 @@ const bool Application::Update()
         if (_resources && _resources->_timer)
         {
             time_delta = _resources->_timer->GetDeltaSeconds();
+        }
+
+        if (_resources)
+        {
+            _resources->_time_accumulate += time_delta;
+            if (2.0f < _resources->_time_accumulate)
+            {
+                _resources->_time_accumulate = 0.0f;
+                DscDag::NodeToken draw_a = _resources->_ui_crossfade_child_a.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode);
+                DscDag::NodeToken draw_b = _resources->_ui_crossfade_child_b.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode);
+
+                DscDag::NodeToken active_child = nullptr;
+                if (draw_a == DscDag::DagCollection::GetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child))
+                {
+                    active_child = draw_b;
+                }
+                else
+                {
+                    active_child = draw_a;
+                }
+                DscDag::DagCollection::SetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child, active_child);
+            }
         }
 
         DscUi::UiInputParam input_param = {};
@@ -160,6 +233,11 @@ const bool Application::Update()
         {
             _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
+
+#if defined(_DEBUG)
+        DscDag::DagCollection::DebugDumpNode(_resources->_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawNode));
+#endif //#if defined(_DEBUG)
+
     }
 
     return _keep_running;

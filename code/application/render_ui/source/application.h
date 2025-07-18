@@ -79,11 +79,17 @@ private:
         Resources(const Resources&) = delete;
 
         std::unique_ptr<DscCommon::Timer> _timer = {};
+        float _time_accumulate = 0.0f;
         std::unique_ptr<DscText::TextManager> _text_manager = {};
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
         DscUi::UiRootNodeGroup _ui_root_node_group;
+       // DscUi::UiNodeGroup _ui_crossfade_node_group;
+        DscDag::NodeToken _crossfade_active_child = {};
+        DscUi::UiNodeGroup _ui_crossfade_child_a;
+        DscUi::UiNodeGroup _ui_crossfade_child_b;
+
     };
     std::unique_ptr<Resources> _resources;
 
