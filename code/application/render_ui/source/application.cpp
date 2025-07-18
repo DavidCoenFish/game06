@@ -85,6 +85,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
+
+        // want a cross fade node, with two children that we can toggle activation on
+        // how do we nominate the active child of the cross fade, have a Selected child 
+
     }
 
     return;
