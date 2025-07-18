@@ -4,6 +4,7 @@
 #include <dsc_common/log_system.h>
 #include <dsc_windows/window_helper.h>
 #include <dsc_version/dsc_version.h>
+#include <dsc_dag_print/dsc_dag_print.h>
 
 int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
     _In_opt_ HINSTANCE,// in_hPrevInstance,
@@ -14,81 +15,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
     DSC_LOG_INFO(LOG_TOPIC_APPLICATION, "Version time:%s %s %s %s\n", DscVersion::GetTimestamp(), DscVersion::GetGitRevision(), DscVersion::GetPlatform(), DscVersion::GetConfiguration());
 
 #if defined(_DEBUG)
-    DscDag::DagNodeValue<DscCommon::VectorInt2>::_s_debug_print_value = [](const DscCommon::VectorInt2& in_value)
-    {
-        std::string result;
-
-        result += "[";
-        result += std::to_string(in_value.GetX());
-        result += ", ";
-        result += std::to_string(in_value.GetY());
-        result += "]";
-
-        return result;
-    };
-    DscDag::DagNodeCalculate<DscCommon::VectorInt2>::_s_debug_print_value = [](const DscCommon::VectorInt2& in_value)
-    {
-        std::string result;
-
-        result += "[";
-        result += std::to_string(in_value.GetX());
-        result += ", ";
-        result += std::to_string(in_value.GetY());
-        result += "]";
-
-        return result;
-    };
-    DscDag::DagNodeValue<DscCommon::VectorFloat4>::_s_debug_print_value = [](const DscCommon::VectorFloat4& in_value)
-    {
-        std::string result;
-
-        result += "[";
-        result += std::to_string(in_value.GetX());
-        result += ", ";
-        result += std::to_string(in_value.GetY());
-        result += ", ";
-        result += std::to_string(in_value.GetZ());
-        result += ", ";
-        result += std::to_string(in_value.GetW());
-        result += "]";
-
-        return result;
-    };
-    DscDag::DagNodeCalculate<DscCommon::VectorFloat4>::_s_debug_print_value = [](const DscCommon::VectorFloat4& in_value)
-    {
-        std::string result;
-
-        result += "[";
-        result += std::to_string(in_value.GetX());
-        result += ", ";
-        result += std::to_string(in_value.GetY());
-        result += ", ";
-        result += std::to_string(in_value.GetZ());
-        result += ", ";
-        result += std::to_string(in_value.GetW());
-        result += "]";
-
-        return result;
-    };
-    DscDag::DagNodeValue<float>::_s_debug_print_value = [](const float& in_value)
-    {
-        return std::to_string(in_value);
-    };
-    DscDag::DagNodeCalculate<float>::_s_debug_print_value = [](const float& in_value)
-    {
-        return std::to_string(in_value);
-    };
-
-#endif//#if defined(_DEBUG)
-
+    DscDagPrint::SetDebugPrintMethods();
+#endif //#if defined(_DEBUG)
 
     const HWND hwnd = DscWindows::WindowHelper(
         [](const HWND in_hwnd, const bool in_fullScreen, const int in_defaultWidth, const int in_defaultHeight)->DscWindows::IWindowApplication*
         {
             return new Application(in_hwnd, in_fullScreen, in_defaultWidth, in_defaultHeight);
         },
-        1080/ 2,
-        1350 / 2,
+        800,
+        600,
         false,
         in_hInstance,
         "RenderUi",

@@ -20,14 +20,13 @@
     .LibraryBaseNameDependency = {
         "dsc_common", 
         "dsc_dag", 
-        "dsc_dag_print", 
-        "dsc_dag_render", 
         "dsc_version", 
         "dsc_onscreen_version", 
         "dsc_windows", 
         "dsc_render", 
         "dsc_render_resource", 
         "dsc_render_resource_png", 
+        "dsc_dag_render", 
         "dsc_text", 
         "dsc_locale",
         "dsc_png",
@@ -71,8 +70,8 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_ui" .WindowExeParam)
+DscVsprojectWindowExe("render_ui_button" .WindowExeParam)
 
-.SolutionProjects + "render_ui_project"
-.SolutionItemsApplicationProject + "render_ui_project"
-.SolutionBuildProject = "render_ui_project"
+.SolutionProjects + "render_ui_button_project"
+.SolutionItemsApplicationProject + "render_ui_button_project"
+//.SolutionBuildProject = "render_ui_button_project"

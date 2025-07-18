@@ -71,11 +71,15 @@ namespace DscUi
 		TDebugGrid,
 		TFill,
 		TGradientFill,
-		TGradientFillForInputState,
+		TGradientFillForInputState, // look at parent input state? 
 		TImage,
 		TCanvas,
 		TText,
 		TStack,
+		TCrossFade, // one child is set to be active and fade in, another array of children to fade out. up to child if it removes tself on crossfade == 0?
+		//TLayerSet, // could be layers for [tooltip, combobox, animation, dialog, screen, background?]
+
+		// there is no button component, components are for layout and draw style
 		//TButton, // has input, filter draw of children for input flag if they have a for_input_flag node
 	};
 
@@ -97,7 +101,6 @@ namespace DscUi
 		TEffectBurnPresent,
 		TEffectBlur,
 		TEffectDesaturate,
-
 
 		TCount
 	};

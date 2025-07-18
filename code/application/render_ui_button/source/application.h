@@ -84,6 +84,7 @@ private:
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
         DscUi::UiRootNodeGroup _ui_root_node_group;
+        DscUi::UiNodeGroup _ui_node_group_gradient_owner;
     };
     std::unique_ptr<Resources> _resources;
 
