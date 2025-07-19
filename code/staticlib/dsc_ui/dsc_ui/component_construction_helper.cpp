@@ -362,7 +362,7 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 const DscDag::NodeToken child_active_draw_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[0]);
                 const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[1]);
             
-                out_value = true;
+                bool data_correct = true;
                 for (const auto& child : child_array)
                 {
                     const bool active = child.GetNodeToken(TUiNodeGroup::TDrawNode) == child_active_draw_node;
@@ -371,13 +371,15 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                     const float cross_fade_amount = DscDag::DagCollection::GetValueType<float>(child_crossfade_amount_node);
                     if (true == active)
                     {
-                        out_value &= (1.0f == cross_fade_amount);
+                        data_correct &= (1.0f == cross_fade_amount);
                     }
                     else
                     {
-                        out_value &= (0.0f == cross_fade_amount);
+                        data_correct &= (0.0f == cross_fade_amount);
                     }
                 }
+                // we return true when the data is not correct, and fade needs to be adjusted
+                out_value = (false == data_correct);
             },
             & component_resource_group
             DSC_DEBUG_ONLY(DSC_COMMA "crossfade condition"));

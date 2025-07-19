@@ -985,13 +985,6 @@ DscUi::UiNodeGroup DscUi::UiManager::AddChildNode(
         &result
         DSC_DEBUG_ONLY(DSC_COMMA "ui component type")));
 
-    // TArrayChildUiNodeGroup
-    result.SetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup, in_dag_collection.CreateValue(
-        std::vector<UiNodeGroup>(),
-        DscDag::CallbackOnSetValue<std::vector<UiNodeGroup>>::Function,
-        &result
-        DSC_DEBUG_ONLY(DSC_COMMA "array child")));
-
     //TUiPanelShaderConstantBuffer
     {
         auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);

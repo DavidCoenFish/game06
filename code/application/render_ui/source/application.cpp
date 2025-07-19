@@ -103,7 +103,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             ).SetClearColour(
-                DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
             ),
             *_draw_system,
             *_resources->_dag_collection,
@@ -115,7 +115,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         _resources->_ui_crossfade_child_a = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f)
+                DscCommon::VectorFloat4(1.0f, 1.0f, 0.0f, 1.0f)
             ).SetCrossfadeChildAmount(
                 1.0f
             ),
@@ -129,7 +129,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         _resources->_ui_crossfade_child_b = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
+                DscCommon::VectorFloat4(1.0f, 0.0f, 1.0f, 1.0f)
             ).SetCrossfadeChildAmount(
                 0.0f
             ),
