@@ -103,7 +103,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             ).SetClearColour(
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)
             ),
             *_draw_system,
             *_resources->_dag_collection,
@@ -115,7 +115,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         _resources->_ui_crossfade_child_a = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(1.0f, 1.0f, 0.0f, 1.0f)
+                //DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
+                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
             ).SetCrossfadeChildAmount(
                 1.0f
             ),
@@ -129,7 +130,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         _resources->_ui_crossfade_child_b = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(1.0f, 0.0f, 1.0f, 1.0f)
+                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
             ).SetCrossfadeChildAmount(
                 0.0f
             ),
@@ -140,6 +141,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "crossfade child b")
         );
+
+        DscDag::DagCollection::SetValueType<DscDag::NodeToken>(
+            _resources->_crossfade_active_child,
+            _resources->_ui_crossfade_child_a.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode)
+            );
     }
 
     return;
@@ -235,7 +241,7 @@ const bool Application::Update()
         }
 
 #if defined(_DEBUG)
-        DscDag::DagCollection::DebugDumpNode(_resources->_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawNode));
+        //DscDag::DagCollection::DebugDumpNode(_resources->_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawNode));
 #endif //#if defined(_DEBUG)
 
     }

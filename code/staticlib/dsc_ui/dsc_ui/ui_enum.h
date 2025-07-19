@@ -245,7 +245,7 @@ namespace DscUi
 		TInputRolloverAccumulate, // [0.0 ... 1.0] over some time period while acumulates to 1 when node is rolled over and drain back to zero when not rolled over
 		TInputActiveTouchPos, // float x, y, of cursor pixel coord from panel top left
 
-		// use the TDrawNode node to identify a UiNodeGroup, so the draw node (at the end of the draw chain for the ui hierarchy node) of the active child
+		// use the TUiNodeGroup::TDrawNode node to identify a child UiNodeGroup, so the draw node (at the end of the draw chain for the ui hierarchy node) of the active child
 		TCrossfadeActiveChild,
 		TCrossfadeChildAmount,
 		TCrossfadeNode, // the crossfade node that needs to be set as an input to the crossfade base draw

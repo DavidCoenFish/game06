@@ -342,7 +342,8 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
         in_self.SetNodeToken(
             DscUi::TUiNodeGroup::TUiPanelTint,
             in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-                    const float amount = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                    float amount = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
+                    amount = sqrt(amount);
                     value = DscCommon::VectorFloat4(amount, amount, amount, amount);
                 },
                 & component_resource_group
