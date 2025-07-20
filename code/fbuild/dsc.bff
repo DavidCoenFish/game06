@@ -13,7 +13,7 @@
 #include "windows/windows.bff"
 
 //Print(.VisualStudioSettings)
-//Print(.Windows10_SDK_X64)
+Print(.Windows10_SDK_X64)
 
 .ConfigurationArray = {}
 
@@ -98,14 +98,16 @@
 
 .CommonVcproject = [
         .ProjectInputPathsRecurse   = true
+        //https://www.fastbuild.org/docs/options.html
+        // -dist  Enable distributed compilation.
 #if DEVELOPMENT_BUILD_CMD
-        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
-        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
-        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds"
+        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds -wrapper"
+        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds -wrapper"
+        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -summary -verbose -showcmds -wrapper"
 #else
-        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform)"
-        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -dist -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform)"
-        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform)"
+        .ProjectBuildCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache ^$(ProjectName)_^$(Configuration)_^$(Platform) -wrapper"
+        .ProjectRebuildCommand      = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache -clean ^$(ProjectName)_^$(Configuration)_^$(Platform) -wrapper"
+        .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -wrapper"
 #endif
 ]
 

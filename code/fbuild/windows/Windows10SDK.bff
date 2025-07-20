@@ -51,14 +51,17 @@
     .WindowsSDK_IncludePaths        = ' "/external:I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/ucrt"'
                                     + ' "/external:I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/um"'
                                     + ' "/external:I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/shared"'
+                                    + ' "/external:I$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/winrt"'
 #else
     .WindowsSDK_IncludePaths        = ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/ucrt"'
                                     + ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/um"'
                                     + ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/shared"'
+                                    + ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/winrt"'
 #endif
     .WindowsSDK_IncludePaths_RC     = ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/ucrt"'
                                     + ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/um"'
                                     + ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/shared"'
+                                    + ' /I"$Windows10_SDKBasePath$/Include/$Windows10_SDKVersion$/winrt"'
 
     .WindowsDK_WinRTAssemblyPath    = '$Windows10_SDKBasePath$/UnionMetadata/$Windows10_SDKVersion$/'
 
