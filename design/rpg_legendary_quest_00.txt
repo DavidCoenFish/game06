@@ -9,3 +9,29 @@ ie, a publically currated automated campain collection
 		- map
 	- combat
 	- local network play/ p2p. one person hosts as dm? or let computer be dm?
+
+//Legendary Quest, CRPG sandbox
+roadmap
+	0.1 preprod
+	0.2 character sheet // and get a build up on steam
+	0.20 name, alignment, gender, drop downs, edit age, tooltips?
+	0.21 attribute panel, tooltips
+	0.22 status
+	0.23 inventory
+	0.24 magic
+	0.3 combat
+	0.30 minimal combat, auto combat (text/ player list)
+	0.31 abstract positional (front row/ back row)
+	0.32 hex grid combat
+	0.33 auto chess
+	0.4 co op (p2p) multiple player and ai game master, or human game master and ai or human players..
+	0.5 character/ monster visuals and animation
+	0.6 magic 
+	0.7 scenario editor 
+	0.8 balance
+	0.80 combat tweaks 
+	0.81 multiplayer tweaks
+	0.82 ui tweaks
+	0.83 example scenarios
+	0.9 polish
+	1.0 first release

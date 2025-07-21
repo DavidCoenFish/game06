@@ -1,3 +1,10 @@
 just another mine craft clone, but with procedural character creation that needs mined world resources to customise character, and automation via social connections
 
 5 elements x 12 zodiack are the minerals mined and combine them to create/ upgrade character
+
+P2P world, with concept of owners of node, owner required to be online/ give permition to people to modify node
+world moves around occasionally unless you have ownership/ defined link to node
+can capture/ raid of node ownership (destroy central crystal, or take central crystal and get to boundrary of region, whole zone turned into combat arena)
+
+
+

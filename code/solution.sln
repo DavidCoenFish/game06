@@ -89,22 +89,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "design", "design", "{B3B483
 		..\design\sandbox_jank_00.txt = ..\design\sandbox_jank_00.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "script", "script", "{627A5E61-6C94-4F93-BC2A-7F5284B7D434}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drafts", "drafts", "{DFE42817-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hunts_goblins", "hunts_goblins", "{F8CA7C86-6C94-4F93-BC2A-7F5284B7D434}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hunts_goblins", "hunts_goblins", "{E18745AA-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
-		..\script\hunts_goblins\draft00.txt = ..\script\hunts_goblins\draft00.txt
-		..\script\hunts_goblins\draft01.txt = ..\script\hunts_goblins\draft01.txt
+		..\design\drafts\hunts_goblins\draft00.txt = ..\design\drafts\hunts_goblins\draft00.txt
+		..\design\drafts\hunts_goblins\draft01.txt = ..\design\drafts\hunts_goblins\draft01.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trailer_bridge_archer", "trailer_bridge_archer", "{DF23EBBD-6C94-4F93-BC2A-7F5284B7D434}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trailer_bridge_archer", "trailer_bridge_archer", "{92379064-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
-		..\script\trailer_bridge_archer\draft00.txt = ..\script\trailer_bridge_archer\draft00.txt
+		..\design\drafts\trailer_bridge_archer\draft00.txt = ..\design\drafts\trailer_bridge_archer\draft00.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trailer_explorer_loop", "trailer_explorer_loop", "{BA60CBFD-6C94-4F93-BC2A-7F5284B7D434}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trailer_explorer_loop", "trailer_explorer_loop", "{F774B024-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
-		..\script\trailer_explorer_loop\draft00.txt = ..\script\trailer_explorer_loop\draft00.txt
+		..\design\drafts\trailer_explorer_loop\draft00.txt = ..\design\drafts\trailer_explorer_loop\draft00.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{1EAABDE6-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		..\utils\make_folder_for_today.cmd = ..\utils\make_folder_for_today.cmd
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution_items", "solution_items", "{CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}"
@@ -420,10 +425,11 @@ Global
 		{10C90518-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{9A116E39-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{B3B4836B-6C94-4F93-BC2A-7F5284B7D434} = {3D8E604F-6C94-4F93-BC2A-7F5284B7D434}
-		{627A5E61-6C94-4F93-BC2A-7F5284B7D434} = {3D8E604F-6C94-4F93-BC2A-7F5284B7D434}
-		{F8CA7C86-6C94-4F93-BC2A-7F5284B7D434} = {627A5E61-6C94-4F93-BC2A-7F5284B7D434}
-		{DF23EBBD-6C94-4F93-BC2A-7F5284B7D434} = {627A5E61-6C94-4F93-BC2A-7F5284B7D434}
-		{BA60CBFD-6C94-4F93-BC2A-7F5284B7D434} = {627A5E61-6C94-4F93-BC2A-7F5284B7D434}
+		{DFE42817-6C94-4F93-BC2A-7F5284B7D434} = {B3B4836B-6C94-4F93-BC2A-7F5284B7D434}
+		{E18745AA-6C94-4F93-BC2A-7F5284B7D434} = {DFE42817-6C94-4F93-BC2A-7F5284B7D434}
+		{92379064-6C94-4F93-BC2A-7F5284B7D434} = {DFE42817-6C94-4F93-BC2A-7F5284B7D434}
+		{F774B024-6C94-4F93-BC2A-7F5284B7D434} = {DFE42817-6C94-4F93-BC2A-7F5284B7D434}
+		{1EAABDE6-6C94-4F93-BC2A-7F5284B7D434} = {3D8E604F-6C94-4F93-BC2A-7F5284B7D434}
 		{A9795628-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
 		{F58DD578-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{5ED5FB3C-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}

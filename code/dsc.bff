@@ -52,28 +52,38 @@
 }
 {
     .temp = [
-        .Path           = "parent/script/hunts_goblins"
+        .Path           = "parent/design/drafts/hunts_goblins"
         .Items = { 
-            "../script/hunts_goblins/draft00.txt",
-            "../script/hunts_goblins/draft01.txt",
+            "../design/drafts/hunts_goblins/draft00.txt",
+            "../design/drafts/hunts_goblins/draft01.txt",
             }
     ]
     ^SolutionItemArray + .temp;
 }
 {
     .temp = [
-        .Path           = "parent/script/trailer_bridge_archer"
+        .Path           = "parent/design/drafts/trailer_bridge_archer"
         .Items = { 
-            "../script/trailer_bridge_archer/draft00.txt",
+            "../design/drafts/trailer_bridge_archer/draft00.txt",
             }
     ]
     ^SolutionItemArray + .temp;
 }
 {
     .temp = [
-        .Path           = "parent/script/trailer_explorer_loop"
+        .Path           = "parent/utils"
         .Items = { 
-            "../script/trailer_explorer_loop/draft00.txt",
+            "../utils/make_folder_for_today.cmd",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+
+{
+    .temp = [
+        .Path           = "parent/design/drafts/trailer_explorer_loop"
+        .Items = { 
+            "../design/drafts/trailer_explorer_loop/draft00.txt",
             }
     ]
     ^SolutionItemArray + .temp;
