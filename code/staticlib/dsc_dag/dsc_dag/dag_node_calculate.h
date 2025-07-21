@@ -5,9 +5,24 @@
 
 namespace DscDag
 {
-	//template <typename IN_TYPE DSC_DEBUG_ONLY(DSC_COMMA typename IN_DEBUG_PRINT = DscCommon::DebugPrintNone<IN_TYPE>)>
+	class DagNodeCalculateBase : public IDagNode
+	{
+	public:
+		const bool SetIndexInput(const int32 in_index, NodeToken in_node = nullptr);
+		void AddInput(NodeToken in_node);
+		void RemoveInput(NodeToken in_node);
+
+	protected:
+		bool _dirty = true;
+		std::set<NodeToken> _input = {};
+		std::vector<NodeToken> _index_input = {};
+		std::set<NodeToken> _output = {};
+
+	};
+
+
 	template <typename IN_TYPE>
-	class DagNodeCalculate : public IDagNode
+	class DagNodeCalculate : public DagNodeCalculateBase
 	{
 	public:
 		DagNodeCalculate() = delete;
@@ -15,9 +30,8 @@ namespace DscDag
 		DagNodeCalculate(const DagNodeCalculate&) = delete;
 
 		typedef std::function<void(IN_TYPE&, std::set<NodeToken>&, std::vector<NodeToken>&)> TCalculateFunction;
-		DagNodeCalculate(const TCalculateFunction& in_calculate_function DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = ""))
-			: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
-			, _calculate_function(in_calculate_function)
+		DagNodeCalculate(const TCalculateFunction& in_calculate_function)
+			: _calculate_function(in_calculate_function)
 		{
 			//nop
 		}
@@ -50,6 +64,7 @@ namespace DscDag
 				// so, currently we could have input that is not used in the calculate, and would keep it's dirty flag as GetValue may not be called.
 				// if it was dirtied again, this node would not be marked dirty, skipped as it is already dirty
 				// so, on each call to calculate, explicity GetValue on all inputs to flush the dirty state
+				// this also allow use of DagNodes to construct the ui render drawlist, where the input update draws children textures to be ready for the calculate to draw
 				for (auto& item : _input)
 				{
 					if (nullptr != item)
@@ -87,38 +102,6 @@ namespace DscDag
 				in_nodeID->MarkDirty();
 			}
 			_output.erase(in_nodeID);
-		}
-
-		virtual const bool SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken) override
-		{
-			DSC_ASSERT(0 <= in_index, "invalid param");
-			// null in_nodeID allowed
-			if (static_cast<int32>(_index_input.size()) <= in_index)
-			{
-				_index_input.resize(in_index + 1);
-			}
-			bool result = false;
-			if (_index_input[in_index] != in_nodeID)
-			{
-				result = true;
-				_index_input[in_index] = in_nodeID;
-				MarkDirty();
-			}
-			return result;
-		}
-
-		virtual void AddInput(NodeToken in_nodeID) override
-		{
-			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
-			_input.insert(in_nodeID);
-			MarkDirty();
-		}
-
-		virtual void RemoveInput(NodeToken in_nodeID) override
-		{
-			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
-			_input.erase(in_nodeID);
-			MarkDirty();
 		}
 
 		virtual const bool GetHasNoLinks() const override
@@ -161,18 +144,18 @@ namespace DscDag
 			_input.clear();
 		}
 
-		virtual const std::type_info& GetTypeInfo() const override
+#if defined(_DEBUG)
+		virtual const std::type_info& DebugGetTypeInfo() const override
 		{
 			return typeid(IN_TYPE);
 		}
 
-#if defined(_DEBUG)
-		virtual const std::string DebugPrint(const int32 in_depth = 0) const override
+		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const override
 		{
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Calculate:\"";
-			result += _debug_name;
+			result += DebugSetNodeName();
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += " type:";
 			result += typeid(IN_TYPE).name();
@@ -211,19 +194,46 @@ namespace DscDag
 
 			return result;
 		}
+
+		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const override
+		{
+			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
+
+			result += "Calculate:\"";
+			result += DebugSetNodeName();
+			result += "\" dirty:" + std::to_string(_dirty);
+			result += " type:";
+			result += typeid(IN_TYPE).name();
+			if (nullptr != _s_debug_print_value)
+			{
+				result += " value:";
+				result += _s_debug_print_value(_value);
+			}
+			result += "\n";
+
+			if (0 < _output.size())
+			{
+				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
+				result += "output:\n";
+				for (NodeToken item : _output)
+				{
+					if (nullptr != item)
+					{
+						result += item->DebugPrint(in_depth + 2);
+					}
+				}
+			}
+
+			return result;
+		}
 public:
 	typedef std::function<std::string(const IN_TYPE&)> TDebugPrintValue;
 	static inline TDebugPrintValue _s_debug_print_value = {};
 #endif //#if defined(_DEBUG)
 
 	private:
-		bool _dirty = true;
 		const TCalculateFunction _calculate_function = {};
 		IN_TYPE _value = {};
-
-		std::set<NodeToken> _input = {};
-		std::vector<NodeToken> _index_input = {};
-		std::set<NodeToken> _output = {};
 
 	}; // DagNodeCalculate
 } //DscDag

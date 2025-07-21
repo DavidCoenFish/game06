@@ -12,30 +12,6 @@ bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<D
 	return a.get() < b.get();
 }
 
-DscDag::NodeToken DscDag::DagCollection::CreateCondition(
-	NodeToken in_condition, 
-	NodeToken in_true_source, 
-	NodeToken in_false_source, 
-	NodeToken in_true_destination, 
-	NodeToken in_false_destination,
-	IDagGroup* in_dag_group_owner_or_nullptr
-	DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name))
-{
-	auto node = std::make_unique<DagNodeCondition>(*this, in_true_source, in_false_source, in_true_destination, in_false_destination DSC_DEBUG_ONLY(DSC_COMMA in_debug_name));
-	NodeToken node_token = node.get();
-	_nodes.insert(std::move(node));
-	if (nullptr != in_dag_group_owner_or_nullptr)
-	{
-		in_dag_group_owner_or_nullptr->AddOwnership(node_token);
-	}
-	if (nullptr != in_condition)
-	{
-		LinkIndexNodes(0, in_condition, node_token);
-	}
-
-	return node_token;
-}
-
 // should already have all links removed? assert if links still exisit?
 void DscDag::DagCollection::DeleteNode(NodeToken in_node)
 {
@@ -108,80 +84,5 @@ const int32 DscDag::DagCollection::GetNodeCount() const
 	return static_cast<int32>(_nodes.size());
 }
 
-void DscDag::DagCollection::LinkNodes(NodeToken in_input, NodeToken in_output)
-{
-	DSC_ASSERT(nullptr != in_input, "invalid param");
-	DSC_ASSERT(nullptr != in_output, "invalid param");
-	if ((nullptr != in_input) && (nullptr != in_output))
-	{
-		in_input->AddOutput(in_output);
-		in_output->AddInput(in_input);
-	}
-	return;
-}
-
-void DscDag::DagCollection::LinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output)
-{
-	bool outputs_input_changed = false;
-	if (nullptr != in_output)
-	{ 
-		outputs_input_changed = in_output->SetIndexInput(in_index, in_input);
-	}
-
-	// trying to allow redundant calls to LinkIndexNodes, this is not idea, as REPLACING a link could end up with a linkage leak...?
-	if ((true == outputs_input_changed) && (nullptr != in_input) && (nullptr != in_output))
-	{
-		in_input->AddOutput(in_output);
-	}
-
-	return;
-}
-
-void DscDag::DagCollection::UnlinkNodes(NodeToken in_input, NodeToken in_output)
-{
-	DSC_ASSERT(nullptr != in_input, "invalid param");
-	DSC_ASSERT(nullptr != in_output, "invalid param");
-	if ((nullptr != in_input) && (nullptr != in_output))
-	{
-		in_output->RemoveInput(in_input);
-		in_input->RemoveOutput(in_output);
-	}
-	return;
-}
-
-void DscDag::DagCollection::UnlinkIndexNodes(int32 in_index, NodeToken in_input, NodeToken in_output)
-{
-	DSC_ASSERT(nullptr != in_output, "invalid param");
-	if (nullptr != in_input) 
-	{
-		in_input->RemoveOutput(in_output);
-	}
-	if (nullptr != in_output)
-	{
-		in_output->SetIndexInput(in_index, nullptr);
-	}
-	return;
-}
-
-#if defined(_DEBUG)
-void DscDag::DagCollection::DebugDumpNode(NodeToken in_input)
-{
-	const std::string fullMessage = in_input->DebugPrint();
-	std::string line = {};
-	for (const auto c : fullMessage)
-	{
-		line += c;
-		if (c == '\n')
-		{
-			OutputDebugString(std::wstring(line.begin(), line.end()).c_str());
-			line = {};
-		}
-	}
-	if (false == line.empty())
-	{
-		OutputDebugString(std::wstring(line.begin(), line.end()).c_str());
-	}
-}
-#endif //#if defined(_DEBUG)
 
 

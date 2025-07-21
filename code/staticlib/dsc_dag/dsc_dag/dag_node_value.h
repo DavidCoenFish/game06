@@ -1,12 +1,9 @@
 #pragma once
 #include "dsc_dag.h"
 #include "i_dag_node.h"
-#include "dag_enum.h"
 #include "dag_node_calculate.h"
 #include <dsc_common\dsc_common.h>
 #include <dsc_common\debug_print.h>
-#include <dsc_common\vector_2.h>
-#include <dsc_common\vector_4.h>
 
 namespace DscDag
 {
@@ -57,11 +54,10 @@ namespace DscDag
 		typedef std::function<void(bool& out_dirty, bool& out_bail, const IN_TYPE&, const IN_TYPE& in_rhs)> TCallbackOnSet;
 
 		DagNodeValue(const IN_TYPE& in_value, 
-			const TCallbackOnSet& in_callback_on_set_value = CallbackOnValueChange<IN_TYPE>::Function
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = ""))
-			: IDagNode(DSC_DEBUG_ONLY(in_debug_name))
-			, _value(in_value)
-			, _callback_on_set(in_callback_on_set_value)
+			const TCallbackOnSet& in_callback_on_set_value_or_null = CallbackOnValueChange<IN_TYPE>::Function
+			)
+			: _value(in_value)
+			, _callback_on_set(in_callback_on_set_value_or_null)
 		{
 			// Nop
 		}
@@ -84,8 +80,11 @@ namespace DscDag
 		{
 			bool set_dirty = false;
 			bool bail = false;
-			//IN_CALLBACK::Function(set_dirty, bail, _value, in_value);
-			_callback_on_set(set_dirty, bail, _value, in_value);
+
+			if (nullptr != _callback_on_set)
+			{
+				_callback_on_set(set_dirty, bail, _value, in_value);
+			}
 
 			if (true == bail)
 			{
@@ -133,34 +132,13 @@ namespace DscDag
 			return (0 == _output.size());
 		}
 
-		virtual const std::type_info& GetTypeInfo() const override
+#if defined(_DEBUG)
+		virtual const std::type_info& DebugGetTypeInfo() const override
 		{
 			return typeid(IN_TYPE);
 		}
 
-		// for DagCondition, wanted to be able to assign output of one node to another node
-		virtual void SetFromNode(IDagNode* const in_node) override
-		{
-			// break a cyclic dependency, would normally call DagCollection::GetValueType, but it needs to have our definition
-			auto value_node = dynamic_cast<DagNodeValue<IN_TYPE>*>(in_node);
-			if (nullptr != value_node)
-			{
-				SetValue(value_node->GetValue());
-				return;
-			}
-			auto calculate_node = dynamic_cast<DagNodeCalculate<IN_TYPE>*>(in_node);
-			if (nullptr != calculate_node)
-			{
-				SetValue(calculate_node->GetValue());
-				return;
-			}
-
-			DSC_ASSERT_ALWAYS("invalid code path");
-			return;
-		}
-
-#if defined(_DEBUG)
-		virtual const std::string DebugPrint(const int32 in_depth = 0) const override
+		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const override
 		{
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
@@ -179,6 +157,37 @@ namespace DscDag
 			return result;
 		}
 
+		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const override
+		{
+			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
+
+			result += "Value:\"";
+			result += _debug_name;
+			result += "\"";
+			result += " type:";
+			result += typeid(IN_TYPE).name();
+			if (nullptr != _s_debug_print_value)
+			{
+				result += " value:";
+				result += _s_debug_print_value(_value);
+			}
+			result += "\n";
+
+			if (0 < _output.size())
+			{
+				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
+				result += "output:\n";
+				for (NodeToken item : _output)
+				{
+					if (nullptr != item)
+					{
+						result += item->DebugPrint(in_depth + 2);
+					}
+				}
+			}
+
+			return result;
+		}
 public:
 	typedef std::function<std::string(const IN_TYPE&)> TDebugPrintValue;
 	static inline TDebugPrintValue _s_debug_print_value = {};

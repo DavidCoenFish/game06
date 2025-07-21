@@ -5,40 +5,39 @@ namespace DscDag
 {
 	class IDagNode;
 	typedef IDagNode* NodeToken;
-	constexpr NodeToken NullToken = nullptr;
+	//constexpr NodeToken NullToken = nullptr;
 
 	class IDagNode
 	{
 	public:
-		IDagNode(DSC_DEBUG_ONLY(const std::string& in_debug_name));
-		virtual ~IDagNode();
+		IDagNode() {}
+		virtual ~IDagNode() {}
 
-		//assert on value node, they have their own logic for setting dirty?
+		// mare ourself as dirty, if we were not already dirty, mark our outputs as dirty as well
 		virtual void MarkDirty();
-		// regenerate value/ remove dirty flag as a side effect?
+		// if dirty, then tell inputs to update, and then calculate (if a calculate node)
 		virtual void Update();
-		// return true if data changed, ie, in_nodeID != what was already set at that index
-		virtual const bool SetIndexInput(const int32 in_index, NodeToken in_nodeID = NullToken);
-		virtual void AddInput(NodeToken in_nodeID);
-		virtual void RemoveInput(NodeToken in_nodeID);
-		virtual void AddOutput(NodeToken in_nodeID);
-		virtual void RemoveOutput(NodeToken in_nodeID);
-
-		virtual const bool GetHasNoLinks() const = 0;
-
+		virtual void AddOutput(NodeToken in_node) = 0;
+		virtual void RemoveOutput(NodeToken in_node) = 0;
+		virtual const bool GetHasNoLinks() const;
 		virtual void UnlinkInputs();
 
-		virtual const std::type_info& GetTypeInfo() const = 0;
-
-		// for DagCondition, wanted to be able to assign output of one node to another node, but with type infor kept in the derrived classes
-		// asserts when called if not overridden 
-		virtual void SetFromNode(IDagNode* const in_node);
-
 #if defined(_DEBUG)
-		virtual const std::string DebugPrint(const int32 in_depth = 0) const = 0;
+		virtual const std::type_info& DebugGetTypeInfo() const = 0;
+		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const = 0;
+		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const = 0;
 #endif //#if defined(_DEBUG)
 
-	protected:
+#if defined(_DEBUG)
+		void DebugSetNodeName(const std::string& in_debug_name) {
+			_debug_name = in_debug_name;
+		}
+		const std::string& GetDebugName() const {
+			return _debug_name;
+		}
+#endif //#if defined(_DEBUG)
+
+	private:
 		DSC_DEBUG_ONLY(std::string _debug_name);
 
 	}; // IDagNode

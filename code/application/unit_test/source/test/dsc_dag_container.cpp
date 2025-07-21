@@ -16,17 +16,17 @@ const bool TestSanity()
 		int32 sum = 0;
 		for (auto& item : inputSet)
 		{
-			sum += DscDag::DagCollection::GetValueType<int32>(item);
+			sum += DscDag::GetValueType<int32>(item);
 		}
 		output = sum;
 	});
 
-	DscDag::DagCollection::LinkNodes(n0, n2);
-	DscDag::DagCollection::LinkNodes(n1, n2);
+	DscDag::LinkNodes(n0, n2);
+	DscDag::LinkNodes(n1, n2);
 
-	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::DagCollection::GetValueType<int32>(n2));
-	DscDag::DagCollection::SetValueType(n0, 3);
-	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::DagCollection::GetValueType<int32>(n2));
+	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::GetValueType<int32>(n2));
+	DscDag::SetValueType(n0, 3);
+	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::GetValueType<int32>(n2));
 
 	return ok;
 }
@@ -44,26 +44,26 @@ const bool TestDirty()
 		int32 sum = 0;
 		for (auto& item : inputSet)
 		{
-			sum += DscDag::DagCollection::GetValueType<int32>(item);
+			sum += DscDag::GetValueType<int32>(item);
 		}
 		output = sum;
 	});
 
-	DscDag::DagCollection::LinkNodes(n0, n2);
-	DscDag::DagCollection::LinkNodes(n1, n2);
+	DscDag::LinkNodes(n0, n2);
+	DscDag::LinkNodes(n1, n2);
 
 	ok = TEST_UTIL_EQUAL(ok, 0, calculateCount);
-	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::DagCollection::GetValueType<int32>(n2));
+	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::GetValueType<int32>(n2));
 	ok = TEST_UTIL_EQUAL(ok, 1, calculateCount);
 
-	DscDag::DagCollection::SetValueType(n0, 3);
+	DscDag::SetValueType(n0, 3);
 	ok = TEST_UTIL_EQUAL(ok, 1, calculateCount);
-	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::DagCollection::GetValueType<int32>(n2));
+	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::GetValueType<int32>(n2));
 	ok = TEST_UTIL_EQUAL(ok, 2, calculateCount);
 
-	DscDag::DagCollection::SetValueType(n0, 3);
+	DscDag::SetValueType(n0, 3);
 	ok = TEST_UTIL_EQUAL(ok, 2, calculateCount);
-	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::DagCollection::GetValueType<int32>(n2));
+	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::GetValueType<int32>(n2));
 	ok = TEST_UTIL_EQUAL(ok, 2, calculateCount);
 
 	return ok;

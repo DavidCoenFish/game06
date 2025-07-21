@@ -1,3 +1,5 @@
+:: make a folder in the same directory as the cmd file, with todays date
+
 @ECHO OFF
 PUSHD %~dp0
 
@@ -20,3 +22,4 @@ SET TIMESTAMP=%_yyyy%-%_mm%-%_dd%
 
 MKDIR %TIMESTAMP%
 
+POPD

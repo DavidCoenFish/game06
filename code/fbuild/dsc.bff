@@ -13,7 +13,7 @@
 #include "windows/windows.bff"
 
 //Print(.VisualStudioSettings)
-Print(.Windows10_SDK_X64)
+//Print(.Windows10_SDK_X64)
 
 .ConfigurationArray = {}
 

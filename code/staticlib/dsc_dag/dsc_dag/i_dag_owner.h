@@ -6,12 +6,13 @@ namespace DscDag
 	class IDagNode;
 	typedef IDagNode* NodeToken;
 
-	class IDagGroup
+	/// Ownership refers to a set of nodes that should be delete together
+	class IDagOwner
 	{
 	public:
-		virtual ~IDagGroup() {};
+		virtual ~IDagOwner() {};
 
 		virtual void AddOwnership(NodeToken in_node_token) = 0;
 
-	}; // IDagGroup
+	}; // IDagOwner
 } //DscDag
