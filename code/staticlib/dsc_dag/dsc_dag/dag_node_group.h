@@ -2,13 +2,15 @@
 #include "dsc_dag.h"
 #include "i_dag_node.h"
 #include "i_dag_owner.h"
-#include "dag_collection.h"
 
 namespace DscDag
 {
+	class DagCollection;
 	class IDagNode;
 	typedef IDagNode* NodeToken;
 
+	/// Used in accessor to check types in and out of DagNode
+#if defined(_DEBUG)
 	struct DagNodeGroupMetaData
 	{
 		DagNodeGroupMetaData() = delete;
@@ -18,60 +20,112 @@ namespace DscDag
 		bool _optional = false;
 		const std::type_info& _type_info;
 	};
-
 	template <typename IN_ENUM>
 	const DagNodeGroupMetaData& GetDagNodeGroupMetaData(const IN_ENUM);
+#endif //#if defined(_DEBUG)
 
-	/// <summary>
-	/// Duck typed class / object that can be handed around to other people that agree with the set of nodes to be provided / interface
-	/// currently missing type safety of the node types however... 
-	/// which could require another array of the type ids/ if empty allowed? and if allowed to set? and bring the GetValueType into method this class?
-	/// </summary>
-	template <typename IN_ENUM, std::size_t IN_SIZE>
+	template <typename IN_ENUM>
+	struct ValidateOneType {
+		static const bool Function(const std::type_info& in_enum_info)
+		{
+			return (typeid(IN_ENUM) == in_enum_info);
+		}
+	};
+
+	template <typename IN_ENUM_A, typename IN_ENUM_B>
+	struct ValidateTwoType {
+		static const bool Function(const std::type_info& in_enum_info)
+		{
+			return (typeid(IN_ENUM_A) == in_enum_info) ||
+				(typeid(IN_ENUM_B) == in_enum_info);
+		}
+	};
+
+	/// hold a fixed size array of Nodes of a controlled type
 	class DagNodeGroup : public IDagNode, public IDagOwner
 	{
 	public:
-		DagNodeGroup() {}
+		DagNodeGroup() = delete;
+		DagNodeGroup& operator=(const DagNodeGroup&) = delete;
+		DagNodeGroup(const DagNodeGroup&) = delete;
 
-		void SetNodeToken(const IN_ENUM in_index, NodeToken in_node_token)
+		typedef std::function<const bool(const std::type_info&)> TValidateFunction;
+		// provide a callback for accepted enum types to construct index from
+		DagNodeGroup(const int32 in_size, const TValidateFunction& in_validate_function);
+		virtual ~DagNodeGroup();
+
+		template <typename IN_ENUM>
+		static NodeToken GetNodeTokenEnum(NodeToken in_node, const IN_ENUM in_index)
 		{
-			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < IN_SIZE), "invalid param");
-#if defined(_DEBUG)
-			const DagGroupNodeMetaData& meta_data = GetDagGroupMetaData(in_index);
-			if (nullptr == in_node_token)
+			DagNodeGroup* const group = dynamic_cast<DagNodeGroup*>(in_node);
+			DSC_ASSERT(nullptr != group, "why are you trying to access node as a DagNodeGroup");
+			if (nullptr == group)
 			{
-				DSC_ASSERT(meta_data._optional == true, "invalid param");
+				return nullptr;
 			}
-			else
-			{
-				DSC_ASSERT(meta_data._type_info == in_node_token->GetTypeInfo(), "invalid param");
-			}
-#endif
-			_node_token_array[static_cast<std::size_t>(in_index)] = in_node_token;
-
-			return;
-		}
-
-		NodeToken GetNodeToken(const IN_ENUM in_index) const
-		{
-			DSC_ASSERT((0 <= static_cast<std::size_t>(in_index)) && (static_cast<std::size_t>(in_index) < IN_SIZE), "invalid param");
+			DSC_ASSERT(true == group->ValidateIndexEnum(typeid(IN_ENUM)), "incompatable enum type");
+			NodeToken result = group->GetNodeToken(static_cast<int32>(in_index));
 #if defined(_DEBUG)
-			const DagGroupNodeMetaData& meta_data = GetDagGroupMetaData(in_index);
-			if (nullptr == _node_token_array[static_cast<std::size_t>(in_index)])
+			const DagNodeGroupMetaData& meta_data = GetDagNodeGroupMetaData(in_index);
+			if (nullptr == result)
 			{
 				DSC_ASSERT(meta_data._optional == true, "invalid state");
 			}
+			else
+			{
+				DSC_ASSERT(result->DebugGetTypeInfo() == meta_data._type_info, "unexpected type");
+			}
 #endif
-			return _node_token_array[static_cast<std::size_t>(in_index)];
+			return result;
 		}
 
-		void Validate() const
+		template <typename IN_ENUM>
+		static void SetNodeTokenEnum(NodeToken in_node, const IN_ENUM in_index, NodeToken in_node_to_add_or_null)
 		{
-			for (std::size_t index = 0; index < IN_SIZE; ++index)
+			DagNodeGroup* const group = dynamic_cast<DagNodeGroup*>(in_node);
+			DSC_ASSERT(nullptr != group, "why are you trying to access node as a DagNodeGroup");
+			if (nullptr == group)
+			{
+				return;
+			}
+			DSC_ASSERT(true == group->ValidateIndexEnum(typeid(IN_ENUM)), "incompatable enum type");
+#if defined(_DEBUG)
+			const DagNodeGroupMetaData& meta_data = GetDagNodeGroupMetaData(in_index);
+			if (nullptr == in_node_to_add_or_null)
+			{
+				DSC_ASSERT(meta_data._optional == true, "invalid state");
+			}
+			else
+			{
+				DSC_ASSERT(in_node_to_add_or_null->DebugGetTypeInfo() == meta_data._type_info, "unexpected type");
+			}
+#endif
+			group->SetNodeToken(static_cast<int32>(in_index), in_node_to_add_or_null);
+		}
+
+		NodeToken GetNodeToken(const int32 in_index) const;
+		void SetNodeToken(const int32 in_index, NodeToken in_node_token_or_null);
+
+#if defined(_DEBUG)
+		template <typename IN_ENUM>
+		static void DebugValidate(NodeToken in_node)
+		{
+			DagNodeGroup* const group = dynamic_cast<DagNodeGroup*>(in_node);
+			DSC_ASSERT(nullptr != group, "why are you trying to access node as a DagNodeGroup");
+			if (nullptr == group)
+			{
+				return;
+			}
+
+			DSC_ASSERT(true == group->ValidateIndexEnum(typeid(IN_ENUM)), "incompatable enum type");
+			// if there is a subset enum, then only check the subset
+			const std::size_t size = std::min(group->_node_token_array.size(), static_cast<size_t>(IN_ENUM::TCount));
+			for (std::size_t index = 0; index < size; ++index)
 			{
 				const DagNodeGroupMetaData& meta_data = GetDagNodeGroupMetaData(static_cast<IN_ENUM>(index));
+				NodeToken item = group->_node_token_array[index];
 
-				if (nullptr == _node_token_array[index])
+				if (nullptr == item)
 				{
 					if (false == meta_data._optional)
 					{
@@ -81,68 +135,45 @@ namespace DscDag
 				}
 				else
 				{
-					if (meta_data._type_info != _node_token_array[index]->GetTypeInfo())
+					if (meta_data._type_info != item->DebugGetTypeInfo())
 					{
-						DSC_ASSERT_ALWAYS("invalid state");
+						DSC_ASSERT_ALWAYS("invalid type found");
 						return;
 					}
 				}
 			}
 			return;
 		}
-
-		void UnlinkOwned()
-		{
-			for (const auto& item : _node_ownership_group)
-			{
-				item->UnlinkInputs();
-			}
-		}
-
-		void DeleteOwned(DagCollection& in_dag_node)
-		{
-			for (const auto& item : _node_ownership_group)
-			{
-				in_dag_node.DeleteNode(item);
-			}
-			_node_ownership_group.clear();
-		}
+#endif //#if defined(_DEBUG)
 
 	private:
-		virtual void AddOwnership(NodeToken in_node_token) override
-		{
-			if (nullptr != in_node_token)
-			{
-				_node_ownership_group.push_back(in_node_token);
-			}
-		}
+		const bool ValidateIndexEnum(const std::type_info& in_index_enum);
 
-		virtual void AddOutput(NodeToken in_nodeID) override
-		{
-			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
-			if (nullptr != in_nodeID)
-			{
-				in_nodeID->MarkDirty();
-			}
-			_output.insert(in_nodeID);
-		}
+		//IDagOwner
+		virtual void AddOwnership(NodeToken in_node_token) override;
+		virtual void DestroyOwned(DagCollection& in_dag_collection) override;
 
-		virtual void RemoveOutput(NodeToken in_nodeID) override
-		{
-			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
-			if (nullptr != in_nodeID)
-			{
-				in_nodeID->MarkDirty();
-			}
-			_output.erase(in_nodeID);
-		}
+		//IDagNode
+		virtual void MarkDirty() override;
+		virtual void Update() override;
+		virtual void AddOutput(NodeToken in_node) override;
+		virtual void RemoveOutput(NodeToken in_node) override;
+		virtual const bool GetHasNoLinks() const override;
+		virtual void UnlinkInputs() override;
+
+#if defined(_DEBUG)
+		virtual const std::type_info& DebugGetTypeInfo() const override;
+		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const override;
+		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const override;
+#endif //#if defined(_DEBUG)
 
 	private:
-		NodeToken _node_token_array[IN_SIZE] = {};
+		const TValidateFunction _validate_function = {};
+		std::vector<NodeToken> _node_token_array = {};
 
 		// trying to make it easier to latter collect all the nodes that are to be removed as a group
-		std::vector<NodeToken> _node_ownership_group = {};
+		std::set<NodeToken> _node_ownership_group = {};
 		std::set<NodeToken> _output = {};
-
+		bool _dirty = false;
 	}; // DagNodeGroup
 } //DscDag

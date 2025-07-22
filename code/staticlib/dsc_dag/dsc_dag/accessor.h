@@ -1,6 +1,5 @@
 #pragma once
 #include "dsc_dag.h"
-#include "dag_node_array.h"
 #include "dag_node_calculate.h"
 #include "dag_node_value.h"
 
@@ -11,7 +10,7 @@ namespace DscDag
 	{
 		DSC_ASSERT(nullptr != in_input, "invalid param");
 		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
-		DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
+		DSC_ASSERT(typeid(IN_TYPE) == in_input->DebugGetTypeInfo(), "invalid param");
 
 		auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
 		if (nullptr != value_node)
@@ -35,7 +34,7 @@ namespace DscDag
 	{
 		DSC_ASSERT(nullptr != in_input, "invalid param");
 		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "GetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
-		DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
+		DSC_ASSERT(typeid(IN_TYPE) == in_input->DebugGetTypeInfo(), "invalid param");
 
 		auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
 		if (nullptr != value_node)
@@ -53,7 +52,7 @@ namespace DscDag
 	{
 		DSC_ASSERT(nullptr != in_input, "invalid param");
 		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "SetValueType in_input:%s in_value:%s\n", in_input->GetTypeInfo().name(), typeid(IN_TYPE).name());
-		DSC_ASSERT(typeid(IN_TYPE) == in_input->GetTypeInfo(), "invalid param");
+		DSC_ASSERT(typeid(IN_TYPE) == in_input->DebugGetTypeInfo(), "invalid param");
 
 		auto value_node = dynamic_cast<DagNodeValue< IN_TYPE>*>(in_input);
 		if (nullptr != value_node)

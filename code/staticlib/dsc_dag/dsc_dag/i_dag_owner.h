@@ -3,6 +3,7 @@
 
 namespace DscDag
 {
+	class DagCollection;
 	class IDagNode;
 	typedef IDagNode* NodeToken;
 
@@ -13,6 +14,7 @@ namespace DscDag
 		virtual ~IDagOwner() {};
 
 		virtual void AddOwnership(NodeToken in_node_token) = 0;
+		virtual void DestroyOwned(DagCollection& in_dag_collection) = 0;
 
 	}; // IDagOwner
 } //DscDag

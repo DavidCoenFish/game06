@@ -221,7 +221,7 @@ namespace DscDag
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Condition:\"";
-			result += DebugSetNodeName();
+			result += DebugGetNodeName();
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += "\n";
 
@@ -253,7 +253,7 @@ namespace DscDag
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Condition:\"";
-			result += DebugSetNodeName();
+			result += DebugGetNodeName();
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += "\n";
 

@@ -17,7 +17,6 @@ namespace DscDag
 		std::set<NodeToken> _input = {};
 		std::vector<NodeToken> _index_input = {};
 		std::set<NodeToken> _output = {};
-
 	};
 
 
@@ -84,24 +83,24 @@ namespace DscDag
 			}
 		}
 
-		virtual void AddOutput(NodeToken in_nodeID) override
+		virtual void AddOutput(NodeToken in_node) override
 		{
-			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
-			if (nullptr != in_nodeID)
+			DSC_ASSERT(nullptr != in_node, "invalid param");
+			if (nullptr != in_node)
 			{
-				in_nodeID->MarkDirty();
+				in_node->MarkDirty();
 			}
-			_output.insert(in_nodeID);
+			_output.insert(in_node);
 		}
 
-		virtual void RemoveOutput(NodeToken in_nodeID) override
+		virtual void RemoveOutput(NodeToken in_node) override
 		{
-			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
-			if (nullptr != in_nodeID)
+			DSC_ASSERT(nullptr != in_node, "invalid param");
+			if (nullptr != in_node)
 			{
-				in_nodeID->MarkDirty();
+				in_node->MarkDirty();
 			}
-			_output.erase(in_nodeID);
+			_output.erase(in_node);
 		}
 
 		virtual const bool GetHasNoLinks() const override
@@ -155,7 +154,7 @@ namespace DscDag
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Calculate:\"";
-			result += DebugSetNodeName();
+			result += DebugGetNodeName();
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += " type:";
 			result += typeid(IN_TYPE).name();
@@ -174,7 +173,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						result += item->DebugPrint(in_depth + 2);
+						result += item->DebugPrintRecurseInputs(in_depth + 2);
 					}
 				}
 			}
@@ -187,7 +186,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						result += item->DebugPrint(in_depth + 2);
+						result += item->DebugPrintRecurseInputs(in_depth + 2);
 					}
 				}
 			}
@@ -200,7 +199,7 @@ namespace DscDag
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Calculate:\"";
-			result += DebugSetNodeName();
+			result += DebugGetNodeName();
 			result += "\" dirty:" + std::to_string(_dirty);
 			result += " type:";
 			result += typeid(IN_TYPE).name();
@@ -219,7 +218,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						result += item->DebugPrint(in_depth + 2);
+						result += item->DebugPrintRecurseOutputs(in_depth + 2);
 					}
 				}
 			}

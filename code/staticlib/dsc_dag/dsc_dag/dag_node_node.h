@@ -7,15 +7,14 @@ namespace DscDag
 	class IDagNode;
 	typedef IDagNode* NodeToken;
 
-	/// we hold an array of node tokens, as they are added to our array, we set ourself as their output, and when they are removed, we remove outselves from their output
-	class DagNodeArray : public IDagNode
+	/// we hold a node token
+	class DagNodeNode : public IDagNode
 	{
 	public:
-		void PushBack(NodeToken in_node);
-		void Remove(NodeToken in_node);
-		NodeToken GetAt(const int32 in_index) const;
-		void SetAt(NodeToken in_node, const int32 in_index);
-		const int32 GetCount() const;
+		DagNodeNode(NodeToken in_node_or_null);
+
+		NodeToken Get() const;
+		void Set(NodeToken in_node_or_null);
 
 	private:
 		virtual void MarkDirty() override;
@@ -32,7 +31,9 @@ namespace DscDag
 #endif //#if defined(_DEBUG)
 
 	private:
-		std::vector<NodeToken> _node_array = {};
+		NodeToken _node = {};
+		std::set<NodeToken> _output = {};
+		bool _dirty = false;
 
 	}; // DagGroup
 } //DscDag

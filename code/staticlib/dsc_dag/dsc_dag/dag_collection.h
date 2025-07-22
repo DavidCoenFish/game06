@@ -2,12 +2,11 @@
 #include "dsc_dag.h"
 #include <dsc_common\dsc_common.h>
 #include <dsc_common\log_system.h>
-#include "dag_node_array.h"
 #include "dag_node_calculate.h"
 #include "dag_node_condition.h"
+#include "dag_node_group.h"
 #include "dag_node_value.h"
 #include "i_dag_owner.h"
-//#include "dag_node_group.h"
 
 namespace DscDag
 {
@@ -17,7 +16,15 @@ namespace DscDag
 	class DagCollection
 	{
 	public:
-		//CreateArray
+		//create a node to hold a node. to create a node to hold a value, see CreateValue
+		NodeToken CreateNode(
+			NodeToken in_node_or_null,
+			IDagOwner* in_dag_owner_or_nullptr = nullptr
+			);
+		NodeToken CreateNodeArray(
+			const std::vector<NodeToken>& in_node_token_array = std::vector<NodeToken>(),
+			IDagOwner* in_dag_owner_or_nullptr = nullptr
+		);
 
 		template <typename IN_TYPE>
 		NodeToken CreateCalculate(
@@ -36,7 +43,7 @@ namespace DscDag
 		}
 
 		/// the in_true_source and in_false_source are only linked to the dirty path of the destination when the condition has calculated as true or false
-		/// THERE is a small window when condition is wating to change, that the non logically correct source and destination can still be linked
+		/// THERE is a small window when condition is waiting to change, that the non logically correct source and destination can still be linked
 		/// condition doesn't have a normal link to destination node, they are only set when the condition is updated/ resolved. see ResolveDirtyConditionNodes
 		template <typename IN_TYPE_TRUE, typename IN_TYPE_FALSE>
 		NodeToken CreateCondition(
@@ -64,7 +71,17 @@ namespace DscDag
 			return node_token;
 		}
 
-		//create group
+		typedef std::function<const bool(const std::type_info&)> TValidateFunction;
+		template <typename IN_ENUM>
+		NodeToken CreateGroupEnum(IDagOwner* in_dag_owner_or_nullptr = nullptr)
+		{
+			return CreateGroup(
+				static_cast<int32>(IN_ENUM::TCount),
+				ValidateOneType<IN_ENUM>::Function,
+				in_dag_owner_or_nullptr
+			);
+		}
+		NodeToken CreateGroup(const int32 in_size, const TValidateFunction& in_validate_function, IDagOwner* in_dag_owner_or_nullptr = nullptr);
 
 		template <typename IN_TYPE>
 		NodeToken CreateValue(
@@ -82,8 +99,6 @@ namespace DscDag
 			}
 			return node_token;
 		}
-
-
 
 		// should already have all links removed? assert if links still exisit?
 		void DeleteNode(NodeToken in_node);

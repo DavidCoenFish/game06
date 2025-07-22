@@ -10,10 +10,11 @@
 
 #include "accessor.h"
 #include "dag_collection.h"
-#include "dag_node_array.h"
 #include "dag_node_calculate.h"
 #include "dag_node_condition.h"
 #include "dag_node_group.h"
+#include "dag_node_node.h"
+#include "dag_node_node_array.h"
 #include "dag_node_value.h"
 #include "debug_print.h"
 #include "i_dag_node.h"

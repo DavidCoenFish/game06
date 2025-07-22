@@ -143,7 +143,7 @@ namespace DscDag
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Value:\"";
-			result += _debug_name;
+			result += DebugGetNodeName();
 			result += "\"";
 			result += " type:";
 			result += typeid(IN_TYPE).name();
@@ -162,7 +162,7 @@ namespace DscDag
 			std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
 
 			result += "Value:\"";
-			result += _debug_name;
+			result += DebugGetNodeName();
 			result += "\"";
 			result += " type:";
 			result += typeid(IN_TYPE).name();
@@ -181,7 +181,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						result += item->DebugPrint(in_depth + 2);
+						result += item->DebugPrintRecurseOutputs(in_depth + 2);
 					}
 				}
 			}
