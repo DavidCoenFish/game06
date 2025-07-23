@@ -60,6 +60,7 @@ namespace DscDag
 		)
 		{
 			auto node = std::make_unique<DagNodeCondition<IN_TYPE_TRUE, IN_TYPE_FALSE>>(
+				*this,
 				in_condition,
 				in_true_source,
 				in_false_source,

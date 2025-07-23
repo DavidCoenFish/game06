@@ -12,8 +12,11 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
     DscDag::NodeToken in_owner
 )
 {
-    DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_parent));
-    DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_owner));
+    //if (nullptr != in_parent)
+    //{
+    //    DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_parent));
+    //}
+    //DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_owner));
 
     DscDag::IDagOwner* const top_owner = dynamic_cast<DscDag::IDagOwner*>(in_owner);
     DSC_ASSERT(nullptr != top_owner, "invalid state");
@@ -142,6 +145,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         }, owner);
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_scale_from_width_node, "ui_scale_from_width"));
         DscDag::LinkIndexNodes(0, in_ui_scale, ui_scale_from_width_node);
+        DSC_ASSERT(nullptr != in_parent, "invalid param");
         DscDag::NodeToken avaliable_size = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TAvaliableSize);
         DscDag::LinkIndexNodes(1, avaliable_size, ui_scale_from_width_node);
 
@@ -311,6 +315,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             gradient_fill
         );
 
+        DSC_ASSERT(nullptr != in_parent, "invalid param");
         DscDag::NodeToken parent_resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TUiComponentResources);
         DscDag::NodeToken parent_input_state_flag = DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_group, TUiComponentResourceNodeGroup::TInputStateFlag);
         DscDag::LinkIndexNodes(0, parent_input_state_flag, gradient_fill); // set with the parent TUiInputStateFlag

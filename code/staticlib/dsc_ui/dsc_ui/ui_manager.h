@@ -210,12 +210,10 @@ namespace DscUi
 			DscDag::NodeToken in_component_resource_group,
 			DscDag::NodeToken in_parent,
 			DscDag::NodeToken& out_draw_base_node
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
 		DscDag::NodeToken MakeDrawNode(
 			const TUiDrawType in_type,
-			const ComponentConstructionHelper* const in_construction_helper_or_null,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
 			std::vector<DscDag::NodeToken>& in_array_input_stack,
@@ -227,7 +225,6 @@ namespace DscUi
 			DscDag::NodeToken in_effect_tint_or_null,
 			DscDag::NodeToken in_child_array_node_or_null,
 			DscDag::NodeToken in_component_resource_group
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 		);
 
 	private:

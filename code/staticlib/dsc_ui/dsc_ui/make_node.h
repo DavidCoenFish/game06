@@ -195,7 +195,6 @@ namespace DscUi
             DscDag::DagCollection& in_dag_collection,
             DscDag::NodeToken in_root_node_group,
             DscDag::NodeToken in_parent_node_group,
-            DscDag::NodeToken in_component_resource_group,
             const UiManager::TEffectConstructionHelper& in_effect_data,
             DscDag::IDagOwner* const in_owner
         );
