@@ -1,375 +1,478 @@
 #include "component_construction_helper.h"
+#include <dsc_dag\dag_collection.h>
+#include <dsc_dag\debug_print.h>
 
-DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
+DscDag::NodeToken DscUi::MakeComponentResourceGroup(
     DscDag::DagCollection& in_dag_collection,
     const DscUi::ComponentConstructionHelper& in_construction_helper,
     DscDag::NodeToken in_time_delta,
     DscDag::NodeToken in_ui_scale,
     //DscDag::NodeToken in_avaliable_size
-    const UiNodeGroup& in_parent,
-    UiNodeGroup& in_self
+    DscDag::NodeToken in_parent,
+    DscDag::NodeToken in_owner
 )
 {
-    DscUi::UiComponentResourceNodeGroup component_resource_group;
-    component_resource_group.SetNodeToken(
-        DscUi::TUiComponentResourceNodeGroup::TClearColour,
-        in_dag_collection.CreateValue(
+    DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_parent));
+    DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_owner));
+
+    DscDag::IDagOwner* const top_owner = dynamic_cast<DscDag::IDagOwner*>(in_owner);
+    DSC_ASSERT(nullptr != top_owner, "invalid state");
+
+    DscDag::NodeToken component_resource_group = in_dag_collection.CreateGroupEnum<DscUi::TUiComponentResourceNodeGroup>(top_owner);
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(component_resource_group, "component_resource_group"));
+    DscDag::IDagOwner* const owner = dynamic_cast<DscDag::IDagOwner*>(component_resource_group);
+    DSC_ASSERT(nullptr != owner, "invalid state");
+
+    {
+        auto clear_colour = in_dag_collection.CreateValueOnValueChange(
             in_construction_helper._clear_colour,
-            DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-            &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "clear colour")));
+            owner
+            );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(clear_colour, "clear_colour"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group, 
+            DscUi::TUiComponentResourceNodeGroup::TClearColour, 
+            clear_colour
+            );
+    }
 
     if (true == in_construction_helper._has_scroll)
     {
-        component_resource_group.SetNodeToken(
+        auto has_manual_scroll_x = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._has_manual_scroll_x,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(has_manual_scroll_x, "has_manual_scroll_x"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::THasManualScrollX,
-            in_dag_collection.CreateValue(
-                in_construction_helper._has_manual_scroll_x,
-                DscDag::CallbackOnValueChange<bool>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll x")));
+            has_manual_scroll_x
+        );
 
-        component_resource_group.SetNodeToken(
+        auto manual_scroll_x = in_dag_collection.CreateValueOnValueChange(
+            0.0f,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(manual_scroll_x, "manual_scroll_x"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TManualScrollX,
-            in_dag_collection.CreateValue(
-                0.0f,
-                DscDag::CallbackOnValueChange<float>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "manual scroll x")));
+            manual_scroll_x
+        );
 
-        component_resource_group.SetNodeToken(
+        auto has_manual_scroll_y = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._has_manual_scroll_y,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(has_manual_scroll_x, "has_manual_scroll_y"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::THasManualScrollY,
-            in_dag_collection.CreateValue(
-                in_construction_helper._has_manual_scroll_y,
-                DscDag::CallbackOnValueChange<bool>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "has manual scroll y")));
+            has_manual_scroll_y
+        );
 
-        component_resource_group.SetNodeToken(
+        auto manual_scroll_y = in_dag_collection.CreateValueOnValueChange(
+            0.0f,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(manual_scroll_y, "manual_scroll_y"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TManualScrollY,
-            in_dag_collection.CreateValue(
-                0.0f,
-                DscDag::CallbackOnValueChange<float>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "manual scroll y")));
+            manual_scroll_y
+        );
     }
 
     if (true == in_construction_helper._has_fill)
     {
-        component_resource_group.SetNodeToken(
+        auto fill_colour = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._fill,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(fill_colour, "fill_colour"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TFillColour,
-            in_dag_collection.CreateValue(
-                in_construction_helper._fill,
-                DscDag::CallbackOnValueChange<DscCommon::VectorFloat4>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "fill colour")));
+            fill_colour
+        );
     }
 
     if (nullptr != in_construction_helper._texture)
     {
-        component_resource_group.SetNodeToken(
+        auto texture = in_dag_collection.CreateValueOnSet(
+            in_construction_helper._fill,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(texture, "texture"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TTexture,
-            in_dag_collection.CreateValue(
-                in_construction_helper._texture,
-                DscDag::CallbackOnSetValue<std::shared_ptr<DscRenderResource::ShaderResource>>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "texture")));
+            texture
+        );
     }
 
     if (nullptr != in_construction_helper._text_run)
     {
         DSC_ASSERT(nullptr != in_construction_helper._text_manager, "invalid state");
-        component_resource_group.SetNodeToken(
+        auto text = in_dag_collection.CreateValueOnSet(
+            DscUi::TUiComponentTextData({ in_construction_helper._text_run , in_construction_helper._text_manager }),
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "text"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TText,
-            in_dag_collection.CreateValue(
-                DscUi::TUiComponentTextData({ in_construction_helper._text_run , in_construction_helper._text_manager }),
-                DscDag::CallbackOnSetValue<DscUi::TUiComponentTextData>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "text")));
+            text
+        );
     }
 
     if (true == in_construction_helper._has_ui_scale_by_avaliable_width)
     {
         const int32 scale_width_low_threashhold = in_construction_helper._scale_width_low_threashhold;
         const float scale_factor = in_construction_helper._scale_factor;
-        component_resource_group.SetNodeToken(
-            DscUi::TUiComponentResourceNodeGroup::TUiScale,
-            in_dag_collection.CreateCalculate<float>([scale_width_low_threashhold, scale_factor](float& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            float ui_scale = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
-            const DscCommon::VectorInt2& avaliable_size = DscDag::DagCollection::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+        auto ui_scale_from_width_node = in_dag_collection.CreateCalculate<float>([scale_width_low_threashhold, scale_factor](float& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            float ui_scale = DscDag::GetValueType<float>(in_input_array[0]);
+            const DscCommon::VectorInt2& avaliable_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
             if (scale_width_low_threashhold < avaliable_size.GetX())
             {
                 ui_scale = (1.0f + (static_cast<float>(avaliable_size.GetX() - scale_width_low_threashhold) * scale_factor));
             }
 
             value = ui_scale;
-        },
-                &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "ui scale from width")));
-        DscDag::DagCollection::LinkIndexNodes(0, in_ui_scale, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
-        //in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize), // ok, this was ment to be the local avaliable size, but have some dependency order issues here
-        DscDag::NodeToken avaliable_size = in_parent.GetNodeToken(TUiNodeGroup::TAvaliableSize);
-        DscDag::DagCollection::LinkIndexNodes(1, avaliable_size, component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale));
+        }, owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_scale_from_width_node, "ui_scale_from_width"));
+        DscDag::LinkIndexNodes(0, in_ui_scale, ui_scale_from_width_node);
+        DscDag::NodeToken avaliable_size = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TAvaliableSize);
+        DscDag::LinkIndexNodes(1, avaliable_size, ui_scale_from_width_node);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TUiScale,
+            ui_scale_from_width_node
+        );
     }
     else
     {
-        component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TUiScale, in_ui_scale);
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TUiScale,
+            in_ui_scale
+        );
+
     }
 
     if (true == in_construction_helper._has_child_slot_data)
     {
-        component_resource_group.SetNodeToken(
+        auto child_slot_size = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._child_size,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(child_slot_size, "child_slot_size"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TChildSlotSize,
-            in_dag_collection.CreateValue(
-                in_construction_helper._child_size,
-                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "child slot size")));
-        component_resource_group.SetNodeToken(
+            child_slot_size
+        );
+
+        auto child_slot_pivot = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._child_pivot,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(child_slot_pivot, "child_slot_pivot"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TChildSlotPivot,
-            in_dag_collection.CreateValue(
-                in_construction_helper._child_pivot,
-                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "child slot pivot")));
-        component_resource_group.SetNodeToken(
+            child_slot_pivot
+        );
+
+        auto child_slot_parent_attach = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._attach_point,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(child_slot_parent_attach, "child_slot_parent_attach"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TChildSlotParentAttach,
-            in_dag_collection.CreateValue(
-                in_construction_helper._attach_point,
-                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "child slot parent attach")));
+            child_slot_parent_attach
+        );
     }
 
     if (true == in_construction_helper._has_desired_size)
     {
-        component_resource_group.SetNodeToken(
+        auto desired_size = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._desired_size,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(desired_size, "desired_size"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TDesiredSize,
-            in_dag_collection.CreateValue(
-                in_construction_helper._desired_size,
-                DscDag::CallbackOnValueChange<DscUi::VectorUiCoord2>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "desired size")));
+            desired_size
+        );
     }
 
     if (true == in_construction_helper._has_padding)
     {
-        component_resource_group.SetNodeToken(
+        auto padding_left = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._padding_left,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(padding_left, "padding_left"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TPaddingLeft,
-            in_dag_collection.CreateValue(
-                in_construction_helper._padding_left,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "padding left")));
-        component_resource_group.SetNodeToken(
-            DscUi::TUiComponentResourceNodeGroup::TPaddingTop,
-            in_dag_collection.CreateValue(
-                in_construction_helper._padding_top,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "padding top")));
-        component_resource_group.SetNodeToken(
+            padding_left
+        );
+
+        auto padding_right = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._padding_right,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(padding_right, "padding_right"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TPaddingRight,
-            in_dag_collection.CreateValue(
-                in_construction_helper._padding_right,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "padding right")));
-        component_resource_group.SetNodeToken(
+            padding_right
+        );
+
+        auto padding_top = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._padding_top,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(padding_top, "padding_top"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TPaddingTop,
+            padding_top
+        );
+
+        auto padding_bottom = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._padding_bottom,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(padding_bottom, "padding_bottom"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TPaddingBottom,
-            in_dag_collection.CreateValue(
-                in_construction_helper._padding_bottom,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "padding bottom")));
+            padding_bottom
+        );
     }
 
     if (true == in_construction_helper._has_gap)
     {
-        component_resource_group.SetNodeToken(
+        auto gap = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._gap,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(gap, "gap"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TGap,
-            in_dag_collection.CreateValue(
-                in_construction_helper._gap,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "gap")));
+            gap
+        );
     }
 
     if (true == in_construction_helper._has_gradient_fill)
     {
-        component_resource_group.SetNodeToken(
+        auto gradient_fill = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._gradient_fill_constant_buffer,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(gradient_fill, "gradient fill"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TGradientFill,
-            in_dag_collection.CreateValue(
-                in_construction_helper._gradient_fill_constant_buffer,
-                DscDag::CallbackOnValueChange<DscUi::TGradientFillConstantBuffer>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "gradient fill")));
+            gradient_fill
+        );
     }
 
     if (true == in_construction_helper._has_multi_gradient_fill)
     {
-        DscDag::NodeToken node = in_dag_collection.CreateCalculate<DscUi::TGradientFillConstantBuffer>([](DscUi::TGradientFillConstantBuffer& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        auto gradient_fill = in_dag_collection.CreateCalculate<DscUi::TGradientFillConstantBuffer>([](DscUi::TGradientFillConstantBuffer& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 if (nullptr == in_input_array[0])
                 {
                     // do we need a warning
                     DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "multi gradent without a parent input state");
                     return;
                 }
-                const TUiInputStateFlag input_state = DscDag::DagCollection::GetValueType<TUiInputStateFlag>(in_input_array[0]);
-                const std::vector<DscUi::TGradientFillConstantBuffer>& array_gradient = DscDag::DagCollection::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_input_array[1]);
+                const TUiInputStateFlag input_state = DscDag::GetValueType<TUiInputStateFlag>(in_input_array[0]);
+                const std::vector<DscUi::TGradientFillConstantBuffer>& array_gradient = DscDag::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_input_array[1]);
 
                 const int32 index = static_cast<int32>(input_state);
                 DSC_ASSERT((0 <= index) && (index < static_cast<int32>(array_gradient.size())), "invalid state");
                 value = array_gradient[index];
-            },
-            &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "gradient fill calculate"));
+            }, 
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(gradient_fill, "gradient fill calculate"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TGradientFill,
+            gradient_fill
+        );
 
-        const DscUi::UiComponentResourceNodeGroup& parent_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources));
-        DscDag::DagCollection::LinkIndexNodes(0, parent_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputStateFlag), node); // set with the parent TUiInputStateFlag
+        DscDag::NodeToken parent_resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TUiComponentResources);
+        DscDag::NodeToken parent_input_state_flag = DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_group, TUiComponentResourceNodeGroup::TInputStateFlag);
+        DscDag::LinkIndexNodes(0, parent_input_state_flag, gradient_fill); // set with the parent TUiInputStateFlag
 
         DSC_ASSERT(nullptr != in_construction_helper._multi_gradient_fill_node, "invalid param");
         // is there a better way to check type?
-        DscDag::DagCollection::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_construction_helper._multi_gradient_fill_node);
-        DscDag::DagCollection::LinkIndexNodes(1, in_construction_helper._multi_gradient_fill_node, node);
-
-        component_resource_group.SetNodeToken(
-            DscUi::TUiComponentResourceNodeGroup::TGradientFill,
-            node);
+        DscDag::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_construction_helper._multi_gradient_fill_node);
+        DscDag::LinkIndexNodes(1, in_construction_helper._multi_gradient_fill_node, gradient_fill);
     }
 
     if (DscUi::TUiFlow::TCount != in_construction_helper._flow_direction)
     {
-        component_resource_group.SetNodeToken(
+        auto flow_direction = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._flow_direction,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(flow_direction, "flow_direction"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TFlow,
-            in_dag_collection.CreateValue(
-                in_construction_helper._flow_direction,
-                DscDag::CallbackOnValueChange<DscUi::TUiFlow>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "flow direction")));
+            flow_direction
+        );
     }
 
     if (true == in_construction_helper._has_child_stack_data)
     {
-        component_resource_group.SetNodeToken(
+        auto stack_size = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._stack_size,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(stack_size, "child stack size"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TChildStackSize,
-            in_dag_collection.CreateValue(
-                in_construction_helper._stack_size,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "child stack size")));
-        component_resource_group.SetNodeToken(
+            stack_size
+        );
+
+        auto stack_pivot = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._stack_pivot,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(stack_pivot, "child stack pivot"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TChildStackPivot,
-            in_dag_collection.CreateValue(
-                in_construction_helper._stack_pivot,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "child stack pivot")));
-        component_resource_group.SetNodeToken(
+            stack_pivot
+        );
+
+        auto stack_parent_attach = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._stack_parent_attach_point,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(stack_parent_attach, "child stack parent attach"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TChildStackParentAttach,
-            in_dag_collection.CreateValue(
-                in_construction_helper._stack_parent_attach_point,
-                DscDag::CallbackOnValueChange<DscUi::UiCoord>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "child stack parent attach")));
+            stack_parent_attach
+        );
     }
 
     if (true == in_construction_helper._has_input)
     {
-        component_resource_group.SetNodeToken(
+        auto input_state_flag = in_dag_collection.CreateValueOnValueChange(
+            DscUi::TUiInputStateFlag::TNone,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_state_flag, "input state flag"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TInputStateFlag,
-            in_dag_collection.CreateValue(
-                DscUi::TUiInputStateFlag::TNone,
-                DscDag::CallbackOnValueChange<DscUi::TUiInputStateFlag>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "input state flag")));
+            input_state_flag
+        );
 
         if (nullptr != in_construction_helper._input_click_callback)
         {
-            component_resource_group.SetNodeToken(
+            auto input_data = in_dag_collection.CreateValueNone(
+                DscUi::TUiComponentInputData({ in_construction_helper._input_click_callback }),
+                owner
+            );
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_data, "input data"));
+            DscDag::DagNodeGroup::SetNodeTokenEnum(
+                component_resource_group,
                 DscUi::TUiComponentResourceNodeGroup::TInputData,
-                in_dag_collection.CreateValue(
-                    DscUi::TUiComponentInputData({ in_construction_helper._input_click_callback}),
-                    DscDag::CallbackNever<DscUi::TUiComponentInputData>::Function,
-                    &component_resource_group
-                    DSC_DEBUG_ONLY(DSC_COMMA "input data")));
+                input_data
+            );
         }
     }
 
     if (true == in_construction_helper._has_input_rollover_accumulate)
     {
-        component_resource_group.SetNodeToken(
+        auto input_rollover_accumulate = in_dag_collection.CreateValueOnValueChange(
+            DscUi::TUiInputStateFlag::TNone,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_rollover_accumulate, "input_rollover_accumulate"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TInputRolloverAccumulate,
-            in_dag_collection.CreateValue(
-                0.0f,
-                DscDag::CallbackOnValueChange<float>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "input rollover accumulate")));
+            input_rollover_accumulate
+        );
     }
 
     if (true == in_construction_helper._has_input_active_touch_pos)
     {
-        component_resource_group.SetNodeToken(
-        DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos,
-        in_dag_collection.CreateValue(
+        auto input_active_touch_pos = in_dag_collection.CreateValueOnValueChange(
             DscCommon::VectorFloat2::s_zero,
-            // possibly not ideal, dont want render made dirty by mouse movement OUTSIDE a button, but want to react to rollover
-            // better would be to unlink depending on a conditional like for rollover accumulate, but being laze and just not updating on change
-            //DscDag::CallbackOnValueChange<DscCommon::VectorFloat2>::Function,
-            DscDag::CallbackNever<DscCommon::VectorFloat2>::Function,
-            &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "input rollover accumulate")));
-
-        //  or, we could use the TInputRolloverAccumulate. or both
-        // hook up the 
-        //const DscUi::UiComponentResourceNodeGroup& parent_resource_group = DscDag::DagCollection::GetValueType<DscUi::UiComponentResourceNodeGroup>(in_parent.GetNodeToken(DscUi::TUiNodeGroup::TUiComponentResources));
-        //DscDag::NodeToken parent_input_state = parent_resource_group.GetNodeToken(TUiComponentResourceNodeGroup::TInputStateFlag);
-        //DSC_ASSERT(nullptr != parent_input_state, "invalid state");
-        // can we just link to the parent input state?
-        //component_resource_group.SetNodeToken(DscUi::TUiComponentResourceNodeGroup::TInputStateFlag, parent_input_state);
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_active_touch_pos, "input_active_touch_pos"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos,
+            input_active_touch_pos
+        );
     }
 
     if (true == in_construction_helper._has_crossfade_child_amount) 
     {
-        component_resource_group.SetNodeToken(
+        auto crossfade_child_amount = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._crossfade_child_amount,
+            owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(crossfade_child_amount, "crossfade_child_amount"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount,
-            in_dag_collection.CreateValue(
-                in_construction_helper._crossfade_child_amount,
-                DscDag::CallbackOnValueChange<float>::Function,
-                &component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "crossfade child amount")));
+            crossfade_child_amount
+        );
 
-        in_self.SetNodeToken(
+        auto crossfade_child_panel_tint = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                float amount = DscDag::GetValueType<float>(in_input_array[0]);
+                amount = sqrt(amount);
+                value = DscCommon::VectorFloat4(amount, amount, amount, amount);
+            },
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(crossfade_child_panel_tint, "crossfade_child_panel_tint"));
+        DscDag::LinkIndexNodes(0,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(crossfade_child_panel_tint, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount),
+            crossfade_child_panel_tint);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            in_owner,
             DscUi::TUiNodeGroup::TUiPanelTint,
-            in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-                    float amount = DscDag::DagCollection::GetValueType<float>(in_input_array[0]);
-                    amount = sqrt(amount);
-                    value = DscCommon::VectorFloat4(amount, amount, amount, amount);
-                },
-                & component_resource_group
-                DSC_DEBUG_ONLY(DSC_COMMA "crossfade child panel tint")));
-
-        DscDag::DagCollection::LinkIndexNodes(0,
-            component_resource_group.GetNodeToken(DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount),
-            in_self.GetNodeToken(DscUi::TUiNodeGroup::TUiPanelTint));
+            crossfade_child_panel_tint
+        );
     }
 
     // the crossfade, on a change to TUiRootNodeGroup::TArrayChildUiNodeGroup, how do we set the child crossfade amount
     // we need tick, child array, and the _crossfade_active_child node
     if (nullptr != in_construction_helper._crossfade_active_child)
     {
-        //condition node - if the state of the 
         DscDag::NodeToken condition = in_dag_collection.CreateCalculate<bool>([](bool& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-                const DscDag::NodeToken child_active_draw_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[0]);
-                const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[1]);
-            
+                const DscDag::NodeToken child_active_draw_node = DscDag::GetValueType<DscDag::NodeToken>(in_input_array[0]);
+                const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[1]);
+
                 bool data_correct = true;
                 for (const auto& child : child_array)
                 {
-                    const bool active = child.GetNodeToken(TUiNodeGroup::TDrawNode) == child_active_draw_node;
-                    const UiComponentResourceNodeGroup& child_resource_node_group = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(child.GetNodeToken(TUiNodeGroup::TUiComponentResources));
-                    DscDag::NodeToken child_crossfade_amount_node = child_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
-                    const float cross_fade_amount = DscDag::DagCollection::GetValueType<float>(child_crossfade_amount_node);
+                    const bool active = DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TDrawNode) == child_active_draw_node;
+                    DscDag::NodeToken child_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TUiComponentResources);
+                    DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+                    const float cross_fade_amount = DscDag::GetValueType<float>(child_crossfade_amount_node);
                     if (true == active)
                     {
                         data_correct &= (1.0f == cross_fade_amount);
@@ -382,61 +485,61 @@ DscUi::UiComponentResourceNodeGroup DscUi::MakeComponentResourceGroup(
                 // we return true when the data is not correct, and fade needs to be adjusted
                 out_value = (false == data_correct);
             },
-            & component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "crossfade condition"));
-        DscDag::DagCollection::LinkIndexNodes(0, in_construction_helper._crossfade_active_child, condition);
-        DscDag::DagCollection::LinkIndexNodes(1, in_self.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), condition);
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(condition, "crossfade condition"));
 
-        DscDag::NodeToken pass_along_tick = in_dag_collection.CreateValue<float>(
+        DscDag::LinkIndexNodes(0, in_construction_helper._crossfade_active_child, condition);
+        DscDag::LinkIndexNodes(
+            1,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_owner, TUiNodeGroup::TArrayChildUiNodeGroup),
+            condition);
+
+        DscDag::NodeToken pass_along_tick = in_dag_collection.CreateValueNotZero<float>(
             0.0f,
-            DscDag::CallbackNotZero<float>::Function,
-            &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "pass along tick"));
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(pass_along_tick, "pass_along_tick"));
 
-        in_dag_collection.CreateCondition(
+        in_dag_collection.CreateCondition<float, bool>(
             condition,
             in_time_delta,
             nullptr,
             pass_along_tick,
             nullptr,
-            &component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "crossfade condition node"));
+            owner);
 
         DscDag::NodeToken crossfade_node = in_dag_collection.CreateCalculate<bool>([](bool& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            const DscDag::NodeToken child_active_draw_node = DscDag::DagCollection::GetValueType<DscDag::NodeToken>(in_input_array[0]);
-            const std::vector<UiNodeGroup>& child_array = DscDag::DagCollection::GetValueType<std::vector<UiNodeGroup>>(in_input_array[1]);
-            const float time_deta = DscDag::DagCollection::GetValueType<float>(in_input_array[2]);
+            const DscDag::NodeToken child_active_draw_node = DscDag::GetValueType<DscDag::NodeToken>(in_input_array[0]);
+            const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[1]);
+            const float time_deta = DscDag::GetValueType<float>(in_input_array[2]);
 
             for (const auto& child : child_array)
             {
-                const bool active = child.GetNodeToken(TUiNodeGroup::TDrawNode) == child_active_draw_node;
-                const UiComponentResourceNodeGroup& child_resource_node_group = DscDag::DagCollection::GetValueType<UiComponentResourceNodeGroup>(child.GetNodeToken(TUiNodeGroup::TUiComponentResources));
-                DscDag::NodeToken child_crossfade_amount_node = child_resource_node_group.GetNodeToken(TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
-                float cross_fade_amount = DscDag::DagCollection::GetValueType<float>(child_crossfade_amount_node);
+                const bool active = DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TDrawNode) == child_active_draw_node;
+                DscDag::NodeToken child_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TUiComponentResources);
+                DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+                float cross_fade_amount = DscDag::GetValueType<float>(child_crossfade_amount_node);
                 cross_fade_amount += (active ? time_deta : -time_deta);
                 cross_fade_amount = std::clamp(cross_fade_amount, 0.0f, 1.0f);
-                DscDag::DagCollection::SetValueType<float>(child_crossfade_amount_node, cross_fade_amount);
+                DscDag::SetValueType<float>(child_crossfade_amount_node, cross_fade_amount);
             }
 
             value = true;
         },
-            & component_resource_group
-            DSC_DEBUG_ONLY(DSC_COMMA "crossfade calculate child fade amount"));
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(crossfade_node, "crossfade calculate child fade amount"));
 
-        DscDag::DagCollection::LinkIndexNodes(0, in_construction_helper._crossfade_active_child, crossfade_node);
-        DscDag::DagCollection::LinkIndexNodes(1, in_self.GetNodeToken(TUiNodeGroup::TArrayChildUiNodeGroup), crossfade_node);
-        DscDag::DagCollection::LinkIndexNodes(2, pass_along_tick, crossfade_node);
+        DscDag::LinkIndexNodes(0, in_construction_helper._crossfade_active_child, crossfade_node);
+        DscDag::LinkIndexNodes(
+            1,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_owner, TUiNodeGroup::TArrayChildUiNodeGroup),
+            crossfade_node);
+        DscDag::LinkIndexNodes(2, pass_along_tick, crossfade_node);
 
-        component_resource_group.SetNodeToken(
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TCrossfadeNode,
             crossfade_node
-            );
-
-        //CAN not do this yet, TDrawBaseNode not set
-        // set the cross fade as a dependency of the cross fade base draw. 
-        // Warning, this will dirty the CrossFade EVERY time tick is set. how can we do better? some sort of condition looking at if the cross fade needs to be updated, which hooks up the time delta?
-        //DscDag::DagCollection::LinkNodes(crossfade_node, in_self.GetNodeToken(TUiNodeGroup::TDrawBaseNode));
-
+        );
     }
 
     return component_resource_group;

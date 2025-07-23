@@ -13,8 +13,8 @@ namespace DscDag
 	public:
 		DagNodeNode(NodeToken in_node_or_null);
 
-		NodeToken Get() const;
-		void Set(NodeToken in_node_or_null);
+		NodeToken GetValue() const;
+		void SetValue(NodeToken in_node_or_null);
 
 	private:
 		virtual void MarkDirty() override;

@@ -19,9 +19,10 @@ namespace DscCommon
 
 namespace DscDag
 {
-	class DagCollection;
-	class IDagNode;
-	typedef IDagNode* NodeToken;
+    class DagCollection;
+    class IDagNode;
+    class IDagOwner;
+    typedef IDagNode* NodeToken;
 }
 
 namespace DscRender
@@ -71,7 +72,7 @@ namespace DscUi
             DscDag::DagCollection& in_dag_collection,
             DscDag::NodeToken in_clear_colour,
             DscDag::NodeToken in_request_size_node,
-            DscUi::UiComponentResourceNodeGroup& in_component_resource_group
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeEffectDrawNode(
@@ -86,7 +87,7 @@ namespace DscUi
             DscDag::NodeToken in_effect_tint,
             const std::vector<DscDag::NodeToken>& in_array_input_stack,
             const int32 in_input_texture_count,
-            DscUi::UiComponentResourceNodeGroup& in_component_resource_group
+            DscDag::IDagOwner* const in_owner
             DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name));
 
         DscDag::NodeToken MakeEffectBurnBlotDrawNode(
@@ -100,16 +101,16 @@ namespace DscUi
             DscDag::NodeToken in_effect_param,
             DscDag::NodeToken in_effect_tint,
             const std::vector<DscDag::NodeToken>& in_array_input_stack,
-            DscUi::UiComponentResourceNodeGroup& in_component_resource_group
+            DscDag::IDagOwner* const in_owner
             DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name));
 
         DscDag::NodeToken MakeAvaliableSize(
             DscDag::DagCollection& in_dag_collection,
             DscDag::NodeToken in_parent_avaliable_size,
             DscDag::NodeToken in_ui_scale,
-            const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
-            const DscUi::UiComponentResourceNodeGroup& in_parent_component_resource_group,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::NodeToken in_component_resource_group,
+            DscDag::NodeToken in_parent_component_resource_group,
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeDesiredSize(
@@ -119,42 +120,42 @@ namespace DscUi
             DscDag::NodeToken in_ui_scale,
             DscDag::NodeToken in_avaliable_size,
             DscDag::NodeToken in_array_child_node_group,
-            const DscUi::UiComponentResourceNodeGroup& in_resource_node_group,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::NodeToken in_resource_node_group,
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeRenderRequestSize(
             DscDag::DagCollection& in_dag_collection,
             DscDag::NodeToken in_desired_size,
             DscDag::NodeToken in_geometry_size_size,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeGeometrySize(
             DscDag::DagCollection& in_dag_collection,
-            const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
-            const DscUi::UiComponentResourceNodeGroup& in_parent_component_resource_group,
+            DscDag::NodeToken in_component_resource_group,
+            DscDag::NodeToken in_parent_component_resource_group,
             DscDag::NodeToken in_desired_size,
             DscDag::NodeToken in_avaliable_size,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeGeometryOffset(
             DscDag::DagCollection& in_dag_collection,
-            const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
-            const DscUi::UiComponentResourceNodeGroup& in_parent_component_resource_group,
+            DscDag::NodeToken in_component_resource_group,
+            DscDag::NodeToken in_parent_component_resource_group,
             DscDag::NodeToken in_parent_avaliable_size,
             DscDag::NodeToken in_ui_scale,
             DscDag::NodeToken in_geometry_size,
             DscDag::NodeToken in_parent_array_child_ui_node_group,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeNodePixelTraversal(
             DscDag::DagCollection& in_dag_collection,
             DscDag::NodeToken in_geometry_size,
             DscDag::NodeToken in_render_request_size,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         /// note: the automatic scroll, to do pingpoing without state, traverses a range of [-1 ... 1] and is passed through an abs() function
@@ -163,10 +164,10 @@ namespace DscUi
         /// and likewise, the screen space calculation that conume scroll need to abs() the scroll values
         DscDag::NodeToken MakeNodeScrollValue(
             DscDag::DagCollection& in_dag_collection,
-            const DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
+            DscDag::NodeToken in_component_resource_group,
             DscDag::NodeToken in_time_delta,
             DscDag::NodeToken in_pixel_traversal_node,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeScreenSpace(
@@ -177,7 +178,7 @@ namespace DscUi
             DscDag::NodeToken in_geometry_offset,
             DscDag::NodeToken in_render_request_size,
             DscDag::NodeToken in_scroll,
-            DscUi::UiNodeGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         DscDag::NodeToken MakeLerpFloat4(
@@ -185,25 +186,27 @@ namespace DscUi
             DscDag::NodeToken in_amount,
             DscDag::NodeToken in_value_0,
             DscDag::NodeToken in_value_1,
-            DscDag::IDagGroup& in_owner_group
+            DscDag::IDagOwner* const in_owner
         );
 
         void MakeEffectParamTintBlotNode(
             DscDag::NodeToken& out_effect_param,
             DscDag::NodeToken& out_effect_tint,
             DscDag::DagCollection& in_dag_collection,
-            const DscUi::UiRootNodeGroup& in_root_node_group,
-            const DscUi::UiNodeGroup& in_parent_node_group,
-            DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
-            const UiManager::TEffectConstructionHelper& in_effect_data
+            DscDag::NodeToken in_root_node_group,
+            DscDag::NodeToken in_parent_node_group,
+            DscDag::NodeToken in_component_resource_group,
+            const UiManager::TEffectConstructionHelper& in_effect_data,
+            DscDag::IDagOwner* const in_owner
         );
 
         void MakeEffectParamTintNode(
             DscDag::NodeToken& out_effect_param,
             DscDag::NodeToken& out_effect_tint,
             DscDag::DagCollection& in_dag_collection,
-            DscUi::UiComponentResourceNodeGroup& in_component_resource_group,
-            const UiManager::TEffectConstructionHelper& in_effect_data
+            DscDag::NodeToken in_component_resource_group,
+            const UiManager::TEffectConstructionHelper& in_effect_data,
+            DscDag::IDagOwner* const in_owner
         );
 
 	} // Make Node

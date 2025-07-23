@@ -186,7 +186,7 @@ const bool Application::Update()
                 DscDag::NodeToken draw_b = _resources->_ui_crossfade_child_b.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode);
 
                 DscDag::NodeToken active_child = nullptr;
-                if (draw_a == DscDag::DagCollection::GetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child))
+                if (draw_a == DscDag::GetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child))
                 {
                     active_child = draw_b;
                 }

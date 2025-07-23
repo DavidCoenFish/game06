@@ -17,6 +17,7 @@
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_render_target.h>
 #include <dsc_ui/ui_input_state.h>
+#include <dsc_ui/component_construction_helper.h>
 #include <dsc_locale/dsc_locale.h>
 #include <dsc_png/dsc_png.h>
 #include <dsc_text/text_manager.h>
@@ -215,16 +216,14 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
 
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
-            DscUi::UiManager::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
+            DscUi::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
             *_draw_system,
             *_resources->_dag_collection,
             top_texture
         );
 
-        auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*_resources->_dag_collection, _resources->_ui_root_node_group);
-
         _resources->_ui_manager->AddChildNode(
-            DscUi::UiManager::MakeComponentDebugGrid().SetChildSlot(
+            DscUi::MakeComponentDebugGrid().SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
@@ -232,13 +231,15 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
 
         _resources->_ui_manager->AddChildNode(
-            DscUi::UiManager::MakeComponentFill(DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f)).SetChildSlot(
+            DscUi::MakeComponentFill(
+                DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f)
+            ).SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(512, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(32, 0.0f), DscUi::UiCoord(192, 0.0f))
@@ -246,13 +247,13 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
             );
 
         _resources->_ui_manager->AddChildNode(
-            DscUi::UiManager::MakeComponentText(
+            DscUi::MakeComponentText(
                 MakeTextRun(*_resources->_text_manager, *_file_system),
                 _resources->_text_manager.get()
             ).SetClearColour(
@@ -265,7 +266,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
@@ -303,8 +304,6 @@ const bool Application::Update()
                 *_resources->_dag_collection,
                 *frame,
                 true, //false,
-                0.0f,
-                DscUi::UiInputState(),
                 _draw_system->GetRenderTargetBackBuffer()
             );
         }

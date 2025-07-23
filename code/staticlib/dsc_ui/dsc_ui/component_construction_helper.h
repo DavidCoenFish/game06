@@ -118,7 +118,7 @@ namespace DscUi
 		bool _desired_size_from_children_max = false; // otherwise from text? or matches avaliable
 
 		bool _has_input = false;
-		std::function<void(const UiComponentResourceNodeGroup&)> _input_click_callback = {};
+		std::function<void(DscDag::NodeToken)> _input_click_callback = {};
 		bool _has_input_rollover_accumulate = false;
 		bool _has_input_active_touch_pos = false;
 
@@ -194,7 +194,7 @@ namespace DscUi
 		}
 
 		ComponentConstructionHelper& SetInputData(
-			const std::function<void(const UiComponentResourceNodeGroup&)>& in_click_callback_or_none = {},
+			const std::function<void(DscDag::NodeToken)>& in_click_callback_or_none = {},
 			const bool in_has_input_rollover_accumulate = false,
 			const bool in_has_input_active_touch_pos = false
 		)
@@ -226,13 +226,13 @@ namespace DscUi
 	};
 
 	// is passing tick and in_self overkill for the crossfade, should this be moved out~ but want the crossfade active child node
-	UiComponentResourceNodeGroup MakeComponentResourceGroup(
+	DscDag::NodeToken MakeComponentResourceGroup(
 		DscDag::DagCollection& in_dag_collection,
 		const ComponentConstructionHelper& in_construction_helper,
 		DscDag::NodeToken in_time_delta,
 		DscDag::NodeToken in_ui_scale,
-		const UiNodeGroup& in_parent,
-		UiNodeGroup& in_self
+		DscDag::NodeToken in_parent,
+		DscDag::NodeToken in_self
 	);
 
 	ComponentConstructionHelper MakeComponentDebugGrid();

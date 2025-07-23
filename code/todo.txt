@@ -28,32 +28,6 @@ UiInstance(UiDagNodeGroup::TDataSource, UiManager, DrawSystem, DagCollection, <e
 static AddTemplate(string, function), or have a UiInstanceManager own the UiManager, DagCollection, map of strings to templates
 UiInstanceFactory? owns a UiManager? or given reference
 
-IDagNode
-	MarkDirty // any input can invoke mark dirty on us, if we become dirty, we also tell our output to MarkDirty
-	AddOutput
-	RemoveOutput
-	Update // undirty/ calculate if dirty
-	DebugPrintRecurseInputs (depth) print node and all inputs
-	DebugPrintRecurseOutputs (depth) print node and all outputs
-	DebugSetName
-	static s_print_value
-	//SetFromNode ? conditional doesn't have awarness of types, or Condition needs to know true/ false source type...
-IDagOwner
-	virtual void AddOwnership(NodeToken in_node_token) = 0;
-
-DagNodeValue (template)
-DagNodeCalculate (template)
-DagNodeCondition (template, true/ false source types. Inputs condition, true source, true destination, false source, false destination)
-DagNodeGroup (template on enum index type. Point of ownership of nodes, if child marked dirty, it dirties the DagNodeGroup)
-DagNodeArray (a std::vector of IDagNode*, which mark the DagNodeArray as dirty when they are marked dirty, and changes to size or item in array marks array output as dirty)
-	push, pop, set_at_index, get_count, get_at_index
-
-dsc_dag\accessor.h
-DscDag::GetValue<type>(node token)
-DscDag::GetValueAt<type>(node token, index)
-DscDag::SetValue<IN_TYPE>(node token, const IN_TYPE& in_value)
-DscDag::SetValueAt<IN_TYPE>(node token, index, const IN_TYPE& in_value)
-
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 
 //legendary quest sandbox?

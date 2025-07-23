@@ -5,6 +5,9 @@
 
 namespace DscDag
 {
+	const std::vector<NodeToken>& GetValueNodeArray(NodeToken in_input);
+	NodeToken GetValueNode(NodeToken in_input);
+
 	template <typename IN_TYPE>
 	static const IN_TYPE& GetValueType(NodeToken in_input)
 	{

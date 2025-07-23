@@ -4,6 +4,7 @@
 #include "accessor.h"
 #include "link.h"
 #include <dsc_common\dsc_common.h>
+#include <dsc_common\debug_print.h>
 
 namespace DscDag
 {
@@ -229,21 +230,21 @@ namespace DscDag
 			{
 				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "condition:\n";
-				result += _condition->DebugPrint(in_depth + 2);
+				result += _condition->DebugPrintRecurseInputs(in_depth + 2);
 			}
 
 			if (nullptr != _true_source)
 			{
 				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "true_source:\n";
-				result += _true_source->DebugPrint(in_depth + 2);
+				result += _true_source->DebugPrintRecurseInputs(in_depth + 2);
 			}
 
 			if (nullptr != _false_source)
 			{
 				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "false_source:\n";
-				result += _false_source->DebugPrint(in_depth + 2);
+				result += _false_source->DebugPrintRecurseInputs(in_depth + 2);
 			}
 
 			return result;
@@ -261,14 +262,14 @@ namespace DscDag
 			{
 				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "true_destination:\n";
-				result += _true_destination->DebugPrint(in_depth + 2);
+				result += _true_destination->DebugPrintRecurseOutputs(in_depth + 2);
 			}
 
 			if (nullptr != _false_destination)
 			{
 				result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
 				result += "false_destination:\n";
-				result += _false_destination->DebugPrint(in_depth + 2);
+				result += _false_destination->DebugPrintRecurseOutputs(in_depth + 2);
 			}
 
 			if (0 < _output.size())
@@ -279,7 +280,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						result += item->DebugPrint(in_depth + 2);
+						result += item->DebugPrintRecurseOutputs(in_depth + 2);
 					}
 				}
 			}

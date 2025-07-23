@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_ui.h"
 #include "ui_enum.h"
+#include <dsc_common\vector_int2.h>
 
 namespace DscCommon
 {

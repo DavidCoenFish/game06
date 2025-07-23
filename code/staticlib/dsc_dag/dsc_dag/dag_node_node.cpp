@@ -7,12 +7,12 @@ DscDag::DagNodeNode::DagNodeNode(NodeToken in_node_or_null)
 	//nop
 }
 
-DscDag::NodeToken DscDag::DagNodeNode::Get() const
+DscDag::NodeToken DscDag::DagNodeNode::GetValue() const
 {
 	return _node;
 }
 
-void DscDag::DagNodeNode::Set(NodeToken in_node_or_null)
+void DscDag::DagNodeNode::SetValue(NodeToken in_node_or_null)
 {
 	if (_node == in_node_or_null)
 	{

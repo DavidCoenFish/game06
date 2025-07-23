@@ -14,7 +14,7 @@ bool DscDag::DagCollection::RawPtrComparator::operator()(const std::unique_ptr<D
 
 DscDag::NodeToken DscDag::DagCollection::CreateNode(
 	NodeToken in_node_or_null,
-	IDagOwner* in_dag_owner_or_nullptr
+	IDagOwner* const in_dag_owner_or_nullptr
 )
 {
 	auto node = std::make_unique<DagNodeNode>(in_node_or_null);
@@ -29,7 +29,7 @@ DscDag::NodeToken DscDag::DagCollection::CreateNode(
 
 DscDag::NodeToken DscDag::DagCollection::CreateNodeArray(
 	const std::vector<NodeToken>& in_node_token_array,
-	IDagOwner* in_dag_owner_or_nullptr
+	IDagOwner* const in_dag_owner_or_nullptr
 	)
 {
 	auto node = std::make_unique<DagNodeNodeArray>(in_node_token_array);
@@ -45,7 +45,7 @@ DscDag::NodeToken DscDag::DagCollection::CreateNodeArray(
 DscDag::NodeToken DscDag::DagCollection::CreateGroup(
 	const int32 in_size, 
 	const TValidateFunction& in_validate_function,
-	IDagOwner* in_dag_owner_or_nullptr
+	IDagOwner* const in_dag_owner_or_nullptr
 	)
 {
 	auto node = std::make_unique<DagNodeGroup>(in_size, in_validate_function);

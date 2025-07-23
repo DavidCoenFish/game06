@@ -19,17 +19,21 @@ namespace DscDag
 		//create a node to hold a node. to create a node to hold a value, see CreateValue
 		NodeToken CreateNode(
 			NodeToken in_node_or_null,
-			IDagOwner* in_dag_owner_or_nullptr = nullptr
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
 			);
+		NodeToken CreateNodeArrayEmpty(IDagOwner* const in_dag_owner_or_nullptr = nullptr)
+		{
+			return CreateNodeArray(std::vector<NodeToken>(), in_dag_owner_or_nullptr);
+		}
 		NodeToken CreateNodeArray(
 			const std::vector<NodeToken>& in_node_token_array = std::vector<NodeToken>(),
-			IDagOwner* in_dag_owner_or_nullptr = nullptr
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
 		);
 
 		template <typename IN_TYPE>
 		NodeToken CreateCalculate(
 			const typename DagNodeCalculate<IN_TYPE>::TCalculateFunction& in_calculate,
-			IDagOwner* in_dag_owner_or_nullptr = nullptr
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
 		)
 		{
 			auto node = std::make_unique<DagNodeCalculate<IN_TYPE>>(in_calculate);
@@ -52,7 +56,7 @@ namespace DscDag
 			NodeToken in_false_source,
 			NodeToken in_true_destination,
 			NodeToken in_false_destination,
-			IDagOwner* in_dag_owner_or_nullptr = nullptr
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
 		)
 		{
 			auto node = std::make_unique<DagNodeCondition<IN_TYPE_TRUE, IN_TYPE_FALSE>>(
@@ -71,9 +75,8 @@ namespace DscDag
 			return node_token;
 		}
 
-		typedef std::function<const bool(const std::type_info&)> TValidateFunction;
 		template <typename IN_ENUM>
-		NodeToken CreateGroupEnum(IDagOwner* in_dag_owner_or_nullptr = nullptr)
+		NodeToken CreateGroupEnum(IDagOwner* const in_dag_owner_or_nullptr = nullptr)
 		{
 			return CreateGroup(
 				static_cast<int32>(IN_ENUM::TCount),
@@ -81,13 +84,23 @@ namespace DscDag
 				in_dag_owner_or_nullptr
 			);
 		}
-		NodeToken CreateGroup(const int32 in_size, const TValidateFunction& in_validate_function, IDagOwner* in_dag_owner_or_nullptr = nullptr);
+		template <typename IN_ENUM_SUPER_SET, typename IN_ENUM_SUB_SET>
+		NodeToken CreateGroupEnum(IDagOwner* const in_dag_owner_or_nullptr = nullptr)
+		{
+			return CreateGroup(
+				static_cast<int32>(IN_ENUM_SUPER_SET::TCount),
+				ValidateTwoType<IN_ENUM_SUPER_SET, IN_ENUM_SUB_SET>::Function,
+				in_dag_owner_or_nullptr
+			);
+		}
+		typedef std::function<const bool(const std::type_info&)> TValidateFunction;
+		NodeToken CreateGroup(const int32 in_size, const TValidateFunction& in_validate_function, IDagOwner* const in_dag_owner_or_nullptr = nullptr);
 
 		template <typename IN_TYPE>
 		NodeToken CreateValue(
 			const IN_TYPE& in_value,
 			typename const DscDag::DagNodeValue<IN_TYPE>::TCallbackOnSet& in_on_set_callback = typename DscDag::CallbackOnValueChange<IN_TYPE>::Function,
-			IDagOwner* in_dag_owner_or_nullptr = nullptr
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
 		)
 		{
 			auto node = std::make_unique<DagNodeValue<IN_TYPE>>(in_value, in_on_set_callback);
@@ -98,6 +111,58 @@ namespace DscDag
 				in_dag_owner_or_nullptr->AddOwnership(node_token);
 			}
 			return node_token;
+		}
+
+		template <typename IN_TYPE>
+		NodeToken CreateValueOnValueChange(
+			const IN_TYPE& in_value,
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
+		)
+		{
+			return CreateValue(
+				in_value,
+				DscDag::CallbackOnValueChange<IN_TYPE>::Function,
+				in_dag_owner_or_nullptr
+			);
+		}
+
+		template <typename IN_TYPE>
+		NodeToken CreateValueNotZero(
+			const IN_TYPE& in_value,
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
+		)
+		{
+			return CreateValue(
+				in_value,
+				DscDag::CallbackNotZero<IN_TYPE>::Function,
+				in_dag_owner_or_nullptr
+			);
+		}
+
+		template <typename IN_TYPE>
+		NodeToken CreateValueOnSet(
+			const IN_TYPE& in_value,
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
+		)
+		{
+			return CreateValue(
+				in_value,
+				DscDag::CallbackOnSetValue<IN_TYPE>::Function,
+				in_dag_owner_or_nullptr
+			);
+		}
+
+		template <typename IN_TYPE>
+		NodeToken CreateValueNone(
+			const IN_TYPE& in_value,
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr
+		)
+		{
+			return CreateValue(
+				in_value,
+				nullptr,
+				in_dag_owner_or_nullptr
+			);
 		}
 
 		// should already have all links removed? assert if links still exisit?

@@ -27,5 +27,5 @@ DscVsprojectConsoleExe("unit_test" .Param)
 
 .SolutionProjects + "unit_test_project"
 .SolutionItemsApplicationProject + "unit_test_project"
-.SolutionBuildProject = "unit_test_project"
+//.SolutionBuildProject = "unit_test_project"
 

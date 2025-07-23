@@ -20,6 +20,10 @@ namespace DscDag
 		void SetAt(NodeToken in_node_or_null, const int32 in_index);
 		const int32 GetCount() const;
 
+		const std::vector<NodeToken>& GetValue() const {
+			return _node_array;
+		}
+
 	private:
 		virtual void MarkDirty() override;
 		virtual void Update() override;
