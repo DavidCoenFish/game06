@@ -99,8 +99,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             top_texture
         );
 
-        auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*_resources->_dag_collection, _resources->_ui_root_node_group);
-
         _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentDebugGrid().SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
@@ -110,7 +108,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
@@ -129,7 +127,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
@@ -165,7 +163,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 _resources->_text_manager.get()
             ).SetClearColour(
                 DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
-            ).SetInputData([this](const DscUi::UiComponentResourceNodeGroup&) {
+            ).SetInputData([this](const DscDag::NodeToken) {
                 this->_keep_running = false;
                 }
             ),
