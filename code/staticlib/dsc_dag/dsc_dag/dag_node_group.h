@@ -2,6 +2,7 @@
 #include "dsc_dag.h"
 #include "i_dag_node.h"
 #include "i_dag_owner.h"
+#include <dsc_common/log_system.h>
 
 namespace DscDag
 {
@@ -97,6 +98,7 @@ namespace DscDag
 			}
 			else
 			{
+				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "SetNodeTokenEnum: in_node_type:%s meta_data_type:%s\n", in_node_to_add_or_null->DebugGetTypeInfo().name(), meta_data._type_info.name());
 				DSC_ASSERT(in_node_to_add_or_null->DebugGetTypeInfo() == meta_data._type_info, "unexpected type");
 			}
 #endif

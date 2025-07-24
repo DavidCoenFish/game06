@@ -56,7 +56,8 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             0.0f,
             owner
         );
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(manual_scroll_x, "manual_scroll_x"));
+        static int32 s_index = 0;
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(manual_scroll_x, std::string("manual_scroll_x") + std::to_string(s_index)));
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TManualScrollX,
@@ -67,7 +68,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             in_construction_helper._has_manual_scroll_y,
             owner
         );
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(has_manual_scroll_x, "has_manual_scroll_y"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(has_manual_scroll_y, "has_manual_scroll_y"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::THasManualScrollY,
@@ -78,7 +79,8 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             0.0f,
             owner
         );
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(manual_scroll_y, "manual_scroll_y"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(manual_scroll_y, std::string("manual_scroll_y") + std::to_string(s_index)));
+        s_index += 1;
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
             DscUi::TUiComponentResourceNodeGroup::TManualScrollY,

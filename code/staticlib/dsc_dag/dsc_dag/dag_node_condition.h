@@ -167,10 +167,6 @@ namespace DscDag
 			{
 				return false;
 			}
-			if (nullptr != _condition)
-			{
-				return false;
-			}
 			if (true == _true_linked)
 			{
 				return false;
@@ -187,7 +183,7 @@ namespace DscDag
 			if (nullptr != _condition)
 			{
 				_condition->RemoveOutput(this);
-				_condition = nullptr;
+				//_condition = nullptr;
 			}
 			if (true == _true_linked)
 			{

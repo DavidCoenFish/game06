@@ -67,10 +67,11 @@ void DscDag::DagNodeGroup::AddOwnership(NodeToken in_node)
 
 void DscDag::DagNodeGroup::DestroyOwned(DagCollection& in_dag_collection)
 {
-	for (const auto& item : _node_ownership_group)
-	{
-		item->UnlinkInputs();
-	}
+	// this was causing Unlink to be called on a destroyed node
+	//for (const auto& item : _node_ownership_group)
+	//{
+	//	item->UnlinkInputs();
+	//}
 
 	for (const auto& item : _node_ownership_group)
 	{
@@ -135,14 +136,16 @@ void DscDag::DagNodeGroup::RemoveOutput(NodeToken in_node)
 
 const bool DscDag::DagNodeGroup::GetHasNoLinks() const
 {
-	for (auto& item : _node_token_array)
-	{
-		if (nullptr != item)
-		{
-			return false;
-		}
-	}
-	return true;
+	return (0 == _output.size());
+
+	//for (auto& item : _node_token_array)
+	//{
+	//	if (nullptr != item)
+	//	{
+	//		return false;
+	//	}
+	//}
+	//return true;
 }
 
 void DscDag::DagNodeGroup::UnlinkInputs()
@@ -152,16 +155,25 @@ void DscDag::DagNodeGroup::UnlinkInputs()
 		if (nullptr != item)
 		{
 			item->RemoveOutput(this);
-			item = nullptr;
+			//item = nullptr;
 		}
 	}
+
+	for (auto& item : _node_ownership_group)
+	{
+		if (nullptr != item)
+		{
+			item->UnlinkInputs();
+		}
+	}
+
 	return;
 }
 
 #if defined(_DEBUG)
 const std::type_info& DscDag::DagNodeGroup::DebugGetTypeInfo() const
 {
-	return typeid(bool);
+	return typeid(DscDag::NodeToken);
 }
 
 const std::string DscDag::DagNodeGroup::DebugPrintRecurseInputs(const int32 in_depth) const

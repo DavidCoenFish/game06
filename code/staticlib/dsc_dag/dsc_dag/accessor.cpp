@@ -20,6 +20,20 @@ const std::vector<DscDag::NodeToken>& DscDag::GetValueNodeArray(NodeToken in_inp
 	return kData;
 }
 
+void DscDag::NodeArrayPushBack(NodeToken in_node_array, NodeToken in_node_to_add)
+{
+	DSC_ASSERT(nullptr != in_node_array, "invalid param");
+	DSC_ASSERT(typeid(std::vector<DscDag::NodeToken>) == in_node_array->DebugGetTypeInfo(), "invalid param");
+
+	auto value_node = dynamic_cast<DagNodeNodeArray*>(in_node_array);
+	if (nullptr != value_node)
+	{
+		value_node->PushBack(in_node_to_add);
+	}
+
+	return;
+}
+
 // do we just not allow DagNodeValue<DscDag::NodeToken> and force usage DagNodeNode?
 DscDag::NodeToken DscDag::GetValueNode(NodeToken in_input)
 {

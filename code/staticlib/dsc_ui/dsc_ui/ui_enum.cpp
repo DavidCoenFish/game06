@@ -65,6 +65,11 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TScreenSpace:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscUi::ScreenSpace) };
+		return s_meta_data;
+	}
 	case DscUi::TUiNodeGroup::TAvaliableSize: // the initial layout size we were told by the parent that we had avaliable
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
@@ -89,11 +94,6 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 	case DscUi::TUiNodeGroup::TScrollPos:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscCommon::VectorFloat2) };
-		return s_meta_data;
-	}
-	case DscUi::TUiNodeGroup::TScreenSpace:
-	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscUi::ScreenSpace) };
 		return s_meta_data;
 	}
 	case DscUi::TUiNodeGroup::TUiPanelShaderConstantBuffer:

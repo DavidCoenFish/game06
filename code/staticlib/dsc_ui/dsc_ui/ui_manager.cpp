@@ -354,25 +354,23 @@ namespace
         in_ui_node_group->UnlinkInputs();
     }
 
-    void TraverseHierarchyDestroy(
-        DscDag::DagCollection& in_dag_collection,
-        DscDag::NodeToken in_ui_node_group
+
+    void TraverseHierarchyDeleteNode(
+        DscDag::NodeToken in_ui_node_group,
+        DscDag::DagCollection& in_dag_collection
     )
     {
         DscDag::NodeToken array_children_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_ui_node_group, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
         const auto& array_children = DscDag::GetValueNodeArray(array_children_node);
         for (auto& child : array_children)
         {
-            TraverseHierarchyDestroy(
-                in_dag_collection,
-                child
-                );
+            TraverseHierarchyDeleteNode(
+                child,
+                in_dag_collection
+            );
         }
-        DscDag::IDagOwner* const owner = dynamic_cast<DscDag::IDagOwner*>(in_ui_node_group);
-        if (nullptr != owner)
-        {
-            owner->DestroyOwned(in_dag_collection);
-        }
+        //in_ui_node_group->UnlinkInputs();
+        in_dag_collection.DeleteNode(in_ui_node_group);
     }
 
 } // namespace
@@ -871,6 +869,35 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TScreenSpace, screen_space);
     }
 
+    // TAvaliableSize
+    DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TAvaliableSize,
+        DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize)
+    );
+
+    // TRenderRequestSize
+    DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TRenderRequestSize,
+        DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize)
+    );
+
+    // TGeometrySize
+    DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TGeometrySize,
+        DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize)
+    );
+
+    // TGeometryOffset
+    {
+        auto node = in_dag_collection.CreateValueNone(DscCommon::VectorInt2::s_zero, owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "geometry offset"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TGeometryOffset, node);
+    }
+
+    // TScrollPos
+    {
+        auto node = in_dag_collection.CreateValueNone(DscCommon::VectorFloat2::s_zero, owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "scroll pos"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TScrollPos, node);
+    }
+
     auto component_resource_node_group = DscUi::MakeComponentResourceGroup(
         in_dag_collection,
         in_construction_helper,
@@ -901,7 +928,7 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
     DscDag::LinkNodes(DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize), draw_node);
 
     DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TDrawNode, draw_node);
-    DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TDrawNode, base_node);
+    DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TDrawBaseNode, base_node);
 
     DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiComponentResourceNodeGroup>(component_resource_node_group));
     DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiRootNodeGroup>(result));
@@ -1107,6 +1134,13 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
     //    }
     //}
 
+    // add result node to parent child array
+    {
+        auto parent_child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TArrayChildUiNodeGroup);
+        DSC_ASSERT(nullptr != parent_child_array_node, "parent must have a child array");
+        DscDag::NodeArrayPushBack(parent_child_array_node, result);
+    }
+
     return result;
 }
 
@@ -1116,21 +1150,9 @@ void DscUi::UiManager::DestroyNode(
     DscDag::NodeToken in_node_group
     )
 {
-#if 0
-    TraverseHierarchyUnlink(
-        DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources), false),
-        DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup), false)
-    );
-    in_root_node_group.UnlinkOwned();
-
-    TraverseHierarchyDestroy(
-        in_dag_collection,
-        DscDag::DagCollection::GetValueNonConstRef<DscUi::UiComponentResourceNodeGroup>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TUiComponentResources), false),
-        DscDag::DagCollection::GetValueNonConstRef<std::vector<DscUi::UiNodeGroup>>(in_root_node_group.GetNodeToken(TUiRootNodeGroup::TArrayChildUiNodeGroup), false)
-    );
-    in_root_node_group.DeleteOwned(in_dag_collection);
-#endif
-    in_dag_collection.DeleteNode(in_node_group);
+    TraverseHierarchyUnlink(in_node_group);
+    TraverseHierarchyDeleteNode(in_node_group, in_dag_collection);
+    //in_dag_collection.DeleteNode(in_node_group);
 
     return;
 }
@@ -1191,7 +1213,7 @@ void DscUi::UiManager::Draw(
 )
 {
     DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TFrame), &in_frame);
-    DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TForceDraw), &in_force_draw);
+    DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TForceDraw), in_force_draw);
 
     if (in_external_render_target_or_null)
     {
@@ -1534,7 +1556,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             out_value = ui_render_target.get();
         },
             owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "gradient effect draw"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "gradient fill draw"));
 
         auto shader_buffer = _gradient_fill_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
@@ -1694,7 +1716,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                 out_value = ui_render_target.get();
             },
             owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "effect clear in_debug_name"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "draw text"));
 
         DscDag::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);

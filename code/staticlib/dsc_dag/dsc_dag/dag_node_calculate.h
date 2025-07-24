@@ -109,17 +109,17 @@ namespace DscDag
 			{
 				return false;
 			}
-			if (0 != _input.size())
-			{
-				return false;
-			}
-			for (const auto& item : _index_input)
-			{
-				if (nullptr != item)
-				{
-					return false;
-				}
-			}
+			//if (0 != _input.size())
+			//{
+			//	return false;
+			//}
+			//for (const auto& item : _index_input)
+			//{
+			//	if (nullptr != item)
+			//	{
+			//		return false;
+			//	}
+			//}
 			return true;
 		}
 
@@ -132,7 +132,7 @@ namespace DscDag
 					item->RemoveOutput(this);
 				}
 			}
-			_index_input.clear();
+			//_index_input.clear();
 			for (const auto& item : _input)
 			{
 				if (nullptr != item)
@@ -140,7 +140,7 @@ namespace DscDag
 					item->RemoveOutput(this);
 				}
 			}
-			_input.clear();
+			//_input.clear();
 		}
 
 #if defined(_DEBUG)

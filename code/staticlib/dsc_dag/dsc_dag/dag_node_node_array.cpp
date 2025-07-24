@@ -17,6 +17,7 @@ void DscDag::DagNodeNodeArray::PushBack(NodeToken in_node)
 	{
 		in_node->AddOutput(this);
 		_node_array.push_back(in_node);
+		MarkDirty();
 	}
 	return;
 }
@@ -29,6 +30,7 @@ void DscDag::DagNodeNodeArray::Remove(NodeToken in_node)
 		in_node->RemoveOutput(this);
 		//https://stackoverflow.com/questions/39912/how-do-i-remove-an-item-from-a-stl-vector-with-a-certain-value
 		_node_array.erase(std::remove(_node_array.begin(), _node_array.end(), in_node), _node_array.end());
+		MarkDirty();
 	}
 	return;
 }
@@ -135,13 +137,13 @@ const bool DscDag::DagNodeNodeArray::GetHasNoLinks() const
 	{
 		return false;
 	}
-	for (auto& item : _node_array)
-	{
-		if (nullptr != item)
-		{
-			return false;
-		}
-	}
+	//for (auto& item : _node_array)
+	//{
+	//	if (nullptr != item)
+	//	{
+	//		return false;
+	//	}
+	//}
 	return true;
 }
 
@@ -154,7 +156,7 @@ void DscDag::DagNodeNodeArray::UnlinkInputs()
 			item->RemoveOutput(this);
 		}
 	}
-	_node_array.clear();
+	//_node_array.clear();
 
 	return;
 }
