@@ -125,22 +125,29 @@ namespace DscDag
 
 		virtual void UnlinkInputs() override
 		{
-			for (const auto& item : _index_input)
+			if (false == _unlinked)
 			{
-				if (nullptr != item)
+				_unlinked = true;
+				for (const auto& item : _index_input)
 				{
-					item->RemoveOutput(this);
+					if (nullptr != item)
+					{
+						item->UnlinkInputs();
+						item->RemoveOutput(this);
+					}
 				}
-			}
-			//_index_input.clear();
-			for (const auto& item : _input)
-			{
-				if (nullptr != item)
+				//_index_input.clear();
+				for (const auto& item : _input)
 				{
-					item->RemoveOutput(this);
+					if (nullptr != item)
+					{
+						item->UnlinkInputs();
+						item->RemoveOutput(this);
+					}
 				}
+				//_input.clear();
 			}
-			//_input.clear();
+			return;
 		}
 
 #if defined(_DEBUG)
@@ -233,6 +240,7 @@ public:
 	private:
 		const TCalculateFunction _calculate_function = {};
 		IN_TYPE _value = {};
+		bool _unlinked = false;
 
 	}; // DagNodeCalculate
 } //DscDag

@@ -29,9 +29,7 @@ namespace DscDag
 #endif //#if defined(_DEBUG)
 
 #if defined(_DEBUG)
-		void DebugSetNodeName(const std::string& in_debug_name) {
-			_debug_name = in_debug_name;
-		}
+		void DebugSetNodeName(const std::string& in_debug_name);
 		const std::string& DebugGetNodeName() const {
 			return _debug_name;
 		}

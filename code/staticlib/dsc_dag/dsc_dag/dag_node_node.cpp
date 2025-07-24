@@ -87,10 +87,10 @@ const bool DscDag::DagNodeNode::GetHasNoLinks() const
 	{
 		return false;
 	}
-	if (nullptr != _node)
-	{
-		return false;
-	}
+	//if (nullptr != _node)
+	//{
+	//	return false;
+	//}
 	return true;
 }
 
@@ -98,8 +98,8 @@ void DscDag::DagNodeNode::UnlinkInputs()
 {
 	if (nullptr != _node)
 	{
+		_node->UnlinkInputs();
 		_node->RemoveOutput(this);
-		_node = nullptr;
 	}
 
 	return;

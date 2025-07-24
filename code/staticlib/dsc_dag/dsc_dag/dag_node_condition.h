@@ -114,13 +114,13 @@ namespace DscDag
 							_false_source->AddOutput(this);
 						}
 
-						if (true == _false_linked)
+						if (true == _true_linked)
 						{
 							if (nullptr != _true_source)
 							{
 								_true_source->RemoveOutput(this);
 							}
-							_false_linked = false;
+							_true_linked = false;
 						}
 					}
 
@@ -180,30 +180,37 @@ namespace DscDag
 
 		virtual void UnlinkInputs() override
 		{
-			if (nullptr != _condition)
+			if (false == _unlinked)
 			{
-				_condition->RemoveOutput(this);
-				//_condition = nullptr;
-			}
-			if (true == _true_linked)
-			{
-				if (nullptr != _true_source)
+				if (nullptr != _condition)
 				{
-					_true_source->RemoveOutput(this);
-					UnlinkNodes(_true_source, _true_destination);
+					_condition->UnlinkInputs();
+					_condition->RemoveOutput(this);
+					//_condition = nullptr;
 				}
-				_true_linked = false;
-			}
-			if (true == _false_linked)
-			{
-				if (nullptr != _false_source)
+				if (true == _true_linked)
 				{
-					_false_source->RemoveOutput(this);
-					UnlinkNodes(_false_source, _false_destination);
+					if (nullptr != _true_source)
+					{
+						_true_source->UnlinkInputs();
+						_true_source->RemoveOutput(this);
+						//UnlinkNodes(_true_source, _true_destination);
+					}
+					_true_linked = false;
 				}
-				_false_linked = false;
+				if (true == _false_linked)
+				{
+					if (nullptr != _false_source)
+					{
+						_false_source->UnlinkInputs();
+						_false_source->RemoveOutput(this);
+						//UnlinkNodes(_false_source, _false_destination);
+					}
+					_false_linked = false;
+				}
+				_unlinked = true;
 			}
-			_unlinked = true;
+			return;
 		}
 
 #if defined(_DEBUG)

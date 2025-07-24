@@ -42,6 +42,7 @@ namespace DscDag
 		std::vector<NodeToken> _node_array = {};
 		std::set<NodeToken> _output = {};
 		bool _dirty = false;
+		bool _unlinked = false;
 
 	}; // DagGroup
 } //DscDag

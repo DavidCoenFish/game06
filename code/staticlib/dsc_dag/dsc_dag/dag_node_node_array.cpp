@@ -149,14 +149,19 @@ const bool DscDag::DagNodeNodeArray::GetHasNoLinks() const
 
 void DscDag::DagNodeNodeArray::UnlinkInputs()
 {
-	for (auto& item : _node_array)
+	if (false == _unlinked)
 	{
-		if (nullptr != item)
+		_unlinked = true;
+		for (auto& item : _node_array)
 		{
-			item->RemoveOutput(this);
+			if (nullptr != item)
+			{
+				item->UnlinkInputs();
+				item->RemoveOutput(this);
+			}
 		}
+		//_node_array.clear();
 	}
-	//_node_array.clear();
 
 	return;
 }

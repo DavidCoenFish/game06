@@ -109,6 +109,8 @@ namespace DscDag
 
 		virtual void AddOutput(NodeToken in_nodeID) override
 		{
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "AddOutput:%p %p\n", this, in_nodeID);
+
 			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
 			if (nullptr != in_nodeID)
 			{
@@ -122,8 +124,11 @@ namespace DscDag
 			DSC_ASSERT(nullptr != in_nodeID, "invalid param");
 			if (nullptr != in_nodeID)
 			{
-				_output.erase(in_nodeID);
-				in_nodeID->MarkDirty();
+				if (0 != _output.erase(in_nodeID))
+				{
+					//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "RemoveOutput:%p %p\n", this, in_nodeID);
+					in_nodeID->MarkDirty();
+				}
 			}
 		}
 

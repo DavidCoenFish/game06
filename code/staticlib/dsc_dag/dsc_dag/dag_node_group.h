@@ -98,7 +98,7 @@ namespace DscDag
 			}
 			else
 			{
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "SetNodeTokenEnum: in_node_type:%s meta_data_type:%s\n", in_node_to_add_or_null->DebugGetTypeInfo().name(), meta_data._type_info.name());
+				//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "SetNodeTokenEnum: in_node_type:%s meta_data_type:%s\n", in_node_to_add_or_null->DebugGetTypeInfo().name(), meta_data._type_info.name());
 				DSC_ASSERT(in_node_to_add_or_null->DebugGetTypeInfo() == meta_data._type_info, "unexpected type");
 			}
 #endif
@@ -177,5 +177,6 @@ namespace DscDag
 		std::set<NodeToken> _node_ownership_group = {};
 		std::set<NodeToken> _output = {};
 		bool _dirty = false;
+		bool _unlinked = false;
 	}; // DagNodeGroup
 } //DscDag

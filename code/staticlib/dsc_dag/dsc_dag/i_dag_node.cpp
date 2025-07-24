@@ -1,5 +1,5 @@
 #include "i_dag_node.h"
-
+#include <dsc_common\log_system.h>
 
 void DscDag::IDagNode::MarkDirty()
 {
@@ -21,3 +21,10 @@ void DscDag::IDagNode::UnlinkInputs()
 {
 	//nop
 }
+#if defined(_DEBUG)
+void DscDag::IDagNode::DebugSetNodeName(const std::string& in_debug_name)
+{
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "node:%p %s\n", this, in_debug_name.c_str());
+	_debug_name = in_debug_name;
+}
+#endif//#if defined(_DEBUG)

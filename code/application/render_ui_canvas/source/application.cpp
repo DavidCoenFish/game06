@@ -216,7 +216,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             _resources->_ui_root_node_group,
             _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
-            DSC_DEBUG_ONLY(DSC_COMMA "child two")
+            DSC_DEBUG_ONLY(DSC_COMMA "child three")
         );
     }
 
@@ -230,7 +230,7 @@ Application::~Application()
         _draw_system->WaitForGpu();
     }
 
-    DSC_DEBUG_ONLY(DscDag::DebugPrintRecurseInputs(_resources->_ui_root_node_group));
+    //DSC_DEBUG_ONLY(DscDag::DebugPrintRecurseInputs(_resources->_ui_root_node_group));
 
     _resources->_ui_manager->DestroyNode(
         *(_resources->_dag_collection),

@@ -150,20 +150,25 @@ const bool DscDag::DagNodeGroup::GetHasNoLinks() const
 
 void DscDag::DagNodeGroup::UnlinkInputs()
 {
-	for (auto& item : _node_token_array)
+	if (false == _unlinked)
 	{
-		if (nullptr != item)
+		_unlinked = true;
+		for (auto& item : _node_token_array)
 		{
-			item->RemoveOutput(this);
-			//item = nullptr;
+			if (nullptr != item)
+			{
+				item->UnlinkInputs();
+				item->RemoveOutput(this);
+				//item = nullptr;
+			}
 		}
-	}
 
-	for (auto& item : _node_ownership_group)
-	{
-		if (nullptr != item)
+		for (auto& item : _node_ownership_group)
 		{
-			item->UnlinkInputs();
+			if (nullptr != item)
+			{
+				item->UnlinkInputs();
+			}
 		}
 	}
 
