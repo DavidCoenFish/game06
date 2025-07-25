@@ -77,25 +77,38 @@ namespace DscDag
 		}
 
 		template <typename IN_ENUM>
-		NodeToken CreateGroupEnum(IDagOwner* const in_dag_owner_or_nullptr = nullptr)
+		NodeToken CreateGroupEnum(
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr,
+			const bool in_ignore_child_dirty = false
+		)
 		{
 			return CreateGroup(
 				static_cast<int32>(IN_ENUM::TCount),
 				ValidateOneType<IN_ENUM>::Function,
-				in_dag_owner_or_nullptr
+				in_dag_owner_or_nullptr,
+				in_ignore_child_dirty
 			);
 		}
 		template <typename IN_ENUM_SUPER_SET, typename IN_ENUM_SUB_SET>
-		NodeToken CreateGroupEnum(IDagOwner* const in_dag_owner_or_nullptr = nullptr)
+		NodeToken CreateGroupEnum(
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr,
+			const bool in_ignore_child_dirty = false
+		)
 		{
 			return CreateGroup(
 				static_cast<int32>(IN_ENUM_SUPER_SET::TCount),
 				ValidateTwoType<IN_ENUM_SUPER_SET, IN_ENUM_SUB_SET>::Function,
-				in_dag_owner_or_nullptr
+				in_dag_owner_or_nullptr,
+				in_ignore_child_dirty
 			);
 		}
 		typedef std::function<const bool(const std::type_info&)> TValidateFunction;
-		NodeToken CreateGroup(const int32 in_size, const TValidateFunction& in_validate_function, IDagOwner* const in_dag_owner_or_nullptr = nullptr);
+		NodeToken CreateGroup(
+			const int32 in_size, 
+			const TValidateFunction& in_validate_function, 
+			IDagOwner* const in_dag_owner_or_nullptr = nullptr,
+			const bool in_ignore_child_dirty = false
+			);
 
 		template <typename IN_TYPE>
 		NodeToken CreateValue(

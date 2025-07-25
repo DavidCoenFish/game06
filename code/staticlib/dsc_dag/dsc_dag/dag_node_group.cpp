@@ -2,8 +2,9 @@
 #include "dag_collection.h"
 
 // provide a callback for accepted enum types to construct index from
-DscDag::DagNodeGroup::DagNodeGroup(const int32 in_size, const TValidateFunction& in_validate_function)
+DscDag::DagNodeGroup::DagNodeGroup(const int32 in_size, const TValidateFunction& in_validate_function, const bool in_ignore_child_dirty)
 	: _validate_function(in_validate_function)
+	, _ignore_child_dirty(in_ignore_child_dirty)
 {
 	DSC_ASSERT(0 < in_size, "invalid param");
 	DSC_ASSERT(nullptr != in_validate_function, "invalid param");
@@ -13,7 +14,7 @@ DscDag::DagNodeGroup::DagNodeGroup(const int32 in_size, const TValidateFunction&
 
 DscDag::DagNodeGroup::~DagNodeGroup()
 {
-	DSC_ASSERT(0 == _node_ownership_group.size(), "invalid state, destroyed owned nodes before dtor, and dnont call virtual in dtor");
+	DSC_ASSERT(0 == _node_ownership_group.size(), "invalid state, destroyed owned nodes before dtor"); // PSA: don't call virtual in dtor, so don't just call unlink in dtor
 }
 
 const bool DscDag::DagNodeGroup::ValidateIndexEnum(const std::type_info& in_index_enum)
@@ -44,13 +45,16 @@ void DscDag::DagNodeGroup::SetNodeToken(const int32 in_index, NodeToken in_node_
 	{
 		return;
 	}
-	if (nullptr != old_value)
+	if (false == _ignore_child_dirty)
 	{
-		old_value->RemoveOutput(this);
-	}
-	if (nullptr != in_node_token_or_null)
-	{
-		in_node_token_or_null->AddOutput(this);
+		if (nullptr != old_value)
+		{
+			old_value->RemoveOutput(this);
+		}
+		if (nullptr != in_node_token_or_null)
+		{
+			in_node_token_or_null->AddOutput(this);
+		}
 	}
 
 	_node_token_array[in_index] = in_node_token_or_null;
@@ -101,11 +105,14 @@ void DscDag::DagNodeGroup::Update()
 	{
 		_dirty = false;
 
-		for (auto& item : _node_token_array)
+		if (false == _ignore_child_dirty)
 		{
-			if (nullptr != item)
+			for (auto& item : _node_token_array)
 			{
-				item->Update();
+				if (nullptr != item)
+				{
+					item->Update();
+				}
 			}
 		}
 	}

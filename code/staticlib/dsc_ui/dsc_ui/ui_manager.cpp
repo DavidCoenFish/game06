@@ -805,7 +805,7 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
     const std::vector<TEffectConstructionHelper>& in_effect_array
     )
 {
-    DscDag::NodeToken result = in_dag_collection.CreateGroupEnum<DscUi::TUiRootNodeGroup, DscUi::TUiNodeGroup>();
+    DscDag::NodeToken result = in_dag_collection.CreateGroupEnum<DscUi::TUiRootNodeGroup, DscUi::TUiNodeGroup>(nullptr, true);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result, "root node"));
 
     DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(result);
@@ -946,7 +946,7 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
     DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name)
     )
 {
-    DscDag::NodeToken result = in_dag_collection.CreateGroupEnum<DscUi::TUiNodeGroup>();
+    DscDag::NodeToken result = in_dag_collection.CreateGroupEnum<DscUi::TUiNodeGroup>(nullptr, true);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result, in_debug_name));
     DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(result);
 
@@ -1141,6 +1141,12 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
         DscDag::NodeArrayPushBack(parent_child_array_node, result);
     }
 
+    // add draw_node to the parent draw base
+    {
+        auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
+        DscDag::LinkNodes(draw_node, parent_draw_base);
+    }
+
     return result;
 }
 
@@ -1226,7 +1232,8 @@ void DscUi::UiManager::Draw(
 
     in_dag_collection.ResolveDirtyConditionNodes();
 
-    in_root_node_group->Update();
+    //in_root_node_group->Update();
+    DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiNodeGroup::TDrawNode)->Update();
 
     return;
 }

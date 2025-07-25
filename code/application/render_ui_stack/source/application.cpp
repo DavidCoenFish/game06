@@ -187,6 +187,14 @@ Application::~Application()
         _draw_system->WaitForGpu();
     }
 
+    //DSC_DEBUG_ONLY(DscDag::DebugPrintRecurseInputs(_resources->_ui_root_node_group));
+
+    _resources->_ui_manager->DestroyNode(
+        *(_resources->_dag_collection),
+        _resources->_ui_root_node_group
+    );
+    _resources->_ui_root_node_group = nullptr;
+
     _resources.reset();
     _draw_system.reset();
     _file_system.reset();

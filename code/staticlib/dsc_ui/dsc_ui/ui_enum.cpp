@@ -32,6 +32,34 @@ const bool operator!= (const int32 in_lhs, const DscUi::TUiInputStateFlag in_rhs
 
 
 #if defined(_DEBUG)
+//template <>
+//const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi::TUiNode in_value)
+//{
+//	switch (in_value)
+//	{
+//	default:
+//		DSC_ASSERT_ALWAYS("invalid switch");
+//		break;
+//	case DscUi::TUiNode::TDrawNode:
+//	{
+//		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
+//		return s_meta_data;
+//	}
+//	case DscUi::TUiNode::TDrawBaseNode:
+//	{
+//		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscUi::UiRenderTarget*) };
+//		return s_meta_data;
+//	}
+//	case DscUi::TUiNode::TUiNodeGroup:
+//	{
+//		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
+//		return s_meta_data;
+//	}
+//	}
+//	static DscDag::DagNodeGroupMetaData s_dummy = { false, typeid(nullptr) };
+//	return s_dummy;
+//}
+
 template <>
 const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi::TUiNodeGroup in_value)
 {

@@ -86,6 +86,16 @@ the number of render targets could also be a resource cost, possibly need a less
 */
 namespace DscUi
 {
+	/*
+	so, 
+	*/
+	//struct UiNode
+	//{
+	//	DscDag::NodeToken _ui_node_group;
+	//	DscDag::NodeToken _draw_node;
+	//	DscDag::NodeToken _base_draw_node;
+	//};
+
 	class IUiComponent;
 	class UiCoord;
 	class UiInputParam;

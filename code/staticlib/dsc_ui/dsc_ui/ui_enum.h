@@ -131,6 +131,15 @@ namespace DscUi
 		const bool operator==(const ScreenSpace& in_rhs) const;
 	};
 
+	//enum class TUiNode : uint8
+	//{
+	//	TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
+	//	TDrawBaseNode, // TDrawNode may be the ui component or an effect, if we want to add a dependency, it needs to be to the base of the draw chain
+	//	TUiNodeGroup,
+
+	//	TCount
+	//};
+
 	// the collection of data for a non root node, see TUiComponentResourceNodeGroup for values provided to a client to manipulate
 	// this is ment to be the minimal set of values for the UiManager to handle layout
 	enum class TUiNodeGroup : uint8
@@ -155,6 +164,7 @@ namespace DscUi
 		TCount
 	};
 
+	// extend TUiNodeGroup with some root node extras
 	enum class TUiRootNodeGroup : uint8
 	{
 		TForceDraw = static_cast<uint8>(TUiNodeGroup::TCount), // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
@@ -171,6 +181,8 @@ namespace DscUi
 } // DscUi
 
 #if defined(_DEBUG)
+//template <>
+//const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi::TUiNode in_value);
 template <>
 const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi::TUiNodeGroup in_value);
 template <>

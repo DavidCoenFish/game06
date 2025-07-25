@@ -45,10 +45,11 @@ DscDag::NodeToken DscDag::DagCollection::CreateNodeArray(
 DscDag::NodeToken DscDag::DagCollection::CreateGroup(
 	const int32 in_size, 
 	const TValidateFunction& in_validate_function,
-	IDagOwner* const in_dag_owner_or_nullptr
+	IDagOwner* const in_dag_owner_or_nullptr,
+	const bool in_ignore_child_dirty
 	)
 {
-	auto node = std::make_unique<DagNodeGroup>(in_size, in_validate_function);
+	auto node = std::make_unique<DagNodeGroup>(in_size, in_validate_function, in_ignore_child_dirty);
 	NodeToken node_token = node.get();
 	_nodes.insert(std::move(node));
 	if (nullptr != in_dag_owner_or_nullptr)

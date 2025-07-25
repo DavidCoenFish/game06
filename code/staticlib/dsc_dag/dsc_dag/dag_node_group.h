@@ -52,7 +52,7 @@ namespace DscDag
 
 		typedef std::function<const bool(const std::type_info&)> TValidateFunction;
 		// provide a callback for accepted enum types to construct index from
-		DagNodeGroup(const int32 in_size, const TValidateFunction& in_validate_function);
+		DagNodeGroup(const int32 in_size, const TValidateFunction& in_validate_function, const bool in_ignore_child_dirty);
 		virtual ~DagNodeGroup();
 
 		template <typename IN_ENUM>
@@ -171,6 +171,7 @@ namespace DscDag
 
 	private:
 		const TValidateFunction _validate_function = {};
+		const bool _ignore_child_dirty;
 		std::vector<NodeToken> _node_token_array = {};
 
 		// trying to make it easier to latter collect all the nodes that are to be removed as a group
