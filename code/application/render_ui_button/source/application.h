@@ -2,7 +2,7 @@
 #include "render_ui.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_windows/i_window_application.h>
-#include <dsc_dag/dag_group.h>
+#include <dsc_dag/dag_node_group.h>
 #include <dsc_ui/ui_enum.h>
 
 #define LOG_TOPIC_APPLICATION "APPLICATION"
@@ -83,8 +83,7 @@ private:
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
-        DscUi::UiRootNodeGroup _ui_root_node_group;
-        DscUi::UiNodeGroup _ui_node_group_gradient_owner;
+        DscDag::NodeToken _ui_root_node_group;
     };
     std::unique_ptr<Resources> _resources;
 

@@ -105,7 +105,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
     if (nullptr != in_construction_helper._texture)
     {
         auto texture = in_dag_collection.CreateValueOnSet(
-            in_construction_helper._fill,
+            in_construction_helper._texture,
             owner
         );
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(texture, "texture"));
@@ -409,7 +409,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
     if (true == in_construction_helper._has_input_rollover_accumulate)
     {
         auto input_rollover_accumulate = in_dag_collection.CreateValueOnValueChange(
-            DscUi::TUiInputStateFlag::TNone,
+            0.0f,
             owner
         );
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_rollover_accumulate, "input_rollover_accumulate"));
@@ -455,7 +455,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             owner);
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(crossfade_child_panel_tint, "crossfade_child_panel_tint"));
         DscDag::LinkIndexNodes(0,
-            DscDag::DagNodeGroup::GetNodeTokenEnum(crossfade_child_panel_tint, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount),
             crossfade_child_panel_tint);
 
         DscDag::DagNodeGroup::SetNodeTokenEnum(

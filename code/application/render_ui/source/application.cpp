@@ -7,6 +7,8 @@
 #include <dsc_common/timer.h>
 #include <dsc_common/vector_int2.h>
 #include <dsc_dag/dag_collection.h>
+#include <dsc_dag/i_dag_owner.h>
+#include <dsc_dag/debug_print.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
@@ -70,8 +72,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             top_texture
         );
 
-        auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*_resources->_dag_collection, _resources->_ui_root_node_group);
-
         _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentDebugGrid().SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
@@ -81,21 +81,19 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
-
-        _resources->_crossfade_active_child = _resources->_dag_collection->CreateValue<DscDag::NodeToken>(
-            nullptr,
-            DscDag::CallbackOnValueChange<DscDag::NodeToken>::Function,
-            &_resources->_ui_root_node_group
-            DSC_DEBUG_ONLY(DSC_COMMA "active crossfade child node")
-            );
+        DscDag::IDagOwner* const owner = dynamic_cast<DscDag::IDagOwner*>(_resources->_ui_root_node_group);
+        _resources->_crossfade_active_child = _resources->_dag_collection->CreateValueOnValueChange<DscDag::NodeToken>(
+            (DscDag::NodeToken)nullptr,
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(_resources->_crossfade_active_child, "active crossfade child node"));
 
         // want a cross fade node, with two children that we can toggle activation on
         // how do we nominate the active child of the cross fade, have a Selected child 
-        DscUi::UiNodeGroup ui_crossfade_node_group = _resources->_ui_manager->AddChildNode(
+        DscDag::NodeToken ui_crossfade_node_group = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentCrossfade(
                 _resources->_crossfade_active_child
             ).SetChildSlot(
@@ -108,15 +106,15 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "crossfade")
         );
 
         _resources->_ui_crossfade_child_a = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentFill(
-                //DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
-                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
+                DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+                //DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
             ).SetCrossfadeChildAmount(
                 1.0f
             ),
@@ -130,7 +128,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         _resources->_ui_crossfade_child_b = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
+                //DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
             ).SetCrossfadeChildAmount(
                 0.0f
             ),
@@ -142,9 +141,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "crossfade child b")
         );
 
-        DscDag::DagCollection::SetValueType<DscDag::NodeToken>(
+        DscDag::SetValueType<DscDag::NodeToken>(
             _resources->_crossfade_active_child,
-            _resources->_ui_crossfade_child_a.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode)
+            DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_child_a, DscUi::TUiNodeGroup::TDrawNode)
             );
     }
 
@@ -157,6 +156,14 @@ Application::~Application()
     {
         _draw_system->WaitForGpu();
     }
+
+    //DSC_DEBUG_ONLY(DscDag::DebugPrintRecurseInputs(_resources->_ui_root_node_group));
+
+    _resources->_ui_manager->DestroyNode(
+        *(_resources->_dag_collection),
+        _resources->_ui_root_node_group
+    );
+    _resources->_ui_root_node_group = nullptr;
 
     _resources.reset();
     _draw_system.reset();
@@ -182,8 +189,8 @@ const bool Application::Update()
             if (2.0f < _resources->_time_accumulate)
             {
                 _resources->_time_accumulate = 0.0f;
-                DscDag::NodeToken draw_a = _resources->_ui_crossfade_child_a.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode);
-                DscDag::NodeToken draw_b = _resources->_ui_crossfade_child_b.GetNodeToken(DscUi::TUiNodeGroup::TDrawNode);
+                DscDag::NodeToken draw_a = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_child_a, DscUi::TUiNodeGroup::TDrawNode);
+                DscDag::NodeToken draw_b = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_child_b, DscUi::TUiNodeGroup::TDrawNode);
 
                 DscDag::NodeToken active_child = nullptr;
                 if (draw_a == DscDag::GetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child))
@@ -194,7 +201,7 @@ const bool Application::Update()
                 {
                     active_child = draw_a;
                 }
-                DscDag::DagCollection::SetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child, active_child);
+                DscDag::SetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child, active_child);
             }
         }
 

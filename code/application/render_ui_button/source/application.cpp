@@ -7,6 +7,7 @@
 #include <dsc_common/timer.h>
 #include <dsc_common/vector_int2.h>
 #include <dsc_dag/dag_collection.h>
+#include <dsc_dag/debug_print.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
@@ -70,8 +71,8 @@ namespace
         DscCommon::FileSystem& in_file_system,
         DscRender::DrawSystem& in_draw_system,
         DscDag::DagCollection& in_dag_collection,
-        DscUi::UiRootNodeGroup& in_ui_root_node_group,
-        DscUi::UiNodeGroup& in_parent_node_group
+        DscDag::NodeToken in_ui_root_node_group,
+        DscDag::NodeToken in_parent_node_group
     )
     {
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_container_effect = {};
@@ -140,8 +141,8 @@ namespace
         DscCommon::FileSystem& in_file_system,
         DscRender::DrawSystem& in_draw_system,
         DscDag::DagCollection& in_dag_collection,
-        DscUi::UiRootNodeGroup& in_ui_root_node_group,
-        DscUi::UiNodeGroup& in_parent_node_group,
+        DscDag::NodeToken in_ui_root_node_group,
+        DscDag::NodeToken in_parent_node_group,
         const std::string& in_message
     )
     {
@@ -251,11 +252,8 @@ namespace
                 {}
             );
 
-            multi_gradient = in_dag_collection.CreateValue(
-                multi_gradient_data,
-                DscDag::CallbackNever<std::vector<DscUi::TGradientFillConstantBuffer>>::Function,
-                nullptr
-                DSC_DEBUG_ONLY(DSC_COMMA "multi gadient data"));
+            multi_gradient = in_dag_collection.CreateValueNone(multi_gradient_data);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(multi_gradient, "multi gadient data"));
             in_dag_collection.AddNodeName(multi_gradient, "multi_gradient");
         }
 
@@ -346,8 +344,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             top_texture
         );
 
-        auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*_resources->_dag_collection, _resources->_ui_root_node_group);
-
         _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentDebugGrid().SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
@@ -357,7 +353,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
@@ -368,15 +364,13 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent
+            _resources->_ui_root_node_group
             );
 
         auto stack_node = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentStack(
                 DscUi::TUiFlow::TVertical,
                 DscUi::UiCoord(0, 0.0f)
-                //).SetClearColour(
-                //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
                 ).SetChildSlot(
                     DscUi::VectorUiCoord2(DscUi::UiCoord(256, 0.0f), DscUi::UiCoord(0, 0.5f)),
                     DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
@@ -385,7 +379,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            root_as_parent,
+            _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
@@ -445,6 +439,14 @@ Application::~Application()
     {
         _draw_system->WaitForGpu();
     }
+
+    //DSC_DEBUG_ONLY(DscDag::DebugPrintRecurseInputs(_resources->_ui_root_node_group));
+
+    _resources->_ui_manager->DestroyNode(
+        *(_resources->_dag_collection),
+        _resources->_ui_root_node_group
+    );
+    _resources->_ui_root_node_group = nullptr;
 
     _resources.reset();
     _draw_system.reset();

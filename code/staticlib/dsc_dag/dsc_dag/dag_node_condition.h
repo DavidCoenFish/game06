@@ -124,8 +124,8 @@ namespace DscDag
 						}
 					}
 
-					if ((nullptr != _true_source) &&
-						(nullptr != _true_destination))
+					if ((nullptr != _false_source) &&
+						(nullptr != _false_destination))
 					{
 						SetValueType<IN_TYPE_FALSE>(
 							_false_destination,

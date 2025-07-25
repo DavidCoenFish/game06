@@ -73,4 +73,4 @@ DscVsprojectWindowExe("render_ui_stack" .WindowExeParam)
 
 .SolutionProjects + "render_ui_stack_project"
 .SolutionItemsApplicationProject + "render_ui_stack_project"
-.SolutionBuildProject = "render_ui_stack_project"
+//.SolutionBuildProject = "render_ui_stack_project"

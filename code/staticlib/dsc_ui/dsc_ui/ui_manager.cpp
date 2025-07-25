@@ -1125,14 +1125,14 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
     DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiNodeGroup>(result));
 
     // add the crossfade node to the base node draw to ensure that if it changes, draw is triggered (not 100% sure this is still correct logic), disable for now
-    //{
-    //    auto component_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
-    //    DscDag::NodeToken crossfade_node = DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeNode);
-    //    if (nullptr != crossfade_node)
-    //    {
-    //        DscDag::LinkNodes(crossfade_node, base_node);
-    //    }
-    //}
+    {
+        auto component_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
+        DscDag::NodeToken crossfade_node = DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeNode);
+        if (nullptr != crossfade_node)
+        {
+            DscDag::LinkNodes(crossfade_node, base_node);
+        }
+    }
 
     // add result node to parent child array
     {

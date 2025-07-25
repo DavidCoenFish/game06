@@ -2,7 +2,7 @@
 #include "render_ui.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_windows/i_window_application.h>
-#include <dsc_dag/dag_group.h>
+#include <dsc_dag/dag_node_group.h>
 #include <dsc_ui/ui_enum.h>
 #include <dsc_render_resource/render_target_pool.h>
 
