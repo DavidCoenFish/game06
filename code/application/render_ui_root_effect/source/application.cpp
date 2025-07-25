@@ -13,6 +13,7 @@
 #include <dsc_render_resource/shader_constant_buffer.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_onscreen_version/onscreen_version.h>
+#include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
 #include <dsc_ui/ui_render_target.h>
 #include <dsc_ui/ui_input_state.h>
@@ -46,11 +47,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array = {};
         effect_array.push_back({ DscUi::TUiEffectType::TEffectCorner, DscCommon::VectorFloat4(64.0f, 64.0f, 64.0f, 64.0f) });
         effect_array.push_back({ DscUi::TUiEffectType::TEffectInnerShadow, DscCommon::VectorFloat4(4.0f, 2.0f, 5.0f, 0.0f), DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f) });
-        effect_array.push_back({DscUi::TUiEffectType::TEffectTint, DscCommon::VectorFloat4(), DscCommon::VectorFloat4(0.1f, 0.0f, 0.0f, 0.5f) });
+        effect_array.push_back({DscUi::TUiEffectType::TEffectTint, DscCommon::VectorFloat4(), DscCommon::VectorFloat4(0.05f, 0.0f, 0.0f, 0.05f) });
         auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
-            DscUi::UiManager::MakeComponentDebugGrid(),
-            //DscUi::UiManager::MakeComponentFill(DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)),
+            DscUi::MakeComponentDebugGrid(),
             *_draw_system,
             *_resources->_dag_collection,
             top_texture,
@@ -97,8 +97,6 @@ const bool Application::Update()
                 *_resources->_dag_collection,
                 *frame,
                 true, //false,
-                0.0f,
-                DscUi::UiInputState(),
                 _draw_system->GetRenderTargetBackBuffer()
             );
         }

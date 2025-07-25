@@ -71,4 +71,4 @@ DscVsprojectWindowExe("render_ui_root_effect" .WindowExeParam)
 
 .SolutionProjects + "render_ui_root_effect_project"
 .SolutionItemsApplicationProject + "render_ui_root_effect_project"
-//.SolutionBuildProject = "render_ui_root_effect_project"
+.SolutionBuildProject = "render_ui_root_effect_project"
