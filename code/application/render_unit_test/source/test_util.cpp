@@ -13,6 +13,8 @@ namespace
 
 const bool TestUtil::AlmostEqual(const bool in_ok, const float in_valueLhs, const float in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
 {
+	DSC_UNUSED(in_fileName);
+	DSC_UNUSED(in_lineNumber);
 	if (std::numeric_limits<float>::epsilon() < std::abs(in_valueLhs - in_valueRhs))
 	{
 		DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "AlmostEqual failed, lhs:%f rhs:%f file:%s line:%d\n", in_valueLhs, in_valueRhs, in_fileName.c_str(), in_lineNumber);
@@ -23,6 +25,8 @@ const bool TestUtil::AlmostEqual(const bool in_ok, const float in_valueLhs, cons
 
 const bool TestUtil::EqualString(const bool in_ok, const std::string& in_valueLhs, const std::string& in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
 {
+	DSC_UNUSED(in_fileName);
+	DSC_UNUSED(in_lineNumber);
 	if (in_valueLhs != in_valueRhs)
 	{
 		DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "EqualString failed, lhs:%s rhs:%s file:%s line:%d\n", in_valueLhs.c_str(), in_valueRhs.c_str(), in_fileName.c_str(), in_lineNumber);
@@ -58,8 +62,7 @@ const bool TestUtil::RunTests(
 				);
 
 			bool ok = false;
-			bool _continue = true;
-			while (true == _continue)
+			while (true)
 			{
 				MSG msg = {};
 				if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

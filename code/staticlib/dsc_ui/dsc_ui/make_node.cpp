@@ -905,6 +905,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeNodeScrollValue(
         scroll_x,
         in_owner);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(condition_scroll_x, "condition_scroll_x"));
+    DSC_UNUSED(condition_scroll_x);
 
     DscDag::NodeToken condition_scroll_y = in_dag_collection.CreateCondition<float, float>(
         condition_y,
@@ -914,6 +915,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeNodeScrollValue(
         scroll_y,
         in_owner);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(condition_scroll_y, "condition_scroll_y"));
+    DSC_UNUSED(condition_scroll_y);
 
     DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscCommon::VectorFloat2>([](DscCommon::VectorFloat2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             const float x = DscDag::GetValueType<float>(in_input_array[0]);
@@ -1078,6 +1080,7 @@ void DscUi::MakeNode::MakeEffectParamTintBlotNode(
         nullptr,
         in_owner);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(condition, "effect blot condition node"));
+    DSC_UNUSED(condition);
 
     out_effect_param = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             const float time_delta = DscDag::GetValueType<float>(in_input_array[0]);

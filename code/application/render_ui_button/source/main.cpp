@@ -27,8 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE in_hInstance,
     );
 
     int32 exitCode = 0;
-    bool _continue = true;
-    while (true == _continue)
+    while (true)
     {
         MSG msg = {};
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

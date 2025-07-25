@@ -89,7 +89,7 @@ const bool ApplicationUi::TestCreateDeleteRootAndChild()
 
     std::unique_ptr<DscDag::DagCollection> dag_collection = std::make_unique<DscDag::DagCollection>();
     std::unique_ptr<DscUi::UiManager> ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *dag_collection);
-    DscUi::UiRootNodeGroup ui_root_node_group = {};
+    DscDag::NodeToken ui_root_node_group = {};
 
     const int dag_node_count_before = dag_collection->GetNodeCount();
 
@@ -104,8 +104,6 @@ const bool ApplicationUi::TestCreateDeleteRootAndChild()
     }
 
     {
-        auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*dag_collection, ui_root_node_group);
-
         ui_manager->AddChildNode(
             DscUi::MakeComponentDebugGrid().SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
@@ -115,13 +113,13 @@ const bool ApplicationUi::TestCreateDeleteRootAndChild()
             *_draw_system,
             *dag_collection,
             ui_root_node_group,
-            root_as_parent,
+            ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
     }
 
-    ui_manager->DestroyRootNode(
+    ui_manager->DestroyNode(
         *dag_collection,
         ui_root_node_group
         );
@@ -142,7 +140,7 @@ const bool ApplicationUi::TestRemoveChild()
 
     std::unique_ptr<DscDag::DagCollection> dag_collection = std::make_unique<DscDag::DagCollection>();
     std::unique_ptr<DscUi::UiManager> ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *dag_collection);
-    DscUi::UiRootNodeGroup ui_root_node_group = {};
+    DscDag::NodeToken ui_root_node_group = {};
 
     {
         auto top_texture = ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
@@ -153,7 +151,6 @@ const bool ApplicationUi::TestRemoveChild()
             top_texture
         );
     }
-    auto root_as_parent = DscUi::UiManager::ConvertRootNodeGroupToNodeGroup(*dag_collection, ui_root_node_group);
 
     {
         ui_manager->AddChildNode(
@@ -165,13 +162,13 @@ const bool ApplicationUi::TestRemoveChild()
             *_draw_system,
             *dag_collection,
             ui_root_node_group,
-            root_as_parent,
+            ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
     }
 
-    DscUi::UiNodeGroup child_to_remove = {};
+    DscDag::NodeToken child_to_remove = {};
     const int dag_node_count_before = dag_collection->GetNodeCount();
     {
         child_to_remove = ui_manager->AddChildNode(
@@ -183,14 +180,14 @@ const bool ApplicationUi::TestRemoveChild()
             *_draw_system,
             *dag_collection,
             ui_root_node_group,
-            root_as_parent,
+            ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
     }
-    ui_manager->RemoveAndDestroyChild(
+    ui_manager->RemoveDestroyChild(
         *dag_collection,
-        root_as_parent,
+        ui_root_node_group,
         child_to_remove
     );
 

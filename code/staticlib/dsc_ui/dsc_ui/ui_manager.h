@@ -158,6 +158,12 @@ namespace DscUi
 			DscDag::NodeToken in_node_group
 			);
 
+		void RemoveDestroyChild(
+			DscDag::DagCollection& in_dag_collection,
+			DscDag::NodeToken in_parent,
+			DscDag::NodeToken in_child_to_destroy
+		);
+
 		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
 
 		/// if multiple calls to update need to start being called with non zero time delta, need to set up frame node to accept

@@ -13,6 +13,8 @@ namespace TestUtil
 	template<typename TYPE>
 	const bool Equal(const bool in_ok, const TYPE in_valueLhs, const TYPE in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
 	{
+		DSC_UNUSED(in_fileName);
+		DSC_UNUSED(in_lineNumber);
 		if (in_valueLhs != in_valueRhs)
 		{
 			DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Equal failed file:%s line:%d\n", in_fileName.c_str(), in_lineNumber);
@@ -24,6 +26,8 @@ namespace TestUtil
 	template<typename TYPE>
 	const bool EqualVector(const bool in_ok, const std::vector<TYPE>& in_valueLhs, const std::vector<TYPE>& in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
 	{
+		DSC_UNUSED(in_fileName);
+		DSC_UNUSED(in_lineNumber);
 		bool match = false;
 		if (in_valueLhs.size() == in_valueRhs.size())
 		{
@@ -53,6 +57,8 @@ namespace TestUtil
 	template<typename TYPE>
 	const bool NotEqual(const bool in_ok, const TYPE in_valueLhs, const TYPE in_valueRhs, const std::string& in_fileName, const int in_lineNumber)
 	{
+		DSC_UNUSED(in_fileName);
+		DSC_UNUSED(in_lineNumber);
 		if (in_valueLhs == in_valueRhs)
 		{
 			DSC_LOG_ERROR(LOG_TOPIC_APPLICATION, "Not Equal failed file:%s line:%d\n", in_fileName.c_str(), in_lineNumber);

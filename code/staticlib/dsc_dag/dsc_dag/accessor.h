@@ -7,6 +7,7 @@ namespace DscDag
 {
 	const std::vector<NodeToken>& GetValueNodeArray(NodeToken in_input);
 	void NodeArrayPushBack(NodeToken in_node_array, NodeToken in_node_to_add);
+	void NodeArrayRemove(NodeToken in_node_array, NodeToken in_node_to_remove);
 
 	NodeToken GetValueNode(NodeToken in_input);
 

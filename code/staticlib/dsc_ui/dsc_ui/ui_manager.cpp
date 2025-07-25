@@ -1163,6 +1163,34 @@ void DscUi::UiManager::DestroyNode(
     return;
 }
 
+
+void DscUi::UiManager::RemoveDestroyChild(
+    DscDag::DagCollection& in_dag_collection,
+    DscDag::NodeToken in_parent,
+    DscDag::NodeToken in_child_to_destroy
+)
+{
+    // remove from parent the child node to remove
+    {
+        auto parent_child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TArrayChildUiNodeGroup);
+        DSC_ASSERT(nullptr != parent_child_array_node, "parent must have a child array");
+        DscDag::NodeArrayRemove(parent_child_array_node, in_child_to_destroy);
+    }
+
+    // unlink draw_node to the parent draw base
+    {
+        auto draw_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_child_to_destroy, TUiNodeGroup::TDrawNode);
+        auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
+        DscDag::UnlinkNodes(draw_node, parent_draw_base);
+    }
+
+    TraverseHierarchyUnlink(in_child_to_destroy);
+    TraverseHierarchyDeleteNode(in_child_to_destroy, in_dag_collection);
+
+    return;
+}
+
+
 void DscUi::UiManager::Update(
     DscDag::NodeToken in_root_node_group,
     const float in_time_delta,
