@@ -308,3 +308,44 @@ IUiComponent::Update(const float in_time_delta)
 IUiComponent::SetDesiredSizeNode(NodeToken) // for making shader constants for ui panel draw
 IUiComponent::SetDrawNode(NodeToken) // for parent to get the render target shader resource to draw as texture
 
+
+//=============================================
+data source, want a way to get a data source to be reflected in the ui system,
+
+ie, main menu
+	template name "main menu"
+	data item title
+	data item array buttons
+		buton name
+		button callback
+
+		=>
+
+	template name "application"
+		active screen //"main menu"
+			template name "main menu"
+			data item title
+			data item array buttons
+				buton name
+				button callback
+
+enum TDataSourceNodeGroup
+	TTemplate // string
+	TData // node group of enum type known by the 
+
+lets say you had a dag calculate with inputs of the template name
+	calculate node has a value of a std::shared<UiInstance>
+	and a reference to the UiInstanceManager which has the map of template name to intance factories
+
+UiInstance::GetTemplateName() const => std::string
+
+this covers ctor/dtor of the UiInstanceManager, but once that is done, what drives the layout to create/ update
+
+DagNodeCalculate ui_intance_node->Update();
+ui_intance_node->GetValue()->Update();
+UiInstance::Update()
+	has ref to dag_collection, the NodeToken of this part of the 
+
+move towards all data handed to ui is already in a DagNode (ComponentConstructionHelper) or make a new DagNode version of helper
+or alternative data paths in ComponentConstructionHelper, it already had a few NodeToken's (case of interest, getting text in)
+

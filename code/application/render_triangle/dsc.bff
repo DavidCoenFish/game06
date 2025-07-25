@@ -27,4 +27,4 @@ DscVsprojectWindowExe("render_triangle" .WindowExeParam)
 
 .SolutionProjects + "render_triangle_project"
 .SolutionItemsApplicationProject + "render_triangle_project"
-.SolutionBuildProject = "render_triangle_project"
+//.SolutionBuildProject = "render_triangle_project"
