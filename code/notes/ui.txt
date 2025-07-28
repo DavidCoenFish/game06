@@ -349,3 +349,13 @@ UiInstance::Update()
 move towards all data handed to ui is already in a DagNode (ComponentConstructionHelper) or make a new DagNode version of helper
 or alternative data paths in ComponentConstructionHelper, it already had a few NodeToken's (case of interest, getting text in)
 
+
+long term improvements
+have a ui node (for the ui heirarchy layout)
+have a top level root node (time delta, input, tooltip layer ref)
+have a dedicated draw node (as to be clear that updating it calls update of render, and not to get mixed in with the rest of the hierarchy)
+
+minimise render resources, always draw to texture (avoid the alkward passing in backbuffer ref?), but don't keep a texture for each and every effect
+some way of doing more draw to end target than many early, we have the screen space coord, only draw to end target? feedback loop of effects
+
+

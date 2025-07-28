@@ -30,7 +30,7 @@ void DscUi::UiInstanceFactory::AddFactory(
 )
 {
 	DSC_ASSERT(false == in_template_name.empty(), "invalid param");
-	DSC_ASSERT(nullptr == in_factory, "invalid param");
+	DSC_ASSERT(nullptr != in_factory, "invalid param");
 	_name_factory_map[in_template_name] = in_factory;
 	return;
 }

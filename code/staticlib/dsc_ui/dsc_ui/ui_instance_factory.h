@@ -39,11 +39,6 @@ namespace DscUi
 	class UiInstanceFactory
 	{
 	public:
-		/*
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
-		*/
 		typedef std::function<std::shared_ptr<IUiInstance>(
 			UiInstanceFactory&,
 			UiManager&, 

@@ -67,7 +67,7 @@ void DscDag::DagCollection::DeleteNode(NodeToken in_node)
 	// if this is a node group, it adds output to each internal node, unlink them BEFORE we get up to the destroy owned
 	// as node groups can both have linkage via SetNode and ownership
 	// yes this is a mess, but lets see how far we can go
-	//in_node->UnlinkInputs();
+	in_node->UnlinkInputs();
 
 	IDagOwner* dag_owner = dynamic_cast<IDagOwner*>(in_node);
 	if (nullptr != dag_owner)
