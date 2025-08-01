@@ -72,10 +72,10 @@ void DscDag::DagNodeGroup::AddOwnership(NodeToken in_node)
 void DscDag::DagNodeGroup::DestroyOwned(DagCollection& in_dag_collection)
 {
 	// this was causing Unlink to be called on a destroyed node
-	//for (const auto& item : _node_ownership_group)
-	//{
-	//	item->UnlinkInputs();
-	//}
+	for (const auto& item : _node_ownership_group)
+	{
+		item->UnlinkInputs();
+	}
 
 	for (const auto& item : _node_ownership_group)
 	{
@@ -164,12 +164,13 @@ void DscDag::DagNodeGroup::UnlinkInputs()
 		{
 			if (nullptr != item)
 			{
-				item->UnlinkInputs();
+				//item->UnlinkInputs();
 				item->RemoveOutput(this);
 				//item = nullptr;
 			}
 		}
 
+		// so, we don't usually recurse UnlinkInputs, but the ui manager wants to unlink hierarchy
 		for (auto& item : _node_ownership_group)
 		{
 			if (nullptr != item)

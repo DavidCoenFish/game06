@@ -87,6 +87,9 @@ namespace
 
         ~UiInstanceApp()
         {
+            DscDag::DebugPrintRecurseInputs(_root_node_group);
+            DscDag::DebugPrintRecurseOutputs(_root_node_group);
+
             _ui_manager.DestroyNode(
                 _dag_collection,
                 _root_node_group

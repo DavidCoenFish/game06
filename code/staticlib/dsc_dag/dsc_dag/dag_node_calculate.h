@@ -132,7 +132,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						item->UnlinkInputs();
+						//item->UnlinkInputs();
 						item->RemoveOutput(this);
 					}
 				}
@@ -141,7 +141,7 @@ namespace DscDag
 				{
 					if (nullptr != item)
 					{
-						item->UnlinkInputs();
+						//item->UnlinkInputs();
 						item->RemoveOutput(this);
 					}
 				}

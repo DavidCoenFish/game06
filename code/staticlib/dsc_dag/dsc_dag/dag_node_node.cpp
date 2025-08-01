@@ -98,7 +98,7 @@ void DscDag::DagNodeNode::UnlinkInputs()
 {
 	if (nullptr != _node)
 	{
-		_node->UnlinkInputs();
+		//_node->UnlinkInputs();
 		_node->RemoveOutput(this);
 	}
 

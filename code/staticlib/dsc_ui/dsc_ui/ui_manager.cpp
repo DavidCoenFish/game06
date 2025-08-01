@@ -811,61 +811,61 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
     DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(result);
     {
         auto frame = in_dag_collection.CreateValueNone((DscRenderResource::Frame*)(nullptr), owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(frame, "frame"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(frame, "frame root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TFrame, frame);
     }
 
     {
         auto time_delta = in_dag_collection.CreateValueNotZero(0.0f, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(time_delta, "time delta"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(time_delta, "time delta root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TTimeDelta, time_delta);
     }
 
     {
         auto ui_scale = in_dag_collection.CreateValueOnValueChange(1.0f, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_scale, "ui scale"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_scale, "ui scale root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TUiScale, ui_scale);
     }
 
     {
         auto input_state = in_dag_collection.CreateValueOnSet(UiInputState(), owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_state, "input_state"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_state, "input state root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TInputState, input_state);
     }
 
     {
         auto force_draw = in_dag_collection.CreateValueNotZero(false, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(force_draw, "force_draw"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(force_draw, "force draw root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TForceDraw, force_draw);
     }
 
     {
         auto ui_render_target = in_dag_collection.CreateValueOnSet(in_ui_render_target, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_render_target, "ui_render_target"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_render_target, "ui render target root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TUiRenderTarget, ui_render_target);
     }
 
     {
         auto render_target_size = in_dag_collection.CreateValueOnValueChange(DscCommon::VectorInt2::s_zero, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(render_target_size, "render_target_size"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(render_target_size, "render target size root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize, render_target_size);
     }
 
     {
         auto ui_component_type = in_dag_collection.CreateValueOnValueChange(in_construction_helper._component_type, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_component_type, "ui_component_type"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_component_type, "ui component type root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TUiComponentType, ui_component_type);
     }
 
     {
         auto array_child = in_dag_collection.CreateNodeArrayEmpty(owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(array_child, "array child"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(array_child, "array child root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TArrayChildUiNodeGroup, array_child);
     }
 
     {
         auto screen_space = in_dag_collection.CreateValueOnValueChange(DscUi::ScreenSpace(), owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(screen_space, "screen space"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(screen_space, "screen space root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TScreenSpace, screen_space);
     }
 
@@ -887,14 +887,14 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
     // TGeometryOffset
     {
         auto node = in_dag_collection.CreateValueNone(DscCommon::VectorInt2::s_zero, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "geometry offset"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "geometry offset root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TGeometryOffset, node);
     }
 
     // TScrollPos
     {
         auto node = in_dag_collection.CreateValueNone(DscCommon::VectorFloat2::s_zero, owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "scroll pos"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "scroll pos root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TScrollPos, node);
     }
 
@@ -1715,7 +1715,10 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             out_value = ui_render_target.get();
         },
             owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "ui panel draw"));
+
+        static int32 s_index = 0;
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, std::string("ui panel draw ") + std::to_string(s_index)));
+        s_index += 1;
 
         DscDag::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);

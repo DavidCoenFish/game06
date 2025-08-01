@@ -193,6 +193,11 @@ const bool ApplicationUi::TestRemoveChild()
 
     const int dag_node_count_after = dag_collection->GetNodeCount();
 
+    ui_manager->DestroyNode(
+        *dag_collection,
+        ui_root_node_group
+    );
+
     // allow resources to get off the gpu before shutdown of ui_manager
     _draw_system->WaitForGpu();
 

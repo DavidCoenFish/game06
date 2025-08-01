@@ -184,7 +184,7 @@ namespace DscDag
 			{
 				if (nullptr != _condition)
 				{
-					_condition->UnlinkInputs();
+					//_condition->UnlinkInputs();
 					_condition->RemoveOutput(this);
 					//_condition = nullptr;
 				}
@@ -192,7 +192,7 @@ namespace DscDag
 				{
 					if (nullptr != _true_source)
 					{
-						_true_source->UnlinkInputs();
+						//_true_source->UnlinkInputs();
 						_true_source->RemoveOutput(this);
 						//UnlinkNodes(_true_source, _true_destination);
 					}
@@ -202,7 +202,7 @@ namespace DscDag
 				{
 					if (nullptr != _false_source)
 					{
-						_false_source->UnlinkInputs();
+						//_false_source->UnlinkInputs();
 						_false_source->RemoveOutput(this);
 						//UnlinkNodes(_false_source, _false_destination);
 					}

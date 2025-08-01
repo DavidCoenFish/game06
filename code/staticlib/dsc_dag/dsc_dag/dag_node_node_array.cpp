@@ -156,7 +156,7 @@ void DscDag::DagNodeNodeArray::UnlinkInputs()
 		{
 			if (nullptr != item)
 			{
-				item->UnlinkInputs();
+				//item->UnlinkInputs();
 				item->RemoveOutput(this);
 			}
 		}
