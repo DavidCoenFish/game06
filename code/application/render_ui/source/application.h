@@ -51,8 +51,11 @@ namespace DscDagRender
 namespace DscUi
 {
     class UiManager;
+    template <typename CONTEXT>
     class UiInstanceFactory;
 }
+
+struct UiInstanceContext;
 
 class Application : public DscWindows::IWindowApplication
 {
@@ -84,7 +87,7 @@ private:
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
-        std::unique_ptr<DscUi::UiInstanceFactory> _ui_instance_factory = {};
+        std::unique_ptr<DscUi::UiInstanceFactory<UiInstanceContext>> _ui_instance_factory = {};
         
         DscDag::NodeToken _data_source_node_group;
         DscDag::NodeToken _ui_instance_node;

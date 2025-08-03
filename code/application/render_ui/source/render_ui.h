@@ -1,5 +1,7 @@
 #pragma once
 
+#include <dsc_common/dsc_common.h>
+
 // trying to get visual studio to see settings
 #ifndef DSC_BFF_BUILD
 

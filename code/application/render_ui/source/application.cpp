@@ -1,4 +1,7 @@
 #include "application.h"
+#include "ui_instance_context.h"
+#include "ui_instance_app.h"
+#include "ui_instance_main_menu.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/file_system.h>
 #include <dsc_common/log_system.h>
@@ -35,118 +38,6 @@
 
 namespace
 {
-    enum class TUiNodeGroupDataSourceApplication : uint8
-    {
-        TMainScreenDataSource = DscUi::TUiNodeGroupDataSource::TCount,
-        TCount
-    };
-
-    class UiInstanceApp : public DscUi::IUiInstance
-    {
-    public:
-        UiInstanceApp() = delete;
-        UiInstanceApp& operator=(const UiInstanceApp&) = delete;
-        UiInstanceApp(const UiInstanceApp&) = delete;
-
-        UiInstanceApp(
-            const std::shared_ptr<DscUi::UiRenderTarget>& in_root_external_render_target_or_null,
-            DscUi::UiManager& in_ui_manager,
-            DscRender::DrawSystem& in_draw_system,
-            DscDag::DagCollection& in_dag_collection
-            )
-            : _ui_manager(in_ui_manager)
-            , _draw_system(in_draw_system)
-            , _dag_collection(in_dag_collection)
-        {
-            _root_node_group = _ui_manager.MakeRootNode(
-                DscUi::MakeComponentCanvas(
-                ).SetClearColour(
-                    DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
-                ),
-                _draw_system,
-                _dag_collection,
-                in_root_external_render_target_or_null
-            );
-
-            _main_screen_cross_fade = _ui_manager.AddChildNode(
-                DscUi::MakeComponentCrossfade(
-                    nullptr
-                ).SetChildSlot(
-                    DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
-                    DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
-                    DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
-                ),
-                _draw_system,
-                _dag_collection,
-                _root_node_group,
-                _root_node_group,
-                std::vector<DscUi::UiManager::TEffectConstructionHelper>()
-                DSC_DEBUG_ONLY(DSC_COMMA "app crossfade main")
-            );
-        }
-
-        ~UiInstanceApp()
-        {
-            DscDag::DebugPrintRecurseInputs(_root_node_group);
-            DscDag::DebugPrintRecurseOutputs(_root_node_group);
-
-            _ui_manager.DestroyNode(
-                _dag_collection,
-                _root_node_group
-                );
-        }
-    private:
-        virtual void Update() override
-        {
-            //todo
-        }
-        virtual DscDag::NodeToken GetDagUiGroupNode() override
-        {
-            return _root_node_group;
-        }
-        virtual DscDag::NodeToken GetDagUiDrawNode() override
-        {
-            return DscDag::DagNodeGroup::GetNodeTokenEnum(_root_node_group, DscUi::TUiNodeGroup::TDrawNode);
-        }
-        virtual DscDag::NodeToken GetDagUiDrawBaseNode() override
-        {
-            return DscDag::DagNodeGroup::GetNodeTokenEnum(_root_node_group, DscUi::TUiNodeGroup::TDrawBaseNode);
-        }
-    private:
-        DscUi::UiManager& _ui_manager;
-        DscRender::DrawSystem& _draw_system;
-        DscDag::DagCollection& _dag_collection;
-
-        DscDag::NodeToken _root_node_group = {};
-        DscDag::NodeToken _main_screen_cross_fade = {};
-    };
-
-    std::shared_ptr<DscUi::IUiInstance> UiInstanceFactoryApp(
-        DscUi::UiInstanceFactory& in_ui_instance_factory,
-        DscUi::UiManager& in_ui_manager,
-        DscRender::DrawSystem& in_draw_system,
-        DscDag::DagCollection& in_dag_collection,
-        const std::shared_ptr<DscUi::UiRenderTarget>& in_root_external_render_target_or_null,
-        DscDag::NodeToken in_data_source, // data source
-        DscDag::NodeToken in_parent_node_or_null// parent node or null
-    )
-    {
-        DSC_UNUSED(in_ui_instance_factory);
-        DSC_UNUSED(in_data_source);
-        DSC_UNUSED(in_parent_node_or_null);
-
-
-        //_calculate_main_screen = in_ui_instance_factory
-
-        std::shared_ptr<DscUi::IUiInstance> result = std::make_shared<UiInstanceApp>(
-            in_root_external_render_target_or_null,
-            in_ui_manager,
-            in_draw_system,
-            in_dag_collection
-            );
-
-        return result;
-    }
 }
 
 Application::Resources::Resources()
@@ -160,7 +51,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     _keep_running = true;
 
     _file_system = std::make_unique<DscCommon::FileSystem>();
-    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.0f));
+    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f));
 
     _resources = std::make_unique<Resources>();
 
@@ -175,12 +66,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
         _resources->_dag_collection = std::make_unique<DscDag::DagCollection>();
         _resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
-        _resources->_ui_instance_factory = std::make_unique<DscUi::UiInstanceFactory>();
+        _resources->_ui_instance_factory = std::make_unique<DscUi::UiInstanceFactory<UiInstanceContext>>();
     }
 
     if (nullptr != _resources->_ui_instance_factory)
     {
-        _resources->_data_source_node_group = _resources->_dag_collection->CreateGroupEnum<TUiNodeGroupDataSourceApplication, DscUi::TUiNodeGroupDataSource>();
+        _resources->_data_source_node_group = _resources->_dag_collection->CreateGroupEnum<UiInstanceApp::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
         DscDag::IDagOwner* const data_source_owner = dynamic_cast<DscDag::IDagOwner*>(_resources->_data_source_node_group);
         {
             auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("app", data_source_owner);
@@ -191,19 +82,44 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 node
                 );
         }
+        {
+            auto main_screen_data_source = _resources->_dag_collection->CreateGroupEnum<UiInstanceMainMenu::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
+            // need to modify DagCollection::Delete to recurse IDagNode owner deletion?
+            //DscDag::IDagOwner* const data_source_owner_internal = dynamic_cast<DscDag::IDagOwner*>(main_screen_data_source);
 
-        _resources->_ui_instance_factory->AddFactory("app", UiInstanceFactoryApp);
-
-        auto ui_render_target = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
-        _resources->_ui_instance_node =
-            _resources->_ui_instance_factory->BuildInstance(
-            _resources->_data_source_node_group,
-            *_resources->_ui_manager,
-            *_draw_system,
-            *_resources->_dag_collection,
-            ui_render_target,
-            nullptr
+            auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("main screen", data_source_owner); // data_source_owner_internal);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main screen"));
+            DscDag::DagNodeGroup::SetNodeTokenEnum(
+                main_screen_data_source,
+                DscUi::TUiNodeGroupDataSource::TTemplateName,
+                node
             );
+
+            DscDag::DagNodeGroup::SetNodeTokenEnum(
+                _resources->_data_source_node_group,
+                UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource,
+                main_screen_data_source
+            );
+        }
+
+        _resources->_ui_instance_factory->AddFactory("app", UiInstanceApp::Factory);
+        _resources->_ui_instance_factory->AddFactory("main screen", UiInstanceMainMenu::Factory);
+
+        {
+            auto ui_render_target = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
+            UiInstanceContext context = {};
+            context._dag_collection = _resources->_dag_collection.get();
+            context._data_source = _resources->_data_source_node_group;
+            context._draw_system = _draw_system.get();
+            context._file_system = _file_system.get();
+            context._root_external_render_target_or_null = ui_render_target;
+            context._ui_manager = _resources->_ui_manager.get();
+
+            _resources->_ui_instance_node =
+                _resources->_ui_instance_factory->BuildInstance(
+                    context
+                );
+        }
     }
 
     return;

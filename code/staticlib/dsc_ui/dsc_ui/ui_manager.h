@@ -84,6 +84,10 @@ may be a bit of a mess for some of the switch functionality paths...
 
 the number of render targets could also be a resource cost, possibly need a less memory intensive way of drawing all the steps/ reusing render targets better
 */
+/*
+may need to be careful of cross contamination of dirty against the draw chain and other chains of dirty
+possible improvements is to have the MakeRootNode return a [RootNodeGroup, UiNodeGroup, DrawNode, DrawBase] but then end up with some mess of threading in the draw nodes for add child...
+*/
 namespace DscUi
 {
 	/*
@@ -133,6 +137,8 @@ namespace DscUi
 			DscCommon::VectorFloat4 _effect_param_rollover = {};
 			DscCommon::VectorFloat4 _effect_param_tint_rollover = {};
 		};
+
+		// reminder, the root node uses a provided ui render target, so setting a clear background colour on the construction_helper will have no effect
 		DscDag::NodeToken MakeRootNode(
 			const ComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
