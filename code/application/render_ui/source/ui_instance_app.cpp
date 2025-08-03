@@ -70,6 +70,7 @@ UiInstanceApp::UiInstanceApp(
         in_root_external_render_target_or_null
     );
 
+#if 0
     _ui_manager.AddChildNode(
         DscUi::MakeComponentDebugGrid().SetChildSlot(
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
@@ -83,6 +84,7 @@ UiInstanceApp::UiInstanceApp(
         std::vector<DscUi::UiManager::TEffectConstructionHelper>()
         DSC_DEBUG_ONLY(DSC_COMMA "debug grid")
     );
+#endif
 
     _main_screen_cross_fade = _ui_manager.AddChildNode(
         DscUi::MakeComponentCrossfade(
