@@ -480,6 +480,8 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
     if (true == in_desired_size_from_children_max)
     {
         node = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([](DscCommon::VectorInt2& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "MakeDesiredSize\n");
+
             const std::vector<DscDag::NodeToken>& array_child_node_group = DscDag::GetValueNodeArray(in_input_array[0]);
             DscCommon::VectorInt2 max_size = {};
             for (const auto& item : array_child_node_group)
@@ -487,11 +489,15 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
                 const DscCommon::VectorInt2& geometry_offset = DscDag::GetValueType< DscCommon::VectorInt2>(DscDag::DagNodeGroup::GetNodeTokenEnum(item, DscUi::TUiNodeGroup::TGeometryOffset));
                 const DscCommon::VectorInt2& geometry_size = DscDag::GetValueType< DscCommon::VectorInt2>(DscDag::DagNodeGroup::GetNodeTokenEnum(item, DscUi::TUiNodeGroup::TGeometrySize));
 
+                //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "  geometry_size[%d, %d] geometry_offset[%d, %d]\n", geometry_size.GetX(), geometry_size.GetY(), geometry_offset.GetX(), geometry_offset.GetY());
+
                 max_size.Set(
                     std::max(max_size.GetX(), geometry_offset.GetX() + geometry_size.GetX()),
                     std::max(max_size.GetY(), geometry_offset.GetY() + geometry_size.GetY())
                 );
             }
+
+            //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, " max_size[%d, %d]\n", max_size.GetX(), max_size.GetY());
 
             value = max_size;
         },
@@ -499,6 +505,9 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "desired size max children"));
 
         DscDag::LinkIndexNodes(0, in_array_child_node_group, node);
+
+        //in_array_child_node_group is currently not dirtied on resize (node group not set to dirty), so desired size was not recalculating
+        DscDag::LinkNodes(in_avaliable_size, node);
     }
     else if (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TDesiredSize))
     {

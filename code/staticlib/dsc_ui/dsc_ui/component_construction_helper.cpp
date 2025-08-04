@@ -130,6 +130,24 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             text
         );
     }
+    else if (nullptr != in_construction_helper._text_run_node)
+    {
+        DSC_ASSERT(nullptr != in_construction_helper._text_manager, "invalid state");
+        DscText::TextManager* text_manager = in_construction_helper._text_manager;
+        auto text = in_dag_collection.CreateCalculate<DscUi::TUiComponentTextData>([text_manager](DscUi::TUiComponentTextData& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            output._text_manager = text_manager;
+            output._text_run = DscDag::GetValueType<std::shared_ptr<DscText::TextRun>>(in_input_array[0]);
+        }, owner
+        );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "text node"));
+
+        DscDag::LinkIndexNodes(0, in_construction_helper._text_run_node, text);
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TText,
+            text
+        );
+    }
 
     if (true == in_construction_helper._has_ui_scale_by_avaliable_width)
     {
@@ -619,6 +637,19 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentText(
 {
     ComponentConstructionHelper result({ TUiComponentType::TText });
     result._text_run = in_text_run;
+    result._text_manager = in_text_manager;
+    result._has_scroll = in_has_scroll;
+    return result;
+}
+
+DscUi::ComponentConstructionHelper DscUi::MakeComponentTextNode(
+    DscDag::NodeToken in_text_run_node,
+    DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
+    const bool in_has_scroll
+)
+{
+    ComponentConstructionHelper result({ TUiComponentType::TTextNode });
+    result._text_run_node = in_text_run_node;
     result._text_manager = in_text_manager;
     result._has_scroll = in_has_scroll;
     return result;

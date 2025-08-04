@@ -75,6 +75,7 @@ namespace DscUi
 		TImage,
 		TCanvas,
 		TText,
+		TTextNode, // alternative data path for TText, but from a DagNode returning a shared_ptr<TextRun>
 		TStack,
 		TCrossFade, // one child is set to be active and fade in, another array of children to fade out. up to child if it removes tself on crossfade == 0?
 		//TLayerSet, // could be layers for [tooltip, combobox, animation, dialog, screen, background?]

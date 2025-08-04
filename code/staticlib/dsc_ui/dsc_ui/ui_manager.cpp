@@ -64,6 +64,8 @@ namespace
             return DscUi::TUiDrawType::TUiPanel;
         case DscUi::TUiComponentType::TText:
             return DscUi::TUiDrawType::TText;
+        case DscUi::TUiComponentType::TTextNode:
+            return DscUi::TUiDrawType::TText;
         case DscUi::TUiComponentType::TStack:
             return DscUi::TUiDrawType::TUiPanel;
         case DscUi::TUiComponentType::TCrossFade:

@@ -71,6 +71,7 @@ namespace DscUi
 
 		// we could use move semantics to have the text run as a unique_ptr, but kind of throwing around the ComponentConstructionHelper by copy
 		std::shared_ptr<DscText::TextRun> _text_run = {};
+		DscDag::NodeToken _text_run_node = nullptr;
 		DscText::TextManager* _text_manager = nullptr;
 
 		// possibly more than just the stack component will use this
@@ -250,6 +251,11 @@ namespace DscUi
 		DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
 		const bool in_has_scroll = true
 		);
+	ComponentConstructionHelper MakeComponentTextNode(
+		DscDag::NodeToken in_text_run_node,
+		DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
+		const bool in_has_scroll = true
+	);
 	ComponentConstructionHelper MakeComponentStack(
 		const TUiFlow in_flow_direction,
 		const UiCoord& in_gap,
