@@ -90,6 +90,8 @@ private:
         std::unique_ptr<DscUi::UiInstanceFactory<UiInstanceContext>> _ui_instance_factory = {};
         
         DscDag::NodeToken _data_source_node_group;
+        DscDag::NodeToken _data_source_main_screen;
+
         DscDag::NodeToken _ui_instance_node;
     };
     std::unique_ptr<Resources> _resources;

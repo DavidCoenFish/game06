@@ -72,6 +72,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     if (nullptr != _resources->_ui_instance_factory)
     {
         _resources->_data_source_node_group = _resources->_dag_collection->CreateGroupEnum<UiInstanceApp::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(_resources->_data_source_node_group, "data source"));
+
         DscDag::IDagOwner* const data_source_owner = dynamic_cast<DscDag::IDagOwner*>(_resources->_data_source_node_group);
         {
             auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("app", data_source_owner);
@@ -82,23 +84,27 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 node
                 );
         }
+        // main screen data source
         {
-            auto main_screen_data_source = _resources->_dag_collection->CreateGroupEnum<UiInstanceMainMenu::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
+            _resources->_data_source_main_screen = _resources->_dag_collection->CreateGroupEnum<UiInstanceMainMenu::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>(data_source_owner);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(_resources->_data_source_main_screen, "data source main screen"));
             // need to modify DagCollection::Delete to recurse IDagNode owner deletion?
-            //DscDag::IDagOwner* const data_source_owner_internal = dynamic_cast<DscDag::IDagOwner*>(main_screen_data_source);
+            DscDag::IDagOwner* const data_source_owner_main_screen = dynamic_cast<DscDag::IDagOwner*>(_resources->_data_source_main_screen);
 
-            auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("main screen", data_source_owner); // data_source_owner_internal);
-            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main screen"));
-            DscDag::DagNodeGroup::SetNodeTokenEnum(
-                main_screen_data_source,
-                DscUi::TUiNodeGroupDataSource::TTemplateName,
-                node
-            );
+            {
+                auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("main screen", data_source_owner_main_screen);
+                DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main screen"));
+                DscDag::DagNodeGroup::SetNodeTokenEnum(
+                    _resources->_data_source_main_screen,
+                    DscUi::TUiNodeGroupDataSource::TTemplateName,
+                    node
+                );
+            }
 
             DscDag::DagNodeGroup::SetNodeTokenEnum(
                 _resources->_data_source_node_group,
                 UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource,
-                main_screen_data_source
+                _resources->_data_source_main_screen
             );
         }
 
@@ -133,6 +139,7 @@ Application::~Application()
     }
 
     _resources->_dag_collection->DeleteNode(_resources->_ui_instance_node);
+    //_resources->_dag_collection->DeleteNode(_resources->_data_source_main_screen);
     _resources->_dag_collection->DeleteNode(_resources->_data_source_node_group);
 
     _resources.reset();

@@ -42,6 +42,8 @@ public:
     {
         TMainScreenDataSource = static_cast<uint8>(DscUi::TUiNodeGroupDataSource::TCount),
         //TDialogDataSource
+        //TLocale
+        //TKeepAppRunning
         TCount
     };
 

@@ -63,11 +63,13 @@ public:
         DscDag::NodeToken in_parent_node_or_null
     );
     ~UiInstanceMainMenu();
+
 private:
     virtual void Update() override;
     virtual DscDag::NodeToken GetDagUiGroupNode() override;
     virtual DscDag::NodeToken GetDagUiDrawNode() override;
     virtual DscDag::NodeToken GetDagUiDrawBaseNode() override;
+
 private:
     DscUi::UiManager& _ui_manager;
     DscRender::DrawSystem& _draw_system;
