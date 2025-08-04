@@ -2,17 +2,39 @@
 #include "ui_instance_context.h"
 #include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
+#include <dsc_locale/dsc_locale.h>
 
 #if defined(_DEBUG)
 template <>
 const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInstanceApp::TUiNodeGroupDataSource in_value)
 {
+    const int32 value_int = static_cast<int32>(in_value);
+    if (value_int < static_cast<int32>(DscUi::TUiNodeGroupDataSource::TCount))
+    {
+        return GetDagNodeGroupMetaData(static_cast<DscUi::TUiNodeGroupDataSource>(in_value));
+    }
+
     switch (in_value)
     {
     default:
         DSC_ASSERT_ALWAYS("invalid switch");
         break;
+    case UiInstanceApp::TUiNodeGroupDataSource::TLocale:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscLocale::LocaleISO_639_1) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
+        return s_meta_data;
+    }
     case UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSource:
     {
         static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
         return s_meta_data;
@@ -24,50 +46,79 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
 
 #endif //#if defined(_DEBUG)
 
+const std::string UiInstanceApp::GetTemplateName()
+{
+    return "app";
+}
 
+DscDag::NodeToken UiInstanceApp::BuildDataSource(
+    DscDag::DagCollection& in_dag_collection
+)
+{
+    auto result = in_dag_collection.CreateGroupEnum<UiInstanceApp::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result, "data source"));
+    DscDag::IDagOwner* const data_source_owner = dynamic_cast<DscDag::IDagOwner*>(result);
+    //TTemplateName
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange<std::string>(GetTemplateName(), data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "template name"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            DscUi::TUiNodeGroupDataSource::TTemplateName,
+            node
+        );
+    }
+    //TLocale
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange(DscLocale::LocaleISO_639_1::English, data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "locale"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceApp::TUiNodeGroupDataSource::TLocale,
+            node
+        );
+    }
+    //TKeepAppRunning
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange(true, data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "keep app running"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning,
+            node
+        );
+    }
+
+    return result;
+}
 
 std::shared_ptr<DscUi::IUiInstance> UiInstanceApp::Factory(
     const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
     const UiInstanceContext& in_context
 )
 {
-    DscDag::NodeToken main_screen_data_source = DscDag::DagNodeGroup::GetNodeTokenEnum(
-        in_context._data_source, 
-        TUiNodeGroupDataSource::TMainScreenDataSource
-    );
-
     std::shared_ptr<DscUi::IUiInstance> result = std::make_shared<UiInstanceApp>(
-        in_context._root_external_render_target_or_null,
         in_ui_instance_factory,
-        *in_context._ui_manager,
-        *in_context._draw_system,
-        *in_context._dag_collection,
-        *in_context._file_system,
-        main_screen_data_source
+        in_context
         );
 
     return result;
 }
 
 UiInstanceApp::UiInstanceApp(
-    const std::shared_ptr<DscUi::UiRenderTarget>& in_root_external_render_target_or_null,
     const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
-    DscUi::UiManager& in_ui_manager,
-    DscRender::DrawSystem& in_draw_system,
-    DscDag::DagCollection& in_dag_collection,
-    DscCommon::FileSystem& in_file_system,
-    DscDag::NodeToken in_main_screen_data_source
+    const UiInstanceContext& in_context
 )
-    : _ui_manager(in_ui_manager)
-    , _draw_system(in_draw_system)
-    , _dag_collection(in_dag_collection)
+    : _ui_manager(*in_context._ui_manager)
+    , _draw_system(*in_context._draw_system)
+    , _dag_collection(*in_context._dag_collection)
 {
     _root_node_group = _ui_manager.MakeRootNode(
         DscUi::MakeComponentCanvas(
         ),
         _draw_system,
         _dag_collection,
-        in_root_external_render_target_or_null
+        in_context._root_external_render_target_or_null
     );
 
 #if 0
@@ -105,14 +156,17 @@ UiInstanceApp::UiInstanceApp(
     );
 
     {
-        UiInstanceContext context = {};
-        context._dag_collection = &_dag_collection;
-        context._data_source = in_main_screen_data_source;
-        context._draw_system = &_draw_system;
-        context._file_system = &in_file_system;
-        context._parent_node_or_null = _main_screen_cross_fade;
+        DscDag::NodeToken main_screen_data_source = DscDag::DagNodeGroup::GetNodeTokenEnum(
+            in_context._data_source,
+            TUiNodeGroupDataSource::TMainScreenDataSource
+        );
+
+        UiInstanceContext context = in_context.MakeChild(
+            main_screen_data_source,
+            _main_screen_cross_fade
+            );
         context._root_node_or_null = _root_node_group;
-        context._ui_manager = &_ui_manager;
+
         _main_screen_factory_node = in_ui_instance_factory.BuildInstance(
             context
         );

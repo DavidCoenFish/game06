@@ -63,7 +63,7 @@ DscDag::NodeToken DscDag::DagCollection::CreateGroup(
 void DscDag::DagCollection::DeleteNode(NodeToken in_node)
 {
 	DSC_ASSERT(nullptr != in_node, "invalid param");
-	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "DeleteNode:%s\n", in_node->DebugGetNodeName().c_str());
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "DeleteNode:%s %p\n", in_node->DebugGetNodeName().c_str(), in_node);
 
 	// if this is a node group, it adds output to each internal node, unlink them BEFORE we get up to the destroy owned
 	// as node groups can both have linkage via SetNode and ownership

@@ -71,35 +71,16 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     if (nullptr != _resources->_ui_instance_factory)
     {
-        _resources->_data_source_node_group = _resources->_dag_collection->CreateGroupEnum<UiInstanceApp::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(_resources->_data_source_node_group, "data source"));
-
+        _resources->_data_source_node_group = UiInstanceApp::BuildDataSource(*_resources->_dag_collection);
         DscDag::IDagOwner* const data_source_owner = dynamic_cast<DscDag::IDagOwner*>(_resources->_data_source_node_group);
-        {
-            auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("app", data_source_owner);
-            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "template name"));
-            DscDag::DagNodeGroup::SetNodeTokenEnum(
-                _resources->_data_source_node_group, 
-                DscUi::TUiNodeGroupDataSource::TTemplateName,
-                node
-                );
-        }
+
         // main screen data source
         {
-            _resources->_data_source_main_screen = _resources->_dag_collection->CreateGroupEnum<UiInstanceMainMenu::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>(data_source_owner);
-            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(_resources->_data_source_main_screen, "data source main screen"));
-            // need to modify DagCollection::Delete to recurse IDagNode owner deletion?
-            DscDag::IDagOwner* const data_source_owner_main_screen = dynamic_cast<DscDag::IDagOwner*>(_resources->_data_source_main_screen);
-
-            {
-                auto node = _resources->_dag_collection->CreateValueOnValueChange<std::string>("main screen", data_source_owner_main_screen);
-                DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main screen"));
-                DscDag::DagNodeGroup::SetNodeTokenEnum(
-                    _resources->_data_source_main_screen,
-                    DscUi::TUiNodeGroupDataSource::TTemplateName,
-                    node
+            _resources->_data_source_main_screen = UiInstanceMainMenu::BuildDataSource(
+                *_resources->_dag_collection,
+                data_source_owner,
+                _resources->_data_source_node_group
                 );
-            }
 
             DscDag::DagNodeGroup::SetNodeTokenEnum(
                 _resources->_data_source_node_group,
@@ -108,18 +89,19 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             );
         }
 
-        _resources->_ui_instance_factory->AddFactory("app", UiInstanceApp::Factory);
-        _resources->_ui_instance_factory->AddFactory("main screen", UiInstanceMainMenu::Factory);
+        _resources->_ui_instance_factory->AddFactory(UiInstanceApp::GetTemplateName(), UiInstanceApp::Factory);
+        _resources->_ui_instance_factory->AddFactory(UiInstanceMainMenu::GetTemplateName(), UiInstanceMainMenu::Factory);
 
         {
             auto ui_render_target = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
             UiInstanceContext context = {};
             context._dag_collection = _resources->_dag_collection.get();
-            context._data_source = _resources->_data_source_node_group;
             context._draw_system = _draw_system.get();
             context._file_system = _file_system.get();
-            context._root_external_render_target_or_null = ui_render_target;
             context._ui_manager = _resources->_ui_manager.get();
+            context._text_manager = _resources->_text_manager.get();
+            context._data_source = _resources->_data_source_node_group;
+            context._root_external_render_target_or_null = ui_render_target;
 
             _resources->_ui_instance_node =
                 _resources->_ui_instance_factory->BuildInstance(

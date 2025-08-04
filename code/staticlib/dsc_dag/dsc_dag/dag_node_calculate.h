@@ -2,6 +2,7 @@
 #include "dsc_dag.h"
 #include "i_dag_node.h"
 #include <dsc_common\debug_print.h>
+#include <dsc_common\log_system.h>
 
 namespace DscDag
 {
@@ -127,6 +128,8 @@ namespace DscDag
 		{
 			if (false == _unlinked)
 			{
+				//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "UnlinkInputs:%s %p\n", DebugGetNodeName().c_str(), this);
+
 				_unlinked = true;
 				for (const auto& item : _index_input)
 				{

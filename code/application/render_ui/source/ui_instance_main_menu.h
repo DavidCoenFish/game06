@@ -13,6 +13,7 @@ namespace DscDag
     class DagCollection;
     class IDagNode;
     typedef IDagNode* NodeToken;
+    class IDagOwner;
 }
 
 namespace DscRender
@@ -41,12 +42,28 @@ public:
     enum class TUiNodeGroupDataSource : uint8
     {
         TTitle = static_cast<uint8>(DscUi::TUiNodeGroupDataSource::TCount),
+        TSubTitle,
+        TButtonArray,
         TCount
+    };
+
+    struct TButtonData
+    {
+        DscDag::NodeToken _button_text = {};
+        std::function<void(DscDag::NodeToken)> _on_click = {};
     };
 
     UiInstanceMainMenu() = delete;
     UiInstanceMainMenu& operator=(const UiInstanceMainMenu&) = delete;
     UiInstanceMainMenu(const UiInstanceMainMenu&) = delete;
+
+    static const std::string GetTemplateName();
+
+    static DscDag::NodeToken BuildDataSource(
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::IDagOwner* const in_data_source_owner,
+        DscDag::NodeToken in_root_data_source_node
+        );
 
     static std::shared_ptr<DscUi::IUiInstance> Factory(
         const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
@@ -54,13 +71,8 @@ public:
     );
 
     UiInstanceMainMenu(
-        DscUi::UiManager& in_ui_manager,
-        DscRender::DrawSystem& in_draw_system,
-        DscDag::DagCollection& in_dag_collection,
-        DscCommon::FileSystem& in_file_system,
-        DscDag::NodeToken in_data_source,
-        DscDag::NodeToken in_root_node_or_null,
-        DscDag::NodeToken in_parent_node_or_null
+        const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
+        const UiInstanceContext& in_context
     );
     ~UiInstanceMainMenu();
 

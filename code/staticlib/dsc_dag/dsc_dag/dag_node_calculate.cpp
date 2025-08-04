@@ -12,6 +12,12 @@ const bool DscDag::DagNodeCalculateBase::SetIndexInput(const int32 in_index, Nod
 	bool result = false;
 	if (_index_input[in_index] != in_node)
 	{
+		NodeToken old_value = _index_input[in_index];
+		if (nullptr != old_value)
+		{
+			old_value->RemoveOutput(this);
+		}
+
 		result = true;
 		_index_input[in_index] = in_node;
 		MarkDirty();

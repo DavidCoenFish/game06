@@ -1,9 +1,129 @@
 #include "ui_instance_main_menu.h"
+#include "ui_instance_app.h"
 #include "ui_instance_context.h"
 #include <dsc_common/file_system.h>
+#include <dsc_common/math.h>
+#include <dsc_render_resource_png/dsc_render_resource_png.h>
+#include <dsc_text/text_manager.h>
+#include <dsc_text/text_run.h>
+#include <dsc_text/i_text_run.h>
 #include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
-#include <dsc_render_resource_png/dsc_render_resource_png.h>
+
+#if defined(_DEBUG)
+template <>
+const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInstanceMainMenu::TUiNodeGroupDataSource in_value)
+{
+    const int32 value_int = static_cast<int32>(in_value);
+    if (value_int < static_cast<int32>(DscUi::TUiNodeGroupDataSource::TCount))
+    {
+        return GetDagNodeGroupMetaData(static_cast<DscUi::TUiNodeGroupDataSource>(in_value));
+    }
+
+    switch (in_value)
+    {
+    default:
+        DSC_ASSERT_ALWAYS("invalid switch");
+        break;
+    case UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::string) };
+        return s_meta_data;
+    }
+    case UiInstanceMainMenu::TUiNodeGroupDataSource::TSubTitle:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::string) };
+        return s_meta_data;
+    }
+    case UiInstanceMainMenu::TUiNodeGroupDataSource::TButtonArray:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::vector<UiInstanceMainMenu::TButtonData>) };
+        return s_meta_data;
+    }
+    }
+    static DscDag::DagNodeGroupMetaData s_dummy = { false, typeid(nullptr) };
+    return s_dummy;
+}
+
+#endif //#if defined(_DEBUG)
+
+const std::string UiInstanceMainMenu::GetTemplateName()
+{
+    return "main menu";
+}
+
+DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
+    DscDag::DagCollection& in_dag_collection,
+    DscDag::IDagOwner* const in_data_source_owner,
+    DscDag::NodeToken in_root_data_source_node
+)
+{
+    DSC_UNUSED(in_root_data_source_node);
+
+    auto result = in_dag_collection.CreateGroupEnum<UiInstanceMainMenu::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>(in_data_source_owner);
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result, "data source main screen"));
+    // need to modify DagCollection::Delete to recurse IDagNode owner deletion?
+    DscDag::IDagOwner* const dag_owner = dynamic_cast<DscDag::IDagOwner*>(result);
+
+    // template name
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange<std::string>(GetTemplateName(), dag_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main menu"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            DscUi::TUiNodeGroupDataSource::TTemplateName,
+            node
+        );
+    }
+
+    // title
+    {
+        // todo: source text from locale system database
+        auto node = in_dag_collection.CreateValueOnValueChange<std::string>("<r:255><g:255><b:255><s:80><h:60>Legendary Quest<s:32><h:0><o:32>\xE2\x84\xA2", dag_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "title"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle,
+            node
+        );
+    }
+
+    // sub title
+    {
+        // todo: source text from locale system database
+        auto node = in_dag_collection.CreateValueOnValueChange<std::string>("<s:24>CRPG Sanbox", dag_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "sub title"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle,
+            node
+        );
+    }
+
+    // button data
+    {
+        std::vector<TButtonData> button_data_array = {};
+        {
+            //<s:24><h:16><d:8>
+            auto text_node = in_dag_collection.CreateValueOnValueChange<std::string>("Exit", dag_owner);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text_node, "Exit"));
+            auto function = [in_root_data_source_node](DscDag::NodeToken) {
+                auto keep_going_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
+                DscDag::SetValueType(keep_going_node, false);
+            };
+            button_data_array.push_back({ text_node , function });
+        }
+        auto node = in_dag_collection.CreateValueNone(button_data_array, dag_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "button array"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceMainMenu::TUiNodeGroupDataSource::TButtonArray,
+            node
+        );
+    }
+
+    return result;
+}
 
 std::shared_ptr<DscUi::IUiInstance> UiInstanceMainMenu::Factory(
     const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
@@ -13,13 +133,8 @@ std::shared_ptr<DscUi::IUiInstance> UiInstanceMainMenu::Factory(
     DSC_UNUSED(in_ui_instance_factory);
 
     std::shared_ptr<DscUi::IUiInstance> result = std::make_shared<UiInstanceMainMenu>(
-        *in_context._ui_manager,
-        *in_context._draw_system,
-        *in_context._dag_collection,
-        *in_context._file_system,
-        in_context._data_source,
-        in_context._root_node_or_null,
-        in_context._parent_node_or_null
+        in_ui_instance_factory,
+        in_context
         );
 
     return result;
@@ -27,20 +142,15 @@ std::shared_ptr<DscUi::IUiInstance> UiInstanceMainMenu::Factory(
 }
 
 UiInstanceMainMenu::UiInstanceMainMenu(
-    DscUi::UiManager& in_ui_manager,
-    DscRender::DrawSystem& in_draw_system,
-    DscDag::DagCollection& in_dag_collection,
-    DscCommon::FileSystem& in_file_system,
-    DscDag::NodeToken in_data_source,
-    DscDag::NodeToken in_root_node_or_null,
-    DscDag::NodeToken in_parent_node_or_null
+    const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
+    const UiInstanceContext& in_context
 )
-    : _ui_manager(in_ui_manager)
-    , _draw_system(in_draw_system)
-    , _dag_collection(in_dag_collection)
-    , _parent_node_group(in_parent_node_or_null)
+    : _ui_manager(*in_context._ui_manager)
+    , _draw_system(*in_context._draw_system)
+    , _dag_collection(*in_context._dag_collection)
+    , _parent_node_group(in_context._parent_node_or_null)
 {
-    DSC_UNUSED(in_data_source);
+    DSC_UNUSED(in_ui_instance_factory);
 
     _main_node_group = _ui_manager.AddChildNode(
         DscUi::MakeComponentCanvas(
@@ -49,12 +159,13 @@ UiInstanceMainMenu::UiInstanceMainMenu(
         ),
         _draw_system,
         _dag_collection,
-        in_root_node_or_null,
-        in_parent_node_or_null,
+        in_context._root_node_or_null,
+        in_context._parent_node_or_null,
         std::vector<DscUi::UiManager::TEffectConstructionHelper>()
         DSC_DEBUG_ONLY(DSC_COMMA "main menu node group")
     );
 
+    // tell the parent node that we are the active crossfade node, null protected but also asuming parent might be crossfade
     {
         auto parent_resource_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_parent_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
         auto cross_fade_active_node = parent_resource_node ? DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_node, DscUi::TUiComponentResourceNodeGroup::TCrossfadeActiveChild) : nullptr;
@@ -64,10 +175,10 @@ UiInstanceMainMenu::UiInstanceMainMenu(
         }
     }
 
+    // background image
     {
-        //auto background_texture = MakeShaderResource(*_file_system, *_draw_system, DscCommon::FileSystem::JoinPath("data", "background", "background_00.png"));
         auto background_texture = DscRenderResourcePng::MakeShaderResource(
-            in_file_system,
+            *in_context._file_system,
             _draw_system,
             DscCommon::FileSystem::JoinPath("data", "background", "background_00.png")
             );
@@ -81,14 +192,82 @@ UiInstanceMainMenu::UiInstanceMainMenu(
             ),
             _draw_system,
             _dag_collection,
-            in_root_node_or_null,
+            in_context._root_node_or_null,
             _main_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "main menu texture")
         );
     }
 
+    // stack node
+    DscDag::NodeToken stack_node = nullptr;
+    {
+        stack_node = _ui_manager.AddChildNode(
+            DscUi::MakeComponentStack(
+                DscUi::TUiFlow::TVertical, DscUi::UiCoord(0, 0.0f)
+            ).SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            ),
+            _draw_system,
+            _dag_collection,
+            in_context._root_node_or_null,
+            _main_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "main menu stack")
+        );
+    }
 
+    // title
+    {
+        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+        const DscText::TextLocale* const pLocale = in_context._text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+        DscText::GlyphCollectionText* font = in_context._text_manager->LoadFont(*in_context._file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+
+        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            "Legendary Quest",
+            pLocale,
+            font,
+            80,
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            60
+        ));
+
+        DscCommon::VectorInt2 container_size = {};
+        const int32 current_width = 0;
+        auto text_run = std::make_shared<DscText::TextRun>(
+            std::move(text_run_array),
+            container_size,
+            true,
+            current_width,
+            DscText::THorizontalAlignment::TMiddle,
+            DscText::TVerticalAlignment::TMiddle
+            );
+
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array = {};
+        effect_array.push_back({
+            DscUi::TUiEffectType::TEffectStroke, 
+            DscCommon::VectorFloat4(4.0f, 0.0f, 0.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+            });
+        _ui_manager.AddChildNode(
+            DscUi::MakeComponentText(
+                text_run,
+                in_context._text_manager,
+                false
+            ).SetUiScaleByWidth(
+                800,
+                0.00125f
+            ),
+            _draw_system,
+            _dag_collection,
+            in_context._root_node_or_null,
+            stack_node,
+            effect_array
+            DSC_DEBUG_ONLY(DSC_COMMA "title node")
+        );
+    }
 }
 
 UiInstanceMainMenu::~UiInstanceMainMenu()

@@ -395,7 +395,10 @@ DscDag::NodeToken DscUi::MakeNode::MakeAvaliableSize(
             value = child_slot_size.EvalueUICoord(parent_avaliable_size, ui_scale);
         },
             in_owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "avaliable size child slot"));
+#if defined(_DEBUG)
+        static int s_trace = 0;
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, std::string("avaliable size child slot ") + std::to_string(s_trace++)));
+#endif
 
         DscDag::LinkIndexNodes(0, in_parent_avaliable_size, node);
         DscDag::LinkIndexNodes(1, in_ui_scale, node);
