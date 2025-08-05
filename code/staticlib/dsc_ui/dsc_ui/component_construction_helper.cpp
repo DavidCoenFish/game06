@@ -7,17 +7,10 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
     const DscUi::ComponentConstructionHelper& in_construction_helper,
     DscDag::NodeToken in_time_delta,
     DscDag::NodeToken in_ui_scale,
-    //DscDag::NodeToken in_avaliable_size
     DscDag::NodeToken in_parent,
     DscDag::NodeToken in_owner
 )
 {
-    //if (nullptr != in_parent)
-    //{
-    //    DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_parent));
-    //}
-    //DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<DscUi::TUiNodeGroup>(in_owner));
-
     DscDag::IDagOwner* const top_owner = dynamic_cast<DscDag::IDagOwner*>(in_owner);
     DSC_ASSERT(nullptr != top_owner, "invalid state");
 
@@ -500,7 +493,6 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
 
         DscDag::NodeToken condition = in_dag_collection.CreateCalculate<bool>([](bool& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 const DscDag::NodeToken child_active_node = DscDag::GetValueType<DscDag::NodeToken>(in_input_array[0]);
-                //const DscDag::NodeToken child_active_node = DscDag::GetValueType<DscDag::NodeToken>(child_active_node_node);
                 const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[1]);
 
                 bool data_correct = true;
@@ -530,6 +522,12 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             1,
             DscDag::DagNodeGroup::GetNodeTokenEnum(in_owner, TUiNodeGroup::TArrayChildUiNodeGroup),
             condition);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition,
+            condition
+            );
 
         DscDag::NodeToken pass_along_tick = in_dag_collection.CreateValueNotZero<float>(
             0.0f,

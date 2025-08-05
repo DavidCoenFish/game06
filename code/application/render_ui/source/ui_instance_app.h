@@ -84,6 +84,7 @@ private:
     virtual DscDag::NodeToken GetDagUiGroupNode() override;
     virtual DscDag::NodeToken GetDagUiDrawNode() override;
     virtual DscDag::NodeToken GetDagUiDrawBaseNode() override;
+    virtual const bool HasActiveTransition() override;
 
 private:
     DscUi::UiManager& _ui_manager;

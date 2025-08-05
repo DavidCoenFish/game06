@@ -176,23 +176,35 @@ const bool Application::Update()
         if (_resources->_ui_manager)
         {
             auto ui_instance = DscDag::GetValueType<std::shared_ptr<DscUi::IUiInstance>>(_resources->_ui_instance_node);
+            if (nullptr != ui_instance)
+            {
+                ui_instance->Update();
 
-            ui_instance->Update();
+                _resources->_ui_manager->Update(
+                    ui_instance->GetDagUiGroupNode(),
+                    time_delta,
+                    input_param,
+                    _draw_system->GetRenderTargetBackBuffer()
+                );
 
-            _resources->_ui_manager->Update(
-                ui_instance->GetDagUiGroupNode(),
-                time_delta,
-                input_param,
-                _draw_system->GetRenderTargetBackBuffer()
-            );
+                _resources->_ui_manager->Draw(
+                    ui_instance->GetDagUiGroupNode(),
+                    *_resources->_dag_collection,
+                    *frame,
+                    true,
+                    _draw_system->GetRenderTargetBackBuffer()
+                );
 
-            _resources->_ui_manager->Draw(
-                ui_instance->GetDagUiGroupNode(),
-                *_resources->_dag_collection,
-                *frame,
-                true,
-                _draw_system->GetRenderTargetBackBuffer()
-            );
+                if (_resources->_data_source_node_group)
+                {
+                    DscDag::NodeToken keep_running_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
+                    _keep_running = DscDag::GetValueType<bool>(keep_running_node) || ui_instance->HasActiveTransition();
+                }
+            }
+            else
+            {
+                _keep_running = false;
+            }
         }
 
         if (_resources->_onscreen_version)
@@ -200,11 +212,6 @@ const bool Application::Update()
             _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);
         }
 
-        if (_resources->_data_source_node_group)
-        {
-            DscDag::NodeToken keep_running_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
-            _keep_running = DscDag::GetValueType<bool>(keep_running_node);
-        }
 
 #if defined(_DEBUG)
         //DscDag::DagCollection::DebugDumpNode(_resources->_ui_root_node_group.GetNodeToken(DscUi::TUiRootNodeGroup::TDrawNode));

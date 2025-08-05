@@ -240,3 +240,18 @@ DscDag::NodeToken UiInstanceApp::GetDagUiDrawBaseNode()
 {
     return DscDag::DagNodeGroup::GetNodeTokenEnum(_root_node_group, DscUi::TUiNodeGroup::TDrawBaseNode);
 }
+
+const bool UiInstanceApp::HasActiveTransition()
+{
+    //_main_screen_cross_fade
+    DscDag::NodeToken component_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TUiComponentResources);
+    DscDag::NodeToken condition_node = component_node ? DscDag::DagNodeGroup::GetNodeTokenEnum(component_node, DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition) : nullptr;
+
+    if (nullptr != condition_node)
+    {
+        return DscDag::GetValueType<bool>(condition_node);
+    }
+
+    return false;
+}
+

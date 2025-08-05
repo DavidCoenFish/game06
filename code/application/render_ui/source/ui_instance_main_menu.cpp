@@ -355,17 +355,8 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
                 auto keep_going_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
                 DscDag::SetValueType(keep_going_node, false);
 
-                // so, want a way to of clearing the main screen and effecting the main menu to fade out
-                //// also want to set to null the root node TMainScreenDataSource
-                ////auto main_screen_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node, UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource);
-                ////DscDag::SetValueType<DscDag::NodeToken>(main_screen_node, nullptr);
-                //
-                //DscDag::DagNodeGroup::SetNodeTokenEnum(
-                //    in_root_data_source_node,
-                //    UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource,
-                //    nullptr
-                //);
-
+                // clear the active screen, (which will cause the main screen ui to delete)
+                // todo: make a copy node to hold the last UiRenderTarget?
                 DscDag::SetValueType<DscDag::NodeToken>(
                     DscDag::DagNodeGroup::GetNodeTokenEnum(
                         in_root_data_source_node,
@@ -410,6 +401,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
     : _ui_manager(*in_context._ui_manager)
     , _draw_system(*in_context._draw_system)
     , _dag_collection(*in_context._dag_collection)
+    , _root_node_group(in_context._root_node_or_null)
     , _parent_node_group(in_context._parent_node_or_null)
 {
     DSC_UNUSED(in_ui_instance_factory);
@@ -569,11 +561,26 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
 UiInstanceMainMenu::~UiInstanceMainMenu()
 {
+#if 1
     _ui_manager.RemoveDestroyChild(
         _dag_collection,
         _parent_node_group,
         _main_node_group
     );
+#endif
+    _ui_manager.AddChildNode(
+        DscUi::MakeComponentFill(
+            DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+        ).SetCrossfadeChildAmount(
+            1.0f
+        ),
+        _draw_system,
+        _dag_collection,
+        _root_node_group,
+        _parent_node_group,
+        std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+        DSC_DEBUG_ONLY(DSC_COMMA "main menu fade out place holder")
+        );
 }
 
 void UiInstanceMainMenu::Update()

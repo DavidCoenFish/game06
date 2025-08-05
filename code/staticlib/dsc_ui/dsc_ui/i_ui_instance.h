@@ -21,7 +21,8 @@ namespace DscUi
 		virtual DscDag::NodeToken GetDagUiDrawNode() = 0;
 		virtual DscDag::NodeToken GetDagUiDrawBaseNode() = 0;
 
-		//virtual const bool HasTransitionFinished() = 0;
+		// return true if there is a transition active
+		virtual const bool HasActiveTransition();
 
 		//virtual void UiRootUpdate(
 		//	UiManager& in_ui_manager,

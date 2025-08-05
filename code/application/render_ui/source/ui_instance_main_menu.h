@@ -87,6 +87,7 @@ private:
     DscRender::DrawSystem& _draw_system;
     DscDag::DagCollection& _dag_collection;
 
+    DscDag::NodeToken _root_node_group = {};
     DscDag::NodeToken _parent_node_group = {};
     DscDag::NodeToken _main_node_group = {};
 };

@@ -73,6 +73,11 @@ namespace DscDag
 					_dirty = false;
 					return;
 				}
+				else
+				{
+					// mark the condition dirty, cross fade was not being recalculated
+					_condition->MarkDirty();
+				}
 
 				// update the input links, this is an attempt to not have the conditional node dirtied from a non active branch
 				if (true == GetValueType<bool>(_condition))
@@ -299,7 +304,7 @@ namespace DscDag
 		bool _unlinked = false;
 		bool _true_linked = false;
 		bool _false_linked = false;
-		NodeToken _condition = nullptr; // input
+		NodeToken _condition = nullptr; // input dag node <bool>
 		NodeToken _true_source = nullptr; // input mostly when condition is true, state can be stick (delay of calculating condition)
 		NodeToken _false_source = nullptr; // input mostly when condition is false, state can be stick (delay of calculating condition)
 		NodeToken _true_destination = nullptr;

@@ -349,6 +349,11 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(bool) };
+		return s_meta_data;
+	}
 	case DscUi::TUiComponentResourceNodeGroup::TCrossfadeNode:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(bool) };
