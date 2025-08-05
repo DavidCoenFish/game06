@@ -55,8 +55,10 @@ namespace DscUi
 			return;
 		}
 
-		// make a DagNode with a std::shared_ptr<IUiInstance> value, but how will this work with recurion, 
-		// how to call again for children ui inside the context of the TUiInstanceFactory, IUiInstance own the child returned NodeToken (calc child IUiInstance)
+		/*
+			CONTEXT._dag_collection
+			CONTEXT._data_source_node (a dag node <DscDag::NodeToken>) which has a value of a DagNodeGroup<TUiNodeGroupDataSource>
+		*/
 		DscDag::NodeToken BuildInstance(
 			CONTEXT& in_context
 		) const
@@ -66,7 +68,14 @@ namespace DscUi
 			(std::shared_ptr<DscUi::IUiInstance>& in_out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
 				in_out_value.reset();
 
-				const std::string& template_name = DscDag::GetValueType<std::string>(in_input_array[0]);
+				DscDag::NodeToken data_source = DscDag::GetValueType<DscDag::NodeToken>(in_input_array[0]);
+				if (nullptr == data_source)
+				{
+					return;
+				}
+
+				DscDag::NodeToken template_node = DscDag::DagNodeGroup::GetNodeTokenEnum(data_source, TUiNodeGroupDataSource::TTemplateName);
+				const std::string& template_name = DscDag::GetValueType<std::string>(template_node);
 
 				auto found = this->_name_factory_map.find(template_name);
 				if (found != this->_name_factory_map.end())
@@ -85,7 +94,8 @@ namespace DscUi
 
 			DscDag::LinkIndexNodes(
 				0, 
-				DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._data_source, TUiNodeGroupDataSource::TTemplateName), 
+				//DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._data_source, TUiNodeGroupDataSource::TTemplateName),
+				in_context._data_source_node,
 				result
 				);
 

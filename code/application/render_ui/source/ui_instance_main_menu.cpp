@@ -365,6 +365,14 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
                 //    UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource,
                 //    nullptr
                 //);
+
+                DscDag::SetValueType<DscDag::NodeToken>(
+                    DscDag::DagNodeGroup::GetNodeTokenEnum(
+                        in_root_data_source_node,
+                        UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode),
+                    nullptr
+                    );
+
             };
             button_data_array.push_back({ text_node , function });
         }
@@ -405,6 +413,8 @@ UiInstanceMainMenu::UiInstanceMainMenu(
     , _parent_node_group(in_context._parent_node_or_null)
 {
     DSC_UNUSED(in_ui_instance_factory);
+
+    DscDag::NodeToken data_source = DscDag::GetValueType< DscDag::NodeToken>(in_context._data_source_node);
 
     _main_node_group = _ui_manager.AddChildNode(
         DscUi::MakeComponentCanvas(
@@ -538,7 +548,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
     // buttons
     {
-        DscDag::NodeToken button_array_data_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._data_source, TUiNodeGroupDataSource::TButtonArray);
+        DscDag::NodeToken button_array_data_node = DscDag::DagNodeGroup::GetNodeTokenEnum(data_source, TUiNodeGroupDataSource::TButtonArray);
         DSC_ASSERT(nullptr != button_array_data_node, "invalid state");
         const auto& button_array_data = DscDag::GetValueType<std::vector<TButtonData>>(button_array_data_node);
         for (const auto& data : button_array_data)

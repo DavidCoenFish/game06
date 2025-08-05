@@ -42,8 +42,11 @@ public:
     {
         TLocale = static_cast<uint8>(DscUi::TUiNodeGroupDataSource::TCount),
         TKeepAppRunning,
-        TMainScreenDataSource,
-        TDialogDataSource,
+        TMainScreenDataSourceNode, // a dag node <NodeToken> with the value of active Data Source for the main screen or null
+        TDialogDataSourceNode,
+
+        TMainMenuDataSource,
+
         TCount
     };
 

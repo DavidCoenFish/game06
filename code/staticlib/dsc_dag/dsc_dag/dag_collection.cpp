@@ -77,20 +77,32 @@ void DscDag::DagCollection::DeleteNode(NodeToken in_node)
 	}
 	DSC_ASSERT(true == in_node->GetHasNoLinks(), "invalid state");
 
-	//_nodes.find(in_node);
-	auto it = std::find_if(_nodes.begin(), _nodes.end(), [&](const std::unique_ptr<DscDag::IDagNode>& ptr) {
-		return ptr.get() == in_node;
-	});
-	if (it != _nodes.end())
+	//_dirty_condition_nodes
 	{
-		_nodes.erase(it);
-	}
-	else
-	{
-		DSC_ASSERT_ALWAYS("attempt to delete a node which was not found");
+		auto found = _dirty_condition_nodes.find(in_node);
+		if (found != _dirty_condition_nodes.end())
+		{
+			_dirty_condition_nodes.erase(found);
+		}
 	}
 
-	//todo: do we need to also check _named_nodes and _dirty_condition_nodes
+	//todo: do we need to also check _named_nodes
+
+	// destroy the node, _nodes is the point of ownership
+	{
+		//_nodes.find(in_node);
+		auto found = std::find_if(_nodes.begin(), _nodes.end(), [&](const std::unique_ptr<DscDag::IDagNode>& ptr) {
+			return ptr.get() == in_node;
+		});
+		if (found != _nodes.end())
+		{
+			_nodes.erase(found);
+		}
+		else
+		{
+			DSC_ASSERT_ALWAYS("attempt to delete a node which was not found");
+		}
+	}
 
 	return;
 }

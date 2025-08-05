@@ -29,14 +29,19 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
         return s_meta_data;
     }
-    case UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSource:
+    case UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode: //dag node <NodeToken> of the active screen data source or null
     {
-        static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
         return s_meta_data;
     }
-    case UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSource:
+    case UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSourceNode: // dag node <NodeToken> of the active dialog data source or null
     {
-        static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TMainMenuDataSource: // NodeGroup of the main menu var
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
         return s_meta_data;
     }
     }
@@ -58,6 +63,7 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
     auto result = in_dag_collection.CreateGroupEnum<UiInstanceApp::TUiNodeGroupDataSource, DscUi::TUiNodeGroupDataSource>();
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result, "data source"));
     DscDag::IDagOwner* const data_source_owner = dynamic_cast<DscDag::IDagOwner*>(result);
+
     //TTemplateName
     {
         auto node = in_dag_collection.CreateValueOnValueChange<std::string>(GetTemplateName(), data_source_owner);
@@ -68,6 +74,7 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
             node
         );
     }
+
     //TLocale
     {
         auto node = in_dag_collection.CreateValueOnValueChange(DscLocale::LocaleISO_639_1::English, data_source_owner);
@@ -78,6 +85,7 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
             node
         );
     }
+
     //TKeepAppRunning
     {
         auto node = in_dag_collection.CreateValueOnValueChange(true, data_source_owner);
@@ -88,6 +96,29 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
             node
         );
     }
+
+    //TMainScreenDataSourceNode
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange<DscDag::NodeToken>(nullptr, data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main screen data source node"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode,
+            node
+        );
+    }
+
+    //TDialogDataSourceNode
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange<DscDag::NodeToken>(nullptr, data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "dialog data source node"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSourceNode,
+            node
+        );
+    }
+
 
     return result;
 }
@@ -156,13 +187,13 @@ UiInstanceApp::UiInstanceApp(
     );
 
     {
-        DscDag::NodeToken main_screen_data_source = DscDag::DagNodeGroup::GetNodeTokenEnum(
-            in_context._data_source,
-            TUiNodeGroupDataSource::TMainScreenDataSource
+        DscDag::NodeToken main_screen_data_source_node = DscDag::DagNodeGroup::GetNodeTokenEnum(
+            DscDag::GetValueType<DscDag::NodeToken>(in_context._data_source_node),
+            TUiNodeGroupDataSource::TMainScreenDataSourceNode
         );
 
         UiInstanceContext context = in_context.MakeChild(
-            main_screen_data_source,
+            main_screen_data_source_node,
             _main_screen_cross_fade
             );
         context._root_node_or_null = _root_node_group;
