@@ -73,11 +73,11 @@ namespace DscDag
 					_dirty = false;
 					return;
 				}
-				else
-				{
-					// mark the condition dirty, cross fade was not being recalculated
-					_condition->MarkDirty();
-				}
+				//else
+				//{
+				//	// mark the condition dirty, cross fade was not being recalculated
+				//	_condition->MarkDirty();
+				//}
 
 				// update the input links, this is an attempt to not have the conditional node dirtied from a non active branch
 				if (true == GetValueType<bool>(_condition))
