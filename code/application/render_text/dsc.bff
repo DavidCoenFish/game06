@@ -90,4 +90,4 @@ DscVsprojectWindowExe("render_text" .WindowExeParam)
 
 .SolutionProjects + "render_text_project"
 .SolutionItemsApplicationProject + "render_text_project"
-//.SolutionBuildProject = "render_text_project"
+.SolutionBuildProject = "render_text_project"

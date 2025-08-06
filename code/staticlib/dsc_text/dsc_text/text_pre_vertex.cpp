@@ -295,7 +295,6 @@ void DscText::TextPreVertex::FinishLine(const int32 in_line_gap_pixels)
 	}
 
 	_accumulate_line_height_offset += _current_line_height;
-	_accumulate_line_height_offset += _current_line_depth;
 	_line_dirty = false;
 
 	//move backward over _pre_vertex_data, items on _line_index
@@ -317,6 +316,9 @@ void DscText::TextPreVertex::FinishLine(const int32 in_line_gap_pixels)
 	_vertical_bounds[0] = std::min(_vertical_bounds[0], _line_vertical_bounds[0]);
 	_vertical_bounds[1] = std::max(_vertical_bounds[1], _line_vertical_bounds[1]);
 
+	// we add current line depth AFTER moving the current text lower, so following lines of text are adjusted
+	// likewise the ling gap
+	_accumulate_line_height_offset += _current_line_depth;
 	_accumulate_line_height_offset += in_line_gap_pixels;
 
 	return;

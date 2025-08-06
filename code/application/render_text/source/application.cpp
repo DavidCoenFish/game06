@@ -68,11 +68,13 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
         //https://r12a.github.io/app-conversion/
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "Non fixed width layout.\nLigature " "\xC3" "\xA6" ".\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA",
+            "Non fixed width layout.\nLigature " "\xC3" "\xA6" ".\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA" " which may not be that special when it is done as unicode glyphs, but feels good.",
             pLocale,
             font,
             64,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            48,
+            12
             ));
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
             "red",
@@ -105,7 +107,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             pLocale,
             font,
             64,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            48,
+            12
         ));
         text_run_array.push_back(DscText::TextRun::MakeTextRunDataIcon(
             icon_b,
@@ -117,7 +121,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             pLocale,
             font,
             64,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
+            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+            48,
+            12
         ));
 
         const int32 current_width = _draw_system->GetRenderTargetBackBuffer()->GetSize().GetX();
@@ -128,7 +134,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             current_width,
             DscText::THorizontalAlignment::TNone,
             DscText::TVerticalAlignment::TTop,
-            24
+            8
             );
     }
 
