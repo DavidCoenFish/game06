@@ -411,7 +411,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
     _main_node_group = _ui_manager.AddChildNode(
         DscUi::MakeComponentCanvas(
         ).SetCrossfadeChildAmount(
-            0.0f
+            0.001f // just for safety, moving to only delete cross fade children when child amount is zero
         ),
         _draw_system,
         _dag_collection,
@@ -561,31 +561,43 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
 UiInstanceMainMenu::~UiInstanceMainMenu()
 {
-#if 1
+    //todo: if our data source is not the main screen data source, if we are the active cross fade, clear the active cross fade
+    // this code is here as in our ctor, we set the active cross fade on the parent, but we 
+
+    // tell the parent node that we are no longer the active crossfade node, null protected but also asuming parent might be crossfade
+    {
+        auto parent_resource_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_parent_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
+        auto cross_fade_active_node = parent_resource_node ? DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_node, DscUi::TUiComponentResourceNodeGroup::TCrossfadeActiveChild) : nullptr;
+        if (nullptr != cross_fade_active_node)
+        {
+            DscDag::SetValueType<DscDag::NodeToken>(cross_fade_active_node, nullptr);
+        }
+    }
+
+#if 0
     _ui_manager.RemoveDestroyChild(
         _dag_collection,
         _parent_node_group,
         _main_node_group
     );
 #endif
-    _ui_manager.AddChildNode(
-        DscUi::MakeComponentFill(
-            DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
-        ).SetCrossfadeChildAmount(
-            1.0f
-        ),
-        _draw_system,
-        _dag_collection,
-        _root_node_group,
-        _parent_node_group,
-        std::vector<DscUi::UiManager::TEffectConstructionHelper>()
-        DSC_DEBUG_ONLY(DSC_COMMA "main menu fade out place holder")
-        );
+    //_ui_manager.AddChildNode(
+    //    DscUi::MakeComponentFill(
+    //        DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+    //    ).SetCrossfadeChildAmount(
+    //        1.0f
+    //    ),
+    //    _draw_system,
+    //    _dag_collection,
+    //    _root_node_group,
+    //    _parent_node_group,
+    //    std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+    //    DSC_DEBUG_ONLY(DSC_COMMA "main menu fade out place holder")
+    //    );
 }
 
 void UiInstanceMainMenu::Update()
 {
-    //nop
 }
 
 DscDag::NodeToken UiInstanceMainMenu::GetDagUiGroupNode()

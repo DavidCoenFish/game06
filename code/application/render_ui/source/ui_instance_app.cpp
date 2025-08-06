@@ -220,10 +220,39 @@ UiInstanceApp::~UiInstanceApp()
 
 void UiInstanceApp::Update()
 {
+    // todo: iterate over children of _main_screen_cross_fade, and remove the children that are at zero cross fade
+    // for safety, do this BOTH before the factory node updates and in the child ui instances, create top level with non zero corss fade amount
+    DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
+    if (nullptr != child_array_node)
+    {
+        std::vector<DscDag::NodeToken> delete_node_array = {};
+        const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
+        for (const auto& child : child_array)
+        {
+            DscDag::NodeToken child_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(child, DscUi::TUiNodeGroup::TUiComponentResources);
+            DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+            const float cross_fade_amount = DscDag::GetValueType<float>(child_crossfade_amount_node);
+            if (0.0f == cross_fade_amount)
+            {
+                delete_node_array.push_back(child);
+            }
+        }
+
+        for (const auto& delete_node : delete_node_array)
+        {
+            _ui_manager.RemoveDestroyChild(
+                _dag_collection,
+                _main_screen_cross_fade,
+                delete_node
+            );
+        }
+    }
+
     if (nullptr != _main_screen_factory_node)
     {
         _main_screen_factory_node->Update();
     }
+
 }
 
 DscDag::NodeToken UiInstanceApp::GetDagUiGroupNode()
@@ -241,15 +270,14 @@ DscDag::NodeToken UiInstanceApp::GetDagUiDrawBaseNode()
     return DscDag::DagNodeGroup::GetNodeTokenEnum(_root_node_group, DscUi::TUiNodeGroup::TDrawBaseNode);
 }
 
-const bool UiInstanceApp::HasActiveTransition()
+const bool UiInstanceApp::HasContent()
 {
     //_main_screen_cross_fade
-    DscDag::NodeToken component_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TUiComponentResources);
-    DscDag::NodeToken condition_node = component_node ? DscDag::DagNodeGroup::GetNodeTokenEnum(component_node, DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition) : nullptr;
-
-    if (nullptr != condition_node)
+    DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
+    const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
+    if (0 != child_array.size())
     {
-        return DscDag::GetValueType<bool>(condition_node);
+        return true;
     }
 
     return false;

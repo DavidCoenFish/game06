@@ -198,7 +198,7 @@ const bool Application::Update()
                 if (_resources->_data_source_node_group)
                 {
                     DscDag::NodeToken keep_running_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
-                    _keep_running = DscDag::GetValueType<bool>(keep_running_node) || ui_instance->HasActiveTransition();
+                    _keep_running = DscDag::GetValueType<bool>(keep_running_node) || ui_instance->HasContent();
                 }
             }
             else

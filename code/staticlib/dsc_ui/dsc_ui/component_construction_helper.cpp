@@ -523,11 +523,11 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             DscDag::DagNodeGroup::GetNodeTokenEnum(in_owner, TUiNodeGroup::TArrayChildUiNodeGroup),
             condition);
 
-        DscDag::DagNodeGroup::SetNodeTokenEnum(
-            component_resource_group,
-            DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition,
-            condition
-            );
+        //DscDag::DagNodeGroup::SetNodeTokenEnum(
+        //    component_resource_group,
+        //    DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition,
+        //    condition
+        //    );
 
         DscDag::NodeToken pass_along_tick = in_dag_collection.CreateValueNotZero<float>(
             0.0f,
