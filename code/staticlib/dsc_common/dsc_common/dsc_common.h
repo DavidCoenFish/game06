@@ -69,6 +69,7 @@ typedef unsigned __int64 uint64;
 #include <mutex>
 #include <set>
 #include <string>
+#include <variant>
 #include <vector>
 
 //D3DX12

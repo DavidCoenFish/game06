@@ -8,14 +8,22 @@
 {
     .temp =  [
         .Path           = "solution_items"
-        .Items = { "dsc.cmd", "dsc.bff", "todo.txt" }
+        .Items = { 
+            "dsc.cmd", 
+            "dsc.bff", 
+            "solution.cmd",
+            "todo.txt" 
+            }
     ]
     ^SolutionItemArray + .temp
 }
 {
     .temp =  [
         .Path           = "solution_items/notes"
-        .Items = { "notes/ui.txt", "notes/notes.txt" }
+        .Items = { 
+            "notes/ui.txt", 
+            "notes/notes.txt" 
+            }
     ]
     ^SolutionItemArray + .temp
 }
@@ -34,6 +42,15 @@
             "../README.md",
             "../Reset.cmd",
             "../sync.cmd"
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/data/sample_json"
+        .Items = { 
+            "../data/sample_json/sample_json/test.json",
             }
     ]
     ^SolutionItemArray + .temp;

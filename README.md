@@ -29,3 +29,7 @@ develop functionalty by making an exe to focus on each feature
 hint<br>
 setting SolutionBuildProject in .\code\dsc.bff (or under) effects what the visual studio solution is set to build by default, and in visual studio, setting the startup project controlles what is run
 it is very easy to have visual studio set to run something that is not being built. have yet to fins a setting in bff to enable every project to build
+
+
+vcpkg install nlohmann-json
+

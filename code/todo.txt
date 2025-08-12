@@ -44,16 +44,3 @@ what is our target project, jank, 2d anime shirow anime draw, subuccus life, leg
 slightly rounded main menu buttons in middle, middle stack, dull text, buttons with drop shadows
 on roll over, burn out the text to black from mouse pos, fade back if cursor leaves. on keyboard selection, a default rollover pos in the middle?
 //full screen texture detecting full red pixels to simulate fire effect? (red -> fire then smoke, blue -> ice then mist, green to poision then rain)
-
-
-
-
-typedef int(*binary_int_op)(int, int); // signature for all valid template params
-template<binary_int_op op>
-int do_op(int a, int b)
-{
- return op(a,b);
-}
-int add(int a, int b) { return a + b; }
-...
-int c = do_op<add>(4,5);

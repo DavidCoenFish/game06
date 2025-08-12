@@ -16,6 +16,7 @@
 #include "dsc_dag\dsc.bff"
 #include "dsc_dag_print\dsc.bff"
 #include "dsc_dag_render\dsc.bff"
+#include "dsc_data\dsc.bff"
 #include "dsc_locale\dsc.bff"
 #include "dsc_onscreen_version\dsc.bff"
 #include "dsc_png\dsc.bff"

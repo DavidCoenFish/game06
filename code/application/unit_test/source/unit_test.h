@@ -7,6 +7,7 @@
 //G : \development\game06\code\staticlib\dsc_common\dsc_common\dsc_common.h
 #include "..\..\..\staticlib\dsc_common\dsc_common\dsc_common.h"
 #include "..\..\..\staticlib\dsc_dag\dsc_dag\dsc_dag.h"
+#include "..\..\..\staticlib\dsc_data\dsc_data\dsc_data.h"
 
 #include "test_util.h"
 

@@ -7,6 +7,10 @@ namespace DscCommon
 {
 class IFileOverlay;
 
+/*
+todo, turn into template, with template param being the behaviour of how overlay load/save works, thought that would move all the 
+interfaces to be virtual. would it be better to constuct the file system with an overlay resolver object
+*/
 class FileSystem
 {
 public:

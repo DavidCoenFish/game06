@@ -11,23 +11,19 @@
     ^SolutionItemArray + .temp
 }
 
-.Param = [
+.LibraryParam = [
     .RootPath = ^_WORKING_DIR_
     .RelativePath = ^_CURRENT_BFF_DIR_
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {
-        "dsc_common", 
-        "dsc_dag",
-        "dsc_data"
+    .LibraryBaseNameDependency = {"dsc_common"}
+    .AdditionalIncludePaths = {
+        "$RootPath$/sdk_include",
         }
-    .DataCopyPath = {"$RootPath$/../data/sample_json"}
-    .DoDataCopy = true
 ]
-DscVsprojectConsoleExe("unit_test" .Param)
+DscVsprojectStaticLib("dsc_data" .LibraryParam)
 
-.SolutionProjects + "unit_test_project"
-.SolutionItemsApplicationProject + "unit_test_project"
-.SolutionBuildProject = "unit_test_project"
-
+.SolutionProjects + "dsc_data_project"
+.SolutionItemsStaticLibProject + "dsc_data_project"
+//.SolutionBuildProject = "dsc_data_project"
