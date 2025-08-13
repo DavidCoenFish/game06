@@ -7,6 +7,8 @@
 #ifndef DSC_BFF_BUILD
 
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
+#include "accessor.h"
+#include "json.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4464)  //relative include path contains '..'
@@ -28,15 +30,17 @@ namespace DscCommon
 
 /*
 endgoal is to have a api like this, but with the data from a monolithic packed struct as to avoid allocations?
-otherwise this looks like a lot of busywork replace the rapidjson::GenericObject<false, rapidjson::Value> with JsonValue
+otherwise this looks like a lot of busywork to just replace the rapidjson::GenericObject<false, rapidjson::Value> with DscData::JsonValue
 */
 namespace DscData
 {
 	//from google prompt> c++ std::variant std::unique json
 	// Forward declarations for recursive types
 	struct JsonValue;
-	using JsonArray = std::vector<std::unique_ptr<JsonValue>>;
-	using JsonObject = std::map<std::string, std::unique_ptr<JsonValue>>;
+	//using JsonArray = std::vector<std::unique_ptr<JsonValue>>;
+	typedef std::vector<std::unique_ptr<JsonValue>> JsonArray;
+	//using JsonObject = std::map<std::string, std::unique_ptr<JsonValue>>;
+	typedef std::map<std::string, std::unique_ptr<JsonValue>> JsonObject;
 
 	// Define the variant for a single JSON value
 	struct JsonValue {
@@ -50,5 +54,9 @@ namespace DscData
 			JsonObject
 		> data;
 	};
+
+	// make a JsonValue with internal variant state of JsonObject
+	std::unique_ptr<JsonValue> MakeJsonObject();
+
 }
 
