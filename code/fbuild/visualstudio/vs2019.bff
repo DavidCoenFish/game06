@@ -148,8 +148,16 @@ Compiler( 'Compiler-VS2019-x64' )
                                     + ' /wd4710'            // function not inlined
                                     + ' /wd4711'            // selected for automatic inline expansion
                                     + ' /wd4820'            // ignore warning, padding needed
+                                    + ' /wd4866'            // compiler may not enforce left-to-right evaluation order for call
                                     + ' /wd5045'            // ignore warning, Compiler will insert Spectre mitigation
                                     + ' /wd5039'            // ignore warning, winbase.h triggering pointer or reference to potentially throwing function passed to 'extern "C"' function under -EHc
+                                    //https://developercommunity.visualstudio.com/t/several-warnings-in-windows-sdk-100177630-in-windo/435362
+                                    + ' /D_WIN32_WINNT_WIN10_TH2=0x0A000001' 
+                                    + ' /D_WIN32_WINNT_WIN10_RS1=0x0A000002'
+                                    + ' /D_WIN32_WINNT_WIN10_RS2=0x0A000003'
+                                    + ' /D_WIN32_WINNT_WIN10_RS3=0x0A000004'
+                                    + ' /D_WIN32_WINNT_WIN10_RS4=0x0A000005'
+                                    + ' /D_WIN32_WINNT_WIN10_RS5=0x0A000006'
 
                                     // Include Paths
                                     //+ ' /I"./"'

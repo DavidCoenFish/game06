@@ -359,3 +359,6 @@ minimise render resources, always draw to texture (avoid the alkward passing in 
 some way of doing more draw to end target than many early, we have the screen space coord, only draw to end target? feedback loop of effects
 
 
+
+https://docs.google.com/spreadsheets/d/e/2PACX-1vQUkV5KLKCtAA-HwunVpT9j4e7nLQmmPazYldzuwh4xL5AVj1ypX4vzrPerCsWXha_aL4GnJyVmzKf0/pubhtml#gid=325157066
+

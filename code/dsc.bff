@@ -22,7 +22,8 @@
         .Path           = "solution_items/notes"
         .Items = { 
             "notes/ui.txt", 
-            "notes/notes.txt" 
+            "notes/notes.txt",
+            "notes/vcpkg.txt"
             }
     ]
     ^SolutionItemArray + .temp

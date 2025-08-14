@@ -12,6 +12,9 @@
 #include <dsc_dag/dag_collection.h>
 #include <dsc_dag/i_dag_owner.h>
 #include <dsc_dag/debug_print.h>
+#include <dsc_data/dsc_data.h>
+#include <dsc_data/accessor.h>
+#include <dsc_data/json.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
@@ -38,6 +41,20 @@
 
 namespace
 {
+    std::unique_ptr<DscData::JsonValue> MakeDataRoot(DscCommon::FileSystem& in_file_system)
+    {
+        auto result = DscData::MakeJsonObject();
+
+        DscData::SetObjectValue(
+            result,
+            "locale",
+            DscData::LoadJsonFromFile(in_file_system, 
+                DscCommon::FileSystem::JoinPath("data", "lqrpg", "locale.json")
+                )
+        );
+
+        return result;
+    }
 }
 
 Application::Resources::Resources()
@@ -58,6 +75,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     if (nullptr != _resources)
     {
         _resources->_timer = std::make_unique<DscCommon::Timer>();
+    }
+
+    if ((nullptr != _file_system) && (nullptr != _resources))
+    {
+        _resources->_data_root = MakeDataRoot(*_file_system);
     }
 
     if ((nullptr != _file_system) && (nullptr != _draw_system))

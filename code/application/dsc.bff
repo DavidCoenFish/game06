@@ -12,6 +12,7 @@
 }
 
 //pull in child scripts
+#include "console_html_to_json\dsc.bff"
 #include "console_premultiply_png\dsc.bff"
 #include "console_test_harf_buzz\dsc.bff"
 #include "render_glyph\dsc.bff"

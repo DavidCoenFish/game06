@@ -318,7 +318,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
     {
         // todo: source text from locale system database
         //<s:24>
-        auto node = in_dag_collection.CreateValueOnValueChange<std::string>("CRPG Sanbox", dag_owner);
+        auto node = in_dag_collection.CreateValueOnValueChange<std::string>("CRPG Sandbox", dag_owner);
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "sub title"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             result,

@@ -21,6 +21,7 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         break;
     case UiInstanceApp::TUiNodeGroupDataSource::TLocale:
     {
+        // see DscCommon::EnumSoftBind<DscLocale::LocaleISO_639_1> for conversion to string
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscLocale::LocaleISO_639_1) };
         return s_meta_data;
     }

@@ -1,25 +1,3 @@
-        Resources();
-        Resources& operator=(const Resources&) = delete;
-        Resources(const Resources&) = delete;
-
-
-https://json.nlohmann.me/integration/package_managers/#vcpkg
-
-https://learn.microsoft.com/en-gb/vcpkg/get_started/get-started?pivots=shell-powershell
-git clone https://github.com/microsoft/vcpkg.git
-
-G:\development\tools\vcpkg\vcpkg.exe
-
-G:\development\tools\vcpkg\scripts\buildsystems
-$env:VCPKG_ROOT = "G:\development\tools\vcpkg"
-$env:PATH = "$env:VCPKG_ROOT;$env:PATH"
-
-vcpkg install nlohmann-json
-cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
-cmake --build build
-
-https://github.com/microsoft/vcpkg/issues/10818
-
-
-cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=G:\development\tools\vcpkg\scripts\buildsystems\vcpkg.cmake
-
+		DrawSystem() = delete;
+		DrawSystem& operator=(const DrawSystem&) = delete;
+		DrawSystem(const DrawSystem&) = delete;

@@ -20,6 +20,11 @@ namespace DscDag
     typedef IDagNode* NodeToken;
 }
 
+namespace DscData
+{
+    struct JsonValue;
+}
+
 namespace DscRender
 {
     class DrawSystem;
@@ -88,7 +93,8 @@ private:
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
         std::unique_ptr<DscUi::UiInstanceFactory<UiInstanceContext>> _ui_instance_factory = {};
-        
+        std::unique_ptr<DscData::JsonValue> _data_root = {};
+
         DscDag::NodeToken _data_source_node;
         DscDag::NodeToken _data_source_node_group;
 

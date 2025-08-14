@@ -22,17 +22,17 @@
         "dsc_dag", 
         "dsc_dag_print", 
         "dsc_dag_render", 
-        "dsc_version", 
+        "dsc_data", 
+        "dsc_locale",
         "dsc_onscreen_version", 
-        "dsc_windows", 
+        "dsc_png",
         "dsc_render", 
         "dsc_render_resource", 
         "dsc_render_resource_png", 
         "dsc_text", 
-        "dsc_locale",
-        "dsc_png",
-        "dsc_version",
         "dsc_ui",
+        "dsc_version", 
+        "dsc_windows"
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 
@@ -57,6 +57,7 @@
         "$RootPath$/../data/font",
         "$RootPath$/../data/background",
         "$RootPath$/../data/sample_png",
+        "$RootPath$/../data/lqrpg",
         }
     .DoDataCopy = true
 

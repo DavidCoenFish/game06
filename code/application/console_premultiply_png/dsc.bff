@@ -17,20 +17,20 @@
     .ConfigurationArray = ^ConfigurationArray
     .VisualStudioSettings = ^VisualStudioSettings
     .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_png"}
+    .LibraryBaseNameDependency = {
+        "dsc_common", 
+        "dsc_png",
+        }
 
     .LinkerAdditionalDependency = {
-        "libpng16.lib"
+        "libpng16.lib",
         }
     .AdditionalStaticLibPaths = {
-        "$RootPath$/sdk/libpng_x64-windows/lib"
+        "$RootPath$/sdk/libpng_x64-windows/lib",
         }
     .AdditionalIncludePaths = {
         "$RootPath$/sdk/libpng_x64-windows/include",
         }
-
-    .DataCopyPath = {"$RootPath$/../data/font"}
-    .DoDataCopy = true
 
     .RootCopyPath = {
         "$RootPath$/sdk/libpng_x64-windows/bin",

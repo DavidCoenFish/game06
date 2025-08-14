@@ -1,0 +1,31 @@
+https://learn.microsoft.com/en-gb/vcpkg/get_started/get-started?pivots=shell-powershell
+git clone https://github.com/microsoft/vcpkg.git
+
+G:\development\tools\vcpkg\vcpkg.exe
+
+G:\development\tools\vcpkg\scripts\buildsystems
+$env:VCPKG_ROOT = "G:\development\tools\vcpkg"
+$env:PATH = "$env:VCPKG_ROOT;$env:PATH"
+
+vcpkg install nlohmann-json
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build
+
+https://github.com/microsoft/vcpkg/issues/10818
+
+
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=G:\development\tools\vcpkg\scripts\buildsystems\vcpkg.cmake
+
+// powershell, from inside visual studio menu bar TOOLS>COMMAND LINE>DEVELOPER POWERSHELL
+$env:VCPKG_ROOT = "G:\development\tools\vcpkg"
+$env:PATH = "$env:VCPKG_ROOT;$env:PATH"
+vcpkg install curl:x64-windows
+
+
+
+https://stackoverflow.com/questions/53861300/how-do-you-properly-install-libcurl-for-use-in-visual-studio-2017
+Get latest vcpkg zip file from https://github.com/microsoft/vcpkg/releases (e.g. https://github.com/microsoft/vcpkg/archive/2019.09.zip) and extract it to a folder of your choice (e.g. C:\vcpkg\)
+Open Developer Command Prompt for VS 2017 (see Windows Start menu or %PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Visual Studio 2017\Visual Studio Tools\) and cd to C:\vcpkg\
+Run bootstrap-vcpkg.bat
+Run vcpkg.exe integrate install
+Run vcpkg.exe install curl
