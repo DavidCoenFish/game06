@@ -5,6 +5,7 @@
 
 namespace
 {
+#if 0
     const char* GetAttribute(const pugi::xml_node& in_node, const char* in_key)
     {
         return in_node.attribute(in_key).as_string("");
@@ -13,6 +14,7 @@ namespace
     {
         return in_node.parent().attribute(in_key).as_string("");
     }
+#endif
 
     const char* GetChildText(const pugi::xml_node& in_node)
     {
@@ -27,10 +29,14 @@ namespace
         SimpleWalker& operator=(const SimpleWalker&) = delete;
         SimpleWalker(const SimpleWalker&) = delete;
 
-        SimpleWalker(TWorksheetMap& out_worksheet_map)
-            : _worksheet_map(out_worksheet_map)
+        SimpleWalker(TWorksheetMap& out_worksheet_map, const std::string& in_worksheet_name)
+            : _worksheet_name(in_worksheet_name)
+            , _worksheet_map(out_worksheet_map)
         {
-            // nop
+            _current_worksheet = std::make_shared<Worksheet>();
+            _worksheet_map[_worksheet_name] = _current_worksheet;
+
+            printf("    parse worksheet:%s\n", _worksheet_name.c_str());
         }
 
         ~SimpleWalker()
@@ -53,39 +59,8 @@ namespace
 
         virtual bool for_each(pugi::xml_node& in_node)
         {
-            const char* parent_id = GetParentAttribute(in_node, "id");
-            const char* id = GetAttribute(in_node, "id");
-
-            //<div id="doc-title"><span class="name">character</span>
-            if (0 == strcmp(id, "doc-title"))
-            {
-                const char* name = GetChildText(in_node);
-                printf("Document name:%s\n", name);
-            }
-
-            //following the observed source of a google sheets published sheet, all the sheets have a button to link to them
-            if (0 == strncmp(id, "sheet-button-", 13))
-            {
-                const char* name = GetChildText(in_node);
-                //printf("Sheet name:%s\n", name);
-                _sheet_names.push_back(name);
-            }
-
-            //then there is the display area with all the sheet data "sheets-viewport" with each sheet in ture defined as a table
-            if (0 == strcmp(parent_id, "sheets-viewport"))
-            {
-                _sheet_index += 1;
-                if ((0 <= _sheet_index) && (_sheet_index < static_cast<int>(_sheet_names.size())))
-                {
-                    StartNewRow();
-
-                    _current_worksheet = std::make_shared<Worksheet>();
-                    const std::string name = _sheet_names[_sheet_index];
-                    _worksheet_map[name] = _current_worksheet;
-
-                    printf("    parse worksheet:%s\n", name.c_str());
-                }
-            }
+            //const char* parent_id = GetParentAttribute(in_node, "id");
+            //const char* id = GetAttribute(in_node, "id");
 
             // for each row in the table
             if (0 == strcmp(in_node.name(), "tr"))
@@ -110,11 +85,8 @@ namespace
         }
 
     private:
+        const std::string _worksheet_name;
         TWorksheetMap& _worksheet_map;
-
-        // temp data for loading state
-        std::vector<std::string> _sheet_names = {};
-        int _sheet_index = -1;
 
         std::shared_ptr<Worksheet> _current_worksheet;
         std::vector<std::string> _current_row;
@@ -123,7 +95,7 @@ namespace
 
 }
 
-const bool StringToWorksheet::DealSourceData(std::map<std::string, std::shared_ptr<Worksheet>>& out_source_data, const std::string& in_source_data)
+const bool StringToWorksheet::DealSourceData(std::map<std::string, std::shared_ptr<Worksheet>>& out_source_data, const std::string& in_source_data, const std::string& in_worksheet_name)
 {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_string(in_source_data.c_str());
@@ -134,7 +106,7 @@ const bool StringToWorksheet::DealSourceData(std::map<std::string, std::shared_p
     }
 
     {
-        SimpleWalker simple_walker(out_source_data);
+        SimpleWalker simple_walker(out_source_data, in_worksheet_name);
         doc.traverse(simple_walker);
     }
 

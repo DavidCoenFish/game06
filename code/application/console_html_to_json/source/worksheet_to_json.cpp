@@ -114,10 +114,6 @@ namespace
         {
             out_action = ActionEnum::TSheet3rd;
         }
-        else if (0 == strcmp("sheet3rdKeyValue", in_token.c_str()))
-        {
-            out_action = ActionEnum::TSheet3rdKeyValue;
-        }
         else if (0 == strcmp("sheet5th", in_token.c_str()))
         {
             out_action = ActionEnum::TSheet5th;
@@ -200,9 +196,26 @@ namespace
                 action = ActionEnum::TString;
                 if (index + 2 < count)
                 {
-                    DealKeySimple(action, split_key[index + 1]);
+                    DealKeySimple(action, split_key[index + 2]);
                 }
 
+                return action;
+            }
+            // sheet3rdKeyValue has an optional list of dataset's after it, else use the value from the cmd line, ie, cursor parent
+            else if (0 == strcmp("sheet3rdKeyValue", token.c_str()))
+            {
+                action = ActionEnum::TSheet3rdKeyValue;
+                // the keys after the sheet3rdKeyValue are presumed to be the data sets
+                bool found = false;
+                for (int sub_index = index + 1; sub_index < count; ++sub_index)
+                {
+                    if (false == found)
+                    {
+                        in_out_cursor.ClearDataset();
+                        found = true;
+                    }
+                    in_out_cursor.AppendDataset(split_key[sub_index]);
+                }
                 return action;
             }
             else

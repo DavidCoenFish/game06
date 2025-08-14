@@ -4,7 +4,6 @@
 #include "worksheet_to_json.h"
 #include "cursor.h"
 
-#include <curl\curl.h>
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -13,20 +12,18 @@
 #include <string>
 
 /*
--u https://docs.google.com/spreadsheets/d/e/2PACX-1vR2_sq9ul16UTDL72R36B5esxO7lH7F6A_LXuaycE3VLl3R-9OTGEyNeMrhQ4-gxwUfGTrRGzvjdiLw/pubhtml -o "C:\development\game05\tools\cpp\html_to_json\output\character_url.json" --sheet5th toc --dataSet en
-
--i "C:\development\game05\tools\cpp\html_to_json\input\character_only.html" -o "C:\development\game05\tools\cpp\html_to_json\output\character.json" --sheet5th toc --dataSet en
--i "C:\development\game05\tools\cpp\html_to_json\input\character_only.html" -o "C:\development\game05\tools\cpp\html_to_json\output\locale.json" --sheet3rdKeyValue locale --dataSet es
-
 https://stackoverflow.com/questions/53861300/how-do-you-properly-install-libcurl-for-use-in-visual-studio-2017
 Get latest vcpkg zip file from https://github.com/microsoft/vcpkg/releases (e.g. https://github.com/microsoft/vcpkg/archive/2019.09.zip) and extract it to a folder of your choice (e.g. C:\vcpkg\)
 Open Developer Command Prompt for VS 2017 (see Windows Start menu or %PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Visual Studio 2017\Visual Studio Tools\) and cd to C:\vcpkg\
 Run bootstrap-vcpkg.bat
 Run vcpkg.exe integrate install
-Run vcpkg.exe install curl
+Run vcpkg.exe install pugixml
+Run vcpkg.exe install nlohmann-json
 
--i "data\sample_html_to_json\character_only.html" -o "output\locale.json" --sheet3rdKeyValue locale --dataSet es
--i "data\sample_html_to_json\character_only.html" -o "output\character.json" --sheet5th toc --dataSet en
+google sheets webpage menu bar File>Download>Web Page (.html) -> downloads a zip of each sheet as a html document
+
+
+-i "data\sample_html_to_json" -o "output\locale.json" --sheet5th toc -d
 
 */
 
@@ -59,7 +56,7 @@ options:
 -h --help -?
 	generate this text
 -i --input <input filepath>
--u --url <input url>
+-d --doctorInput // default html saved out from google html is not well formed xml, trim the file down to what is inside <body...>...</body> tag
 -s --dataSet <lable>
 	add lable to the allowed dataSet for filtering sheet3rdKeyValue sheets
 -3 --sheet3rd <worksheet name>
@@ -73,118 +70,98 @@ options:
 )");
     }
 
-    const int DealInputFile(std::map<std::string, std::shared_ptr<Worksheet>>& out_source_data, const std::string& in_input_file_path)
+    const std::string DoctorInput(const std::string& in_source_data)
+    {
+        const std::string skip_past_token = "<link type=\"text/css\" rel=\"stylesheet\" href=\"resources/sheet.css\" >";
+        const auto found = in_source_data.find(skip_past_token);
+        if (std::string::npos != found)
+        {
+            return in_source_data.substr(found + skip_past_token.length());
+        }
+        return in_source_data;
+    }
+
+    // default html saved out from google html is not well formed xml, trim the file down to what is inside <body...>...</body> tag
+    const int DealInputFile(std::map<std::string, std::shared_ptr<Worksheet>>& out_source_data, const std::string& in_input_file_path, const bool in_doctor_input)
     {
         printf("Input file:%s\n", in_input_file_path.c_str());
 
-        //get the source string
-        //https://stackoverflow.com/questions/20902945/reading-a-string-from-file-c
-        std::string source_data;
-        {
-            const std::ifstream input_stream(in_input_file_path, std::ios_base::binary);
+        int result = ApplicationExitCode::TNone;
 
-            if (input_stream.fail()) 
+        for (const auto& entry : std::filesystem::directory_iterator(in_input_file_path))
+        {
+
+            //get the source string
+            //https://stackoverflow.com/questions/20902945/reading-a-string-from-file-c
+            std::string source_data;
             {
-                return ApplicationExitCode::TInputFileFail;
+                const std::ifstream input_stream(entry, std::ios_base::binary);
+
+                if (input_stream.fail()) 
+                {
+                    result |= ApplicationExitCode::TInputFileFail;
+                    continue;
+                }
+
+                std::stringstream buffer;
+                buffer << input_stream.rdbuf();
+
+                source_data = buffer.str();
             }
 
-            std::stringstream buffer;
-            buffer << input_stream.rdbuf();
-
-            source_data = buffer.str();
-        }
-
-        //convert source string to Worksheets
-        if (false == StringToWorksheet::DealSourceData(out_source_data, source_data))
-        {
-            return ApplicationExitCode::TParseSource;
-        }
-
-        return ApplicationExitCode::TNone;
-    }
-
-    size_t WriteData(void *ptr, size_t size, size_t nmemb, void* source_data_raw)
-    {
-        std::string& source_data = *(std::string*)source_data_raw;
-        size_t written = 0;
-        //size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
-        if (size == 1)
-        {
-            char* trace = (char*)ptr;
-            for (int index = 0; index < static_cast<int>(nmemb); ++index)
+            if (true == in_doctor_input)
             {
-                source_data += trace[index];
-                written += 1;
+                source_data = DoctorInput(source_data);
             }
+
+            //convert source string to Worksheets
+            const auto sheet_name = std::filesystem::path(entry).stem().string();
+            if (false == StringToWorksheet::DealSourceData(out_source_data, source_data, sheet_name))
+            {
+                result |= ApplicationExitCode::TParseSource;
+                continue;
+            }
+
         }
 
-        return written;
+
+        return result;
     }
 
-    const int DealInputUrl(std::map<std::string, std::shared_ptr<Worksheet>>& out_source_data, const std::string& in_input_url)
+    const int SaveStringToFile(const std::string& in_data, const std::filesystem::path& in_file_path)
     {
-        printf("Input url:%s\n", in_input_url.c_str());
-        //get the source string
-        std::string source_data;
+        //printf("Save file:%s\n", in_file_path.c_str());
 
-        //https://curl.se/libcurl/c/url2file.html
-        curl_global_init(CURL_GLOBAL_ALL);
-        CURL *curl;
-        curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_URL, in_input_url.c_str());
-
-        /* Switch on full protocol/debug output while testing */
-        //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
- 
-        /* disable progress meter, set to 0L to enable it */
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &source_data);
-        CURLcode res = curl_easy_perform(curl);
-
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-
-        if (CURLE_OK != res)
-        {
-            return ApplicationExitCode::TInputURLFail;
-        }
-
-        //convert source string to Worksheets
-        if (false == StringToWorksheet::DealSourceData(out_source_data, source_data))
-        {
-            return ApplicationExitCode::TParseSource;
-        }
-
-        return ApplicationExitCode::TNone;
-    }
-
-    const int DealOutput(const nlohmann::json& in_output_data, const std::string& in_output_file_path)
-    {
-        printf("Output:%s\n", in_output_file_path.c_str());
-
-        std::filesystem::path dir_path = std::filesystem::path(in_output_file_path).parent_path();
+        std::filesystem::path dir_path = std::filesystem::path(in_file_path).parent_path();
         std::filesystem::create_directories(dir_path);
 
-        std::ofstream outFile(in_output_file_path, std::ios::out | std::ios::binary | std::ios::ate);
+        std::ofstream outFile(in_file_path, std::ios::out | std::ios::binary | std::ios::ate);
         if (!outFile)
         {
-            printf("output file creation failed:%s\n", in_output_file_path.c_str());
+            printf("output file creation failed\n");
             return ApplicationExitCode::TOutputFileCreateFailed;
         }
 
-        //const std::string data = in_output_data.template get<std::string>();
-        const std::string data = in_output_data.dump(1, '\t');
-        outFile.write(data.c_str(), data.size());
+        outFile.write(in_data.c_str(), in_data.size());
         if (!outFile)
         {
-            printf("output file write failed:%s\n", in_output_file_path.c_str());
+            printf("output file write failed\n");
             return ApplicationExitCode::TOutputFileWriteFailed;
         }
 
         outFile.close();
 
         return ApplicationExitCode::TNone;
+
+    }
+
+    const int DealOutput(const nlohmann::json& in_output_data, const std::string& in_output_file_path)
+    {
+        printf("DealOutput:%s\n", in_output_file_path.c_str());
+
+        const std::string data = in_output_data.dump(1, '\t');
+
+        return SaveStringToFile(data.c_str(), in_output_file_path);
     }
 
 }
@@ -215,10 +192,9 @@ int main(const int in_argc, const char* const in_argv[])
                 index += 1;
                 state.input_file_path = in_argv[index];
             }
-            else if (((token == "-u") || (token == "--url")) && (index + 1 < in_argc))
+            else if ((token == "-d") || (token == "--doctorInput"))
             {
-                index += 1;
-                state.input_url = in_argv[index];
+                state.doctor_input = true;
             }
             else if (((token == "-s") || (token == "--dataSet")) && (index + 1 < in_argc))
             {
@@ -264,11 +240,7 @@ int main(const int in_argc, const char* const in_argv[])
     // input
     if (false == state.input_file_path.empty())
     {
-        result |= DealInputFile(state.source_data, state.input_file_path);
-    }
-    if (false == state.input_url.empty())
-    {
-        result |= DealInputUrl(state.source_data, state.input_url);
+        result |= DealInputFile(state.source_data, state.input_file_path, state.doctor_input);
     }
 
     // process

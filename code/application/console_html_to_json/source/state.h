@@ -12,6 +12,8 @@ class State
 {
 public:
     bool do_help = false;
+    bool doctor_input = false;
+    bool save_out_input = false;
 
     std::string input_file_path = {};
     std::string input_url = {};

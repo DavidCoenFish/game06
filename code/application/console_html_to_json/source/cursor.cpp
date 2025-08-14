@@ -122,26 +122,6 @@ void Cursor::PushArray(const int in_array_index)
     return;
 }
 
-#if 0
-const bool Cursor::TestDataset(const std::set<std::string>& in_data_set) const
-{
-    if (false == _use_data_set)
-    {
-        return true;
-    }
-
-    for (auto item : _data_set)
-    {
-        auto found = in_data_set.find(item);
-        if (found != in_data_set.end())
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-#else
 const bool Cursor::TestDataset(const std::string& in_needle) const
 {
     if (false == _use_data_set)
@@ -157,7 +137,17 @@ const bool Cursor::TestDataset(const std::string& in_needle) const
 
     return false;
 }
-#endif
+
+void Cursor::ClearDataset()
+{
+    _data_set.clear();
+}
+
+void Cursor::AppendDataset(const std::string& in_token)
+{
+    _data_set.insert(in_token);
+}
+
 
 Cursor Cursor::Clone() const
 {

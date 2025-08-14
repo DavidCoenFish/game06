@@ -35,6 +35,8 @@ public:
     void PushArray(const int in_array_index);
     //const bool TestDataset(const std::set<std::string>& in_data_set) const;
     const bool TestDataset(const std::string& in_needle) const;
+    void ClearDataset();
+    void AppendDataset(const std::string& in_token);
 
     Cursor Clone() const;
     Cursor CloneSetUseDataSet(const bool in_use_data_set) const;

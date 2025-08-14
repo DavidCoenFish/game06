@@ -1,5 +1,12 @@
 #pragma once
 
+//#include <Windows.h> // for WideCharToMultiByte
+
+#include <set>
+#include <string>
+#include <map>
+#include <vector>
+
 #pragma warning(push)
 
 #pragma warning(disable : 4514)  // unreferenced inline function has been removed
