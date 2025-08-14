@@ -26,7 +26,7 @@ Run vcpkg.exe integrate install
 Run vcpkg.exe install curl
 
 -i "data\sample_html_to_json\character_only.html" -o "output\locale.json" --sheet3rdKeyValue locale --dataSet es
--i "data\sample_html_to_json\character_only.html" -o "output\character.json" --sheet5th toc
+-i "data\sample_html_to_json\character_only.html" -o "output\character.json" --sheet5th toc --dataSet en
 
 */
 
