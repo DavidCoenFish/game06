@@ -56,8 +56,6 @@ namespace
             return DscUi::TUiDrawType::TFill;
         case DscUi::TUiComponentType::TGradientFill:
             return DscUi::TUiDrawType::TGradientFill;
-        case DscUi::TUiComponentType::TGradientFillForInputState:
-            return DscUi::TUiDrawType::TGradientFill;
         case DscUi::TUiComponentType::TImage:
             return DscUi::TUiDrawType::TImage;
         case DscUi::TUiComponentType::TCanvas:
