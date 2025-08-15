@@ -103,16 +103,25 @@ const std::string& DscData::GetString(const std::unique_ptr<JsonValue>& in_value
 	return s_dummy;
 }
 
+const std::unique_ptr<DscData::JsonValue>& DscData::GetObjectChild(const JsonValue& in_parent, const std::string& in_key)
+{
+	const JsonObject& map_value = std::get<JsonObject>(in_parent.data);
+	const auto iter = map_value.find(in_key);
+	if (iter != map_value.end())
+	{
+		return iter->second;
+	}
+
+	static std::unique_ptr<JsonValue> s_dummy;
+	return s_dummy;
+}
+
+
 const std::unique_ptr<DscData::JsonValue>& DscData::GetObjectChild(const std::unique_ptr<JsonValue>& in_parent, const std::string& in_key)
 {
 	if (nullptr != in_parent)
 	{
-		const JsonObject& map_value = std::get<JsonObject>(in_parent->data);
-		const auto iter = map_value.find(in_key);
-		if (iter != map_value.end())
-		{
-			return iter->second;
-		}
+		return GetObjectChild(*in_parent, in_key);
 	}
 	static std::unique_ptr<JsonValue> s_dummy;
 	return s_dummy;

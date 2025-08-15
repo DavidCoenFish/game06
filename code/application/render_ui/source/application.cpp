@@ -43,14 +43,8 @@ namespace
 {
     std::unique_ptr<DscData::JsonValue> MakeDataRoot(DscCommon::FileSystem& in_file_system)
     {
-        auto result = DscData::MakeJsonObject();
-
-        DscData::SetObjectValue(
-            result,
-            "locale",
-            DscData::LoadJsonFromFile(in_file_system, 
-                DscCommon::FileSystem::JoinPath("data", "lqrpg", "locale.json")
-                )
+        auto result = DscData::LoadJsonFromFile(in_file_system,
+            DscCommon::FileSystem::JoinPath("data", "lqrpg", "locale.json")
         );
 
         return result;
@@ -93,7 +87,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     if (nullptr != _resources->_ui_instance_factory)
     {
-        _resources->_data_source_node_group = UiInstanceApp::BuildDataSource(*_resources->_dag_collection);
+        _resources->_data_source_node_group = UiInstanceApp::BuildDataSource(
+            *_resources->_dag_collection,
+            *_resources->_data_root
+        );
         DscDag::IDagOwner* const data_source_owner = dynamic_cast<DscDag::IDagOwner*>(_resources->_data_source_node_group);
 
         _resources->_data_source_node = _resources->_dag_collection->CreateValueOnValueChange<DscDag::NodeToken>(_resources->_data_source_node_group);
@@ -134,6 +131,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             context._file_system = _file_system.get();
             context._ui_manager = _resources->_ui_manager.get();
             context._text_manager = _resources->_text_manager.get();
+            context._root_data_source_node_group = _resources->_data_source_node_group;
             context._data_source_node = _resources->_data_source_node;
             context._root_external_render_target_or_null = ui_render_target;
 

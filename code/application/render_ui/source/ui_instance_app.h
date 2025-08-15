@@ -15,6 +15,11 @@ namespace DscDag
     typedef IDagNode* NodeToken;
 }
 
+namespace DscData
+{
+    struct JsonValue;
+}
+
 namespace DscRender
 {
     class DagCollection;
@@ -41,6 +46,9 @@ public:
     enum class TUiNodeGroupDataSource : uint8
     {
         TLocale = static_cast<uint8>(DscUi::TUiNodeGroupDataSource::TCount),
+        TLocaleData,
+        TFontPath,
+
         TKeepAppRunning,
         TMainScreenDataSourceNode, // a dag node <NodeToken> with the value of active Data Source for the main screen or null
         TDialogDataSourceNode,
@@ -57,7 +65,8 @@ public:
     static const std::string GetTemplateName();
 
     static DscDag::NodeToken BuildDataSource(
-        DscDag::DagCollection& in_dag_collection
+        DscDag::DagCollection& in_dag_collection,
+        DscData::JsonValue& in_data
     );
 
     static std::shared_ptr<DscUi::IUiInstance> Factory(
@@ -68,14 +77,6 @@ public:
     UiInstanceApp(
         const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
         const UiInstanceContext& in_context
-
-        //const std::shared_ptr<DscUi::UiRenderTarget>& in_root_external_render_target_or_null,
-        //const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,
-        //DscUi::UiManager& in_ui_manager,
-        //DscRender::DrawSystem& in_draw_system,
-        //DscDag::DagCollection& in_dag_collection,
-        //DscCommon::FileSystem& in_file_system,
-        //DscDag::NodeToken in_main_screen_data_source
     );
     ~UiInstanceApp();
 

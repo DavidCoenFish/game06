@@ -17,6 +17,7 @@ namespace DscData
 	const float GetFloat(const std::unique_ptr<JsonValue>& in_value);
 	const std::string& GetString(const std::unique_ptr<JsonValue>& in_value);
 
+	const std::unique_ptr<JsonValue>& GetObjectChild(const JsonValue& in_parent, const std::string& in_key);
 	const std::unique_ptr<JsonValue>& GetObjectChild(const std::unique_ptr<JsonValue>& in_parent, const std::string& in_key);
 	const int32 GetArrayCount(const std::unique_ptr<JsonValue>& in_parent);
 	const std::unique_ptr<JsonValue>& GetArrayChild(const std::unique_ptr<JsonValue>& in_parent, const int32 in_index);

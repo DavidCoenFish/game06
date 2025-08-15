@@ -48,6 +48,7 @@ public:
     DscCommon::FileSystem* _file_system = {};
     DscText::TextManager* _text_manager = {};
     std::shared_ptr<DscUi::UiRenderTarget> _root_external_render_target_or_null = {};
+    DscDag::NodeToken _root_data_source_node_group = {}; // the root data source DagNodeGroup 
     DscDag::NodeToken _data_source_node = {}; // a dag node <node token> with the value of the data source DagNodeGroup 
     DscDag::NodeToken _root_node_or_null = {};
     DscDag::NodeToken _parent_node_or_null = {};

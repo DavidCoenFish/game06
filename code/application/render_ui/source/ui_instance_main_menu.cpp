@@ -3,6 +3,8 @@
 #include "ui_instance_context.h"
 #include <dsc_common/file_system.h>
 #include <dsc_common/math.h>
+#include <dsc_data/dsc_data.h>
+#include <dsc_data/accessor.h>
 #include <dsc_render_resource_png/dsc_render_resource_png.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_text/text_run.h>
@@ -27,6 +29,7 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         break;
     case UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle:
     {
+        // do we spit out strings of TextRun
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::string) };
         return s_meta_data;
     }
@@ -48,38 +51,28 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
 
 namespace
 {
-    std::shared_ptr<DscText::TextRun> MakeTextRun(
-        DscText::TextManager& in_text_manager,
-        DscCommon::FileSystem& in_file_system,
-        const std::string& in_message)
+    DscDag::NodeToken MakeLocaleKey(
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::IDagOwner* const in_data_source_owner,
+        DscDag::NodeToken in_root_data_source_node,
+        const std::string& in_locale_key
+    )
     {
-        DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
-
-        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
-        DscCommon::VectorInt2 container_size = {};
-        const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
-
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            in_message,
-            pLocale,
-            font,
-            20,
-            DscCommon::Math::ConvertColourToInt(111, 28, 11, 255),
-            10,
-            10,
-            -2
-        ));
-
-        const int32 current_width = 0;
-        auto text_run = std::make_shared<DscText::TextRun>(
-            std::move(text_run_array),
-            container_size,
-            true,
-            current_width,
-            DscText::THorizontalAlignment::TMiddle,
-            DscText::TVerticalAlignment::TTop
+        auto node = in_dag_collection.CreateCalculate<std::string>([in_locale_key](std::string& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const DscData::JsonValue* locale_data = DscDag::GetValueType<DscData::JsonValue*>(in_input_array[0]);
+                DSC_ASSERT(nullptr != locale_data, "invalid state");
+                output = DscData::GetString(DscData::GetObjectChild(*locale_data, in_locale_key));
+                return;
+            },
+            in_data_source_owner
             );
-        return text_run;
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, in_locale_key));
+        DscDag::LinkIndexNodes(
+            0,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node, UiInstanceApp::TUiNodeGroupDataSource::TLocaleData),
+            node);
+
+        return node;
     }
 
     void AddButton(
@@ -90,7 +83,8 @@ namespace
         DscCommon::FileSystem& in_file_system,
         DscText::TextManager& in_text_manager,
         DscDag::NodeToken in_root_node,
-        DscDag::NodeToken in_parent_node
+        DscDag::NodeToken in_parent_node,
+        DscDag::NodeToken in_root_data_source_node_group
     )
     {
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_button_effect = {};
@@ -237,22 +231,47 @@ namespace
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.25f)
             });
 
-
-        //DscText::TextManager* text_manager = &in_text_manager;
         auto text = in_dag_collection.CreateCalculate<std::shared_ptr<DscText::TextRun>>(
             [&in_text_manager, &in_file_system]
             (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-            const std::string& message = DscDag::GetValueType<std::string>(in_input_array[0]);
-            output = MakeTextRun(
-                in_text_manager,
-                in_file_system,
-                message);
+                const DscLocale::LocaleISO_639_1 locale = DscDag::GetValueType<DscLocale::LocaleISO_639_1>(in_input_array[0]);
+                const std::string& font_path = DscDag::GetValueType<std::string>(in_input_array[1]);
+                const std::string& message = DscDag::GetValueType<std::string>(in_input_array[2]);
+
+                const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(locale);
+                DscText::GlyphCollectionText* font = in_text_manager.LoadFont(in_file_system, font_path);
+
+                std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+                DscCommon::VectorInt2 container_size = {};
+
+                text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                    message,
+                    pLocale,
+                    font,
+                    20,
+                    DscCommon::Math::ConvertColourToInt(111, 28, 11, 255)//,
+                    //20,
+                    //10
+                    ,0,0,15
+                ));
+
+                const int32 current_width = 0;
+                output = std::make_shared<DscText::TextRun>(
+                    std::move(text_run_array),
+                    container_size,
+                    true,
+                    current_width,
+                    DscText::THorizontalAlignment::TMiddle,
+                    DscText::TVerticalAlignment::TMiddle
+                    );
+
             }, dynamic_cast<DscDag::IDagOwner*>(button_node_group)
             );
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "text node"));
 
-        DscDag::LinkIndexNodes(0, in_data._button_text, text);
-
+        DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TLocale), text);
+        DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TFontPath), text);
+        DscDag::LinkIndexNodes(2, in_data._button_text, text);
 
         in_ui_manager.AddChildNode(
             DscUi::MakeComponentTextNode(
@@ -304,9 +323,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
 
     // title
     {
-        // todo: source text from locale system database
-        auto node = in_dag_collection.CreateValueOnValueChange<std::string>("<r:255><g:255><b:255><s:80><h:60>Legendary Quest<s:32><h:0><o:32>\xE2\x84\xA2", dag_owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "title"));
+        auto node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "main menu title");
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             result,
             UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle,
@@ -316,13 +333,10 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
 
     // sub title
     {
-        // todo: source text from locale system database
-        //<s:24>
-        auto node = in_dag_collection.CreateValueOnValueChange<std::string>("CRPG Sandbox", dag_owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "sub title"));
+        auto node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "main menu sub title");
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             result,
-            UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle,
+            UiInstanceMainMenu::TUiNodeGroupDataSource::TSubTitle,
             node
         );
     }
@@ -333,24 +347,21 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
 
         //Character
         {
-            auto text_node = in_dag_collection.CreateValueOnValueChange<std::string>("Character", dag_owner);
-            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text_node, "Character"));
+            auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "character");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
             };
             button_data_array.push_back({ text_node , function });
         }
         //Combat
         {
-            auto text_node = in_dag_collection.CreateValueOnValueChange<std::string>("Combat", dag_owner);
-            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text_node, "Combat"));
+            auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "combat");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
             };
             button_data_array.push_back({ text_node , function });
         }
         // Exit
         {
-            auto text_node = in_dag_collection.CreateValueOnValueChange<std::string>("Exit", dag_owner);
-            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text_node, "Exit"));
+            auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "exit");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
                 auto keep_going_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
                 DscDag::SetValueType(keep_going_node, false);
@@ -477,40 +488,56 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
     // title
     {
-        std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
-        const DscText::TextLocale* const pLocale = in_context._text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
-        DscText::GlyphCollectionText* font = in_context._text_manager->LoadFont(*in_context._file_system, DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf"));
+        auto& text_manager = *in_context._text_manager;
+        auto& file_system = *in_context._file_system;
+        auto text = in_context._dag_collection->CreateCalculate<std::shared_ptr<DscText::TextRun>>(
+                [&text_manager, &file_system]
+                (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                    const DscLocale::LocaleISO_639_1 locale = DscDag::GetValueType<DscLocale::LocaleISO_639_1>(in_input_array[0]);
+                    const std::string& font_path = DscDag::GetValueType<std::string>(in_input_array[1]);
+                    const std::string& message = DscDag::GetValueType<std::string>(in_input_array[2]);
 
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "Legendary Quest",
-            pLocale,
-            font,
-            80,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
-            50,
-            30
-        ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
-            "\xE2" "\x84" "\xA2",
-            pLocale,
-            font,
-            32,
-            DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
-            0,
-            0,
-            24
-        ));
+                    const DscText::TextLocale* const pLocale = text_manager.GetLocaleToken(locale);
+                    DscText::GlyphCollectionText* font = text_manager.LoadFont(file_system, font_path);
 
-        DscCommon::VectorInt2 container_size = {};
-        const int32 current_width = 0;
-        auto text_run = std::make_shared<DscText::TextRun>(
-            std::move(text_run_array),
-            container_size,
-            true,
-            current_width,
-            DscText::THorizontalAlignment::TMiddle,
-            DscText::TVerticalAlignment::TMiddle
+                    std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+                    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                        message,
+                        pLocale,
+                        font,
+                        80,
+                        DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+                        50,
+                        30
+                    ));
+
+                    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                        "\xE2" "\x84" "\xA2",
+                        pLocale,
+                        font,
+                        32,
+                        DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
+                        0,
+                        0,
+                        24
+                    ));
+
+                    DscCommon::VectorInt2 container_size = {};
+                    const int32 current_width = 0;
+                    output = std::make_shared<DscText::TextRun>(
+                        std::move(text_run_array),
+                        container_size,
+                        true,
+                        current_width,
+                        DscText::THorizontalAlignment::TMiddle,
+                        DscText::TVerticalAlignment::TMiddle
+                        );
+            }, dynamic_cast<DscDag::IDagOwner*>(stack_node)
             );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "title node"));
+        DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._root_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TLocale), text);
+        DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._root_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TFontPath), text);
+        DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(data_source, TUiNodeGroupDataSource::TTitle), text);
 
         std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array = {};
         effect_array.push_back({
@@ -519,8 +546,8 @@ UiInstanceMainMenu::UiInstanceMainMenu(
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
             });
         _ui_manager.AddChildNode(
-            DscUi::MakeComponentText(
-                text_run,
+            DscUi::MakeComponentTextNode(
+                text,
                 in_context._text_manager,
                 false
             ).SetUiScaleByWidth(
@@ -535,6 +562,61 @@ UiInstanceMainMenu::UiInstanceMainMenu(
             stack_node,
             effect_array
             DSC_DEBUG_ONLY(DSC_COMMA "title node")
+        );
+    }
+
+    // sub title
+    {
+        auto& text_manager = *in_context._text_manager;
+        auto& file_system = *in_context._file_system;
+        auto text = in_context._dag_collection->CreateCalculate<std::shared_ptr<DscText::TextRun>>(
+            [&text_manager, &file_system]
+        (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const DscLocale::LocaleISO_639_1 locale = DscDag::GetValueType<DscLocale::LocaleISO_639_1>(in_input_array[0]);
+            const std::string& font_path = DscDag::GetValueType<std::string>(in_input_array[1]);
+            const std::string& message = DscDag::GetValueType<std::string>(in_input_array[2]);
+
+            const DscText::TextLocale* const pLocale = text_manager.GetLocaleToken(locale);
+            DscText::GlyphCollectionText* font = text_manager.LoadFont(file_system, font_path);
+
+            std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+            text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                message,
+                pLocale,
+                font,
+                20
+            ));
+
+            DscCommon::VectorInt2 container_size = {};
+            const int32 current_width = 0;
+            output = std::make_shared<DscText::TextRun>(
+                std::move(text_run_array),
+                container_size,
+                true,
+                current_width,
+                DscText::THorizontalAlignment::TMiddle,
+                DscText::TVerticalAlignment::TMiddle
+                );
+        }, dynamic_cast<DscDag::IDagOwner*>(stack_node)
+            );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "sub title node"));
+        DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._root_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TLocale), text);
+        DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_context._root_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TFontPath), text);
+        DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(data_source, TUiNodeGroupDataSource::TSubTitle), text);
+
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> effect_array = {};
+        _ui_manager.AddChildNode(
+            DscUi::MakeComponentTextNode(
+                text,
+                in_context._text_manager,
+                false
+            ),
+            _draw_system,
+            _dag_collection,
+            in_context._root_node_or_null,
+            stack_node,
+            effect_array
+            DSC_DEBUG_ONLY(DSC_COMMA "sub title node")
         );
     }
 
@@ -553,7 +635,8 @@ UiInstanceMainMenu::UiInstanceMainMenu(
                 *in_context._file_system,
                 *in_context._text_manager,
                 in_context._root_node_or_null,
-                stack_node
+                stack_node,
+                in_context._root_data_source_node_group
                 );
         }
     }

@@ -45,5 +45,5 @@ DscVsprojectConsoleExe("console_html_to_json" .Param)
 
 .SolutionProjects + "console_html_to_json_project"
 .SolutionItemsApplicationProject + "console_html_to_json_project"
-.SolutionBuildProject = "console_html_to_json_project"
+//.SolutionBuildProject = "console_html_to_json_project"
 
