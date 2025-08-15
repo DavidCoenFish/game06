@@ -544,6 +544,26 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
 
                 value = text_run_raw->GetTextBounds();
             }
+
+            // inflate desired size by padding
+            if ((nullptr != in_input_array[3]) &&
+                (nullptr != in_input_array[4]) &&
+                (nullptr != in_input_array[5]) &&
+                (nullptr != in_input_array[6])
+                )
+            {
+                const DscUi::UiCoord& padding_left = DscDag::GetValueType<DscUi::UiCoord>(in_input_array[3]);
+                const DscUi::UiCoord& padding_top = DscDag::GetValueType<DscUi::UiCoord>(in_input_array[4]);
+                const DscUi::UiCoord& padding_right = DscDag::GetValueType<DscUi::UiCoord>(in_input_array[5]);
+                const DscUi::UiCoord& padding_bottom = DscDag::GetValueType<DscUi::UiCoord>(in_input_array[6]);
+
+                value.Set(
+                    value.GetX() + padding_left.Evaluate(avaliable_size.GetX(), avaliable_size.GetY(), ui_scale)
+                    + padding_right.Evaluate(avaliable_size.GetX(), avaliable_size.GetY(), ui_scale),
+                    value.GetY() + padding_top.Evaluate(avaliable_size.GetY(), avaliable_size.GetX(), ui_scale)
+                    + padding_bottom.Evaluate(avaliable_size.GetY(), avaliable_size.GetX(), ui_scale)
+                    );
+            }
         },
             in_owner);
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "desired size text"));
@@ -551,6 +571,12 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
         DscDag::LinkIndexNodes(0, in_avaliable_size, node);
         DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TText), node);
         DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TUiScale), node);
+
+        DscDag::LinkIndexNodes(3, DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TPaddingLeft), node);
+        DscDag::LinkIndexNodes(4, DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TPaddingTop), node);
+        DscDag::LinkIndexNodes(5, DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TPaddingRight), node);
+        DscDag::LinkIndexNodes(6, DscDag::DagNodeGroup::GetNodeTokenEnum(in_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TPaddingBottom), node);
+
     }
 
     return node;

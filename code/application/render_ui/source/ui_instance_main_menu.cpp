@@ -473,7 +473,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
             DscUi::MakeComponentStack(
                 DscUi::TUiFlow::TVertical, DscUi::UiCoord(0, 0.0f)
             ).SetChildSlot(
-                DscUi::VectorUiCoord2(DscUi::UiCoord(-16, 1.0f), DscUi::UiCoord(-16, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(-16, 1.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
             ),
@@ -506,9 +506,9 @@ UiInstanceMainMenu::UiInstanceMainMenu(
                         pLocale,
                         font,
                         80,
-                        DscCommon::Math::ConvertColourToInt(255, 255, 255, 255),
-                        60,
-                        30
+                        DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)//,
+                        //60,
+                        //30
                     ));
 
                     text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
@@ -553,6 +553,11 @@ UiInstanceMainMenu::UiInstanceMainMenu(
             ).SetUiScaleByWidth(
                 800,
                 0.00125f
+            ).SetPadding(
+                DscUi::UiCoord(0, 0.0f),
+                DscUi::UiCoord(4, 0.0f),
+                DscUi::UiCoord(0, 0.0f),
+                DscUi::UiCoord(4, 0.0f)
             //).SetClearColour(
             //    DscCommon::VectorFloat4(0.0f, 0.5f, 0.0f, 1.0f)
             ),
@@ -585,9 +590,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
                 pLocale,
                 font,
                 20,
-                DscCommon::Math::ConvertColourToInt(0, 0, 0, 255),
-                20,
-                10
+                DscCommon::Math::ConvertColourToInt(0, 0, 0, 255)
             ));
 
             DscCommon::VectorInt2 container_size = {};
@@ -613,6 +616,11 @@ UiInstanceMainMenu::UiInstanceMainMenu(
                 text,
                 in_context._text_manager,
                 false
+            ).SetPadding(
+                DscUi::UiCoord(0, 0.0f),
+                DscUi::UiCoord(8, 0.0f),
+                DscUi::UiCoord(0, 0.0f),
+                DscUi::UiCoord(8, 0.0f)
             ),
             _draw_system,
             _dag_collection,
