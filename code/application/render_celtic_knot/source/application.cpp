@@ -35,63 +35,85 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 // UINT InstanceDataStepRate;
         });
 
-    std::vector<uint8> vertex_shader_data;
-    if (false == _file_system->LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_vs.cso")))
+    // shader
     {
-        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load vertex shader\n");
-    }
-    std::vector<uint8> pixel_shader_data;
-    //if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1000_ps.cso")))
-    //if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1100_ps.cso")))
-    //if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1111_ps.cso")))
-    if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_ps.cso")))
-    {
-        DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load pixel shader\n");
-    }
-    std::vector < DXGI_FORMAT > render_target_format;
-    render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
-    DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
-        input_element_desc_array,
-        D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-        DXGI_FORMAT_UNKNOWN,
-        // DXGI_FORMAT_D32_FLOAT,
-        render_target_format,
-        DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),  //CD3DX12_BLEND_DESC(D3D12_DEFAULT),
-        CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-        CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
-    );
-    std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
-    _shader = std::make_shared<DscRenderResource::Shader>(
-        _draw_system.get(),
-        shader_pipeline_state_data,
-        vertex_shader_data,
-        std::vector<uint8_t>(),
-        pixel_shader_data,
-        array_shader_resource_info
-        );
-
-    std::vector<uint8_t> vertex_data = DscRenderResource::GeometryGeneric::FactoryArrayLiteral(
+        std::vector<uint8> vertex_shader_data;
+        if (false == _file_system->LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_vs.cso")))
         {
-            -1.0f, -1.0f, 0.0f, 0.0f,
-            -1.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, -1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 1.0f, 1.0f,
+            DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load vertex shader\n");
         }
-    );
-
-    _geometry_generic = std::make_shared<DscRenderResource::GeometryGeneric>(
-        _draw_system.get(),
-        D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
-        input_element_desc_array,
-        vertex_data,
-        4
+        std::vector<uint8> pixel_shader_data;
+        if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_ps.cso")))
+        {
+            DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load pixel shader\n");
+        }
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            input_element_desc_array,
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            // DXGI_FORMAT_D32_FLOAT,
+            render_target_format,
+            DscRenderResource::ShaderPipelineStateData::FactoryBlendDescAlphaPremultiplied(),  //CD3DX12_BLEND_DESC(D3D12_DEFAULT),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
         );
+        std::vector<std::shared_ptr<DscRenderResource::ShaderResourceInfo>> array_shader_resource_info;
+        _knot_shader = std::make_shared<DscRenderResource::Shader>(
+            _draw_system.get(),
+            shader_pipeline_state_data,
+            vertex_shader_data,
+            std::vector<uint8_t>(),
+            pixel_shader_data,
+            array_shader_resource_info
+            );
+    }
+
+    // geometry
+    {
+        std::vector<uint8_t> vertex_data = DscRenderResource::GeometryGeneric::FactoryArrayLiteral(
+            {
+                -1.0f, -1.0f, 0.0f, 0.0f,
+                -1.0f, 1.0f, 0.0f, 1.0f,
+                1.0f, -1.0f, 1.0f, 0.0f,
+                1.0f, 1.0f, 1.0f, 1.0f,
+            }
+        );
+        _geometry_generic = std::make_shared<DscRenderResource::GeometryGeneric>(
+            _draw_system.get(),
+            D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+            input_element_desc_array,
+            vertex_data,
+            4
+            );
+    }
+
+    //_knot_render_target
+    {
+        std::vector < DscRender::RenderTargetFormatData > target_format_data_array = {};
+        target_format_data_array.push_back(
+            DscRender::RenderTargetFormatData(
+                DXGI_FORMAT_B8G8R8A8_UNORM,
+                true,
+                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
+            )
+        );
+
+        _knot_render_target = std::make_shared<DscRenderResource::RenderTargetTexture>(
+            _draw_system.get(),
+            target_format_data_array,
+            DscRender::RenderTargetDepthData(),
+            DscCommon::VectorInt2(128, 128)
+            );
+    }
 }
 
 Application::~Application()
 {
+    _knot_render_target.reset();
     _geometry_generic.reset();
-    _shader.reset();
+    _knot_shader.reset();
     if (_draw_system)
     {
         _draw_system->WaitForGpu();

@@ -42,6 +42,7 @@ private:
     std::unique_ptr<DscCommon::FileSystem> _file_system;
     std::unique_ptr<DscRender::DrawSystem> _draw_system;
     std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_generic;
-    std::shared_ptr<DscRenderResource::Shader> _shader;
+    std::shared_ptr<DscRenderResource::Shader> _knot_shader;
+    std::shared_ptr<DscRenderResource::RenderTargetTexture> _knot_render_target;
 
 };
