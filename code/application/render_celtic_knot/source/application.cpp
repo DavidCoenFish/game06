@@ -28,6 +28,7 @@ namespace
 
     struct TDataConstantBuffer
     {
+        // data size [x,y] for the celtic knot data map, then [z,w] of the render target size
         float _texture_size[4];
     };
 
@@ -337,18 +338,26 @@ const bool Application::Update()
         frame->Draw(_geometry_generic);
 
         DscCommon::VectorInt2 data_size = {};
+        DscCommon::VectorInt2 data_render_target_size = {};
         {
             data_size.Set(
-                DscCommon::Math::Ceiling(render_size.GetX() / _k_knot_texture_size, 8),
-                DscCommon::Math::Ceiling(render_size.GetY() / _k_knot_texture_size, 8)
+                (render_size.GetX() / _k_knot_texture_size) + 1,
+                (render_size.GetY() / _k_knot_texture_size) + 1
                 );
-            _data_render_target->Resize(frame->GetCommandList(), frame->GetDrawSystem().GetD3dDevice(), data_size);
+            data_render_target_size.Set(
+                DscCommon::Math::Ceiling(data_size.GetX(), 8),
+                DscCommon::Math::Ceiling(data_size.GetY(), 8)
+            );
+            _data_render_target->Resize(frame->GetCommandList(), frame->GetDrawSystem().GetD3dDevice(), data_render_target_size);
         }
+#if 0
         frame->SetRenderTargetTexture(_data_render_target);
         {
             auto& buffer = _data_shader_constant_buffer->GetConstant<TDataConstantBuffer>(0);
             buffer._texture_size[0] = static_cast<float>(data_size.GetX());
             buffer._texture_size[1] = static_cast<float>(data_size.GetY());
+            buffer._texture_size[2] = static_cast<float>(data_render_target_size.GetX());
+            buffer._texture_size[3] = static_cast<float>(data_render_target_size.GetY());
         }
         frame->SetShader(_data_shader, _data_shader_constant_buffer);
         frame->Draw(_geometry_generic);
@@ -359,13 +368,30 @@ const bool Application::Update()
             buffer._texture_size_knot_size[0] = static_cast<float>(render_size.GetX());
             buffer._texture_size_knot_size[1] = static_cast<float>(render_size.GetY());
             buffer._texture_size_knot_size[2] = static_cast<float>(_k_knot_texture_size);
-            buffer._data_size[0] = static_cast<float>(data_size.GetX());
-            buffer._data_size[1] = static_cast<float>(data_size.GetY());
+            buffer._data_size[0] = static_cast<float>(data_render_target_size.GetX());
+            buffer._data_size[1] = static_cast<float>(data_render_target_size.GetY());
         }
         _fill_knot_shader->SetShaderResourceViewHandle(0, _data_render_target->GetShaderResourceHeapWrapperItem());
         _fill_knot_shader->SetShaderResourceViewHandle(1, _knot_render_target->GetShaderResourceHeapWrapperItem());
         frame->SetShader(_fill_knot_shader, _fill_knot_shader_constant_buffer);
         frame->Draw(_geometry_generic);
+#else
+        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
+        data_render_target_size.Set(
+            render_size.GetX() / 32,
+            render_size.GetY() / 32
+        );
+        {
+            auto& buffer = _data_shader_constant_buffer->GetConstant<TDataConstantBuffer>(0);
+            buffer._texture_size[0] = static_cast<float>(data_size.GetX());
+            buffer._texture_size[1] = static_cast<float>(data_size.GetY());
+            buffer._texture_size[2] = static_cast<float>(data_render_target_size.GetX());
+            buffer._texture_size[3] = static_cast<float>(data_render_target_size.GetY());
+        }
+        frame->SetShader(_data_shader, _data_shader_constant_buffer);
+        frame->Draw(_geometry_generic);
+
+#endif
     }
 
     return true;

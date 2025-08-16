@@ -84,5 +84,16 @@ Pixel main(Interpolant in_input)
         value,
         1.0);
 
+    //result._colour = g_texture_data.Sample(g_sampler_state_data, in_input._uv);
+    //float2 temp = floor(in_input._uv * _data_size.xy);
+    //if ((temp.x == 0.0) && (temp.y == 0.0))
+    //{
+    //    result._colour = float4(
+    //        1.0,
+    //        0.0,
+    //        0.0,
+    //        1.0);
+    //}
+
     return result;
 }
