@@ -41,9 +41,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load vertex shader\n");
     }
     std::vector<uint8> pixel_shader_data;
-    if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1000_ps.cso")))
+    //if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1000_ps.cso")))
     //if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1100_ps.cso")))
     //if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_1111_ps.cso")))
+    if (false == _file_system->LoadFile(pixel_shader_data, DscCommon::FileSystem::JoinPath("shader", "knot_ps.cso")))
     {
         DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load pixel shader\n");
     }
