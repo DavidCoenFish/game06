@@ -44,18 +44,21 @@ private:
     std::unique_ptr<DscCommon::FileSystem> _file_system;
     std::unique_ptr<DscRender::DrawSystem> _draw_system;
     std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry_generic;
+
     std::shared_ptr<DscRenderResource::Shader> _knot_shader;
     std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _knot_shader_constant_buffer;
     std::shared_ptr<DscRenderResource::RenderTargetTexture> _knot_render_target;
 
-    std::shared_ptr<DscRenderResource::ShaderResource> _texture;
+    //std::shared_ptr<DscRenderResource::ShaderResource> _texture;
+
+    std::shared_ptr<DscRenderResource::Shader> _data_shader;
+    std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _data_shader_constant_buffer;
+    std::shared_ptr<DscRenderResource::RenderTargetTexture> _data_render_target;
 
     std::shared_ptr<DscRenderResource::Shader> _fill_knot_shader;
     std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _fill_knot_shader_constant_buffer;
 
 
-    static constexpr int32 _k_knot_texture_size = 128;
-    static constexpr int32 _k_texture_size_x = 4;
-    static constexpr int32 _k_texture_size_y = 4;
+    static constexpr int32 _k_knot_texture_size = 32;
 
 };
