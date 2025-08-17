@@ -24,7 +24,9 @@ Pixel main(Interpolant in_input)
 {
     Pixel result;
 
-    float2 pixel_uv = in_input._uv * _texture_size_knot_size.xy;
+    float2 uv = in_input._uv + (_data_size.zw / _texture_size_knot_size.xy);
+
+    float2 pixel_uv = uv * _texture_size_knot_size.xy;
     float2 knot_size = float2(_texture_size_knot_size.z, _texture_size_knot_size.z);
     float2 knot_uv = fmod(pixel_uv, knot_size) / knot_size;
 

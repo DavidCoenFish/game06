@@ -30,10 +30,11 @@ Pixel main(Interpolant in_input)
     //mirror
     pixel_uv = floor(min(pixel_uv, middle_data - (pixel_uv - middle_data)));
     float df = saturate(length((pixel_uv - middle_data) / (middle_data * 1.4)));
-    //float2 index_uv = floor(pixel_uv); // in_input._uv* _texture_size.zw);
-    //df = df * df * df * df;
-    //float value = random(pixel_uv);
+
+    float hollow_factor = saturate((min(_texture_size.x, _texture_size.y) - 3.0) / 15.0);
+
     float mul = (df * df * df);
+    mul = 1.0 - (hollow_factor * (1.0 - mul));
     float value = random(pixel_uv) * mul;
     if ((pixel_uv.x == 1.0) ||
         (pixel_uv.y == 1.0))
@@ -45,7 +46,7 @@ Pixel main(Interpolant in_input)
     if ((pixel_uv.x <= 0) ||
         (pixel_uv.y <= 0))
     {
-        value *= 0.0625;
+        value = 0;
     }
 
     //value = 1.0 - step(value, 0.06);

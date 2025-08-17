@@ -370,6 +370,8 @@ const bool Application::Update()
             buffer._texture_size_knot_size[2] = static_cast<float>(_k_knot_texture_size);
             buffer._data_size[0] = static_cast<float>(data_render_target_size.GetX());
             buffer._data_size[1] = static_cast<float>(data_render_target_size.GetY());
+            buffer._data_size[2] = static_cast<float>((((data_size.GetX() - 1) * _k_knot_texture_size) - render_size.GetX()) / 2);
+            buffer._data_size[3] = static_cast<float>((((data_size.GetY() - 1) * _k_knot_texture_size) - render_size.GetY()) / 2);
         }
         _fill_knot_shader->SetShaderResourceViewHandle(0, _data_render_target->GetShaderResourceHeapWrapperItem());
         _fill_knot_shader->SetShaderResourceViewHandle(1, _knot_render_target->GetShaderResourceHeapWrapperItem());
