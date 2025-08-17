@@ -350,7 +350,7 @@ const bool Application::Update()
             );
             _data_render_target->Resize(frame->GetCommandList(), frame->GetDrawSystem().GetD3dDevice(), data_render_target_size);
         }
-#if 0
+#if 1
         frame->SetRenderTargetTexture(_data_render_target);
         {
             auto& buffer = _data_shader_constant_buffer->GetConstant<TDataConstantBuffer>(0);
@@ -378,8 +378,8 @@ const bool Application::Update()
 #else
         frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
         data_render_target_size.Set(
-            render_size.GetX() / 32,
-            render_size.GetY() / 32
+            render_size.GetX() / 16,
+            render_size.GetY() / 16
         );
         {
             auto& buffer = _data_shader_constant_buffer->GetConstant<TDataConstantBuffer>(0);
