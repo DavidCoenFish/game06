@@ -7,19 +7,22 @@ cbuffer ConstantBuffer : register(b0)
     float4 _texture_size;
 };
 
-
 struct Pixel
 {
     float4 _colour : SV_TARGET0;
 };
+
+// how far we extend into the neibouring pixel for subpixel smoothing
+// have seen gaps (stray dark pixels as knot size 24 pixels with 0.5, or knot size 32 with 0.75)
+#define s_subpixel_thickness 1.0
 
 float CalculateRay(float in_value, float2 in_pos, float2 in_ray_origin, float2 in_ray_dir, float in_ray_thickness)
 {
     float2 pos = in_pos - in_ray_origin;
     float t = dot(in_ray_dir, pos);
     float d = abs(dot(float2(in_ray_dir.y, -(in_ray_dir.x)), pos));
-    float value_x = max(0.0, ((in_ray_thickness - d) * _texture_size.x) + 1.0);
-    float value_y = max(0.0, (t * _texture_size.x) + 1.0);
+    float value_x = max(0.0, ((in_ray_thickness - d) * _texture_size.x) + s_subpixel_thickness);
+    float value_y = max(0.0, (t * _texture_size.x) + s_subpixel_thickness);
     float result = max(in_value, min(value_x, value_y));
     return result;
 }
@@ -29,9 +32,9 @@ float CalculateRaySegment(float in_value, float2 in_pos, float2 in_ray_origin, f
     float2 pos = in_pos - in_ray_origin;
     float t = dot(in_ray_dir, pos);
     float d = abs(dot(float2(in_ray_dir.y, -(in_ray_dir.x)), pos));
-    float value_x = max(0.0, ((in_ray_thickness - d) * _texture_size.x) + 1);
-    float value_t0 = max(0.0, (t * _texture_size.x) + 1.0);
-    float value_t1 = max(0.0, ((in_length - t) * _texture_size.x) + 1.0);
+    float value_x = max(0.0, ((in_ray_thickness - d) * _texture_size.x) + s_subpixel_thickness);
+    float value_t0 = max(0.0, (t * _texture_size.x) + s_subpixel_thickness);
+    float value_t1 = max(0.0, ((in_length - t) * _texture_size.x) + s_subpixel_thickness);
     float result = max(in_value, min(value_x, min(value_t0, value_t1)));
     return result;
 }
@@ -41,13 +44,13 @@ float CalculateArc(float in_value, float2 in_pos, float in_radius, float in_thic
     float2 pos = in_pos - float2(0.5, 0.5);
     float d = length(pos);
 
-    float value_d = max(0.0, ((in_thickness - abs(in_radius - d)) * _texture_size.x) + 1);
+    float value_d = max(0.0, ((in_thickness - abs(in_radius - d)) * _texture_size.x) + s_subpixel_thickness);
 
     float c0 = dot(in_clip_dir_0, pos);
-    float value_c0 = max(0.0, (c0 * _texture_size.x) + 1.0);
+    float value_c0 = max(0.0, (c0 * _texture_size.x) + s_subpixel_thickness);
 
     float c1 = dot(in_clip_dir_1, pos);
-    float value_c1 = max(0.0, (c1 * _texture_size.x) + 1.0);
+    float value_c1 = max(0.0, (c1 * _texture_size.x) + s_subpixel_thickness);
 
     float result = max(in_value, min(value_d, min(value_c0, value_c1)));
     return result;
