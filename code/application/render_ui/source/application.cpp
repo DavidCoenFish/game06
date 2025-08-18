@@ -77,6 +77,36 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_resources->_dag_collection,
             ui_render_target
         );
+
+        _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentDebugGrid().SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            _resources->_ui_root_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "child one")
+        );
+
+        _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentFill(
+                DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f)
+            ).SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            _resources->_ui_root_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "child two")
+        );
     }
 
     return;

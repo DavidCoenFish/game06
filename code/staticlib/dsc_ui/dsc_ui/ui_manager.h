@@ -100,6 +100,7 @@ namespace DscUi
 	//	DscDag::NodeToken _base_draw_node;
 	//};
 
+	class CelticKnot;
 	class IUiComponent;
 	class UiCoord;
 	class UiInputParam;
@@ -277,5 +278,7 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
 
 		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
+
+		std::unique_ptr<CelticKnot> _celtic_knot = {};
 	};
 }

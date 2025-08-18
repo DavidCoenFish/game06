@@ -10,6 +10,7 @@
 #include "..\..\dsc_locale\dsc_locale\dsc_locale.h"
 #include "..\..\dsc_render\dsc_render\dsc_render.h"
 #include "..\..\dsc_render_resource\dsc_render_resource\dsc_render_resource.h"
+#include "celtic_knot.h"
 #include "component_construction_helper.h"
 #include "i_ui_instance.h"
 #include "make_node.h"

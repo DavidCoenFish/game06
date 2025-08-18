@@ -126,6 +126,8 @@ namespace DscUi
 		bool _has_parent_index = false;
 		int32 _parent_index = 0; // what happens to the existing child if you overwrite a child
 
+		int32 _celtic_knot_size_pixels = 0;
+
 	public:
 		ComponentConstructionHelper& SetClearColour(
 			const DscCommon::VectorFloat4& in_clear_colour
@@ -262,10 +264,10 @@ namespace DscUi
 		const bool in_desired_size_from_children_max = true,
 		const bool in_has_scroll = true
 		);
-
 	ComponentConstructionHelper MakeComponentCrossfade(
 		DscDag::NodeToken in_crossfade_active_child
 		);
-		// delete child on fade out flag?
-
+	ComponentConstructionHelper MakeComponentCelticKnot(
+		const int32 in_knot_size_pixels
+	);
 }

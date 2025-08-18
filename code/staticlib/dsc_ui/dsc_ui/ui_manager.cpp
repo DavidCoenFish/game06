@@ -1,5 +1,6 @@
 #include "ui_manager.h"
 
+#include "celtic_knot.h"
 #include "component_construction_helper.h"
 #include "make_node.h"
 #include "screen_quad.h"
@@ -381,6 +382,9 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
     _render_target_pool = std::make_unique<DscRenderResource::RenderTargetPool>(DscRenderResource::s_default_pixel_alignment);
 
     //_full_quad_pos_uv
+    // -1,1   1,1       0,0  1,0
+    //     pos             uv
+    // -1,-1  1,-1      0,1  1,1
     {
         std::vector<uint8_t> vertex_raw_data;
 

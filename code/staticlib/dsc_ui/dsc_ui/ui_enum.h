@@ -252,6 +252,8 @@ namespace DscUi
 		//TCrossfadeCondition, // true if the fade is active
 		TCrossfadeNode, // the crossfade node that needs to be set as an input to the crossfade base draw
 
+		TCelticKnotSize,
+
 		TCount
 	};
 	typedef DscDag::DagGroup<TUiComponentResourceNodeGroup, static_cast<std::size_t>(TUiComponentResourceNodeGroup::TCount)> UiComponentResourceNodeGroup;

@@ -578,6 +578,35 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         );
     }
 
+    if (TUiComponentType::TCelticKnotFill == in_construction_helper._component_type)
+    {
+        auto knot_size = in_dag_collection.CreateCalculate<int32>([](int32& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            if (nullptr == in_input_array[0])
+            {
+                // do we need a warning
+                DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "multi gradent without a parent input state");
+                return;
+            }
+            const TUiInputStateFlag input_state = DscDag::GetValueType<TUiInputStateFlag>(in_input_array[0]);
+            const std::vector<DscUi::TGradientFillConstantBuffer>& array_gradient = DscDag::GetValueType<std::vector<DscUi::TGradientFillConstantBuffer>>(in_input_array[1]);
+
+            const int32 index = static_cast<int32>(input_state);
+            DSC_ASSERT((0 <= index) && (index < static_cast<int32>(array_gradient.size())), "invalid state");
+            value = array_gradient[index];
+        },
+            owner
+            );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(gradient_fill, "gradient fill calculate"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TGradientFill,
+            gradient_fill
+        );
+
+        DscDag::LinkIndexNodes(0, in_ui_scale, knot_size);
+
+    }
+
     return component_resource_group;
 }
 
@@ -678,3 +707,12 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentCrossfade(
     return result;
 }
 
+DscUi::ComponentConstructionHelper DscUi::MakeComponentCelticKnot(
+    const int32 in_knot_size_pixels
+)
+{
+    ComponentConstructionHelper result({ TUiComponentType::TCelticKnotFill });
+    result._celtic_knot_size_pixels = in_knot_size_pixels;
+    return result;
+
+}
