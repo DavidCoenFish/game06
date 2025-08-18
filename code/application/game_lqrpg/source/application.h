@@ -92,8 +92,13 @@ private:
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
         std::unique_ptr<DscDag::DagCollection> _dag_collection = {};
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
+        std::unique_ptr<DscUi::UiInstanceFactory<UiInstanceContext>> _ui_instance_factory = {};
+        std::unique_ptr<DscData::JsonValue> _data_root = {};
 
-        DscDag::NodeToken _ui_root_node_group = {};
+        DscDag::NodeToken _data_source_node;
+        DscDag::NodeToken _data_source_node_group;
+
+        DscDag::NodeToken _ui_instance_node;
     };
     std::unique_ptr<Resources> _resources;
 

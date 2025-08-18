@@ -31,5 +31,5 @@ DscVsprojectWindowExe("render_celtic_knot" .WindowExeParam)
 
 .SolutionProjects + "render_celtic_knot_project"
 .SolutionItemsApplicationProject + "render_celtic_knot_project"
-.SolutionBuildProject = "render_celtic_knot_project"
+//.SolutionBuildProject = "render_celtic_knot_project"
 
