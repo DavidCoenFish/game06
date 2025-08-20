@@ -7,7 +7,7 @@ struct Pixel
 
 cbuffer ConstantBuffer : register(b0)
 {
-    // we want to know the texture size so we can smooth pixel edges
+    // data size [x,y] for the celtic knot data map, then [z,w] of the render target size
     float4 _texture_size;
 };
 
@@ -25,9 +25,11 @@ Pixel main(Interpolant in_input)
 {
     Pixel result;
 
-    float2 pixel_uv = float2(in_input._uv.x, 1.0 - in_input._uv.y) * _texture_size.zw;
-    float2 middle_data = _texture_size.xy * 0.5;
-    //mirror
+    //float2 pixel_uv = float2(in_input._uv.x, 1.0 - in_input._uv.y) * _texture_size.zw;
+    float2 pixel_uv = in_input._uv * _texture_size.zw;
+    float2 middle_data = _texture_size.xy * 0.5;    
+	
+	//mirror
     pixel_uv = floor(min(pixel_uv, middle_data - (pixel_uv - middle_data)));
     float df = saturate(length((pixel_uv - middle_data) / (middle_data * 1.4)));
 
