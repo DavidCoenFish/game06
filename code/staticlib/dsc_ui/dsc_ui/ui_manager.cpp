@@ -57,6 +57,8 @@ namespace
             return DscUi::TUiDrawType::TFill;
         case DscUi::TUiComponentType::TGradientFill:
             return DscUi::TUiDrawType::TGradientFill;
+        case DscUi::TUiComponentType::TCelticKnotFill:
+            return DscUi::TUiDrawType::TCelticKnotFill;
         case DscUi::TUiComponentType::TImage:
             return DscUi::TUiDrawType::TImage;
         case DscUi::TUiComponentType::TCanvas:
@@ -380,6 +382,8 @@ DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::Fi
 {
     _dag_resource = DscDagRender::DagResource::Factory(&in_draw_system, &in_dag_collection);
     _render_target_pool = std::make_unique<DscRenderResource::RenderTargetPool>(DscRenderResource::s_default_pixel_alignment);
+
+	_celtic_knot = std::make_unique<CelticKnot>(in_draw_system, in_file_system);
 
     //_full_quad_pos_uv
     // -1,1   1,1       0,0  1,0
@@ -1611,6 +1615,18 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(3, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TGradientFill), result_node);
     }
     break;
+	case TUiDrawType::TCelticKnotFill:
+	{
+		result_node = _celtic_knot->MakeDrawNode(
+			_full_quad_pos_uv,
+			in_dag_collection,
+            in_draw_system,
+            in_frame_node,
+            in_ui_render_target_node,
+			in_component_resource_group
+			);
+	}
+	break;
     case TUiDrawType::TImage:
     {
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;

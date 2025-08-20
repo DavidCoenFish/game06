@@ -89,6 +89,7 @@ namespace DscUi
 		TDebugGrid,
 		TFill,
 		TGradientFill,
+		TCelticKnotFill,
 		TImage,
 		TText,
 		TEffectDropShadow,

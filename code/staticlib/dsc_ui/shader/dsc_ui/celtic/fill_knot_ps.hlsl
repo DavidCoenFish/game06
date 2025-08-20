@@ -17,6 +17,7 @@ cbuffer ConstantBuffer : register(b0)
 {
     // width, height of our render target, then the size of the knot
     float4 _texture_size_knot_size;
+	// width, height of the data texture, then a pixel delta x, delta y to get the knot centered on the render target
     float4 _data_size;
 };
 
