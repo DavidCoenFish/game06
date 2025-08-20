@@ -19,6 +19,7 @@ cbuffer ConstantBuffer : register(b0)
     float4 _texture_size_knot_size;
 	// width, height of the data texture, then a pixel delta x, delta y to get the knot centered on the render target
     float4 _data_size;
+    float4 _knot_tint;
 };
 
 Pixel main(Interpolant in_input)
@@ -78,16 +79,16 @@ Pixel main(Interpolant in_input)
         mask = float4(1.0, 0.0, 0.0, 0.0);
     }
 
+    knot_uv.y = 1.0 - (knot_uv.y);
+    knot_uv *= (_texture_size_knot_size.z / _texture_size_knot_size.w);
+
     float4 texel_knot = g_texture_knot.Sample(g_sampler_state_knot, knot_uv) * mask;
     float value = texel_knot.x + texel_knot.y + texel_knot.z + texel_knot.w;
 
-    //float data_texel = g_texture_data.Sample(g_sampler_state_data, in_input._uv).r;
+    result._colour = _knot_tint * value;
 
-    result._colour = float4(
-        value,
-        value,
-        value,
-        1.0);
+    //result._colour.r = knot_uv.x;
+    //result._colour.g = knot_uv.y;
 
     return result;
 }

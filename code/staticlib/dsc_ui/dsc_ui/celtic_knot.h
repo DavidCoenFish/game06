@@ -6,6 +6,13 @@ namespace DscCommon
 	class FileSystem;
 }
 
+namespace DscDag
+{
+	class DagCollection;
+	class IDagNode;
+	typedef IDagNode* NodeToken;
+}
+
 namespace DscRender
 {
 	class DrawSystem;

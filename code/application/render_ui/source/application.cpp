@@ -29,7 +29,6 @@
 #include <dsc_ui/ui_input_param.h>
 #include <dsc_ui/ui_instance_factory.h>
 #include <dsc_locale/dsc_locale.h>
-#include <dsc_png/dsc_png.h>
 #include <dsc_text/text_manager.h>
 #include <dsc_text/text_run.h>
 #include <dsc_text/text_run_text.h>
@@ -51,7 +50,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     _keep_running = true;
 
     _file_system = std::make_unique<DscCommon::FileSystem>();
-    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f));
+    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f));
 
     _resources = std::make_unique<Resources>();
 
@@ -78,23 +77,34 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             ui_render_target
         );
 
-        _resources->_ui_manager->AddChildNode(
-            DscUi::MakeComponentDebugGrid().SetChildSlot(
-                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
-                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
-                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
-            ),
-            *_draw_system,
-            *_resources->_dag_collection,
-            _resources->_ui_root_node_group,
-            _resources->_ui_root_node_group,
-            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
-            DSC_DEBUG_ONLY(DSC_COMMA "child one")
-        );
+        //_resources->_ui_manager->AddChildNode(
+        //    DscUi::MakeComponentDebugGrid().SetChildSlot(
+        //        DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+        //        DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f)),
+        //        DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.0f))
+        //    ),
+        //    *_draw_system,
+        //    *_resources->_dag_collection,
+        //    _resources->_ui_root_node_group,
+        //    _resources->_ui_root_node_group,
+        //    std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+        //    DSC_DEBUG_ONLY(DSC_COMMA "child one")
+        //);
+
+
+        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_effect = {};
+        array_effect.push_back({
+            DscUi::TUiEffectType::TEffectDropShadow,
+            DscCommon::VectorFloat4(2.0f, 8.0f, 6.0f, 0.0f),
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+            });
 
         _resources->_ui_manager->AddChildNode(
-            DscUi::MakeComponentFill(
-                DscCommon::VectorFloat4(0.5f, 0.0f, 0.0f, 0.5f)
+            DscUi::MakeComponentCelticKnot(
+                32, 
+                DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
+            ).SetClearColour(
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)
             ).SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
@@ -104,7 +114,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
             _resources->_ui_root_node_group,
-            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            array_effect
             DSC_DEBUG_ONLY(DSC_COMMA "child two")
         );
     }

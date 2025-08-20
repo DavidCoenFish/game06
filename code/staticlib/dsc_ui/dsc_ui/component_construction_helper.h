@@ -127,6 +127,7 @@ namespace DscUi
 		int32 _parent_index = 0; // what happens to the existing child if you overwrite a child
 
 		int32 _celtic_knot_size_pixels = 0;
+		DscCommon::VectorFloat4 _celtic_knot_tint = {};
 
 	public:
 		ComponentConstructionHelper& SetClearColour(
@@ -268,6 +269,7 @@ namespace DscUi
 		DscDag::NodeToken in_crossfade_active_child
 		);
 	ComponentConstructionHelper MakeComponentCelticKnot(
-		const int32 in_knot_size_pixels
+		const int32 in_knot_size_pixels,
+		const DscCommon::VectorFloat4& in_knot_tint
 	);
 }

@@ -1,4 +1,5 @@
 #include "component_construction_helper.h"
+#include <dsc_common\math.h>
 #include <dsc_dag\dag_collection.h>
 #include <dsc_dag\debug_print.h>
 
@@ -594,9 +595,18 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             DscUi::TUiComponentResourceNodeGroup::TCelticKnotSize,
             knot_size_node
         );
-
         DscDag::LinkIndexNodes(0, in_ui_scale, knot_size_node);
 
+
+        DscDag::NodeToken knot_tint_node = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._celtic_knot_tint,
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(knot_tint_node, "knot_tint"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TCelticKnotTint,
+            knot_tint_node
+        );
     }
 
     return component_resource_group;
@@ -700,11 +710,12 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentCrossfade(
 }
 
 DscUi::ComponentConstructionHelper DscUi::MakeComponentCelticKnot(
-    const int32 in_knot_size_pixels
+    const int32 in_knot_size_pixels,
+    const DscCommon::VectorFloat4& in_knot_tint
 )
 {
     ComponentConstructionHelper result({ TUiComponentType::TCelticKnotFill });
     result._celtic_knot_size_pixels = in_knot_size_pixels;
+    result._celtic_knot_tint = in_knot_tint;
     return result;
-
 }

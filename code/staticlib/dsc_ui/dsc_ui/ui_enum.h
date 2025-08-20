@@ -254,6 +254,7 @@ namespace DscUi
 		TCrossfadeNode, // the crossfade node that needs to be set as an input to the crossfade base draw
 
 		TCelticKnotSize,
+		TCelticKnotTint,
 
 		TCount
 	};
