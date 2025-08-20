@@ -1621,6 +1621,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 			_full_quad_pos_uv,
 			in_dag_collection,
             in_draw_system,
+			*_render_target_pool,
             in_frame_node,
             in_ui_render_target_node,
 			in_component_resource_group

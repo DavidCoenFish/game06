@@ -200,7 +200,6 @@ DscDag::NodeToken DscUi::CelticKnot::MakeDrawNode(
 	DscRender::DrawSystem& in_draw_system,
     DscRenderResource::RenderTargetPool& in_render_target_pool,
 	DscDag::NodeToken in_frame_node,
-	DscDag::NodeToken in_render_target_viewport_size,
 	DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_component_resource_group
 	)
