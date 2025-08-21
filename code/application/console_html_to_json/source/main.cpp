@@ -12,18 +12,12 @@
 #include <string>
 
 /*
-https://stackoverflow.com/questions/53861300/how-do-you-properly-install-libcurl-for-use-in-visual-studio-2017
-Get latest vcpkg zip file from https://github.com/microsoft/vcpkg/releases (e.g. https://github.com/microsoft/vcpkg/archive/2019.09.zip) and extract it to a folder of your choice (e.g. C:\vcpkg\)
-Open Developer Command Prompt for VS 2017 (see Windows Start menu or %PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Visual Studio 2017\Visual Studio Tools\) and cd to C:\vcpkg\
-Run bootstrap-vcpkg.bat
-Run vcpkg.exe integrate install
-Run vcpkg.exe install pugixml
-Run vcpkg.exe install nlohmann-json
-
 google sheets webpage menu bar File>Download>Web Page (.html) -> downloads a zip of each sheet as a html document
 
-
+https://docs.google.com/spreadsheets/d/1SaIO66R9qPoMUqq8C-PDZ-vMbLdrqfQH7dlKiuJQYNg/edit?gid=199073173#gid=199073173
 -i "data\sample_html_to_json" -o "output\locale.json" --sheet5th toc -d
+-i "data\sample_html_to_json" -o "G:\development\game06\data\lqrpg\lqrpg\data.json" --sheet5th toc -d
+
 
 */
 

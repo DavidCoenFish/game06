@@ -359,6 +359,13 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
             };
             button_data_array.push_back({ text_node , function });
         }
+        //Options
+        {
+            auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "options");
+            auto function = [in_root_data_source_node](DscDag::NodeToken) {
+            };
+            button_data_array.push_back({ text_node , function });
+        }
         // Exit
         {
             auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "exit");

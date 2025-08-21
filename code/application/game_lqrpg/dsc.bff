@@ -76,4 +76,4 @@ DscVsprojectWindowExe("game_lqrpg" .WindowExeParam)
 
 .SolutionProjects + "game_lqrpg_project"
 .SolutionItemsApplicationProject + "game_lqrpg_project"
-//.SolutionBuildProject = "game_lqrpg_project"
+.SolutionBuildProject = "game_lqrpg_project"

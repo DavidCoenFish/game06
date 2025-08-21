@@ -20,3 +20,14 @@ cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=G:\development\tools\vcpkg\scripts\bu
 vcpkg install harfbuzz
 
 copy C:\bin\vcpkg\packages\* to C:\development\game06\code\sdk\* 
+
+
+https://stackoverflow.com/questions/53861300/how-do-you-properly-install-libcurl-for-use-in-visual-studio-2017
+Get latest vcpkg zip file from https://github.com/microsoft/vcpkg/releases (e.g. https://github.com/microsoft/vcpkg/archive/2019.09.zip) and extract it to a folder of your choice (e.g. C:\vcpkg\)
+Open Developer Command Prompt for VS 2017 (see Windows Start menu or %PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Visual Studio 2017\Visual Studio Tools\) and cd to C:\vcpkg\
+Run bootstrap-vcpkg.bat
+Run vcpkg.exe integrate install
+Run vcpkg.exe install pugixml
+Run vcpkg.exe install nlohmann-json
+Run vcpkg.exe install harfbuzz
+

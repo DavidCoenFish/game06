@@ -44,7 +44,7 @@ namespace
     std::unique_ptr<DscData::JsonValue> MakeDataRoot(DscCommon::FileSystem& in_file_system)
     {
         auto result = DscData::LoadJsonFromFile(in_file_system,
-            DscCommon::FileSystem::JoinPath("data", "lqrpg", "locale.json")
+            DscCommon::FileSystem::JoinPath("data", "lqrpg", "data.json")
         );
 
         return result;
