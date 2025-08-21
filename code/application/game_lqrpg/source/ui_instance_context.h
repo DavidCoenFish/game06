@@ -1,5 +1,5 @@
 #pragma once
-#include "render_ui.h"
+#include "game_lqrpg.h"
 
 namespace DscCommon
 {
