@@ -110,7 +110,7 @@ namespace
 
 		for (const auto& iter : in_object)
 		{
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DATA, "load object key:%s type:%d\n", iter.name.GetString(), static_cast<int8>(iter.value.GetType()));
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DATA, "load object key:%s type:%d\n", iter.name.GetString(), static_cast<int8>(iter.value.GetType()));
 			auto value = LoadJson(
 				iter.value
 				DSC_DEBUG_ONLY(DSC_COMMA in_file_path)

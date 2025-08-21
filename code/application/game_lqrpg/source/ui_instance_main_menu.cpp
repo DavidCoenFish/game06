@@ -349,6 +349,12 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         {
             auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "character");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
+                UiInstanceApp::DataSourceMainScreenStackPush(in_root_data_source_node,
+                    DscDag::DagNodeGroup::GetNodeTokenEnum(
+                        in_root_data_source_node,
+                        UiInstanceApp::TUiNodeGroupDataSource::TCharacterDataSource
+                    )
+                );
             };
             button_data_array.push_back({ text_node , function });
         }
@@ -356,6 +362,12 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         {
             auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "combat");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
+                UiInstanceApp::DataSourceMainScreenStackPush(in_root_data_source_node,
+                    DscDag::DagNodeGroup::GetNodeTokenEnum(
+                        in_root_data_source_node,
+                        UiInstanceApp::TUiNodeGroupDataSource::TCombatDataSource
+                    )
+                );
             };
             button_data_array.push_back({ text_node , function });
         }
@@ -363,6 +375,12 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         {
             auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "options");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
+                UiInstanceApp::DataSourceDialogStackPush(in_root_data_source_node,
+                    DscDag::DagNodeGroup::GetNodeTokenEnum(
+                        in_root_data_source_node,
+                        UiInstanceApp::TUiNodeGroupDataSource::TOptionsDataSource
+                        )
+                    );
             };
             button_data_array.push_back({ text_node , function });
         }
@@ -370,18 +388,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         {
             auto text_node = MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "exit");
             auto function = [in_root_data_source_node](DscDag::NodeToken) {
-                auto keep_going_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_data_source_node, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
-                DscDag::SetValueType(keep_going_node, false);
-
-                // clear the active screen, (which will cause the main screen ui to delete)
-                // todo: make a copy node to hold the last UiRenderTarget?
-                DscDag::SetValueType<DscDag::NodeToken>(
-                    DscDag::DagNodeGroup::GetNodeTokenEnum(
-                        in_root_data_source_node,
-                        UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode),
-                    nullptr
-                    );
-
+                UiInstanceApp::DataSourceMainScreenStackClear(in_root_data_source_node);
             };
             button_data_array.push_back({ text_node , function });
         }

@@ -110,14 +110,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
                 data_source_main_screen
             );
 
-            // set the active screen
-            DscDag::SetValueType<DscDag::NodeToken>(
-                DscDag::DagNodeGroup::GetNodeTokenEnum(
-                    _resources->_data_source_node_group,
-                    UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode),
+            // set the active screen to the main menu
+            UiInstanceApp::DataSourceMainScreenStackPush(
+                _resources->_data_source_node_group,
                 data_source_main_screen
-                );
-
+            );
         }
 
         _resources->_ui_instance_factory->AddFactory(UiInstanceApp::GetTemplateName(), UiInstanceApp::Factory);
@@ -217,8 +214,7 @@ const bool Application::Update()
 
                 if (_resources->_data_source_node_group)
                 {
-                    DscDag::NodeToken keep_running_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_data_source_node_group, UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning);
-                    _keep_running = DscDag::GetValueType<bool>(keep_running_node) || ui_instance->HasContent();
+                    _keep_running = ui_instance->HasContent();
                 }
             }
             else

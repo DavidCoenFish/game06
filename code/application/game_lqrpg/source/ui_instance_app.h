@@ -49,11 +49,19 @@ public:
         TLocaleData,
         TFontPath,
 
-        TKeepAppRunning,
+        //TKeepAppRunning,
         TMainScreenDataSourceNode, // a dag node <NodeToken> with the value of active Data Source for the main screen or null
-        TDialogDataSourceNode,
+        TMainScreenDataSourceStack, // for back navigation, an array of the data sources we have navigated into
+        TDialogDataSourceNode, // a dag node <NodeToken> with the value of a dialog to draw ontop of the screen or null
+        TDialogDataSourceStack,
 
+        // main screen
         TMainMenuDataSource,
+        TCharacterDataSource,
+        TCombatDataSource,
+
+        // dialogs
+        TOptionsDataSource,
 
         TCount
     };
@@ -68,6 +76,14 @@ public:
         DscDag::DagCollection& in_dag_collection,
         DscData::JsonValue& in_data
     );
+
+    static void DataSourceMainScreenStackPush(DscDag::NodeToken in_data_source, DscDag::NodeToken in_main_screen);
+    static void DataSourceMainScreenStackPop(DscDag::NodeToken in_data_source);
+    static void DataSourceMainScreenStackClear(DscDag::NodeToken in_data_source);
+
+    static void DataSourceDialogStackPush(DscDag::NodeToken in_data_source, DscDag::NodeToken in_dialog);
+    static void DataSourceDialogStackPop(DscDag::NodeToken in_data_source);
+    static void DataSourceDialogStackClear(DscDag::NodeToken in_data_source);
 
     static std::shared_ptr<DscUi::IUiInstance> Factory(
         const DscUi::UiInstanceFactory<UiInstanceContext>& in_ui_instance_factory,

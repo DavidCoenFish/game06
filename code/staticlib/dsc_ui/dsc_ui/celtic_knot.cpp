@@ -212,57 +212,6 @@ DscDag::NodeToken DscUi::CelticKnot::MakeDrawNode(
     DscDag::NodeToken in_component_resource_group
 	)
 {
-#if 0
-    DSC_UNUSED(in_render_target_pool);
-    DSC_UNUSED(in_frame_node);
-    DSC_UNUSED(in_component_resource_group);
-
-    DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(in_component_resource_group);
-    DSC_ASSERT(nullptr != owner, "invalid state");
-    DscDag::NodeToken result_node = nullptr;
-
-    // draw the data texture
-    std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = in_full_quad_pos_uv;
-    std::weak_ptr<DscRenderResource::Shader> weak_shader = _data_shader;
-    result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-        auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
-        DSC_ASSERT(nullptr != frame, "invalid state");
-        auto& ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
-        DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-        auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-
-        auto& buffer = shader_buffer->GetConstant<TDataConstantBuffer>(0);
-        const auto viewport_size = ui_render_target->GetViewportSize();
-        buffer._texture_size[0] = static_cast<float>(viewport_size.GetX());
-        buffer._texture_size[1] = static_cast<float>(viewport_size.GetY());
-        buffer._texture_size[2] = static_cast<float>(viewport_size.GetX());
-        buffer._texture_size[3] = static_cast<float>(viewport_size.GetY());
-
-        if (true == ui_render_target->ActivateRenderTarget(*frame))
-        {
-            frame->SetShader(weak_shader.lock(), shader_buffer);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
-        }
-
-        out_value = ui_render_target.get();
-    },
-        owner);
-    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "data texture draw"));
-
-    auto shader_buffer = _data_shader->MakeShaderConstantBuffer(&in_draw_system);
-    auto shader_buffer_node = in_dag_collection.CreateValue(
-        shader_buffer,
-        DscDag::CallbackNever<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>::Function,
-        owner);
-    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(shader_buffer_node, "data shader constant"));
-
-    DscDag::LinkIndexNodes(0, in_frame_node, result_node);
-    DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
-    DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
-
-    return result_node;
-#else
     DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(in_component_resource_group);
     DSC_ASSERT(nullptr != owner, "invalid state");
 
@@ -484,6 +433,5 @@ DscDag::NodeToken DscUi::CelticKnot::MakeDrawNode(
 	}
 
 	return result_node;
-#endif
 }
 

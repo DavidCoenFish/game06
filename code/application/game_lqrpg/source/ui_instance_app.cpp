@@ -40,14 +40,24 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::string) };
         return s_meta_data;
     }
-    case UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning:
-    {
-        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
-        return s_meta_data;
-    }
+    //case UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning:
+    //{
+    //    static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
+    //    return s_meta_data;
+    //}
     case UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode: //dag node <NodeToken> of the active screen data source or null
     {
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceStack: // for back navigation, an array of the data sources we have navigated into
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSourceStack:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::vector<DscDag::NodeToken>) };
         return s_meta_data;
     }
     case UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSourceNode: // dag node <NodeToken> of the active dialog data source or null
@@ -60,6 +70,22 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
         return s_meta_data;
     }
+    case UiInstanceApp::TUiNodeGroupDataSource::TCharacterDataSource:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TCombatDataSource:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
+        return s_meta_data;
+    }
+    case UiInstanceApp::TUiNodeGroupDataSource::TOptionsDataSource:
+    {
+        static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
+        return s_meta_data;
+    }
+
     }
     static DscDag::DagNodeGroupMetaData s_dummy = { false, typeid(nullptr) };
     return s_dummy;
@@ -143,15 +169,15 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
     }
 
     //TKeepAppRunning
-    {
-        auto node = in_dag_collection.CreateValueOnValueChange(true, data_source_owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "keep app running"));
-        DscDag::DagNodeGroup::SetNodeTokenEnum(
-            result,
-            UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning,
-            node
-        );
-    }
+    //{
+    //    auto node = in_dag_collection.CreateValueOnValueChange(true, data_source_owner);
+    //    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "keep app running"));
+    //    DscDag::DagNodeGroup::SetNodeTokenEnum(
+    //        result,
+    //        UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning,
+    //        node
+    //    );
+    //}
 
     //TMainScreenDataSourceNode
     {
@@ -160,6 +186,17 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             result,
             UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode,
+            node
+        );
+    }
+
+    //TMainScreenDataSourceStack
+    {
+        auto node = in_dag_collection.CreateValueNone<std::vector<DscDag::NodeToken>>(std::vector<DscDag::NodeToken>(), data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main screen data source stack"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceStack,
             node
         );
     }
@@ -175,8 +212,85 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
         );
     }
 
+    //TMainScreenDataSourceStack
+    {
+        auto node = in_dag_collection.CreateValueNone<std::vector<DscDag::NodeToken>>(std::vector<DscDag::NodeToken>(), data_source_owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "dialog data source stack"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            result,
+            UiInstanceApp::TUiNodeGroupDataSource::TDialogDataSourceStack,
+            node
+        );
+    }
 
     return result;
+}
+
+
+void UiInstanceApp::DataSourceMainScreenStackPush(DscDag::NodeToken in_data_source, DscDag::NodeToken in_main_screen)
+{
+    DSC_ASSERT(nullptr != in_data_source, "invalid param");
+    DSC_ASSERT(nullptr != in_main_screen, "invalid param");
+    std::vector<DscDag::NodeToken>& stack = DscDag::GetValueNonConstRef<std::vector<DscDag::NodeToken>>(DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TMainScreenDataSourceStack), true);
+    stack.push_back(in_main_screen);
+
+    DscDag::NodeToken main_screen_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TMainScreenDataSourceNode);
+    DscDag::SetValueType(main_screen_node, in_main_screen);
+}
+
+void UiInstanceApp::DataSourceMainScreenStackPop(DscDag::NodeToken in_data_source)
+{
+    DSC_ASSERT(nullptr != in_data_source, "invalid param");
+    std::vector<DscDag::NodeToken>& stack = DscDag::GetValueNonConstRef<std::vector<DscDag::NodeToken>>(DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TMainScreenDataSourceStack), true);
+    stack.pop_back();
+
+    DscDag::NodeToken back = (0 < stack.size()) ? stack.back() : nullptr;
+
+    DscDag::NodeToken main_screen_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TMainScreenDataSourceNode);
+    DscDag::SetValueType(main_screen_node, back);
+}
+
+void UiInstanceApp::DataSourceMainScreenStackClear(DscDag::NodeToken in_data_source)
+{
+    DSC_ASSERT(nullptr != in_data_source, "invalid param");
+    std::vector<DscDag::NodeToken>& stack = DscDag::GetValueNonConstRef<std::vector<DscDag::NodeToken>>(DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TMainScreenDataSourceStack), true);
+    stack.clear();
+
+    DscDag::NodeToken main_screen_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TMainScreenDataSourceNode);
+    DscDag::SetValueType<DscDag::NodeToken>(main_screen_node, nullptr);
+}
+
+void UiInstanceApp::DataSourceDialogStackPush(DscDag::NodeToken in_data_source, DscDag::NodeToken in_dialog)
+{
+    DSC_ASSERT(nullptr != in_data_source, "invalid param");
+    DSC_ASSERT(nullptr != in_dialog, "invalid param");
+    std::vector<DscDag::NodeToken>& stack = DscDag::GetValueNonConstRef<std::vector<DscDag::NodeToken>>(DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TDialogDataSourceStack), true);
+    stack.push_back(in_dialog);
+
+    DscDag::NodeToken dialog_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TDialogDataSourceNode);
+    DscDag::SetValueType(dialog_node, in_dialog);
+}
+
+void UiInstanceApp::DataSourceDialogStackPop(DscDag::NodeToken in_data_source)
+{
+    DSC_ASSERT(nullptr != in_data_source, "invalid param");
+    std::vector<DscDag::NodeToken>& stack = DscDag::GetValueNonConstRef<std::vector<DscDag::NodeToken>>(DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TDialogDataSourceStack), true);
+    stack.pop_back();
+
+    DscDag::NodeToken back = (0 < stack.size()) ? stack.back() : nullptr;
+
+    DscDag::NodeToken dialog_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TDialogDataSourceNode);
+    DscDag::SetValueType<DscDag::NodeToken>(dialog_node, back);
+}
+
+void UiInstanceApp::DataSourceDialogStackClear(DscDag::NodeToken in_data_source)
+{
+    DSC_ASSERT(nullptr != in_data_source, "invalid param");
+    std::vector<DscDag::NodeToken>& stack = DscDag::GetValueNonConstRef<std::vector<DscDag::NodeToken>>(DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TDialogDataSourceStack), true);
+    stack.clear();
+
+    DscDag::NodeToken dialog_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_data_source, TUiNodeGroupDataSource::TDialogDataSourceNode);
+    DscDag::SetValueType(dialog_node, nullptr);
 }
 
 std::shared_ptr<DscUi::IUiInstance> UiInstanceApp::Factory(
