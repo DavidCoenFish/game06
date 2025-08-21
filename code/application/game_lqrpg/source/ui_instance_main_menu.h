@@ -47,12 +47,6 @@ public:
         TCount
     };
 
-    struct TButtonData
-    {
-        DscDag::NodeToken _button_text = {};
-        std::function<void(DscDag::NodeToken)> _on_click = {};
-    };
-
     UiInstanceMainMenu() = delete;
     UiInstanceMainMenu& operator=(const UiInstanceMainMenu&) = delete;
     UiInstanceMainMenu(const UiInstanceMainMenu&) = delete;

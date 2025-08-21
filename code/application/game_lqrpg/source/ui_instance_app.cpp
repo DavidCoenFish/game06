@@ -8,6 +8,7 @@
 #include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
 
+
 #if defined(_DEBUG)
 template <>
 const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInstanceApp::TUiNodeGroupDataSource in_value)
@@ -365,7 +366,7 @@ UiInstanceApp::UiInstanceApp(
         UiInstanceContext context = in_context.MakeChild(
             main_screen_data_source_node,
             _main_screen_cross_fade
-            );
+        );
         context._root_node_or_null = _root_node_group;
 
         _main_screen_factory_node = in_ui_instance_factory.BuildInstance(
