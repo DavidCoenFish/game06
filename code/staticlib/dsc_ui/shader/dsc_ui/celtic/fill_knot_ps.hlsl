@@ -89,6 +89,7 @@ Pixel main(Interpolant in_input)
 
     //result._colour.r = knot_uv.x;
     //result._colour.g = knot_uv.y;
+    //result._colour = float4(a, a, a, 1.0);
 
     return result;
 }

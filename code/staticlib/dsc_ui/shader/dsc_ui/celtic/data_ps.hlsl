@@ -25,40 +25,31 @@ Pixel main(Interpolant in_input)
 {
     Pixel result;
 
-    //float2 pixel_uv = float2(in_input._uv.x, 1.0 - in_input._uv.y) * _texture_size.zw;
     float2 pixel_uv = in_input._uv * _texture_size.zw;
-    float2 middle_data = _texture_size.xy * 0.5;    
-	
-	//mirror
+    float2 middle_data = _texture_size.xy * 0.5;
+    //mirror
     pixel_uv = floor(min(pixel_uv, middle_data - (pixel_uv - middle_data)));
-    float df = saturate(length((pixel_uv - middle_data) / (middle_data * 1.4)));
+    float df = saturate(length((pixel_uv - middle_data) / middle_data));
+    float min_dim = min(_texture_size.x, _texture_size.y);
+    float hollow_factor = saturate((min_dim - 3.0) / 5.0);
+    float mul = 1.0 - (hollow_factor * (1.0 - (df * df)));
 
-    float hollow_factor = saturate((min(_texture_size.x, _texture_size.y) - 3.0) / 15.0);
-
-    float mul = (df * df * df);
-    mul = 1.0 - (hollow_factor * (1.0 - mul));
     float value = random(pixel_uv) * mul;
-    if ((pixel_uv.x == 1.0) ||
-        (pixel_uv.y == 1.0))
+    value += 0.35 * saturate(4 - (min_dim * 0.5));
+    if ((pixel_uv.x == 2.0) ||
+        (pixel_uv.y == 2.0))
     {
-        //value *= max(0.5, (20 - max(middle_data.x, middle_data.y)) * 0.05));
-        value *= 0.5;
+        value += 0.35;
     }
-
     if ((pixel_uv.x <= 0) ||
         (pixel_uv.y <= 0))
     {
         value = 0;
     }
 
-    //value = 1.0 - step(value, 0.06);
-    value = 1.0 - step(value, 0.125);
-
-    result._colour = float4(
-        value,
-        value,
-        value,
-        1.0);
+    value = 1 - step(value, 0.5);
+    result._colour = float4(value, value, value, 1.0);
+    //result._colour = float4(mul, mul, mul, 1.0);
 
     return result;
 }
