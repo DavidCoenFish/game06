@@ -319,8 +319,7 @@ UiInstanceApp::UiInstanceApp(
         DscUi::MakeComponentCanvas(
         ),
         _draw_system,
-        _dag_collection,
-        in_context._root_external_render_target_or_null
+        _dag_collection
     );
 
 #if 0

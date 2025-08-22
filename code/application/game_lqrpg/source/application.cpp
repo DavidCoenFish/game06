@@ -121,7 +121,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_ui_instance_factory->AddFactory(UiInstanceMainMenu::GetTemplateName(), UiInstanceMainMenu::Factory);
 
         {
-            auto ui_render_target = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
             UiInstanceContext context = {};
             context._dag_collection = _resources->_dag_collection.get();
             context._draw_system = _draw_system.get();
@@ -130,7 +129,6 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             context._text_manager = _resources->_text_manager.get();
             context._root_data_source_node_group = _resources->_data_source_node_group;
             context._data_source_node = _resources->_data_source_node;
-            context._root_external_render_target_or_null = ui_render_target;
 
             _resources->_ui_instance_node =
                 _resources->_ui_instance_factory->BuildInstance(
@@ -187,7 +185,7 @@ const bool Application::Update()
                 pos,
                 left_button,
                 right_button
-                );
+            );
         }
 
         if (_resources->_ui_manager)
@@ -201,16 +199,25 @@ const bool Application::Update()
                     ui_instance->GetDagUiGroupNode(),
                     time_delta,
                     input_param,
-                    _draw_system->GetRenderTargetBackBuffer()
+                    _draw_system->GetRenderTargetBackBuffer()->GetViewportSize()
                 );
 
-                _resources->_ui_manager->Draw(
+                DscUi::UiRenderTarget* ui_texture = nullptr;
+                ui_texture = _resources->_ui_manager->Draw(
                     ui_instance->GetDagUiGroupNode(),
                     *_resources->_dag_collection,
-                    *frame,
-                    true,
-                    _draw_system->GetRenderTargetBackBuffer()
+                    *frame
                 );
+
+                frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
+                if (nullptr != ui_texture) 
+                {
+                    _resources->_ui_manager->DrawUiTextureToCurrentRenderTarget(
+                        *frame,
+                        ui_instance->GetDagUiGroupNode(),
+                        ui_texture
+                    );
+                }
 
                 if (_resources->_data_source_node_group)
                 {
@@ -222,7 +229,6 @@ const bool Application::Update()
                 _keep_running = false;
             }
         }
-
         if (_resources->_onscreen_version)
         {
             _resources->_onscreen_version->Update(*_draw_system, *frame, *_resources->_text_manager);

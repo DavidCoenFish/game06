@@ -56,7 +56,6 @@
     .DataCopyPath = {
         "$RootPath$/../data/font",
         "$RootPath$/../data/background",
-        "$RootPath$/../data/sample_png",
         "$RootPath$/../data/lqrpg",
         }
     .DoDataCopy = true
@@ -76,4 +75,4 @@ DscVsprojectWindowExe("game_lqrpg" .WindowExeParam)
 
 .SolutionProjects + "game_lqrpg_project"
 .SolutionItemsApplicationProject + "game_lqrpg_project"
-//.SolutionBuildProject = "game_lqrpg_project"
+.SolutionBuildProject = "game_lqrpg_project"

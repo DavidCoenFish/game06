@@ -25,7 +25,8 @@ SET TIMESTAMP=%_yyyy%-%_mm%-%_dd%T%_hour%_%_minute%_%_second%
 
 ::Set project
 
-SET PROJECT_NAME=render_ui_button
+::SET PROJECT_NAME=render_ui
+SET PROJECT_NAME=game_lqrpg
 SET PLATFORM=x64
 SET CONFIG=Release
 
