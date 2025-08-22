@@ -153,14 +153,9 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 	default:
 		DSC_ASSERT_ALWAYS("invalid switch");
 		break;
-	//case DscUi::TUiRootNodeGroup::TForceDraw:
-	//{
-	//	static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
-	//	return s_meta_data;
-	//}
-	case DscUi::TUiRootNodeGroup::TUiRenderTarget:
+	case DscUi::TUiRootNodeGroup::TUiPanelShaderConstantBuffer:
 	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::shared_ptr<DscUi::UiRenderTarget>) };
+		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
 		return s_meta_data;
 	}
 	case DscUi::TUiRootNodeGroup::TRenderTargetViewportSize:

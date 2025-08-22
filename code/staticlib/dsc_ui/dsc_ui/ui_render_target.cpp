@@ -10,6 +10,7 @@ DscUi::UiRenderTarget::UiRenderTarget(
 	const bool in_allow_clear_on_set
 )
 	: _allow_clear_on_set(in_allow_clear_on_set)
+	, _enabled(true)
 {
 	//nop
 }

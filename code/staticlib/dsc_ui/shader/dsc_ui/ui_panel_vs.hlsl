@@ -16,12 +16,21 @@ cbuffer ConstantBuffer : register(b0)
 Interpolant main(Vertex in_input)
 {
     Interpolant result;
+#if 0
+    result._position = float4(
+        in_input._position.x,
+        in_input._position.y,
+        0.0f,
+        1.0f
+        );
+#else
     result._position = float4(
         _pos_size.x + (_pos_size.z * in_input._position.x),
         _pos_size.y - (_pos_size.w * in_input._position.y),
         0.0f, 
         1.0f
         );
+#endif
     result._uv = float2(
         _uv_size.x + (_uv_size.z * in_input._position.x),
         _uv_size.y + (_uv_size.w * in_input._position.y)

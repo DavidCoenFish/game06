@@ -69,12 +69,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 
     if (nullptr != _resources->_ui_manager)
     {
-        auto ui_render_target = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
             DscUi::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
             *_draw_system,
-            *_resources->_dag_collection,
-            ui_render_target
+            *_resources->_dag_collection
         );
 
         std::vector<DscUi::UiManager::TEffectConstructionHelper> array_effect = {};
@@ -157,21 +155,31 @@ const bool Application::Update()
                 );
         }
 
+        DscUi::UiRenderTarget* ui_texture = nullptr;
         if (_resources->_ui_manager)
         {
             _resources->_ui_manager->Update(
                 _resources->_ui_root_node_group,
                 time_delta,
                 input_param,
-                _draw_system->GetRenderTargetBackBuffer()
+                _draw_system->GetRenderTargetBackBuffer()->GetViewportSize()
             );
 
-            _resources->_ui_manager->Draw(
+            ui_texture = _resources->_ui_manager->Draw(
                 _resources->_ui_root_node_group,
                 *_resources->_dag_collection,
+                *frame
+            );
+        }
+
+        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
+
+        if (nullptr != ui_texture)
+        {
+            _resources->_ui_manager->DrawUiTextureToCurrentRenderTarget(
                 *frame,
-                true,
-                _draw_system->GetRenderTargetBackBuffer()
+                _resources->_ui_root_node_group,
+                ui_texture
             );
         }
 

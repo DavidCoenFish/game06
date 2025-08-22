@@ -20,6 +20,7 @@ Pixel main(Interpolant in_input)
 
     result._colour = texel * _tint;
     //result._colour = float4(1.0, 0.0, 0.0, 1.0);
+    //result._colour = _tint;
 
     return result;
 }

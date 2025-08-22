@@ -118,7 +118,7 @@ namespace DscUi
 
 		UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection);
 		~UiManager();
-#if 1
+
 		struct TEffectConstructionHelper
 		{
 			TUiEffectType _effect_type = TUiEffectType::TCount;
@@ -174,93 +174,12 @@ namespace DscUi
 			DscRenderResource::Frame& in_frame
 		);
 
-		std::shared_ptr<DscRenderResource::ShaderConstantBuffer> MakeUiPanelTextureShaderConstantBuffer(
-			DscRender::DrawSystem& in_draw_system
-			);
-
-		void DrawUiTextureToScreen(
+		void DrawUiTextureToCurrentRenderTarget(
 			DscRenderResource::Frame& in_frame,
-			DscRender::IRenderTarget* const in_render_target,
-			const bool in_allow_clear_on_set,
-			std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
+			DscDag::NodeToken in_root_node_group,
 			UiRenderTarget* const in_ui_texture,
 			const DscCommon::VectorFloat4& in_tint_colour = DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
 		);
-
-#else
-		// these are std::shared_ptr as do not have a DagNodeCalculate unique, and we are 
-		std::shared_ptr<UiRenderTarget> MakeUiRenderTarget(
-			DscRender::IRenderTarget* const in_render_target,
-			const bool in_allow_clear_on_draw
-			);
-		std::shared_ptr<UiRenderTarget> MakeUiRenderTarget(
-			const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture,
-			const bool in_allow_clear_on_draw
-			);
-
-		struct TEffectConstructionHelper
-		{
-			TUiEffectType _effect_type = TUiEffectType::TCount;
-			DscCommon::VectorFloat4 _effect_param = {};
-			DscCommon::VectorFloat4 _effect_param_tint = {};
-			bool _use_rollover_param_lerp = false;
-			DscCommon::VectorFloat4 _effect_param_rollover = {};
-			DscCommon::VectorFloat4 _effect_param_tint_rollover = {};
-		};
-
-		// reminder, the root node uses a provided ui render target, so setting a clear background colour on the construction_helper will have no effect
-		DscDag::NodeToken MakeRootNode(
-			const ComponentConstructionHelper& in_construction_helper,
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			const std::shared_ptr<UiRenderTarget>& in_ui_render_target,
-			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
-			);
-
-		// what about when we want a child to be at an index? set child of "application layer set"? put optional index in construction helper
-		DscDag::NodeToken AddChildNode(
-			const ComponentConstructionHelper& in_construction_helper,
-			DscRender::DrawSystem& in_draw_system,
-			DscDag::DagCollection& in_dag_collection,
-			DscDag::NodeToken in_root_node_group,
-			DscDag::NodeToken in_parent,
-			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
-		);
-
-		/// also destroys all children
-		void DestroyNode(
-			DscDag::DagCollection& in_dag_collection,
-			DscDag::NodeToken in_node_group
-			);
-
-		void RemoveDestroyChild(
-			DscDag::DagCollection& in_dag_collection,
-			DscDag::NodeToken in_parent,
-			DscDag::NodeToken in_child_to_destroy
-		);
-
-		// no seperating update from draw as worried about not having the correct render size/ layout to consume input
-
-		/// if multiple calls to update need to start being called with non zero time delta, need to set up frame node to accept
-		/// a null frame ptr and call update, and skip all steps that needed frame? (but update auto scroll anim, ect)?
-		/// otherwise, just call Update at least once for every Draw?
-		/// things that are not drawn may not animatate correctly either... nodes would be marked dirty, but not ticked unless needed to be drawn?
-		void Update(
-			DscDag::NodeToken in_root_node_group,
-			const float in_time_delta,
-			const UiInputParam& in_input_param,
-			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
-		);
-
-		void Draw(
-			DscDag::NodeToken in_root_node_group,
-			DscDag::DagCollection& in_dag_collection,
-			DscRenderResource::Frame& in_frame,
-			const bool in_force_draw,
-			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
-			);
-#endif
 
 	private:
 		//void UpdateRootViewportSize(
@@ -274,7 +193,6 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			const std::vector<TEffectConstructionHelper>& in_effect_array,
 			DscDag::NodeToken in_root_node_group,
-			DscDag::NodeToken in_last_render_target_or_null,
 			DscDag::NodeToken in_render_request_size,
 			DscDag::NodeToken in_child_array_node_or_null,
 			DscDag::NodeToken in_component_resource_group,
