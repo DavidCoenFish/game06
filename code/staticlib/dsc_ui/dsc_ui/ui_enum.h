@@ -167,8 +167,8 @@ namespace DscUi
 	// extend TUiNodeGroup with some root node extras
 	enum class TUiRootNodeGroup : uint8
 	{
-		TForceDraw = static_cast<uint8>(TUiNodeGroup::TCount), // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
-		TRenderTargetViewportSize,
+		//TForceDraw = static_cast<uint8>(TUiNodeGroup::TCount), // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
+		TRenderTargetViewportSize = static_cast<uint8>(TUiNodeGroup::TCount),
 		TUiRenderTarget, // UiTexture passed in with creation of the root node, and pass in an otional IRenderTarget on draw. if the client want to update the UiTexture (reference to back buffer texture?)
 		TUiScale,
 		TFrame, // no dirty on set

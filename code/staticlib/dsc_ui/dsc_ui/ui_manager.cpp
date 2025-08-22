@@ -789,6 +789,180 @@ DscUi::UiManager::~UiManager()
     //nop
 }
 
+
+#if 1
+
+DscDag::NodeToken DscUi::UiManager::MakeRootNode(
+    const ComponentConstructionHelper& in_construction_helper,
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
+)
+{
+}
+
+// what about when we want a child to be at an index? set child of "application layer set"? put optional index in construction helper
+DscDag::NodeToken DscUi::UiManager::AddChildNode(
+    const ComponentConstructionHelper& in_construction_helper,
+    DscRender::DrawSystem& in_draw_system,
+    DscDag::DagCollection& in_dag_collection,
+    DscDag::NodeToken in_root_node_group,
+    DscDag::NodeToken in_parent,
+    const std::vector<TEffectConstructionHelper>& in_effect_array
+    DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
+)
+{
+
+}
+
+/// also destroys all children, but doesn't know about parent to unlink it, so main useage is for the root node
+void DscUi::UiManager::DestroyNode(
+    DscDag::DagCollection& in_dag_collection,
+    DscDag::NodeToken in_node_group
+)
+{
+}
+
+/// detach the child from the parent then recusivly destroy the child
+void DscUi::UiManager::RemoveDestroyChild(
+    DscDag::DagCollection& in_dag_collection,
+    DscDag::NodeToken in_parent,
+    DscDag::NodeToken in_child_to_destroy
+)
+{
+
+}
+
+void DscUi::UiManager::Update(
+    DscDag::NodeToken in_root_node_group,
+    const float in_time_delta,
+    const UiInputParam& in_input_param,
+    const DscCommon::VectorInt2& in_layout_target_size
+)
+{
+    DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TTimeDelta), in_time_delta);
+
+    DscDag::NodeToken node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiRenderTarget);
+    auto render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(node);
+    DSC_ASSERT(nullptr != render_target, "invalid state");
+
+    if (nullptr != render_target)
+    {
+        const DscCommon::VectorInt2 viewport_size = render_target->GetViewportSize();
+        DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TRenderTargetViewportSize), viewport_size);
+
+        DscUi::ScreenSpace screen_space({ DscCommon::VectorFloat4(
+            0.0f,
+            0.0f,
+            static_cast<float>(viewport_size.GetX()),
+            static_cast<float>(viewport_size.GetY())
+        ), DscCommon::VectorFloat4(
+            0.0f,
+            0.0f,
+            static_cast<float>(viewport_size.GetX()),
+            static_cast<float>(viewport_size.GetY())
+        ) });
+
+        DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiNodeGroup::TScreenSpace), screen_space);
+    }
+
+    UiInputState& input_state = DscDag::GetValueNonConstRef<UiInputState>(
+        DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TInputState),
+        false);
+
+    //travers node hierarcy with the in_input_state updating a UiInputInternal to effect state/ button clicks/ rollover
+    //multiple touches may also be the keyboard navigation? 
+    //if there is only going to be one touch, then combine TraverseHierarchyInput and TraverseHierarchyRolloverAccumulate
+    bool first = true;
+    for (const auto& touch : in_input_param._touch_data_array)
+    {
+        bool consumed = false;
+        TraverseHierarchyInput(
+            touch,
+            in_root_node_group,
+            input_state.GetTouchState(touch),
+            first,
+            consumed
+        );
+        first = false;
+    }
+
+    TraverseHierarchyRolloverAccumulate(
+        in_root_node_group,
+        in_time_delta
+    );
+
+    return;
+}
+
+// return the UiRenderTarget of the full ui image, size is from Update::in_layout_target_size
+DscUi::UiRenderTarget* const DscUi::UiManager::Draw(
+    DscDag::NodeToken in_root_node_group,
+    DscDag::DagCollection& in_dag_collection,
+    DscRenderResource::Frame& in_frame
+)
+{
+    if (nullptr != in_root_node_group)
+    {
+        DscDag::SetValueType(DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TFrame), &in_frame);
+    }
+    in_dag_collection.ResolveDirtyConditionNodes();
+
+    DscDag::NodeToken draw_node = (nullptr != in_root_node_group) ? DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiNodeGroup::TDrawNode) : nullptr;
+
+    DscUi::UiRenderTarget* const ui_render_target = (nullptr != draw_node) ? DscDag::GetValueType<DscUi::UiRenderTarget*>(draw_node) : nullptr;
+
+    return ui_render_target;
+}
+
+std::shared_ptr<DscRenderResource::ShaderConstantBuffer> DscUi::UiManager::MakeUiPanelTextureShaderConstantBuffer(
+    DscRender::DrawSystem& in_draw_system
+)
+{
+    auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
+    return panel_shader_constant_buffer;
+}
+
+void DscUi::UiManager::DrawUiTextureToScreen(
+    DscRenderResource::Frame& in_frame,
+    DscRender::IRenderTarget* const in_render_target,
+    const bool in_allow_clear_on_set,
+    std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
+    UiRenderTarget* const in_ui_texture,
+    const DscCommon::VectorFloat4& in_tint_colour = DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
+)
+{
+    in_frame.SetRenderTarget(in_render_target, in_allow_clear_on_set);
+
+    auto& buffer = in_shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferVS>(0);
+
+    buffer._pos_size[0] = -1.0f;
+    buffer._pos_size[1] = -1.0f;
+    buffer._pos_size[2] = 2.0f;
+    buffer._pos_size[3] = 2.0f;
+
+    buffer._uv_size[0] = 0.0f;
+    buffer._uv_size[1] = 0.0f;
+    const auto render_target_size = in_render_target->GetSize();
+    const auto texture_size = in_render_target->GetSize();
+    buffer._uv_size[2] = static_cast<float>(texture_size.GetX()) / static_cast<float>(render_target_size.GetX());
+    buffer._uv_size[3] = static_cast<float>(texture_size.GetY()) / static_cast<float>(render_target_size.GetY());
+
+    auto& buffer_tint = in_shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
+    buffer_tint._tint_colour[0] = in_tint_colour.GetX();
+    buffer_tint._tint_colour[1] = in_tint_colour.GetY();
+    buffer_tint._tint_colour[2] = in_tint_colour.GetZ();
+    buffer_tint._tint_colour[3] = in_tint_colour.GetW();
+
+    _ui_panel_shader->SetShaderResourceViewHandle(0, in_ui_texture->GetTexture());
+    in_frame.SetShader(_ui_panel_shader, in_shader_constant_buffer);
+    in_frame.Draw(_ui_panel_geometry);
+
+    return;
+}
+
+#else
+
 std::shared_ptr<DscUi::UiRenderTarget> DscUi::UiManager::MakeUiRenderTarget(
     DscRender::IRenderTarget* const in_render_target,
     const bool in_allow_clear_on_draw
@@ -1273,6 +1447,8 @@ void DscUi::UiManager::Draw(
 
     return;
 }
+
+#endif
 
 void DscUi::UiManager::UpdateRootViewportSize(
     DscDag::NodeToken in_root_node_group

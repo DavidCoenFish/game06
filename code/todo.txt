@@ -1,10 +1,8 @@
 - ?ui
-	LayerComponent
-		how is layer component different to a canvas? or is conceptually the DataSource/ScreenTemplate coupling
-	ScreenTemplates
-	Locale
-	MainMenu Screen
-	Option Screen
+	refactor UiRenderTarget to no use external render target, add helper to draw UiRenderTargett to backbuffer
+	Option Dialog
+		drop down (local select)
+		slider (ui scale)
 	Character Screen
 	Combat Screen
 

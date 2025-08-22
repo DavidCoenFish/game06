@@ -7,53 +7,11 @@
 #include <dsc_render_resource\render_target_texture.h>
 
 DscUi::UiRenderTarget::UiRenderTarget(
-	DscRender::IRenderTarget* const in_external_render_target,
-	const bool in_allow_clear_on_draw
-) 
-	: _allow_clear_on_draw(in_allow_clear_on_draw)
-	, _external_render_target(in_external_render_target)
+	const bool in_allow_clear_on_set
+)
+	: _allow_clear_on_set(in_allow_clear_on_set)
 {
 	//nop
-}
-
-DscUi::UiRenderTarget::UiRenderTarget(
-	const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture,
-	const bool in_allow_clear_on_draw
-)
-	: _allow_clear_on_draw(in_allow_clear_on_draw)
-	, _render_target_texture(in_render_target_texture)
-{
-	//nop
-}
-
-
-DscUi::UiRenderTarget::UiRenderTarget(
-	const bool in_allow_clear_on_draw
-)
-	: _allow_clear_on_draw(in_allow_clear_on_draw)
-{
-	//nop
-}
-
-// assert if _render_target_pool_texture is not null
-void DscUi::UiRenderTarget::UpdateExternalRenderTarget(
-	DscRender::IRenderTarget* const in_external_render_target
-)
-{
-	DSC_ASSERT(nullptr == _render_target_pool_texture, "invalid state");
-	DSC_ASSERT(nullptr == _render_target_texture, "invalid state");
-	_external_render_target = in_external_render_target;
-	return;
-}
-
-void DscUi::UiRenderTarget::UpdateRenderTarget(
-	const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture
-)
-{
-	DSC_ASSERT(nullptr == _render_target_pool_texture, "invalid state");
-	DSC_ASSERT(nullptr == _external_render_target, "invalid state");
-	_render_target_texture = in_render_target_texture;
-	return;
 }
 
 // assert if _external_render_target is not null
@@ -64,8 +22,6 @@ void DscUi::UiRenderTarget::UpdateRenderTargetPool(
 	const DscCommon::VectorFloat4& in_clear_colour
 )
 {
-	DSC_ASSERT(nullptr == _external_render_target, "invalid state");
-	DSC_ASSERT(nullptr == _render_target_texture, "invalid state");
 	std::vector<DscRender::RenderTargetFormatData> target_format_data_array = {};
 	target_format_data_array.push_back(
 		DscRender::RenderTargetFormatData(
@@ -85,8 +41,6 @@ void DscUi::UiRenderTarget::UpdateRenderTargetPool(
 	return;
 }
 
-// call SetRenderTarget or SetRenderTargetTexture depending on if we have a _external_render_target or a _render_target_pool_texture
-// asserts if neither is set
 const bool DscUi::UiRenderTarget::ActivateRenderTarget(
 	DscRenderResource::Frame& in_frame
 )
@@ -96,19 +50,9 @@ const bool DscUi::UiRenderTarget::ActivateRenderTarget(
 		return false;
 	}
 
-	if (nullptr != _external_render_target)
+	if (nullptr != _render_target_pool_texture)
 	{
-		in_frame.SetRenderTarget(_external_render_target, _allow_clear_on_draw);
-		return true;
-	}
-	else if (nullptr != _render_target_pool_texture)
-	{
-		in_frame.SetRenderTargetTexture(_render_target_pool_texture->_render_target_texture, _allow_clear_on_draw);
-		return true;
-	}
-	else if (nullptr != _render_target_texture)
-	{
-		in_frame.SetRenderTargetTexture(_render_target_texture, _allow_clear_on_draw);
+		in_frame.SetRenderTargetTexture(_render_target_pool_texture->_render_target_texture, _allow_clear_on_set);
 		return true;
 	}
 
@@ -125,19 +69,12 @@ const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetTextureSize() const
 		return DscCommon::VectorInt2::s_zero;
 	}
 
-	if (nullptr != _external_render_target)
-	{
-		return _external_render_target->GetSize();
-	}
-	else if (nullptr != _render_target_pool_texture)
+	if (nullptr != _render_target_pool_texture)
 	{
 		DSC_ASSERT(nullptr != _render_target_pool_texture->_render_target_texture, "invalid state");
 		return _render_target_pool_texture->_render_target_texture->GetSize();
 	}
-	else if (nullptr != _render_target_texture)
-	{
-		return _render_target_texture->GetSize();
-	}
+
 	return DscCommon::VectorInt2::s_zero;
 }
 
@@ -148,19 +85,12 @@ const DscCommon::VectorInt2 DscUi::UiRenderTarget::GetViewportSize() const
 		return DscCommon::VectorInt2::s_zero;
 	}
 
-	if (nullptr != _external_render_target)
-	{
-		return _external_render_target->GetViewportSize();
-	}
-	else if (nullptr != _render_target_pool_texture)
+	if (nullptr != _render_target_pool_texture)
 	{
 		DSC_ASSERT(nullptr != _render_target_pool_texture->_render_target_texture, "invalid state");
 		return _render_target_pool_texture->_render_target_texture->GetViewportSize();
 	}
-	else if (nullptr != _render_target_texture)
-	{
-		return _render_target_texture->GetViewportSize();
-	}
+
 	return DscCommon::VectorInt2::s_zero;
 }
 
@@ -176,10 +106,7 @@ std::shared_ptr<DscRender::HeapWrapperItem> DscUi::UiRenderTarget::GetTexture()
 	{
 		return _render_target_pool_texture->_render_target_texture->GetShaderResourceHeapWrapperItem(0);
 	}
-	else if (nullptr != _render_target_texture)
-	{
-		return _render_target_texture->GetShaderResourceHeapWrapperItem(0);
-	}
+
 	return nullptr;
 }
 

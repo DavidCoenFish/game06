@@ -31,24 +31,7 @@ namespace DscUi
 	{
 	public:
 		UiRenderTarget(
-			DscRender::IRenderTarget* const in_external_render_target,
-			const bool in_allow_clear_on_draw
-		);
-		UiRenderTarget(
-			const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture,
-			const bool in_allow_clear_on_draw
-			);
-		UiRenderTarget(
-			const bool in_allow_clear_on_draw
-			);
-
-		// assert if _render_target_pool_texture is not null
-		void UpdateExternalRenderTarget(
-			DscRender::IRenderTarget* const in_external_render_target
-			);
-
-		void UpdateRenderTarget(
-			const std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target_texture
+			const bool in_allow_clear_on_set
 			);
 
 		// assert if _external_render_target is not null
@@ -84,12 +67,9 @@ namespace DscUi
 		}
 
 	private:
-		bool _allow_clear_on_draw = false;
-		bool _enabled = true;
-
-		DscRender::IRenderTarget* _external_render_target = {};
+		bool _allow_clear_on_set = false;
+		bool _enabled = false;
 		std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> _render_target_pool_texture = {};
-		std::shared_ptr<DscRenderResource::RenderTargetTexture> _render_target_texture = {};
 
 	};
 }

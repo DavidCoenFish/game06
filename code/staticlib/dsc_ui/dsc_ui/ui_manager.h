@@ -118,7 +118,76 @@ namespace DscUi
 
 		UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection);
 		~UiManager();
+#if 1
+		struct TEffectConstructionHelper
+		{
+			TUiEffectType _effect_type = TUiEffectType::TCount;
+			DscCommon::VectorFloat4 _effect_param = {};
+			DscCommon::VectorFloat4 _effect_param_tint = {};
+			bool _use_rollover_param_lerp = false;
+			DscCommon::VectorFloat4 _effect_param_rollover = {};
+			DscCommon::VectorFloat4 _effect_param_tint_rollover = {};
+		};
 
+		DscDag::NodeToken MakeRootNode(
+			const ComponentConstructionHelper& in_construction_helper,
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
+		);
+
+		// what about when we want a child to be at an index? set child of "application layer set"? put optional index in construction helper
+		DscDag::NodeToken AddChildNode(
+			const ComponentConstructionHelper& in_construction_helper,
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			DscDag::NodeToken in_root_node_group,
+			DscDag::NodeToken in_parent,
+			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
+		);
+
+		/// also destroys all children, but doesn't know about parent to unlink it, so main useage is for the root node
+		void DestroyNode(
+			DscDag::DagCollection& in_dag_collection,
+			DscDag::NodeToken in_node_group
+		);
+
+		/// detach the child from the parent then recusivly destroy the child
+		void RemoveDestroyChild(
+			DscDag::DagCollection& in_dag_collection,
+			DscDag::NodeToken in_parent,
+			DscDag::NodeToken in_child_to_destroy
+		);
+
+		void Update(
+			DscDag::NodeToken in_root_node_group,
+			const float in_time_delta,
+			const UiInputParam& in_input_param,
+			const DscCommon::VectorInt2& in_layout_target_size
+		);
+
+		// return the UiRenderTarget of the full ui image, size is from Update::in_layout_target_size
+		UiRenderTarget* const Draw(
+			DscDag::NodeToken in_root_node_group,
+			DscDag::DagCollection& in_dag_collection,
+			DscRenderResource::Frame& in_frame
+		);
+
+		std::shared_ptr<DscRenderResource::ShaderConstantBuffer> MakeUiPanelTextureShaderConstantBuffer(
+			DscRender::DrawSystem& in_draw_system
+			);
+
+		void DrawUiTextureToScreen(
+			DscRenderResource::Frame& in_frame,
+			DscRender::IRenderTarget* const in_render_target,
+			const bool in_allow_clear_on_set,
+			std::shared_ptr<DscRenderResource::ShaderConstantBuffer>& in_shader_constant_buffer,
+			UiRenderTarget* const in_ui_texture,
+			const DscCommon::VectorFloat4& in_tint_colour = DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
+		);
+
+#else
 		// these are std::shared_ptr as do not have a DagNodeCalculate unique, and we are 
 		std::shared_ptr<UiRenderTarget> MakeUiRenderTarget(
 			DscRender::IRenderTarget* const in_render_target,
@@ -191,34 +260,12 @@ namespace DscUi
 			const bool in_force_draw,
 			DscRender::IRenderTarget* const in_external_render_target_or_null = nullptr
 			);
-
-		// test code wants access to some of the internals
-#if defined(_DEBUG)
-		std::shared_ptr<DscRenderResource::Shader>& GetUiPanelShader() {
-			return _ui_panel_shader;
-		}
-		std::shared_ptr<DscRenderResource::Shader>& GetGradientFillShader() {
-			return _gradient_fill_shader;
-		}
-		std::shared_ptr<DscRenderResource::Shader>& GetEffectDropShadowShader() {
-			return  _effect_drop_shadow_shader;
-		}
-
-		std::shared_ptr<DscRenderResource::GeometryGeneric>& GetGeometryFullQuadPosUv() {
-			return  _full_quad_pos_uv;
-		}
-		std::shared_ptr<DscRenderResource::GeometryGeneric>& GetGeometryUiPanel() {
-			return  _ui_panel_geometry;
-		}
-		DscRenderResource::RenderTargetPool& GetRenderTargetPool() {
-			return *_render_target_pool;
-		}
-#endif //_debug
+#endif
 
 	private:
-		void UpdateRootViewportSize(
-			DscDag::NodeToken in_root_node_group
-			);
+		//void UpdateRootViewportSize(
+		//	DscDag::NodeToken in_root_node_group
+		//	);
 
 		// so, if MakeDrawStack creates a UiRenderTaget, how does that get back into the parent, TUiNodeGroup::TUiRenderTarget
 		DscDag::NodeToken MakeDrawStack(
@@ -253,6 +300,8 @@ namespace DscUi
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored
 		std::unique_ptr<DscDagRender::DagResource> _dag_resource = {};
+		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
+		std::unique_ptr<CelticKnot> _celtic_knot = {};
 
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};
@@ -270,15 +319,12 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _effect_blur_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_desaturate_shader = {};
 
-		// a full quad is of pos range [-1 ... 1] and uv range of [0 ... 1]
+		// a full quad is of pos range [-1 ... 1] and uv range of [0 ... 1] (uv 0,0 top left)
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_quad_pos_uv = {};
 		// a full quad is of pos range [-1 ... 1]
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _full_quad_pos = {};
 		// panel geometry is vertex of pos range [0 ... 1] intended to be affected by shader variables
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _ui_panel_geometry = {};
 
-		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
-
-		std::unique_ptr<CelticKnot> _celtic_knot = {};
 	};
 }
