@@ -8,6 +8,45 @@
 #include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
 
+namespace
+{
+    const float UpdateCrossFadeChildren(
+        DscUi::UiManager& in_ui_manager,
+        DscDag::DagCollection& in_dag_collection,
+        DscDag::NodeToken in_cross_fade
+    )
+    {
+        float cross_fade_sum = 0.0f;
+        DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
+        if (nullptr != child_array_node)
+        {
+            std::vector<DscDag::NodeToken> delete_node_array = {};
+            const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
+            for (const auto& child : child_array)
+            {
+                DscDag::NodeToken child_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(child, DscUi::TUiNodeGroup::TUiComponentResources);
+                DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+                const float cross_fade_amount = DscDag::GetValueType<float>(child_crossfade_amount_node);
+                cross_fade_sum += cross_fade_amount;
+                if (0.0f == cross_fade_amount)
+                {
+                    delete_node_array.push_back(child);
+                }
+            }
+
+            for (const auto& delete_node : delete_node_array)
+            {
+                in_ui_manager.RemoveDestroyChild(
+                    in_dag_collection,
+                    in_cross_fade,
+                    delete_node
+                );
+            }
+        }
+        return std::min(1.0f, cross_fade_sum);
+    }
+}
+
 
 #if defined(_DEBUG)
 template <>
@@ -41,11 +80,6 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::string) };
         return s_meta_data;
     }
-    //case UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning:
-    //{
-    //    static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
-    //    return s_meta_data;
-    //}
     case UiInstanceApp::TUiNodeGroupDataSource::TMainScreenDataSourceNode: //dag node <NodeToken> of the active screen data source or null
     {
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscDag::NodeToken) };
@@ -168,17 +202,6 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
             node
         );
     }
-
-    //TKeepAppRunning
-    //{
-    //    auto node = in_dag_collection.CreateValueOnValueChange(true, data_source_owner);
-    //    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "keep app running"));
-    //    DscDag::DagNodeGroup::SetNodeTokenEnum(
-    //        result,
-    //        UiInstanceApp::TUiNodeGroupDataSource::TKeepAppRunning,
-    //        node
-    //    );
-    //}
 
     //TMainScreenDataSourceNode
     {
@@ -347,15 +370,38 @@ UiInstanceApp::UiInstanceApp(
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
         ).SetClearColour(
             DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)
+        ).SetHasEffectScale(
+        ),
+        _draw_system,
+        _dag_collection,
+        _root_node_group,
+        _root_node_group,
+        std::vector<DscUi::UiManager::TEffectConstructionHelper>({
+            {DscUi::TUiEffectType::TEffectBlur}
+            ,{DscUi::TUiEffectType::TEffectDesaturate}
+            })
+        DSC_DEBUG_ONLY(DSC_COMMA "app crossfade main")
+    );
+
+    _dialog_cross_fade = _ui_manager.AddChildNode(
+        DscUi::MakeComponentCrossfade(
+            nullptr
+        ).SetChildSlot(
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+        ).SetClearColour(
+            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)
         ),
         _draw_system,
         _dag_collection,
         _root_node_group,
         _root_node_group,
         std::vector<DscUi::UiManager::TEffectConstructionHelper>()
-        DSC_DEBUG_ONLY(DSC_COMMA "app crossfade main")
+        DSC_DEBUG_ONLY(DSC_COMMA "app crossfade dialog")
     );
 
+    // make a node to build the main screen ui
     {
         DscDag::NodeToken main_screen_data_source_node = DscDag::DagNodeGroup::GetNodeTokenEnum(
             DscDag::GetValueType<DscDag::NodeToken>(in_context._data_source_node),
@@ -372,6 +418,26 @@ UiInstanceApp::UiInstanceApp(
             context
         );
     }
+
+    // make a node to build the dialog
+    {
+        DscDag::NodeToken dialog_data_source_node = DscDag::DagNodeGroup::GetNodeTokenEnum(
+            DscDag::GetValueType<DscDag::NodeToken>(in_context._data_source_node),
+            TUiNodeGroupDataSource::TDialogDataSourceNode
+        );
+
+        UiInstanceContext context = in_context.MakeChild(
+            dialog_data_source_node,
+            _dialog_cross_fade
+        );
+        context._root_node_or_null = _root_node_group;
+
+        _dialog_factory_node = in_ui_instance_factory.BuildInstance(
+            context
+        );
+    }
+
+    return;
 }
 
 UiInstanceApp::~UiInstanceApp()
@@ -382,6 +448,9 @@ UiInstanceApp::~UiInstanceApp()
     _dag_collection.DeleteNode(_main_screen_factory_node);
     _main_screen_factory_node = nullptr;
 
+    _dag_collection.DeleteNode(_dialog_factory_node);
+    _dialog_factory_node = nullptr;
+
     _ui_manager.DestroyNode(
         _dag_collection,
         _root_node_group
@@ -390,31 +459,29 @@ UiInstanceApp::~UiInstanceApp()
 
 void UiInstanceApp::Update()
 {
-    // todo: iterate over children of _main_screen_cross_fade, and remove the children that are at zero cross fade
+    // iterate over children of _main_screen_cross_fade, and remove the children that are at zero cross fade
     // for safety, do this BOTH before the factory node updates and in the child ui instances, create top level with non zero corss fade amount
-    DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
-    if (nullptr != child_array_node)
-    {
-        std::vector<DscDag::NodeToken> delete_node_array = {};
-        const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
-        for (const auto& child : child_array)
-        {
-            DscDag::NodeToken child_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(child, DscUi::TUiNodeGroup::TUiComponentResources);
-            DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child_resource_node_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
-            const float cross_fade_amount = DscDag::GetValueType<float>(child_crossfade_amount_node);
-            if (0.0f == cross_fade_amount)
-            {
-                delete_node_array.push_back(child);
-            }
-        }
+    UpdateCrossFadeChildren(
+        _ui_manager,
+        _dag_collection,
+        _main_screen_cross_fade
+        );
 
-        for (const auto& delete_node : delete_node_array)
+    const float dialog_coverage = UpdateCrossFadeChildren(
+        _ui_manager,
+        _dag_collection,
+        _dialog_cross_fade
+    );
+
+    if (nullptr != _main_screen_cross_fade)
+    {
+        DscDag::NodeToken component_resources = DscDag::DagNodeGroup::GetNodeTokenEnum(
+            _main_screen_cross_fade, DscUi::TUiNodeGroup::TUiComponentResources);
+        DscDag::NodeToken effect_strength_node = component_resources ? DscDag::DagNodeGroup::GetNodeTokenEnum(
+            component_resources, DscUi::TUiComponentResourceNodeGroup::TEffectStrength) : nullptr;
+        if (nullptr != effect_strength_node)
         {
-            _ui_manager.RemoveDestroyChild(
-                _dag_collection,
-                _main_screen_cross_fade,
-                delete_node
-            );
+            DscDag::SetValueType(effect_strength_node, dialog_coverage);
         }
     }
 
@@ -423,6 +490,12 @@ void UiInstanceApp::Update()
         _main_screen_factory_node->Update();
     }
 
+    if (nullptr != _dialog_factory_node)
+    {
+        _dialog_factory_node->Update();
+    }
+
+    return;
 }
 
 DscDag::NodeToken UiInstanceApp::GetDagUiGroupNode()
@@ -443,11 +516,13 @@ DscDag::NodeToken UiInstanceApp::GetDagUiDrawBaseNode()
 const bool UiInstanceApp::HasContent()
 {
     //_main_screen_cross_fade
-    DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
-    const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
-    if (0 != child_array.size())
     {
-        return true;
+        DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
+        const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
+        if (0 != child_array.size())
+        {
+            return true;
+        }
     }
 
     return false;

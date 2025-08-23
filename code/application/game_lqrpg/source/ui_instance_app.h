@@ -111,6 +111,11 @@ private:
     DscDag::NodeToken _root_node_group = {};
     DscDag::NodeToken _main_screen_cross_fade = {};
     DscDag::NodeToken _main_screen_factory_node = {};
+
+    DscDag::NodeToken _dialog_cross_fade = {};
+    DscDag::NodeToken _dialog_factory_node = {};
+
+
 };
 
 

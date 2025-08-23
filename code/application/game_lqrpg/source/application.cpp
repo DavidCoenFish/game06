@@ -1,7 +1,10 @@
 #include "application.h"
 #include "ui_instance_context.h"
 #include "ui_instance_app.h"
+#include "ui_instance_combat.h"
+#include "ui_instance_character.h"
 #include "ui_instance_main_menu.h"
+#include "ui_instance_options.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/file_system.h>
 #include <dsc_common/log_system.h>
@@ -117,8 +120,59 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             );
         }
 
+        // character data source
+        {
+            auto data_source = UiInstanceCharacter::BuildDataSource(
+                *_resources->_dag_collection,
+                data_source_owner,
+                _resources->_data_source_node_group
+            );
+
+            // store the main menu data source
+            DscDag::DagNodeGroup::SetNodeTokenEnum(
+                _resources->_data_source_node_group,
+                UiInstanceApp::TUiNodeGroupDataSource::TCharacterDataSource,
+                data_source
+            );
+        }
+
+        // Combat data source
+        {
+            auto data_source = UiInstanceCombat::BuildDataSource(
+                *_resources->_dag_collection,
+                data_source_owner,
+                _resources->_data_source_node_group
+            );
+
+            // store the main menu data source
+            DscDag::DagNodeGroup::SetNodeTokenEnum(
+                _resources->_data_source_node_group,
+                UiInstanceApp::TUiNodeGroupDataSource::TCombatDataSource,
+                data_source
+            );
+        }
+
+        // Options data source
+        {
+            auto data_source = UiInstanceOptions::BuildDataSource(
+                *_resources->_dag_collection,
+                data_source_owner,
+                _resources->_data_source_node_group
+            );
+
+            // store the main menu data source
+            DscDag::DagNodeGroup::SetNodeTokenEnum(
+                _resources->_data_source_node_group,
+                UiInstanceApp::TUiNodeGroupDataSource::TOptionsDataSource,
+                data_source
+            );
+        }
+
         _resources->_ui_instance_factory->AddFactory(UiInstanceApp::GetTemplateName(), UiInstanceApp::Factory);
+        _resources->_ui_instance_factory->AddFactory(UiInstanceCombat::GetTemplateName(), UiInstanceCombat::Factory);
+        _resources->_ui_instance_factory->AddFactory(UiInstanceCharacter::GetTemplateName(), UiInstanceCharacter::Factory);
         _resources->_ui_instance_factory->AddFactory(UiInstanceMainMenu::GetTemplateName(), UiInstanceMainMenu::Factory);
+        _resources->_ui_instance_factory->AddFactory(UiInstanceOptions::GetTemplateName(), UiInstanceOptions::Factory);
 
         {
             UiInstanceContext context = {};

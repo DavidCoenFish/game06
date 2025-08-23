@@ -609,6 +609,19 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         );
     }
 
+    if (true == in_construction_helper._has_effect_scale)
+    {
+        DscDag::NodeToken effect_scale_node = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._effect_strength,
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(effect_scale_node, "effect strength"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TEffectStrength,
+            effect_scale_node
+        );
+    }
+
     return component_resource_group;
 }
 

@@ -1,7 +1,5 @@
 #pragma once
 #include "game_lqrpg.h"
-
-
 #include <dsc_ui\i_ui_instance.h>
 #include <dsc_ui\ui_instance_factory.h>
 

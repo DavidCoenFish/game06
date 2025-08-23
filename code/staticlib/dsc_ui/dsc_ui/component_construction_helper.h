@@ -129,6 +129,9 @@ namespace DscUi
 		int32 _celtic_knot_size_pixels = 0;
 		DscCommon::VectorFloat4 _celtic_knot_tint = {};
 
+		bool _has_effect_scale = false;
+		float _effect_strength = 0.0f;
+
 	public:
 		ComponentConstructionHelper& SetClearColour(
 			const DscCommon::VectorFloat4& in_clear_colour
@@ -227,6 +230,15 @@ namespace DscUi
 			_crossfade_child_amount = in_crossfade_child_amount;
 			return *this;
 		}
+
+		ComponentConstructionHelper& SetHasEffectScale(
+			const float in_effect_strength = 0.0f
+		)
+		{
+			_has_effect_scale = true;
+			_effect_strength = in_effect_strength;
+			return *this;
+		}
 	};
 
 	// is passing tick and in_self overkill for the crossfade, should this be moved out~ but want the crossfade active child node
@@ -270,6 +282,6 @@ namespace DscUi
 		);
 	ComponentConstructionHelper MakeComponentCelticKnot(
 		const int32 in_knot_size_pixels,
-		const DscCommon::VectorFloat4& in_knot_tint
+		const DscCommon::VectorFloat4& in_knot_tint = DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f)
 	);
 }

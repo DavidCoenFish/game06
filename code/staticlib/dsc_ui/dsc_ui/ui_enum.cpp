@@ -364,6 +364,12 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TEffectStrength:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
+	}
+
 	}
 
 	static DscDag::DagNodeGroupMetaData s_dummy = { false, typeid(nullptr) };

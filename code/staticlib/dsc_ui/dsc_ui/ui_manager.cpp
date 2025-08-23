@@ -1822,6 +1822,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiScale),
             nullptr,
             nullptr,
+            nullptr,
             in_child_array_node_or_null,
             in_component_resource_group
         );
@@ -1863,6 +1864,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 }
             }
 
+            DscDag::NodeToken effect_strength = nullptr;
             DscDag::NodeToken effect_param = nullptr;
             DscDag::NodeToken effect_tint = nullptr;
 
@@ -1883,6 +1885,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             else
             {
                 MakeNode::MakeEffectParamTintNode(
+                    effect_strength,
                     effect_param,
                     effect_tint,
                     in_dag_collection,
@@ -1901,6 +1904,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 ui_render_target_node,
                 ui_render_target_node_b,
                 DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiScale),
+                effect_strength,
                 effect_param,
                 effect_tint,
                 in_child_array_node_or_null,
@@ -1924,6 +1928,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_ui_render_target_node_b,
     DscDag::NodeToken in_ui_scale,
+    DscDag::NodeToken in_effect_strength_or_null,
     DscDag::NodeToken in_effect_param_or_null,
     DscDag::NodeToken in_effect_tint_or_null,
     DscDag::NodeToken in_child_array_node_or_null,
@@ -2252,6 +2257,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2268,6 +2274,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2284,6 +2291,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2300,6 +2308,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2316,6 +2325,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2332,6 +2342,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2348,6 +2359,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,
@@ -2381,6 +2393,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             in_frame_node,
             in_ui_render_target_node,
             in_ui_scale,
+            in_effect_strength_or_null,
             in_effect_param_or_null,
             in_effect_tint_or_null,
             in_array_input_stack,

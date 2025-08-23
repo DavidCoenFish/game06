@@ -256,6 +256,8 @@ namespace DscUi
 		TCelticKnotSize,
 		TCelticKnotTint,
 
+		TEffectStrength, // [0.0f ... 1.0] effect strength
+
 		TCount
 	};
 	typedef DscDag::DagGroup<TUiComponentResourceNodeGroup, static_cast<std::size_t>(TUiComponentResourceNodeGroup::TCount)> UiComponentResourceNodeGroup;

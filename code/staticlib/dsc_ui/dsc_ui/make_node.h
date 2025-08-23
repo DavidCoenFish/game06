@@ -83,6 +83,7 @@ namespace DscUi
             DscDag::NodeToken in_frame_node,
             DscDag::NodeToken in_ui_render_target_node,
             DscDag::NodeToken in_ui_scale,
+            DscDag::NodeToken in_effect_strength,
             DscDag::NodeToken in_effect_param,
             DscDag::NodeToken in_effect_tint,
             const std::vector<DscDag::NodeToken>& in_array_input_stack,
@@ -200,6 +201,7 @@ namespace DscUi
         );
 
         void MakeEffectParamTintNode(
+            DscDag::NodeToken& out_effect_strength,
             DscDag::NodeToken& out_effect_param,
             DscDag::NodeToken& out_effect_tint,
             DscDag::DagCollection& in_dag_collection,

@@ -76,7 +76,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
     // template name
     {
         auto node = in_dag_collection.CreateValueOnValueChange<std::string>(GetTemplateName(), dag_owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "main menu"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, GetTemplateName()));
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             result,
             DscUi::TUiNodeGroupDataSource::TTemplateName,
@@ -172,8 +172,6 @@ std::shared_ptr<DscUi::IUiInstance> UiInstanceMainMenu::Factory(
     const UiInstanceContext& in_context
 )
 {
-    DSC_UNUSED(in_ui_instance_factory);
-
     std::shared_ptr<DscUi::IUiInstance> result = std::make_shared<UiInstanceMainMenu>(
         in_ui_instance_factory,
         in_context

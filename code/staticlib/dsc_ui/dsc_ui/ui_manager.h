@@ -209,6 +209,7 @@ namespace DscUi
 			DscDag::NodeToken in_ui_render_target_node,
 			DscDag::NodeToken in_ui_render_target_node_b,
 			DscDag::NodeToken in_ui_scale,
+			DscDag::NodeToken in_effect_strength_or_null,
 			DscDag::NodeToken in_effect_param_or_null,
 			DscDag::NodeToken in_effect_tint_or_null,
 			DscDag::NodeToken in_child_array_node_or_null,

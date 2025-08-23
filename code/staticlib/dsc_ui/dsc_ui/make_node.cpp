@@ -94,6 +94,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_ui_scale,
+    DscDag::NodeToken in_effect_strength,
     DscDag::NodeToken in_effect_param,
     DscDag::NodeToken in_effect_tint,
     const std::vector<DscDag::NodeToken>& in_array_input_stack,
@@ -114,14 +115,26 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
         const auto& shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
         DSC_ASSERT(nullptr != shader_buffer, "invalid state");
         const float ui_scale = DscDag::GetValueType<float>(in_input_array[3]);
-        const DscCommon::VectorFloat4& effect_param = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
-        const DscCommon::VectorFloat4& effect_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
+        const float effect_strength = (nullptr != in_input_array[4]) ? DscDag::GetValueType<float>(in_input_array[4]) : 1.0f;
+        if (0.0f == effect_strength)
+        {
+            out_value = nullptr;
+            if ((0 < in_input_texture_count) && (nullptr != in_input_array[7]))
+            {
+                out_value = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
+            }
+            return;
+        }
+
+        const DscCommon::VectorFloat4& effect_param = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
+        const DscCommon::VectorFloat4& effect_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[6]);
 
         const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
 
         auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
         buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
         buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
+        buffer._width_height[2] = effect_strength;
         buffer._effect_param[0] = effect_param[0] * ui_scale;
         buffer._effect_param[1] = effect_param[1] * ui_scale;
         buffer._effect_param[2] = effect_param[2] * ui_scale;
@@ -136,7 +149,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
 
         if (0 < in_input_texture_count)
         {
-            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
+            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
             //ui_render_target->SetEnabled(input_texture->GetEnabled());
             const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
             buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
@@ -149,7 +162,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
         }
         if (1 < in_input_texture_count) //&& (true == ui_render_target->GetEnabled()))
         {
-            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
+            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[8]);
             //ui_render_target->SetEnabled(input_texture->GetEnabled());
             const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
             buffer._texture_param_1[0] = static_cast<float>(input_texture_viewport_size.GetX());
@@ -181,12 +194,13 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
     DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
     DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
     DscDag::LinkIndexNodes(3, in_ui_scale, result_node);
-    DscDag::LinkIndexNodes(4, in_effect_param, result_node);
-    DscDag::LinkIndexNodes(5, in_effect_tint, result_node);
+    DscDag::LinkIndexNodes(4, in_effect_strength, result_node);
+    DscDag::LinkIndexNodes(5, in_effect_param, result_node);
+    DscDag::LinkIndexNodes(6, in_effect_tint, result_node);
     for (int32 index = 0; index < in_input_texture_count; ++index)
     {
         DSC_ASSERT(index < static_cast<int32>(in_array_input_stack.size()), "invalid state");
-        DscDag::LinkIndexNodes(6 + index, in_array_input_stack[in_array_input_stack.size() - in_input_texture_count +  index], result_node);
+        DscDag::LinkIndexNodes(7 + index, in_array_input_stack[in_array_input_stack.size() - in_input_texture_count +  index], result_node);
     }
 
     return result_node;
@@ -1150,6 +1164,7 @@ void DscUi::MakeNode::MakeEffectParamTintBlotNode(
 }
 
 void DscUi::MakeNode::MakeEffectParamTintNode(
+    DscDag::NodeToken& out_effect_strength,
     DscDag::NodeToken& out_effect_param,
     DscDag::NodeToken& out_effect_tint,
     DscDag::DagCollection& in_dag_collection,
@@ -1211,6 +1226,13 @@ void DscUi::MakeNode::MakeEffectParamTintNode(
             in_owner);
             DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(out_effect_tint, "effect tint"));
     }
+
+    out_effect_strength = DscDag::DagNodeGroup::GetNodeTokenEnum(
+        in_component_resource_group,
+        DscUi::TUiComponentResourceNodeGroup::TEffectStrength
+    );
+
+    return;
 }
 
 

@@ -10,7 +10,7 @@ struct Pixel
 
 cbuffer ConstantBuffer : register(b0)
 {
-    float4 _width_height;
+    float4 _width_height_strength;
     float4 _effect_param;
     float4 _tint;
     float4 _texture_param_0; // viewport size xy, texture size zw. the ui can draw to viewports/ subset areas of textures
@@ -27,7 +27,7 @@ float4 SampleAtOffset(
     float2 flip_offset = float2(in_offset_pixel.y, -in_offset_pixel.x);
     sum += g_texture.Sample(g_sampler_state, (in_pivot_pixel + flip_offset) / in_texture_size);
     sum += g_texture.Sample(g_sampler_state, (in_pivot_pixel - flip_offset) / in_texture_size);
-    sum *= 0.16; // 4 / 25
+    sum *= 0.04; // 1 / 25
     return sum;
 }
 
@@ -46,7 +46,9 @@ float4 CalculateBlur(
     average_colour += SampleAtOffset(pivot_pixel, float2(2.5, 3.5), _texture_param_0.zw);
     average_colour += SampleAtOffset(pivot_pixel, float2(4.5, 1.5), _texture_param_0.zw);
 
-    return average_colour;
+    float4 result_colour = lerp(texel, average_colour, _width_height_strength.z);
+
+    return result_colour;
 }
 
 Pixel main(Interpolant in_input)
