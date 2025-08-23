@@ -213,10 +213,25 @@ namespace
             );
 
         const bool inside = DscCommon::Math::InsideBounds(x, y, screen_space._screen_valid); 
-            //&& DscCommon::Math::InsideBounds(x, y, screen_space._screen_space);
+
+        bool allow_input = false;
 
         DscDag::NodeToken resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(in_ui_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
+        DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+        if (nullptr != child_crossfade_amount_node)
+        {
+            // bail if we are not 1.0f cross fade, then ignore for input (still need a way of aborting input checks)
+            if (1.0f != DscDag::GetValueType<float>(child_crossfade_amount_node))
+            {
+                return;
+            }
+        }
+
         DscDag::NodeToken input_state_flag = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputStateFlag);
+        if (nullptr != input_state_flag)
+        {
+            allow_input = true;
+        }
 
         if (nullptr != input_state_flag)
         {
