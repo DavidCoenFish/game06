@@ -378,7 +378,11 @@ UiInstanceApp::UiInstanceApp(
         _root_node_group,
         std::vector<DscUi::UiManager::TEffectConstructionHelper>({
             {DscUi::TUiEffectType::TEffectBlur}
-            ,{DscUi::TUiEffectType::TEffectDesaturate}
+            ,{
+                DscUi::TUiEffectType::TEffectDesaturate,
+                DscCommon::VectorFloat4(),
+                DscCommon::VectorFloat4(0.375f, 0.375f, 0.375f, 1.0f)
+            }
             })
         DSC_DEBUG_ONLY(DSC_COMMA "app crossfade main")
     );
