@@ -121,7 +121,7 @@ UiInstanceOptions::UiInstanceOptions(
         ).SetCrossfadeChildAmount(
             0.001f // just for safety, moving to only delete cross fade children when child amount is zero
         ).SetChildSlot(
-            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.75f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
         ),
@@ -150,14 +150,13 @@ UiInstanceOptions::UiInstanceOptions(
     }
 
     _ui_manager.AddChildNode(
-        DscUi::MakeComponentCelticKnot(
-            32
+        DscUi::MakeComponentCanvas(
         ).SetChildSlot(
             DscUi::VectorUiCoord2(DscUi::UiCoord(-16, 1.0f), DscUi::UiCoord(-16, 1.0f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
         ).SetClearColour(
-            DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
+            DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
         ),
         _draw_system,
         _dag_collection,
@@ -167,6 +166,29 @@ UiInstanceOptions::UiInstanceOptions(
             {
                 DscUi::TUiEffectType::TEffectCorner,
                 DscCommon::VectorFloat4(32.0f, 32.0f, 32.0f, 32.0f)
+            }
+            })
+        DSC_DEBUG_ONLY(DSC_COMMA "background")
+    );
+
+    _ui_manager.AddChildNode(
+        DscUi::MakeComponentCelticKnot(
+            32,
+            DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.5f)
+        ).SetChildSlot(
+            DscUi::VectorUiCoord2(DscUi::UiCoord(-16, 1.0f), DscUi::UiCoord(-16, 1.0f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+            DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+        ),
+        _draw_system,
+        _dag_collection,
+        in_context._root_node_or_null,
+        _main_node_group,
+        std::vector<DscUi::UiManager::TEffectConstructionHelper>({
+            {
+                DscUi::TUiEffectType::TEffectDropShadow,
+                DscCommon::VectorFloat4(2.0f, 8.0f, 6.0f, 0.0f),
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
             }
             })
         DSC_DEBUG_ONLY(DSC_COMMA "celtic knot")

@@ -547,7 +547,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             const DscDag::NodeToken child_active_node = DscDag::GetValueType<DscDag::NodeToken>(in_input_array[0]);
             //const DscDag::NodeToken child_active_node = DscDag::GetValueType<DscDag::NodeToken>(child_active_node_node);
             const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[1]);
-            const float time_deta = DscDag::GetValueType<float>(in_input_array[2]);
+            const float time_deta = DscDag::GetValueType<float>(in_input_array[2]) * 1.5f;
 
             for (const auto& child : child_array)
             {

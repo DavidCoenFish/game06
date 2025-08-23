@@ -36,9 +36,13 @@ namespace DscUi
 		TNone,
 		TRollover = 1 << 0, // use rollover for keyboard navigation?
 		TClick = 1 << 1,
-		TSelection = 1 << 2
+		TSelection = 1 << 2,
+		TVisualMask = TRollover | TClick | TSelection,
 
-		// flashing white on click start/ end seems like a good idear but looks kind of flashy, won't do this for now
+		TDisable = 1 << 3,
+		TAbortInputTraveral = 1 << 4,
+
+		// flashing white on click start/ end seems like a good idea but looks kind of flashy, won't do this for now
 		// is this the frame the click started, should also have TClick set
 		//TClickStart = 1 << 3,
 		// did click end this frame, can be true without TClick set

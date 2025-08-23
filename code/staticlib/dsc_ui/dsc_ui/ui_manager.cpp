@@ -221,6 +221,7 @@ namespace
         if (nullptr != child_crossfade_amount_node)
         {
             // bail if we are not 1.0f cross fade, then ignore for input (still need a way of aborting input checks)
+            // todo: remove and replace with input flags [abort, ignore]
             if (1.0f != DscDag::GetValueType<float>(child_crossfade_amount_node))
             {
                 return;
