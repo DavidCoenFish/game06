@@ -318,6 +318,12 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscUi::TUiInputStateFlag) };
 		return s_meta_data;
 	}
+
+	case DscUi::TUiComponentResourceNodeGroup::TInputFlowBehaviour:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscUi::TUiInputFlowBehaviour) };
+		return s_meta_data;
+	}
 	case DscUi::TUiComponentResourceNodeGroup::TInputData:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscUi::TUiComponentInputData) };

@@ -37,10 +37,10 @@ namespace DscUi
 		TRollover = 1 << 0, // use rollover for keyboard navigation?
 		TClick = 1 << 1,
 		TSelection = 1 << 2,
-		TVisualMask = TRollover | TClick | TSelection,
+		//TVisualMask = TRollover | TClick | TSelection,
 
-		TDisable = 1 << 3,
-		TAbortInputTraveral = 1 << 4,
+		//TDisable = 1 << 3,
+		//TAbortInputTraveral = 1 << 4,
 
 		// flashing white on click start/ end seems like a good idea but looks kind of flashy, won't do this for now
 		// is this the frame the click started, should also have TClick set
@@ -56,6 +56,14 @@ const bool operator!= (const int32 in_lhs, const DscUi::TUiInputStateFlag in_rhs
 
 namespace DscUi
 {
+	// do we clear the TUiInputStateFlag flag on ignored/skipped over nodes of the hierarchy
+	enum class TUiInputFlowBehaviour : uint8
+	{
+		TNormal,
+		TIgnore, // do not process this node or it's children
+		TModal, // deal with this node and children, but ignore node traversal of the remaining hierarchy
+	};
+
 	/// should this just be changed to directly using windows virtual key id? or vaugely allow remapping
 	/// This was intended for ui navigation control, but what if we want general key presses to be comunicated with some component
 	enum class TUiNavigationType : uint8
@@ -248,6 +256,7 @@ namespace DscUi
 		TChildStackParentAttach,
 
 		TInputStateFlag,
+		TInputFlowBehaviour,
 		TInputData,
 		TInputRolloverAccumulate, // [0.0 ... 1.0] over some time period while acumulates to 1 when node is rolled over and drain back to zero when not rolled over
 		TInputActiveTouchPos, // float x, y, of cursor pixel coord from panel top left

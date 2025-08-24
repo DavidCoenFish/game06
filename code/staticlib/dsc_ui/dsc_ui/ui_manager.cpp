@@ -202,7 +202,8 @@ namespace
         DscDag::NodeToken in_ui_node_group,
         DscUi::UiInputState::TouchState& in_touch_data,
         const bool in_clear_flag,
-        bool& in_out_consumed
+        bool& in_out_consumed,
+        bool& in_out_ignore
     )
     {
         const float x = static_cast<float>(in_touch._root_relative_pos.GetX());
@@ -212,28 +213,23 @@ namespace
             DscDag::DagNodeGroup::GetNodeTokenEnum(in_ui_node_group, DscUi::TUiNodeGroup::TScreenSpace)
             );
 
-        const bool inside = DscCommon::Math::InsideBounds(x, y, screen_space._screen_valid); 
-
-        bool allow_input = false;
+        bool inside = DscCommon::Math::InsideBounds(x, y, screen_space._screen_valid); 
+        if (true == in_out_ignore)
+        {
+            inside = false;
+        }
 
         DscDag::NodeToken resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(in_ui_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
-        DscDag::NodeToken child_crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
-        if (nullptr != child_crossfade_amount_node)
+        DscDag::NodeToken input_flow_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputFlowBehaviour);
+        const DscUi::TUiInputFlowBehaviour input_flow_behaviour = (nullptr != input_flow_amount_node) ?
+            DscDag::GetValueType<DscUi::TUiInputFlowBehaviour>(input_flow_amount_node) : DscUi::TUiInputFlowBehaviour::TNormal;
+
+        if (DscUi::TUiInputFlowBehaviour::TIgnore == input_flow_behaviour)
         {
-            // bail if we are not 1.0f cross fade, then ignore for input (still need a way of aborting input checks)
-            // todo: remove and replace with input flags [abort, ignore]
-            if (1.0f != DscDag::GetValueType<float>(child_crossfade_amount_node))
-            {
-                return;
-            }
+            inside = false;
         }
 
         DscDag::NodeToken input_state_flag = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputStateFlag);
-        if (nullptr != input_state_flag)
-        {
-            allow_input = true;
-        }
-
         if (nullptr != input_state_flag)
         {
             k_rollover = inside;
@@ -309,14 +305,23 @@ namespace
         const auto& array_children = DscDag::GetValueNodeArray(array_children_node);
         for (auto iter = array_children.rbegin(); iter != array_children.rend(); ++iter)
         {
+            bool dummy_local = true;
+            bool& ignore_local = (DscUi::TUiInputFlowBehaviour::TIgnore == input_flow_behaviour) ?
+                dummy_local : in_out_ignore;
             DscDag::NodeToken child = *iter;
             TraverseHierarchyInput(
                 in_touch,
                 child,
                 in_touch_data,
                 in_clear_flag,
-                in_out_consumed
+                in_out_consumed,
+                ignore_local
                 );
+        }
+
+        if (DscUi::TUiInputFlowBehaviour::TModal == input_flow_behaviour)
+        {
+            in_out_ignore = true;
         }
     }
 
@@ -1228,12 +1233,14 @@ void DscUi::UiManager::Update(
     for (const auto& touch : in_input_param._touch_data_array)
     {
         bool consumed = false;
+        bool ignore = false;
         TraverseHierarchyInput(
             touch,
             in_root_node_group,
             input_state.GetTouchState(touch),
             first,
-            consumed
+            consumed,
+            ignore
         );
         first = false;
     }

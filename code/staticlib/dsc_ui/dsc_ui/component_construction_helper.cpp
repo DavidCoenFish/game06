@@ -579,6 +579,47 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         );
     }
 
+    if (true == in_construction_helper._has_input_flow) 
+    {
+        // only base the input flow on crossfade if we are normal flow, if we are like told to be modal, then we set it to modal
+        DscDag::NodeToken node = nullptr;
+        DscDag::NodeToken crossfade_amount_node = DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_group, DscUi::TUiComponentResourceNodeGroup::TCrossfadeChildAmount);
+        if ((nullptr != crossfade_amount_node) && (DscUi::TUiInputFlowBehaviour::TNormal == in_construction_helper._ui_input_flow_behaviour))
+        {
+            // make a input flow node based on the crossfade amount node
+            //DscUi::TUiComponentResourceNodeGroup::TInputFlowBehaviour
+            node = in_dag_collection.CreateCalculate<DscUi::TUiInputFlowBehaviour>([](DscUi::TUiInputFlowBehaviour& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                const float cross_fade_amount = DscDag::GetValueType<float>(in_input_array[0]);
+
+                if (cross_fade_amount < 1.0f)
+                {
+                    out_value = DscUi::TUiInputFlowBehaviour::TIgnore;
+                }
+                else
+                {
+                    out_value = DscUi::TUiInputFlowBehaviour::TNormal;
+                }
+            },
+                owner);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "input_flow_calculate"));
+            DscDag::LinkIndexNodes(0, crossfade_amount_node, node);
+
+        }
+        else
+        {
+            node = in_dag_collection.CreateValueOnValueChange(
+                    in_construction_helper._ui_input_flow_behaviour,
+                    owner
+                );
+                DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "input_flow"));
+        }
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TInputFlowBehaviour,
+            node
+        );
+    }
+
     if (TUiComponentType::TCelticKnotFill == in_construction_helper._component_type)
     {
 		const int32 knot_size_pixels = in_construction_helper._celtic_knot_size_pixels;

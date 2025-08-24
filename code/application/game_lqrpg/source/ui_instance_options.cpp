@@ -120,6 +120,8 @@ UiInstanceOptions::UiInstanceOptions(
         DscUi::MakeComponentCanvas(
         ).SetCrossfadeChildAmount(
             0.001f // just for safety, moving to only delete cross fade children when child amount is zero
+        ).SetInputFlow(
+            DscUi::TUiInputFlowBehaviour::TModal
         ).SetChildSlot(
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.75f), DscUi::UiCoord(0, 0.5f)),
             DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),

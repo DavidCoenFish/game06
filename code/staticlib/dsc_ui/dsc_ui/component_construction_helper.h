@@ -122,6 +122,8 @@ namespace DscUi
 		std::function<void(DscDag::NodeToken)> _input_click_callback = {};
 		bool _has_input_rollover_accumulate = false;
 		bool _has_input_active_touch_pos = false;
+		bool _has_input_flow = false;
+		DscUi::TUiInputFlowBehaviour _ui_input_flow_behaviour = DscUi::TUiInputFlowBehaviour::TNormal;
 
 		bool _has_parent_index = false;
 		int32 _parent_index = 0; // what happens to the existing child if you overwrite a child
@@ -228,6 +230,16 @@ namespace DscUi
 		{
 			_has_crossfade_child_amount = true;
 			_crossfade_child_amount = in_crossfade_child_amount;
+			_has_input_flow = true;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetInputFlow(
+			const DscUi::TUiInputFlowBehaviour in_ui_input_flow_behaviour = DscUi::TUiInputFlowBehaviour::TNormal
+			)
+		{
+			_has_input_flow = true;
+			_ui_input_flow_behaviour = in_ui_input_flow_behaviour;
 			return *this;
 		}
 
