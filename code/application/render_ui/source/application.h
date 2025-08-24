@@ -94,6 +94,9 @@ private:
         std::unique_ptr<DscUi::UiManager> _ui_manager = {};
 
         DscDag::NodeToken _ui_root_node_group = {};
+        DscDag::NodeToken _selected_index_node = nullptr;
+
+
     };
     std::unique_ptr<Resources> _resources;
 

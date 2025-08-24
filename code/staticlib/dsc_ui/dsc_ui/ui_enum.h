@@ -49,9 +49,12 @@ namespace DscUi
 		//TClickEnd = 1 << 4
 	};
 }
+
+const DscUi::TUiInputStateFlag operator &= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
 const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs);
 const DscUi::TUiInputStateFlag operator | (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs);
 const DscUi::TUiInputStateFlag operator& (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs);
+const DscUi::TUiInputStateFlag operator~ (const DscUi::TUiInputStateFlag in_value);
 const bool operator!= (const int32 in_lhs, const DscUi::TUiInputStateFlag in_rhs);
 
 namespace DscUi
@@ -270,6 +273,10 @@ namespace DscUi
 		TCelticKnotTint,
 
 		TEffectStrength, // [0.0f ... 1.0] effect strength
+
+		TSelectedChildIndex, // for the parent of the selected set of items
+		TSelectedItemIndex, // for the child of the selected set, the index of the item in the selection set
+		TSelectedItemSelected, // for the child of the selected set, a true, false value for if we are the selected item
 
 		TCount
 	};

@@ -663,6 +663,57 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         );
     }
 
+    if (true == in_construction_helper._has_selected_child)
+    {
+        DscDag::NodeToken selected_child_index_node = in_construction_helper._selected_child_index_node;
+        if (nullptr == selected_child_index_node)
+        {
+            selected_child_index_node = in_dag_collection.CreateValueOnValueChange(
+                in_construction_helper._selected_child_index,
+                owner);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(selected_child_index_node, "selected_child_index"));
+        }
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TSelectedChildIndex,
+            selected_child_index_node
+        );
+    }
+
+    if (true == in_construction_helper._has_item_index)
+    {
+        DscDag::NodeToken item_index_node = in_dag_collection.CreateValueOnValueChange(
+            in_construction_helper._item_index,
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(item_index_node, "item_index_node"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TSelectedItemIndex,
+            item_index_node
+        );
+
+        DSC_ASSERT(nullptr != in_parent, "invalid param");
+        DscDag::NodeToken parent_resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TUiComponentResources);
+        DscDag::NodeToken parent_selected_child_index_node = DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_group, TUiComponentResourceNodeGroup::TSelectedChildIndex);
+
+        auto node = in_dag_collection.CreateCalculate<bool>([](bool& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+            const int32 item_index = DscDag::GetValueType<int32>(in_input_array[0]);
+            const int32 parent_selected_index = DscDag::GetValueType<int32>(in_input_array[1]);
+
+            out_value = (item_index == parent_selected_index);
+        },
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "item selected"));
+        DscDag::LinkIndexNodes(0, item_index_node, node);
+        DscDag::LinkIndexNodes(1, parent_selected_child_index_node, node);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TSelectedItemSelected,
+            node
+        );
+    }
+
     return component_resource_group;
 }
 

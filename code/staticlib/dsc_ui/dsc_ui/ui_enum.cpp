@@ -6,6 +6,13 @@
 #include <dsc_render_resource/shader_resource.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
 
+const DscUi::TUiInputStateFlag operator &= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs)
+{
+	const int32 temp = static_cast<int32>(in_out_lhs) & static_cast<int32>(in_rhs);
+	in_out_lhs = static_cast<DscUi::TUiInputStateFlag>(temp);
+	return in_out_lhs;
+}
+
 const DscUi::TUiInputStateFlag operator |= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs)
 {
 	const int32 temp = static_cast<int32>(in_out_lhs) | static_cast<int32>(in_rhs);
@@ -22,6 +29,12 @@ const DscUi::TUiInputStateFlag operator | (const DscUi::TUiInputStateFlag in_lhs
 const DscUi::TUiInputStateFlag operator& (const DscUi::TUiInputStateFlag in_lhs, const DscUi::TUiInputStateFlag in_rhs)
 {
 	const int32 temp = static_cast<int32>(in_lhs) & static_cast<int32>(in_rhs);
+	return static_cast<DscUi::TUiInputStateFlag>(temp);
+}
+
+const DscUi::TUiInputStateFlag operator~ (const DscUi::TUiInputStateFlag in_value)
+{
+	const int32 temp = ~static_cast<int32>(in_value);
 	return static_cast<DscUi::TUiInputStateFlag>(temp);
 }
 
@@ -350,11 +363,6 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
-	//case DscUi::TUiComponentResourceNodeGroup::TCrossfadeCondition:
-	//{
-	//	static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(bool) };
-	//	return s_meta_data;
-	//}
 	case DscUi::TUiComponentResourceNodeGroup::TCrossfadeNode:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(bool) };
@@ -375,7 +383,22 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
+	case DscUi::TUiComponentResourceNodeGroup::TSelectedChildIndex:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(int) };
+		return s_meta_data;
+	}
 
+	case DscUi::TUiComponentResourceNodeGroup::TSelectedItemIndex:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(int) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TSelectedItemSelected:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(bool) };
+		return s_meta_data;
+	}
 	}
 
 	static DscDag::DagNodeGroupMetaData s_dummy = { false, typeid(nullptr) };

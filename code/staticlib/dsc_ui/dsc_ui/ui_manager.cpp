@@ -273,6 +273,21 @@ namespace
             {
                 flag |= DscDag::GetValueType<DscUi::TUiInputStateFlag>(input_state_flag);
             }
+
+            DscDag::NodeToken selected_item_selected_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TSelectedItemSelected);
+            if (nullptr != selected_item_selected_node)
+            {
+                const bool is_selected = DscDag::GetValueType<bool>(selected_item_selected_node);
+                if (true == is_selected)
+                {
+                    flag |= DscUi::TUiInputStateFlag::TSelection;
+                }
+                else
+                {
+                    flag &= ~DscUi::TUiInputStateFlag::TSelection;
+                }
+            }
+
             DscDag::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
 
             if (true == clicked)

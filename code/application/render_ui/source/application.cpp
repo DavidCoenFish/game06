@@ -37,6 +37,205 @@
 
 namespace
 {
+    void AddListItem(
+        DscDag::NodeToken in_selected_index_node,
+        const int32 in_index,
+        const std::string& in_message,
+        DscUi::UiManager& in_ui_manager,
+        DscRender::DrawSystem& in_draw_system,
+        DscDag::DagCollection& in_dag_collection,
+        DscCommon::FileSystem& in_file_system,
+        DscText::TextManager& in_text_manager,
+        DscDag::NodeToken in_root_node,
+        DscDag::NodeToken in_parent_node
+        )
+    {
+        auto item_node_group = in_ui_manager.AddChildNode(
+            DscUi::MakeComponentCanvas(
+            ).SetInputData(
+                [in_index, in_selected_index_node]
+                (DscDag::NodeToken) {
+                    DscDag::SetValueType(in_selected_index_node, in_index);
+                    return;
+                },
+                true,
+                true
+            ).SetHasItemIndex(
+                in_index
+            ).SetChildStackData(
+                DscUi::UiCoord(0, 1.0f),
+                DscUi::UiCoord(0, 0.5f),
+                DscUi::UiCoord(0, 0.5f)
+            ).SetDesiredSize(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(48, 0.0f))
+            ).SetClearColour(
+                DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_root_node,
+            in_parent_node,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "item")
+        );
+
+        DscDag::NodeToken multi_gradient = in_dag_collection.FetchNodeName("item_multi_gradient");
+        if (nullptr == multi_gradient)
+        {
+            std::vector<DscUi::TGradientFillConstantBuffer> multi_gradient_data = {};
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_none,
+                {
+                    {0.0f, 0.1f, 0.5f, 1.0f},
+                    {0.557f, 0.314f, 0.208f, 1.0f},
+                    {0.733f, 0.439f, 0.286f, 1.0f},
+                    {0.941f, 0.627f, 0.396f, 1.0f},
+                    {0.996f, 0.757f, 0.525f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_rollover,
+                {
+                    {0.0f, 0.5f, 0.9f, 1.0f},
+                    {0.557f, 0.314f, 0.208f, 1.0f},
+                    {0.733f, 0.439f, 0.286f, 1.0f},
+                    {0.941f, 0.627f, 0.396f, 1.0f},
+                    {0.996f, 0.757f, 0.525f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_click,
+                {
+                    {0.0f, 0.75f, 1.0f, 1.1f},
+                    {0.839f, 0.529f, 0.361f, 1.0f},
+                    {0.525f, 0.306f, 0.196f, 1.0f},
+                    {0.255f, 0.098f, 0.051f, 1.0f},
+                    {0.341f, 0.063f, 0.055f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_rollover_click,
+                {
+                    {0.0f, 0.9f, 1.5f, 1.6f},
+                    {0.839f, 0.529f, 0.361f, 1.0f},
+                    {0.525f, 0.306f, 0.196f, 1.0f},
+                    {0.255f, 0.098f, 0.051f, 1.0f},
+                    {0.341f, 0.063f, 0.055f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_selection,
+                {
+                    {0.0f, 0.1f, 0.5f, 1.0f},
+                    {0.0f, 0.314f, 0.208f, 1.0f},
+                    {0.0f, 0.439f, 0.286f, 1.0f},
+                    {0.0f, 0.627f, 0.396f, 1.0f},
+                    {0.0f, 0.757f, 0.525f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_rollover_selection,
+                {
+                    {0.0f, 0.5f, 0.9f, 1.0f},
+                    {0.0f, 0.314f, 0.208f, 1.0f},
+                    {0.0f, 0.439f, 0.286f, 1.0f},
+                    {0.0f, 0.627f, 0.396f, 1.0f},
+                    {0.0f, 0.757f, 0.525f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_click_selection,
+                {
+                    {0.0f, 0.75f, 1.0f, 1.1f},
+                    {0.0f, 0.529f, 0.361f, 1.0f},
+                    {0.0f, 0.306f, 0.196f, 1.0f},
+                    {0.0f, 0.098f, 0.051f, 1.0f},
+                    {0.0f, 0.063f, 0.055f, 1.0f}
+                }
+            );
+            multi_gradient_data.push_back(
+                //in_gradient_fill_constant_buffer_rollover_click_selection
+                {
+                    {0.0f, 0.9f, 1.5f, 1.6f},
+                    {0.0f, 0.529f, 0.361f, 1.0f},
+                    {0.0f, 0.306f, 0.196f, 1.0f},
+                    {0.0f, 0.098f, 0.051f, 1.0f},
+                    {0.0f, 0.063f, 0.055f, 1.0f}
+                }
+            );
+
+            multi_gradient = in_dag_collection.CreateValueNone(multi_gradient_data);
+            DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(multi_gradient, "item multi gadient data"));
+            in_dag_collection.AddNodeName(multi_gradient, "item_multi_gradient");
+        }
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentMultiGradientFill(
+                multi_gradient
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_root_node,
+            item_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "item multi fill")
+        );
+
+
+        auto text = in_dag_collection.CreateCalculate<std::shared_ptr<DscText::TextRun>>(
+            [&in_text_manager, &in_file_system, in_message]
+        (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>&) {
+            const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
+            DscText::GlyphCollectionText* font = in_text_manager.LoadFont(
+                in_file_system, 
+                DscCommon::FileSystem::JoinPath("data", "font", "code2000.ttf")
+            );
+
+            std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
+            DscCommon::VectorInt2 container_size = {};
+
+            text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                in_message,
+                pLocale,
+                font,
+                20,
+                DscCommon::Math::ConvertColourToInt(111, 28, 11, 255)//,
+                //20,
+                //10
+                , 0, 0, 15
+            ));
+
+            const int32 current_width = 0;
+            output = std::make_shared<DscText::TextRun>(
+                std::move(text_run_array),
+                container_size,
+                true,
+                current_width,
+                DscText::THorizontalAlignment::TMiddle,
+                DscText::TVerticalAlignment::TMiddle
+                );
+
+        }, dynamic_cast<DscDag::IDagOwner*>(item_node_group)
+            );
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "text node"));
+
+        in_ui_manager.AddChildNode(
+            DscUi::MakeComponentTextNode(
+                text,
+                &in_text_manager
+            ).SetChildSlot(
+                //).SetClearColour(
+                //    DscCommon::VectorFloat4(0.0f, 0.0f, 1.0f, 1.0f)
+            ),
+            in_draw_system,
+            in_dag_collection,
+            in_root_node,
+            item_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "item text")
+        );
+
+    }
 }
 
 Application::Resources::Resources()
@@ -75,31 +274,71 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_resources->_dag_collection
         );
 
-        std::vector<DscUi::UiManager::TEffectConstructionHelper> array_effect = {};
-        array_effect.push_back({
-            DscUi::TUiEffectType::TEffectDropShadow,
-            DscCommon::VectorFloat4(2.0f, 8.0f, 6.0f, 0.0f),
-            DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
-            });
+        _resources->_selected_index_node = _resources->_dag_collection->CreateValueOnValueChange<int32>(0);
 
-        _resources->_ui_manager->AddChildNode(
-            DscUi::MakeComponentCelticKnot(
-                32, 
-                DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 1.0f)
+        auto stack_selector_node_group = _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentStack(
+                DscUi::TUiFlow::TVertical,
+                DscUi::UiCoord(8, 0.0f)
             ).SetClearColour(
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.1f)
+                DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
             ).SetChildSlot(
-                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(300, 0.0f), DscUi::UiCoord(600, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f))
+            ).SetHasSelectedChild(
+                0,
+                _resources->_selected_index_node
             ),
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
             _resources->_ui_root_node_group,
-            array_effect
-            DSC_DEBUG_ONLY(DSC_COMMA "child knot")
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "stack")
         );
+
+        AddListItem(
+            _resources->_selected_index_node,
+            0,
+            "zero",
+            *_resources->_ui_manager,
+            *_draw_system,
+            *_resources->_dag_collection,
+            *_file_system,
+            *_resources->_text_manager,
+            _resources->_ui_root_node_group,
+            stack_selector_node_group
+        );
+
+        AddListItem(
+            _resources->_selected_index_node,
+            1,
+            "one",
+            *_resources->_ui_manager,
+            *_draw_system,
+            *_resources->_dag_collection,
+            *_file_system,
+            *_resources->_text_manager,
+            _resources->_ui_root_node_group,
+            stack_selector_node_group
+        );
+
+        AddListItem(
+            _resources->_selected_index_node,
+            2,
+            "two",
+            *_resources->_ui_manager,
+            *_draw_system,
+            *_resources->_dag_collection,
+            *_file_system,
+            *_resources->_text_manager,
+            _resources->_ui_root_node_group,
+            stack_selector_node_group
+        );
+
+
+
     }
 
     return;

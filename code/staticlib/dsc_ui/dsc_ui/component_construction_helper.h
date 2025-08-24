@@ -134,6 +134,13 @@ namespace DscUi
 		bool _has_effect_scale = false;
 		float _effect_strength = 0.0f;
 
+		bool _has_selected_child = false;
+		int32 _selected_child_index = 0;
+		DscDag::NodeToken _selected_child_index_node = {};
+
+		bool _has_item_index = false;
+		int32 _item_index = 0;
+
 	public:
 		ComponentConstructionHelper& SetClearColour(
 			const DscCommon::VectorFloat4& in_clear_colour
@@ -249,6 +256,26 @@ namespace DscUi
 		{
 			_has_effect_scale = true;
 			_effect_strength = in_effect_strength;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetHasSelectedChild(
+			const int32 in_selected_child_index = 0,
+			DscDag::NodeToken in_selected_child_index_node = nullptr
+		)
+		{
+			_has_selected_child = true;
+			_selected_child_index = in_selected_child_index;
+			_selected_child_index_node = in_selected_child_index_node;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetHasItemIndex(
+			const int32 in_item_index = 0
+		)
+		{
+			_has_item_index = true;
+			_item_index = in_item_index;
 			return *this;
 		}
 	};
