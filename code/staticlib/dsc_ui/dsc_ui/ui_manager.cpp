@@ -1168,6 +1168,28 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
     {
         auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
         DscDag::LinkNodes(draw_node, parent_draw_base);
+
+        //addition dependence, ie, scroll change
+        DscDag::NodeToken node = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TGeometryOffset);
+        if (nullptr != node)
+        {
+            DscDag::LinkNodes(node, parent_draw_base);
+        }
+        node = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TGeometrySize);
+        if (nullptr != node)
+        {
+            DscDag::LinkNodes(node, parent_draw_base);
+        }
+        node = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TScrollPos);
+        if (nullptr != node)
+        {
+            DscDag::LinkNodes(node, parent_draw_base);
+        }
+        node = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiPanelTint);
+        if (nullptr != node)
+        {
+            DscDag::LinkNodes(node, parent_draw_base);
+        }
     }
 
     return result;
@@ -1204,6 +1226,28 @@ void DscUi::UiManager::RemoveDestroyChild(
         auto draw_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_child_to_destroy, TUiNodeGroup::TDrawNode);
         auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
         DscDag::UnlinkNodes(draw_node, parent_draw_base);
+
+        //addition dependence, ie, scroll change
+        DscDag::NodeToken node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_child_to_destroy, TUiNodeGroup::TGeometryOffset);
+        if (nullptr != node)
+        {
+            DscDag::UnlinkNodes(node, parent_draw_base);
+        }
+        node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_child_to_destroy, TUiNodeGroup::TGeometrySize);
+        if (nullptr != node)
+        {
+            DscDag::UnlinkNodes(node, parent_draw_base);
+        }
+        node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_child_to_destroy, TUiNodeGroup::TScrollPos);
+        if (nullptr != node)
+        {
+            DscDag::UnlinkNodes(node, parent_draw_base);
+        }
+        node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_child_to_destroy, TUiNodeGroup::TUiPanelTint);
+        if (nullptr != node)
+        {
+            DscDag::UnlinkNodes(node, parent_draw_base);
+        }
     }
 
     TraverseHierarchyUnlink(in_child_to_destroy);
@@ -2175,6 +2219,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
             const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[2]);
 
+            DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "UiPanelDraw viewport x:%d y:%d\n", ui_render_target->GetViewportSize().GetX(), ui_render_target->GetViewportSize().GetY() );
+
             if (true == ui_render_target->ActivateRenderTarget(*frame))
             {
                 auto shader = weak_shader.lock();
@@ -2248,6 +2294,10 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DSC_ASSERT(nullptr != in_child_array_node_or_null, "invalid state");
         DscDag::LinkIndexNodes(2, in_child_array_node_or_null, result_node);
+
+        // so, if a child's scroll value changes, we need to know to mark ourself dirty (or TUiPanelTint, TGeometryOffset, TGeometrySize ...)
+        // easiest way i can think of is to just set the entire child array as a draw input, but we do actually have that as input, in_child_array_node_or_null
+        // and the NodeGroup was set to not progergate member changes...
     }
     break;
     case TUiDrawType::TText:

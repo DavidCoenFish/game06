@@ -973,6 +973,8 @@ DscDag::NodeToken DscUi::MakeNode::MakeNodeScrollValue(
             const float x = DscDag::GetValueType<float>(in_input_array[0]);
             const float y = DscDag::GetValueType<float>(in_input_array[1]);
 
+            DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "scroll x:%f y:%f\n", x, y);
+
             value.Set(x, y);
         },
         in_owner);

@@ -298,46 +298,21 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "stack")
         );
 
-        AddListItem(
-            _resources->_selected_index_node,
-            0,
-            "zero",
-            *_resources->_ui_manager,
-            *_draw_system,
-            *_resources->_dag_collection,
-            *_file_system,
-            *_resources->_text_manager,
-            _resources->_ui_root_node_group,
-            stack_selector_node_group
-        );
-
-        AddListItem(
-            _resources->_selected_index_node,
-            1,
-            "one",
-            *_resources->_ui_manager,
-            *_draw_system,
-            *_resources->_dag_collection,
-            *_file_system,
-            *_resources->_text_manager,
-            _resources->_ui_root_node_group,
-            stack_selector_node_group
-        );
-
-        AddListItem(
-            _resources->_selected_index_node,
-            2,
-            "two",
-            *_resources->_ui_manager,
-            *_draw_system,
-            *_resources->_dag_collection,
-            *_file_system,
-            *_resources->_text_manager,
-            _resources->_ui_root_node_group,
-            stack_selector_node_group
-        );
-
-
+        for (int32 index = 0; index < 20; ++index)
+        {
+            AddListItem(
+                _resources->_selected_index_node,
+                index,
+                std::to_string(index),
+                *_resources->_ui_manager,
+                *_draw_system,
+                *_resources->_dag_collection,
+                *_file_system,
+                *_resources->_text_manager,
+                _resources->_ui_root_node_group,
+                stack_selector_node_group
+            );
+        }
 
     }
 
@@ -374,6 +349,9 @@ const bool Application::Update()
         {
             time_delta = _resources->_timer->GetDeltaSeconds();
         }
+
+        DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "Update time_delta:%f\n", time_delta);
+
 
         DscUi::UiInputParam input_param = {};
         {
