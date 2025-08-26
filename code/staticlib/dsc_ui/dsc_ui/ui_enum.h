@@ -23,6 +23,13 @@ namespace DscUi
 		TCount
 	};
 
+	enum class TUiScrollHorizontal : uint8
+	{
+		TNone = 0,
+		THorizontal = 1 << 0,
+		TVertical = 2 << 0
+	};
+
 	/// will these need to be flags, allow "shift control right click"? start with simple
 	enum class TUiTouchFlavour : uint8
 	{
@@ -107,6 +114,7 @@ namespace DscUi
 		TCelticKnotFill,
 		TImage,
 		TText,
+		TScrollBar,
 		TEffectDropShadow,
 		TEffectInnerShadow,
 		TEffectCorner,

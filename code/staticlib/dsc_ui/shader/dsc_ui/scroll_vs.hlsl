@@ -1,4 +1,4 @@
-#include "ui_panel_interpolant.hlsli"
+#include "scroll_interpolant.hlsli"
 
 struct Vertex
 {

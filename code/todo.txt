@@ -6,26 +6,8 @@
 	Character Screen
 	Combat Screen
 
-- ?partial upload
-
-
-say we have a data source, a struct of {template name, node group} type of node group is dependent on selected template?
-how to manage add/replace/removal of ui elements via values in the data source?
-DataSourceWrapper{ string _template_name; unique<IDagNodeGroup> _data_source; } // don't get to change template name? or do you
-  or
-UiDagNodeGroup::TDataSource<...> { TTemplateName, .... }
-
-want to use a DataSource to create something that wraps the UiManager and UiRoot and external changes to data source can modify the ui heirearchy
-UiCollection? UiHeirarchy? UiDocument? UiScreen? UiInstance?
-UiInstance(UiDagNodeGroup::TDataSource, UiManager, DrawSystem, DagCollection, <external render target to draw result ui to>)
-	makes a DagNode chain that on update, builds the related ui heirarchy?
-	owns a DagCollection?
-	how to add a gradient multi array node to the UiInstace DagCollection? what about adding UiNode construction templates
-::Update(time delta, input, new viewport size) -> rebuilds hierarchy, then applies viewport size and then input?
-::Draw() -> do we also rebuild the hierarchy here?
-static AddTemplate(string, function), or have a UiInstanceManager own the UiManager, DagCollection, map of strings to templates
-UiInstanceFactory? owns a UiManager? or given reference
-
+- ?partial upload texture for text
+- remove usage of rapidjson? replace with nlohmann
 
 what is our target project, jank, 2d anime shirow anime draw, subuccus life, legendary quest sandbox, amobeba rts? 
 //legendary quest sandbox?
@@ -37,8 +19,3 @@ what is our target project, jank, 2d anime shirow anime draw, subuccus life, leg
 		- map
 	- combat
 	- local network play/ coop. one person hosts as dm? or let computer be dm?
-
-
-slightly rounded main menu buttons in middle, middle stack, dull text, buttons with drop shadows
-on roll over, burn out the text to black from mouse pos, fade back if cursor leaves. on keyboard selection, a default rollover pos in the middle?
-//full screen texture detecting full red pixels to simulate fire effect? (red -> fire then smoke, blue -> ice then mist, green to poision then rain)
