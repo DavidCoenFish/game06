@@ -23,7 +23,7 @@ namespace DscUi
 		TCount
 	};
 
-	enum class TUiScrollHorizontal : uint8
+	enum class TUiScrollbarAxis : uint8
 	{
 		TNone = 0,
 		THorizontal = 1 << 0,
@@ -90,16 +90,18 @@ namespace DscUi
 
 	enum class TUiComponentType : uint8
 	{
+		TCanvas,
+		TCelticKnotFill,
+		TCrossFade, // one child is set to be active and fade in, another array of children to fade out. up to child if it removes tself on crossfade == 0?
 		TDebugGrid,
 		TFill,
 		TGradientFill,
-		TCelticKnotFill,
 		TImage,
-		TCanvas,
-		TText,
-		TTextNode, // alternative data path for TText, but from a DagNode returning a shared_ptr<TextRun>
+		TScrollBar,
 		TStack,
-		TCrossFade, // one child is set to be active and fade in, another array of children to fade out. up to child if it removes tself on crossfade == 0?
+		TText,
+		// Todo, merge TTextNode into TText
+		TTextNode, // alternative data path for TText, but from a DagNode returning a shared_ptr<TextRun>
 
 		// there is no button component, components are for layout and draw style
 		//TButton, // has input, filter draw of children for input flag if they have a for_input_flag node
@@ -219,6 +221,12 @@ namespace DscUi
 		std::shared_ptr<DscText::TextRun> _text_run = {};
 		DscText::TextManager* _text_manager = nullptr;
 	};
+	struct TUiComponentScrollbarData
+	{
+		TUiScrollbarAxis _scrollbar_axis_flag = TUiScrollbarAxis::TNone;
+		UiCoord _scrollbar_knot_min_dimention_x = {};
+		UiCoord _scrollbar_knot_min_dimention_y = {};
+	};
 
 	//this is ment as the data store for a UiComponent, but we replaced the UiComponent with a dag node/ node group...
 	enum class TUiComponentResourceNodeGroup : uint8
@@ -247,6 +255,12 @@ namespace DscUi
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
+
+		TScrollbarData, // axis flag, min knot size, step
+		TScrollbarDataSourceX,
+		TScrollbarRangeDataSourceX,
+		TScrollbarDataSourceY,
+		TScrollbarRangeDataSourceY,
 
 		// child slots of presumably a canvas parent, but there may be things other than a canvas that can hold child slots?
 		TChildSlotSize,
@@ -301,7 +315,8 @@ namespace DscUi
 	struct TUiComponentInputData
 	{
 		std::function<void(DscDag::NodeToken)> _click_callback = {};
-		//std::function<void(const VectorFloat4&, const VectorFloat2&)> _drag_callback = {};
+		// node relative click start, node relative click current. use node token to get current node size via screen coords?
+		std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2&)> _drag_callback = {};
 		//DscCommon::VectorInt2 _screen_touch_pos_click_start = {};
 		//DscCommon::VectorFloat4 _node_screen_space_click_start = {};
 
