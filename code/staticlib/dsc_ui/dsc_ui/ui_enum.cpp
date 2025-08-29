@@ -294,22 +294,22 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TScrollBarWriteX:
 	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TScrollBarRangeReadX:
 	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TScrollBarWriteY:
 	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TScrollBarRangeReadY:
 	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TChildSlotSize:

@@ -298,6 +298,53 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DSC_DEBUG_ONLY(DSC_COMMA "stack")
         );
 
+		DscDag::NodeToken scrollbar_write_y = nullptr;
+		DscDag::NodeToken scrollbar_range_read_y = _resources->_dag_collection->CreateCalculate<DscCommon::VectorFloat4>([]
+    (DscCommon::VectorFloat4& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        const DscCommon::VectorInt2& geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+        const DscCommon::VectorInt2& geometry_offset = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+        const DscCommon::VectorInt2& render_request_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[2]);
+
+		output.Set(
+			static_cast<float>(geometry_offset.GetY()),
+			static_cast<float>(geometry_offset.GetY() + geometry_size.GetY()),
+			static_cast<float>(render_request_size.GetY()),
+			0.0f
+			);
+
+    }, dynamic_cast<DscDag::IDagOwner*>(stack_selector_node_group)
+        );
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(scrollbar_range_read_y, "node to scroll data convertor"));
+
+    DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(stack_selector_node_group, DscUi::TUiNodeGroup::TGeometrySize), scrollbar_range_read_y);
+    DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(stack_selector_node_group, DscUi::TUiNodeGroup::TGeometryOffset), scrollbar_range_read_y);
+    DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(stack_selector_node_group, DscUi::TUiNodeGroup::TRenderRequestSize), scrollbar_range_read_y);
+
+		// scroll bar
+        _resources->_ui_manager->AddChildNode(
+            DscUi::MakeComponentScrollbarY(
+				DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f),
+                DscUi::UiCoord(8, 0.0f),
+				scrollbar_write_y,
+				scrollbar_range_read_y
+			).SetClearColour(
+                DscCommon::VectorFloat4(0.0f, 1.0f, 0.0f, 1.0f)
+            ).SetChildSlot(
+                DscUi::VectorUiCoord2(DscUi::UiCoord(8, 0.0f), DscUi::UiCoord(0, 1.0f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
+                DscUi::VectorUiCoord2(DscUi::UiCoord(154, 0.5f), DscUi::UiCoord(0, 0.5f))
+            ).SetHasSelectedChild(
+                0,
+                _resources->_selected_index_node
+            ),
+            *_draw_system,
+            *_resources->_dag_collection,
+            _resources->_ui_root_node_group,
+            _resources->_ui_root_node_group,
+            std::vector<DscUi::UiManager::TEffectConstructionHelper>()
+            DSC_DEBUG_ONLY(DSC_COMMA "stack")
+        );
+
         for (int32 index = 0; index < 20; ++index)
         {
             AddListItem(

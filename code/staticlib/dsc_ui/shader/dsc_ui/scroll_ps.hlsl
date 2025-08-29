@@ -1,6 +1,6 @@
 #include "scroll_interpolant.hlsli"
 
-cbuffer ConstantBuffer1 : register(b1)
+cbuffer ConstantBuffer1 : register(b0)
 {
 	// colour of the knot
     float4 _tint;
