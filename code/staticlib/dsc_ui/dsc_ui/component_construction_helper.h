@@ -67,18 +67,17 @@ namespace DscUi
 		bool _has_manual_scroll_y = false;
 
 		TUiScrollbarAxis _scrollbar_axis_flag = TUiScrollbarAxis::TNone;
-		// does the scrollbar listen to input and write result to the _scrollbar_data_source_x, _scrollbar_data_source_y if not null
-		bool _scrollbar_interactive = false;
+		DscCommon::VectorFloat4 _scrollbar_knot_tint = DscCommon::VectorFloat4::s_zero;
 		// min thickness in the y direction for the x axis scrollbar
 		UiCoord _scrollbar_knot_min_dimention_x = {};
-		DscDag::NodeToken _scrollbar_data_source_x = nullptr;
+		DscDag::NodeToken _scrollbar_write_x = nullptr;
 		// knot low, knot high, total range
-		DscDag::NodeToken _scrollbar_data_source_range_x = nullptr;
+		DscDag::NodeToken _scrollbar_range_read_x = nullptr;
 		// min thickness in the x direction for the Y axis scrollbar
 		UiCoord _scrollbar_knot_min_dimention_y = {};
-		DscDag::NodeToken _scrollbar_data_source_y = nullptr;
+		DscDag::NodeToken _scrollbar_write_y = nullptr;
 		// knot low, knot high, total range
-		DscDag::NodeToken _scrollbar_data_source_range_y = nullptr;
+		DscDag::NodeToken _scrollbar_range_read_y = nullptr;
 
 		bool _has_fill = false;
 		DscCommon::VectorFloat4 _fill;
@@ -341,16 +340,19 @@ namespace DscUi
 	);
 
 	ComponentConstructionHelper MakeComponentScrollbarX(
-		const bool in_scrollbar_interactive = false,
+		//const bool in_scrollbar_interactive = false,
+		const DscCommon::VectorFloat4& in_scrollbar_knot_tint = DscCommon::VectorFloat4::s_zero,
 		const UiCoord& in_scrollbar_knot_min_dimention_x = UiCoord(),
-		const DscDag::NodeToken in_scrollbar_data_source_x = nullptr,
-		const DscDag::NodeToken in_scrollbar_data_source_range_x = nullptr
+		const DscDag::NodeToken in_scrollbar_write_x = nullptr,
+		const DscDag::NodeToken in_scrollbar_range_read_x = nullptr
 		);
+
 	ComponentConstructionHelper MakeComponentScrollbarY(
-		const bool in_scrollbar_interactive = false,
+		//const bool in_scrollbar_interactive = false,
+		const DscCommon::VectorFloat4& in_scrollbar_knot_tint = DscCommon::VectorFloat4::s_zero,
 		const UiCoord& in_scrollbar_knot_min_dimention_y = UiCoord(),
-		const DscDag::NodeToken in_scrollbar_data_source_y = nullptr,
-		const DscDag::NodeToken in_scrollbar_data_source_range_y = nullptr
+		const DscDag::NodeToken in_scrollbar_write_y = nullptr,
+		const DscDag::NodeToken in_scrollbar_range_read_y = nullptr
 		);
 	// a MakeScrollbarXY? don't write code unless there is a use case
 

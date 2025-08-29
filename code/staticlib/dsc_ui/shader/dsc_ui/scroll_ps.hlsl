@@ -2,8 +2,11 @@
 
 cbuffer ConstantBuffer1 : register(b1)
 {
+	// colour of the knot
     float4 _tint;
+	// render viewport size 
     float4 _pixel_width_height;
+	// bounds of knot in pixels
     float4 _pixel_low_x_y_high_x_y;
 };
 

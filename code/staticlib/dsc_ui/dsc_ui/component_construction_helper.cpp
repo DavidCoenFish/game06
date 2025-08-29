@@ -718,25 +718,48 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
 
 	if (TUiComponentType::TScrollBar == in_construction_helper._component_type)
 	{
+        DscDag::NodeToken data_node = in_dag_collection.CreateValueNone<DscUi::TUiComponentScrollbarData>(
+			{
+				in_construction_helper._scrollbar_axis_flag,
+				in_construction_helper._scrollbar_knot_min_dimention_x,
+				in_construction_helper._scrollbar_knot_min_dimention_y
+			},
+            owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(data_node, "scroll data node"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
-            DscUi::TUiComponentResourceNodeGroup::TScrollbarDataSourceX,
-            in_construction_helper._scrollbar_data_source_x
+            DscUi::TUiComponentResourceNodeGroup::TScrollBarData,
+            data_node
+        );
+
+        DscDag::NodeToken tint_node = in_dag_collection.CreateValueOnValueChange(
+				in_construction_helper._scrollbar_knot_tint, owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(tint_node, "scroll tint node"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TScrollBarKnotTint,
+            tint_node
+        );
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(
+            component_resource_group,
+            DscUi::TUiComponentResourceNodeGroup::TScrollBarWriteX,
+            in_construction_helper._scrollbar_write_x
         );
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
-            DscUi::TUiComponentResourceNodeGroup::TScrollbarDataSourceY,
-            in_construction_helper._scrollbar_data_source_y
+            DscUi::TUiComponentResourceNodeGroup::TScrollBarWriteY,
+            in_construction_helper._scrollbar_write_y
         );
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
-            DscUi::TUiComponentResourceNodeGroup::TScrollbarRangeDataSourceX,
-            in_construction_helper._scrollbar_data_source_range_x
+            DscUi::TUiComponentResourceNodeGroup::TScrollBarRangeReadX,
+            in_construction_helper._scrollbar_range_read_x
         );
         DscDag::DagNodeGroup::SetNodeTokenEnum(
             component_resource_group,
-            DscUi::TUiComponentResourceNodeGroup::TScrollbarRangeDataSourceY,
-            in_construction_helper._scrollbar_data_source_range_y
+            DscUi::TUiComponentResourceNodeGroup::TScrollBarRangeReadY,
+            in_construction_helper._scrollbar_range_read_y
         );
 	}
 
@@ -852,34 +875,38 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentCelticKnot(
 }
 
 DscUi::ComponentConstructionHelper DscUi::MakeComponentScrollbarX(
-	const bool in_scrollbar_interactive,
+	//const bool in_scrollbar_interactive,
+	const DscCommon::VectorFloat4& in_scrollbar_knot_tint,
 	const UiCoord& in_scrollbar_knot_min_dimention_x,
-	const DscDag::NodeToken in_scrollbar_data_source_x,
-	const DscDag::NodeToken in_scrollbar_data_source_range_x
+	const DscDag::NodeToken in_scrollbar_write_x,
+	const DscDag::NodeToken in_scrollbar_range_read_x
 	)
 {
     ComponentConstructionHelper result({ TUiComponentType::TScrollBar });
 	result._scrollbar_axis_flag = TUiScrollbarAxis::THorizontal;
-	result._scrollbar_interactive = in_scrollbar_interactive;
+	//result._scrollbar_interactive = in_scrollbar_interactive;
+	result._scrollbar_knot_tint = in_scrollbar_knot_tint;
 	result._scrollbar_knot_min_dimention_x = in_scrollbar_knot_min_dimention_x;
-	result._scrollbar_data_source_x = in_scrollbar_data_source_x;
-	result._scrollbar_data_source_range_x = in_scrollbar_data_source_range_x;
+	result._scrollbar_write_x = in_scrollbar_write_x;
+	result._scrollbar_range_read_x = in_scrollbar_range_read_x;
 	return result;
 }
 
 DscUi::ComponentConstructionHelper DscUi::MakeComponentScrollbarY(
-	const bool in_scrollbar_interactive,
+	//const bool in_scrollbar_interactive,
+	const DscCommon::VectorFloat4& in_scrollbar_knot_tint,
 	const UiCoord& in_scrollbar_knot_min_dimention_y,
-	const DscDag::NodeToken in_scrollbar_data_source_y,
-	const DscDag::NodeToken in_scrollbar_data_source_range_y
+	const DscDag::NodeToken in_scrollbar_write_y,
+	const DscDag::NodeToken in_scrollbar_range_read_y
 	)
 {
     ComponentConstructionHelper result({ TUiComponentType::TScrollBar });
 	result._scrollbar_axis_flag = TUiScrollbarAxis::TVertical;
-	result._scrollbar_interactive = in_scrollbar_interactive;
+	//result._scrollbar_interactive = in_scrollbar_interactive;
+	result._scrollbar_knot_tint = in_scrollbar_knot_tint;
 	result._scrollbar_knot_min_dimention_y = in_scrollbar_knot_min_dimention_y;
-	result._scrollbar_data_source_y = in_scrollbar_data_source_y;
-	result._scrollbar_data_source_range_y = in_scrollbar_data_source_range_y;
+	result._scrollbar_write_y = in_scrollbar_write_y;
+	result._scrollbar_range_read_y = in_scrollbar_range_read_y;
 	return result;
 }
 

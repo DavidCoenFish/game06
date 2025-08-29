@@ -65,6 +65,7 @@ namespace DscUi
 		// direction scale not implement, so currently hardcoded to be equivalent to [0, 1, 0, 1]
 		//float direction_scale[4]; // vx, vy, d1, d2 -> focus_needle = (dot(uv, [vx, vy]) - d1) / (d2 - d1)
 	};
+
 } // DscUi
 
 const bool operator==(const DscUi::TGradientFillConstantBuffer& in_lhs, const DscUi::TGradientFillConstantBuffer& in_rhs);
@@ -88,6 +89,16 @@ namespace DscUi
 	struct TUiPanelShaderConstantBufferPS
 	{
 		float _tint_colour[4];
+	};
+
+	struct TScrollBarConstantBuffer
+	{
+		// colour of the knot
+		float _tint[4];
+		// render viewport size 
+		float _pixel_width_height[4];
+		// bounds of knot in pixels
+		float _pixel_low_x_y_high_x_y[4];
 	};
 
 }

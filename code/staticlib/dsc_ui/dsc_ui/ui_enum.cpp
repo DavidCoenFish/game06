@@ -6,6 +6,17 @@
 #include <dsc_render_resource/shader_resource.h>
 #include <dsc_render_resource/shader_constant_buffer.h>
 
+const DscUi::TUiScrollbarAxis operator& (const DscUi::TUiScrollbarAxis in_lhs, const DscUi::TUiScrollbarAxis in_rhs)
+{
+	const int32 temp = static_cast<int32>(in_lhs) & static_cast<int32>(in_rhs);
+	return static_cast<DscUi::TUiScrollbarAxis>(temp);
+}
+
+const bool operator!= (const int32 in_lhs, const DscUi::TUiScrollbarAxis in_rhs)
+{
+	return in_lhs != static_cast<int32>(in_rhs);
+}
+
 const DscUi::TUiInputStateFlag operator &= (DscUi::TUiInputStateFlag& in_out_lhs, const DscUi::TUiInputStateFlag in_rhs)
 {
 	const int32 temp = static_cast<int32>(in_out_lhs) & static_cast<int32>(in_rhs);
@@ -166,11 +177,11 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 	default:
 		DSC_ASSERT_ALWAYS("invalid switch");
 		break;
-	case DscUi::TUiRootNodeGroup::TUiPanelShaderConstantBuffer:
-	{
-		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
-		return s_meta_data;
-	}
+	//case DscUi::TUiRootNodeGroup::TUiPanelShaderConstantBuffer:
+	//{
+	//	static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::shared_ptr<DscRenderResource::ShaderConstantBuffer>) };
+	//	return s_meta_data;
+	//}
 	case DscUi::TUiRootNodeGroup::TRenderTargetViewportSize:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscCommon::VectorInt2) };
@@ -268,6 +279,37 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 	case DscUi::TUiComponentResourceNodeGroup::TManualScrollY:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(float) };
+		return s_meta_data;
+	}
+
+	case DscUi::TUiComponentResourceNodeGroup::TScrollBarKnotTint:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TScrollBarData:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscUi::TUiComponentScrollbarData) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TScrollBarWriteX:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TScrollBarRangeReadX:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TScrollBarWriteY:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
+		return s_meta_data;
+	}
+	case DscUi::TUiComponentResourceNodeGroup::TScrollBarRangeReadY:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscDag::NodeToken) };
 		return s_meta_data;
 	}
 	case DscUi::TUiComponentResourceNodeGroup::TChildSlotSize:

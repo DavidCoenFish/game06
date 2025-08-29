@@ -227,6 +227,7 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::Shader> _image_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _fill_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _gradient_fill_shader = {};
+		std::shared_ptr<DscRenderResource::Shader> _scroll_bar_shader = {};
 
 		std::shared_ptr<DscRenderResource::Shader> _effect_round_corner_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _effect_drop_shadow_shader = {};

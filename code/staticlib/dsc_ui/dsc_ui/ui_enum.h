@@ -1,5 +1,6 @@
 #pragma once
 #include "dsc_ui.h"
+#include "ui_coord.h"
 #include <dsc_dag/dag_node_group.h>
 
 namespace DscDag
@@ -29,6 +30,12 @@ namespace DscUi
 		THorizontal = 1 << 0,
 		TVertical = 2 << 0
 	};
+}
+const DscUi::TUiScrollbarAxis operator& (const DscUi::TUiScrollbarAxis in_lhs, const DscUi::TUiScrollbarAxis in_rhs);
+const bool operator!= (const int32 in_lhs, const DscUi::TUiScrollbarAxis in_rhs);
+
+namespace DscUi
+{
 
 	/// will these need to be flags, allow "shift control right click"? start with simple
 	enum class TUiTouchFlavour : uint8
@@ -194,7 +201,7 @@ namespace DscUi
 	{
 		//TForceDraw = static_cast<uint8>(TUiNodeGroup::TCount), // the draw method sets this if at least the top level render needs to run, useful if something else is writing to the render target
 		TRenderTargetViewportSize = static_cast<uint8>(TUiNodeGroup::TCount),
-		TUiPanelShaderConstantBuffer,
+		//TUiPanelShaderConstantBuffer,
 		TUiScale,
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
@@ -224,8 +231,8 @@ namespace DscUi
 	struct TUiComponentScrollbarData
 	{
 		TUiScrollbarAxis _scrollbar_axis_flag = TUiScrollbarAxis::TNone;
-		UiCoord _scrollbar_knot_min_dimention_x = {};
-		UiCoord _scrollbar_knot_min_dimention_y = {};
+		UiCoord _scrollbar_knot_min_dimention_x = UiCoord();
+		UiCoord _scrollbar_knot_min_dimention_y = UiCoord();
 	};
 
 	//this is ment as the data store for a UiComponent, but we replaced the UiComponent with a dag node/ node group...
@@ -256,11 +263,13 @@ namespace DscUi
 		THasManualScrollY,
 		TManualScrollY,
 
-		TScrollbarData, // axis flag, min knot size, step
-		TScrollbarDataSourceX,
-		TScrollbarRangeDataSourceX,
-		TScrollbarDataSourceY,
-		TScrollbarRangeDataSourceY,
+		//TScrollBarShaderConstantBuffer, // this could just be an input node to the draw calculate node
+		TScrollBarKnotTint,
+		TScrollBarData, // axis flag, min knot size, step
+		TScrollBarWriteX,
+		TScrollBarRangeReadX,
+		TScrollBarWriteY,
+		TScrollBarRangeReadY,
 
 		// child slots of presumably a canvas parent, but there may be things other than a canvas that can hold child slots?
 		TChildSlotSize,
