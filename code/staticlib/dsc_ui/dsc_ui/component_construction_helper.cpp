@@ -35,7 +35,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
 
     if (true == in_construction_helper._has_scroll)
     {
-        DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "has_scroll: true\n");
+        //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "has_scroll: true\n");
 
         auto has_manual_scroll_x = in_dag_collection.CreateValueOnValueChange(
             in_construction_helper._has_manual_scroll_x,

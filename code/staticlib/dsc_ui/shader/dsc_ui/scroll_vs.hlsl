@@ -17,7 +17,7 @@ Interpolant main(Vertex in_input)
         );
     result._uv = float2(
         (in_input._position.x + 1.0) * 0.5,
-        (in_input._position.y + 1.0) * 0.5
+        1.0 - ((in_input._position.y + 1.0) * 0.5)
         );
     return result;
 }

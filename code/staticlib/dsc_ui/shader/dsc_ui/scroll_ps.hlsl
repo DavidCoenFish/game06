@@ -22,7 +22,7 @@ float CalculateCoverageLow(float in_pixel_floor, float in_scroll_floor, float in
     {
         coverage = 1.0 - in_scroll_frac;
     }
-    else if (in_pixel_floor < in_scroll_floor)
+    else if (in_scroll_floor < in_pixel_floor)
     {
         coverage = 1.0;
     }
@@ -65,6 +65,8 @@ Pixel main(Interpolant in_input)
     result._colour = _tint * coverage;
     //result._colour = float4(1.0, 0.0, 0.0, 1.0);
     //result._colour = _tint;
+	//result._colour.x = in_input._uv.x;
+	//result._colour.y = in_input._uv.y;
 
     return result;
 }

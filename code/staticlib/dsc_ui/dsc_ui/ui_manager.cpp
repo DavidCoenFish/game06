@@ -2264,7 +2264,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
             const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[2]);
 
-            DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "UiPanelDraw viewport x:%d y:%d\n", ui_render_target->GetViewportSize().GetX(), ui_render_target->GetViewportSize().GetY() );
+            //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "UiPanelDraw viewport x:%d y:%d\n", ui_render_target->GetViewportSize().GetX(), ui_render_target->GetViewportSize().GetY() );
 
             if (true == ui_render_target->ActivateRenderTarget(*frame))
             {

@@ -68,3 +68,12 @@ const bool DscCommon::Math::InsideBounds(const float in_x, const float in_y, con
 		(in_x < in_bounds[2]) &&
 		(in_y < in_bounds[3]));
 }
+
+// 3x^2 - 2x^3
+const float DscCommon::Math::EaseInEaseOut(const float in_x)
+{
+	const float x2 = in_x * in_x;
+	const float result = (3.0f * x2) - (2.0f * x2 * in_x);
+	return result;
+}
+

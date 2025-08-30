@@ -38,5 +38,7 @@ namespace Math
 	/// since the function name is Inside, then only reurn true if x is bigger than low and smaller than high bounds
 	const bool InsideBounds(const float in_x, const float in_y, const VectorFloat4& in_bounds);
 
+	// 3x^2 - 2x^3
+	const float EaseInEaseOut(const float in_x);
 }
 }
