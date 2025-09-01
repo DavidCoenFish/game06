@@ -16,6 +16,21 @@ const uint32 DscCommon::Math::Ceiling(const uint32 in_value, const uint32 in_ali
 	return in_value + (in_alignment - pad);
 }
 
+const float DscCommon::Math::Clamp(const float in_value, const float in_low, const float in_high)
+{
+	// this order of operations is to convert (nan)in_value into in_low
+	if ((in_low < in_value) && (in_value < in_high))
+	{
+		return in_value;
+	}
+	if (in_high < in_value)
+	{
+		return in_high;
+	}
+
+	return in_low;
+}
+
 // top left pixel [[0,0] ... [screen width,height]] => render bottom left [[-1.0,-1.0] ... [1.0, 1.0]]
 const float DscCommon::Math::UIPixelsToRenderSpaceHorizontal(const int32 in_pixel, const int32 in_screen_width)
 {

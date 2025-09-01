@@ -25,9 +25,11 @@ namespace DscUi
 		{
 			int32 _id = 0;
 			DscDag::NodeToken _node_under_click_start = nullptr;
+			DscCommon::VectorFloat2 _node_relative_click_start = {};
 			bool _click_start = false;
 			bool _click_end = false;
 			bool _lask_known_touch_active = false;
+
 		};
 
 		UiInputState();

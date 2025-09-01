@@ -323,11 +323,10 @@ namespace DscUi
 {
 	struct TUiComponentInputData
 	{
-		std::function<void(DscDag::NodeToken)> _click_callback = {};
+		// clicked node, node relative click pos
+		std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&)> _click_callback = {};
 		// node relative click start, node relative click current. use node token to get current node size via screen coords?
 		std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2&)> _drag_callback = {};
-		//DscCommon::VectorInt2 _screen_touch_pos_click_start = {};
-		//DscCommon::VectorFloat4 _node_screen_space_click_start = {};
 
 		// use a different node for TUiInputStateFlag
 		//bool _rollover = false;

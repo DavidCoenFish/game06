@@ -134,7 +134,9 @@ namespace DscUi
 		bool _desired_size_from_children_max = false; // otherwise from text? or matches avaliable
 
 		bool _has_input = false;
-		std::function<void(DscDag::NodeToken)> _input_click_callback = {};
+		std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&)> _input_click_callback = {};
+		std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2&)> _input_drag_callback = {};
+
 		bool _has_input_rollover_accumulate = false;
 		bool _has_input_active_touch_pos = false;
 		bool _has_input_flow = false;
@@ -225,13 +227,15 @@ namespace DscUi
 		}
 
 		ComponentConstructionHelper& SetInputData(
-			const std::function<void(DscDag::NodeToken)>& in_click_callback_or_none = {},
+			const std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&)>& in_input_click_callback = {},
+			const std::function<void(DscDag::NodeToken, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2&)>& in_input_drag_callback = {},
 			const bool in_has_input_rollover_accumulate = false,
 			const bool in_has_input_active_touch_pos = false
 		)
 		{
 			_has_input = true;
-			_input_click_callback = in_click_callback_or_none;
+			_input_click_callback = in_input_click_callback;
+			_input_drag_callback = in_input_drag_callback;
 			_has_input_rollover_accumulate = in_has_input_rollover_accumulate;
 			_has_input_active_touch_pos = in_has_input_active_touch_pos;
 			return *this;

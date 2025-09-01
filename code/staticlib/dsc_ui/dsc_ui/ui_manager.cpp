@@ -234,7 +234,13 @@ namespace
         DscDag::NodeToken input_state_flag = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputStateFlag);
         if (nullptr != input_state_flag)
         {
+			const DscCommon::VectorFloat2 node_relative_touch_pos(
+				x - screen_space._screen_space.GetX(),
+				y - screen_space._screen_space.GetY()
+			);
+
             k_rollover = inside;
+            bool dragged = false;
             bool clicked = false;
             DscUi::TUiInputStateFlag flag = inside ? DscUi::TUiInputStateFlag::TRollover : DscUi::TUiInputStateFlag::TNone;
             if ((false == in_out_consumed) && (true == inside))
@@ -245,11 +251,12 @@ namespace
                     if (in_touch_data._click_start)
                     {
                         //flag |= DscUi::TUiInputStateFlag::TClickStart;
-                       in_touch_data._node_under_click_start = input_state_flag;
+                       in_touch_data._node_under_click_start = in_ui_node_group;
+					   in_touch_data._node_relative_click_start = node_relative_touch_pos;
                     }
                 }
                 else if ((true == in_touch_data._click_end) &&
-                    (input_state_flag == in_touch_data._node_under_click_start))
+                    (in_ui_node_group == in_touch_data._node_under_click_start))
                 {
                     in_out_consumed = true;
                     // we have a click
@@ -259,11 +266,12 @@ namespace
             }
 
             // slightly pull this out of the above condition, saves doing it top level of callstack
-            if (input_state_flag == in_touch_data._node_under_click_start)
+            if (in_ui_node_group == in_touch_data._node_under_click_start)
             {
                 if (in_touch._active)
                 {
                     flag |= DscUi::TUiInputStateFlag::TClick;
+					dragged = true;
                 }
                 else
                 {
@@ -292,29 +300,37 @@ namespace
 
             DscDag::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
 
-            if (true == clicked)
-            {
-                DscDag::NodeToken input_data_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputData);
-                if (nullptr != input_data_node)
-                {
-                    const DscUi::TUiComponentInputData& input_data = DscDag::GetValueType<DscUi::TUiComponentInputData>(input_data_node);
-                    if (nullptr != input_data._click_callback)
-                    {
-                        input_data._click_callback(in_ui_node_group);
-                    }
-                }
-            }
+			if ((true == clicked) || (true == dragged))
+			{
+				DscDag::NodeToken input_data_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputData);
+				if (nullptr != input_data_node)
+				{
+					const DscUi::TUiComponentInputData& input_data = DscDag::GetValueType<DscUi::TUiComponentInputData>(input_data_node);
+					if (true == clicked)
+					{
+						if (nullptr != input_data._click_callback)
+						{
+							input_data._click_callback(in_ui_node_group, node_relative_touch_pos);
+						}
+					}
+					else if (true == dragged)
+					{
+						if (nullptr != input_data._drag_callback)
+						{
+							input_data._drag_callback(
+								in_ui_node_group, 
+								in_touch_data._node_relative_click_start,
+								node_relative_touch_pos
+								);
+						}
+					}
+				}
+			}
 
             DscDag::NodeToken active_touch_pos = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos);
             if (nullptr != active_touch_pos)
             {
-                //screen_space, origin top left?
-                //in_touch_data origin, top left
-                const DscCommon::VectorFloat2 relative_mouse_pos(
-                    x - screen_space._screen_space[0],
-                    y - screen_space._screen_space[1]
-                    );
-                DscDag::SetValueType(active_touch_pos, relative_mouse_pos);
+                DscDag::SetValueType(active_touch_pos, node_relative_touch_pos);
             }
         }
 

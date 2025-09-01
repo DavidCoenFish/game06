@@ -408,7 +408,11 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         if (nullptr != in_construction_helper._input_click_callback)
         {
             auto input_data = in_dag_collection.CreateValueNone(
-                DscUi::TUiComponentInputData({ in_construction_helper._input_click_callback }),
+                DscUi::TUiComponentInputData({ 
+					in_construction_helper._input_click_callback,
+					in_construction_helper._input_drag_callback,
+					
+					}),
                 owner
             );
             DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(input_data, "input data"));
