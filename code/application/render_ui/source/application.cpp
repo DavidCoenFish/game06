@@ -298,6 +298,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "stack")
         );
+
 		auto scroll_owner = dynamic_cast<DscDag::IDagOwner*>(stack_selector_node_group);
 		DscDag::NodeToken scrollbar_write_y = _resources->_dag_collection->CreateValueOnValueChange<float>(
 			0.5f,
@@ -331,14 +332,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         );
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(scrollbar_range_read_y, "node to scroll data convertor"));
 
-    //DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(stack_selector_node_group, DscUi::TUiNodeGroup::TGeometrySize), scrollbar_range_read_y);
     DscDag::LinkIndexNodes(0, fake_geometry_size, scrollbar_range_read_y);
-    //DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(stack_selector_node_group, DscUi::TUiNodeGroup::TRenderRequestSize), scrollbar_range_read_y);
     DscDag::LinkIndexNodes(1, fake_render_request_size, scrollbar_range_read_y);
-    //DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(stack_selector_node_group, DscUi::TUiNodeGroup::TScrollPos), scrollbar_range_read_y);
     DscDag::LinkIndexNodes(2, scrollbar_write_y, scrollbar_range_read_y);
 
-		// scroll bar
+		// scroll_bar_node
         _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentScrollbarY(
 				DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f),
@@ -346,7 +344,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
 				scrollbar_write_y,
 				scrollbar_range_read_y
 			).SetClearColour(
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f)
             ).SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(16, 0.0f), DscUi::UiCoord(400, 0.0f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.0f), DscUi::UiCoord(0, 0.5f)),

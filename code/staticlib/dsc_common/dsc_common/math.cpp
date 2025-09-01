@@ -19,11 +19,11 @@ const uint32 DscCommon::Math::Ceiling(const uint32 in_value, const uint32 in_ali
 const float DscCommon::Math::Clamp(const float in_value, const float in_low, const float in_high)
 {
 	// this order of operations is to convert (nan)in_value into in_low
-	if ((in_low < in_value) && (in_value < in_high))
+	if ((in_low <= in_value) && (in_value <= in_high))
 	{
 		return in_value;
 	}
-	if (in_high < in_value)
+	if (in_low < in_value)
 	{
 		return in_high;
 	}
