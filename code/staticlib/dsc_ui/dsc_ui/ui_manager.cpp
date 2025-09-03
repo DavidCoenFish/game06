@@ -298,8 +298,6 @@ namespace
                 }
             }
 
-            DscDag::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
-
 			if ((true == clicked) || (true == dragged))
 			{
 				DscDag::NodeToken input_data_node = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputData);
@@ -317,6 +315,8 @@ namespace
 					{
 						if (nullptr != input_data._drag_callback)
 						{
+							// if the drag callback is triggered, tread as rollover
+		                    flag |= DscUi::TUiInputStateFlag::TRollover;
 							input_data._drag_callback(
 								in_ui_node_group, 
 								in_touch_data._node_relative_click_start,
@@ -326,6 +326,8 @@ namespace
 					}
 				}
 			}
+
+            DscDag::SetValueType<DscUi::TUiInputStateFlag>(input_state_flag, flag);
 
             DscDag::NodeToken active_touch_pos = DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, DscUi::TUiComponentResourceNodeGroup::TInputActiveTouchPos);
             if (nullptr != active_touch_pos)
