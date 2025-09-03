@@ -93,13 +93,12 @@ IF 0 NEQ %ERRORLEVEL% (
 ::echo "%VERSION_MAJOR%.%VERSION_MINOR%.%VERSION_PATCH%">code\staticlib\dsc_version\dsc_version\version_string.txt
 ::echo "%VERSION_PATCH%">code\staticlib\dsc_version\dsc_version\version_patch.txt
 
+echo "%TIMESTAMP%">code\staticlib\dsc_version\dsc_version\timestamp.txt
 
 :: to set a git tag
 ::git tag -a v0.1 -m "start tagged version history"
 
 for /f "delims=" %%A in ('git describe --long') do set "var=%%A"
 echo "%var%">code\staticlib\dsc_version\dsc_version\git_revision.txt
-
-echo "%TIMESTAMP%">code\staticlib\dsc_version\dsc_version\timestamp.txt
 
 POPD
