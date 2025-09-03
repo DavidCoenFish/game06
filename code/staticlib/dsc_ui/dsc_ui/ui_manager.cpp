@@ -208,6 +208,14 @@ namespace
         bool& in_out_ignore
     )
     {
+        const bool visible = DscDag::GetValueType<bool>(
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_ui_node_group, DscUi::TUiNodeGroup::TVisible)
+            );
+		if (false == visible)
+		{
+			return;
+		}
+
         const float x = static_cast<float>(in_touch._root_relative_pos.GetX());
         const float y = static_cast<float>(in_touch._root_relative_pos.GetY());
 
@@ -255,14 +263,16 @@ namespace
 					   in_touch_data._node_relative_click_start = node_relative_touch_pos;
                     }
                 }
-                else if ((true == in_touch_data._click_end) &&
-                    (in_ui_node_group == in_touch_data._node_under_click_start))
-                {
-                    in_out_consumed = true;
-                    // we have a click
-                    //flag |= DscUi::TUiInputStateFlag::TClickEnd;
-                    clicked = true;
-                }
+                else if (true == in_touch_data._click_end)
+				{
+					in_out_consumed = true;
+                    if (in_ui_node_group == in_touch_data._node_under_click_start)
+					{
+						// we have a click, if we started in this node
+						//flag |= DscUi::TUiInputStateFlag::TClickEnd;
+						clicked = true;
+					}
+				}
             }
 
             // slightly pull this out of the above condition, saves doing it top level of callstack
@@ -434,7 +444,13 @@ namespace
 
 } // namespace
 
-DscUi::UiManager::UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection)
+DscUi::UiManager::UiManager(
+	DscRender::DrawSystem& in_draw_system, 
+	DscCommon::FileSystem& in_file_system, 
+	DscDag::DagCollection& in_dag_collection, 
+	const std::vector<TEffectConstructionHelper>& in_scrollbar_effect_array
+	)
+	: _scrollbar_effect_array(in_scrollbar_effect_array)
 {
     _dag_resource = DscDagRender::DagResource::Factory(&in_draw_system, &in_dag_collection);
     _render_target_pool = std::make_unique<DscRenderResource::RenderTargetPool>(DscRenderResource::s_default_pixel_alignment);
@@ -1170,18 +1186,19 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
 
 	bool add_scroll_bar_x = false;
 	bool add_scroll_bar_y = false;
+	DscDag::NodeToken pixel_traversal_node = nullptr;
     //TScrollPos, // where is the geometry size quad is on the render target texture
     {
         auto resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
-		add_scroll_bar_x = (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX));
-		add_scroll_bar_y = (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX));
-
-        if (add_scroll_bar_x &&
-            add_scroll_bar_y &&
+        if ((nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX)) &&
+            (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollY)) &&
             (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::TManualScrollX)) &&
             (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::TManualScrollY)))
         {
-            DscDag::NodeToken pixel_traversal_node = MakeNode::MakeNodePixelTraversal(
+			add_scroll_bar_x = DscDag::GetValueType<bool>(DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX));
+			add_scroll_bar_y = DscDag::GetValueType<bool>(DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollY));
+
+            pixel_traversal_node = MakeNode::MakeNodePixelTraversal(
                 in_dag_collection,
                 DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TGeometrySize),
                 DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TRenderRequestSize),
@@ -1290,6 +1307,19 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
             DscDag::LinkNodes(node, parent_draw_base);
         }
     }
+
+	if ((true == add_scroll_bar_x) || 
+		(true == add_scroll_bar_y))
+	{
+		AddScrollbar(
+			in_draw_system,
+			in_dag_collection,
+			in_root_node_group,
+			in_parent,
+			result,
+			pixel_traversal_node
+			);
+	}
 
     return result;
 }
@@ -2063,7 +2093,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                 out_value = ui_render_target.get();
             },
             owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "draw text"));
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_node, "draw scrollbar"));
 
         auto shader_buffer = _scroll_bar_shader->MakeShaderConstantBuffer(&in_draw_system);
         auto shader_buffer_node = in_dag_collection.CreateValue(
@@ -2249,3 +2279,436 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     }
     return result_node;
 }
+
+
+void DscUi::UiManager::AddScrollbar(
+	DscRender::DrawSystem& in_draw_system,
+	DscDag::DagCollection& in_dag_collection,
+	DscDag::NodeToken in_root_node_group,
+	DscDag::NodeToken in_parent,
+	DscDag::NodeToken in_node_to_scroll,
+	DscDag::NodeToken in_pixel_traversal_node
+	)
+{
+	DSC_UNUSED(in_draw_system);
+
+	DscDag::NodeToken parent_component_resource_group =  DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TUiComponentResources);
+
+	//display scroll x
+    DscDag::NodeToken result_x = in_dag_collection.CreateGroupEnum<DscUi::TUiNodeGroup>(nullptr, true);
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_x, "scrollbar x"));
+    DscDag::IDagOwner* owner_x = dynamic_cast<DscDag::IDagOwner*>(result_x);
+	DscDag::NodeToken want_scroll_x = in_dag_collection.CreateCalculate<bool>(
+		[]
+		(bool& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+	        const DscCommon::VectorInt2& pixel_traversal = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+	        const bool has_manual_scroll = in_input_array[1] ? DscDag::GetValueType<bool>(in_input_array[1]) : false;
+	        const bool visible = DscDag::GetValueType<bool>(in_input_array[2]);
+			output = ((true == has_manual_scroll) && (0 < pixel_traversal.GetX()) && (true == visible));
+		},
+		owner_x
+		);
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(want_scroll_x, "want_scroll_x"));
+    DscDag::LinkIndexNodes(0, in_pixel_traversal_node, want_scroll_x);
+    DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(parent_component_resource_group, TUiComponentResourceNodeGroup::THasManualScrollX), want_scroll_x);
+    DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TVisible), want_scroll_x);
+    DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TVisible, want_scroll_x);
+
+
+	//display scroll y
+    DscDag::NodeToken result_y = in_dag_collection.CreateGroupEnum<DscUi::TUiNodeGroup>(nullptr, true);
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result_y, "scrollbar y"));
+    DscDag::IDagOwner* owner_y = dynamic_cast<DscDag::IDagOwner*>(result_y);
+	DscDag::NodeToken want_scroll_y = in_dag_collection.CreateCalculate<bool>(
+		[]
+		(bool& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+	        const DscCommon::VectorInt2& pixel_traversal = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+	        const bool has_manual_scroll = in_input_array[1] ? DscDag::GetValueType<bool>(in_input_array[1]) : false;
+	        const bool visible = DscDag::GetValueType<bool>(in_input_array[2]);
+			output = ((true == has_manual_scroll) && (0 < pixel_traversal.GetY()) && (true == visible));
+		},
+		owner_y
+		);
+    DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(want_scroll_y, "want_scroll_y"));
+    DscDag::LinkIndexNodes(0, in_pixel_traversal_node, want_scroll_y);
+    DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(parent_component_resource_group, TUiComponentResourceNodeGroup::THasManualScrollY), want_scroll_y);
+    DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TVisible), want_scroll_y);
+    DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TVisible, want_scroll_y);
+
+    //TArrayChildUiNodeGroup (BEFORE TUiComponentResources)
+    {
+        auto array_child = in_dag_collection.CreateNodeArrayEmpty(owner_x);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(array_child, "array child"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TArrayChildUiNodeGroup, array_child);
+    }
+    {
+        auto array_child = in_dag_collection.CreateNodeArrayEmpty(owner_y);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(array_child, "array child"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TArrayChildUiNodeGroup, array_child);
+    }
+
+    //TUiComponentResources X
+    //{
+		DscDag::NodeToken scrollbar_write_x = DscDag::DagNodeGroup::GetNodeTokenEnum(parent_component_resource_group, TUiComponentResourceNodeGroup::TManualScrollX);
+
+		DscDag::NodeToken scrollbar_range_read_x = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([]
+		(DscCommon::VectorFloat4& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+			const DscCommon::VectorInt2& geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+			const DscCommon::VectorInt2& render_request_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+			const float scroll_pos = DscDag::GetValueType<float>(in_input_array[2]);
+			const float scroll_x = std::min(1.0f, std::max(0.0f, std::abs(scroll_pos)));
+			const int32 overhang = std::max(0, render_request_size.GetX() - geometry_size.GetX());
+			const float low = static_cast<float>(overhang) * scroll_x;
+			output.Set(
+				low,
+				low + static_cast<float>(geometry_size.GetX()),
+				static_cast<float>(render_request_size.GetX()),
+				0.0f
+				);
+			}, owner_x
+			);
+		DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(scrollbar_range_read_x, "node to scroll data convertor x"));
+
+		DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometrySize), scrollbar_range_read_x);
+		DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TRenderRequestSize), scrollbar_range_read_x);
+		DscDag::LinkIndexNodes(2, scrollbar_write_x, scrollbar_range_read_x);
+
+		auto construction_helper_x = DscUi::MakeComponentScrollbarX(
+				DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+                DscUi::UiCoord(8, 0.0f),
+				scrollbar_write_x,
+				scrollbar_range_read_x
+			//).SetClearColour(
+            //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+            ).SetInputData(
+                [scrollbar_write_x]
+                (DscDag::NodeToken in_node, const DscCommon::VectorFloat2& in_node_rel_click) {
+					const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
+						DscDag::DagNodeGroup::GetNodeTokenEnum(in_node, DscUi::TUiNodeGroup::TScreenSpace)
+						);
+					const float length = screen_space._screen_space.GetZ() - screen_space._screen_space.GetX();
+					const float ratio = (0.0f != length) ? DscCommon::Math::Clamp(in_node_rel_click.GetX() / length, 0.0f, 1.0f) : 0.0f;
+					DscDag::SetValueType(scrollbar_write_x, ratio);
+                    return;
+                },
+                [scrollbar_write_x]
+                (DscDag::NodeToken in_node, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2& in_node_rel_click) {
+					const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
+						DscDag::DagNodeGroup::GetNodeTokenEnum(in_node, DscUi::TUiNodeGroup::TScreenSpace)
+						);
+					const float length = screen_space._screen_space.GetZ() - screen_space._screen_space.GetX();
+					const float ratio = (0.0f != length) ? DscCommon::Math::Clamp(in_node_rel_click.GetX() / length, 0.0f, 1.0f) : 0.0f;
+					DscDag::SetValueType(scrollbar_write_x, ratio);
+                    return;
+                },
+                true,
+                true
+            );
+
+	{
+        auto component_resource_node_group = MakeComponentResourceGroup(
+            in_dag_collection,
+            construction_helper_x,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TTimeDelta),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiScale),
+            in_parent,
+            result_x
+        );
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TUiComponentResources, component_resource_node_group);
+    }
+    //TUiComponentResources Y
+    //{
+		DscDag::NodeToken scrollbar_write_y = DscDag::DagNodeGroup::GetNodeTokenEnum(parent_component_resource_group, TUiComponentResourceNodeGroup::TManualScrollY);
+
+		DscDag::NodeToken scrollbar_range_read_y = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([]
+		(DscCommon::VectorFloat4& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+			const DscCommon::VectorInt2& geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+			const DscCommon::VectorInt2& render_request_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+			const float scroll_pos = DscDag::GetValueType<float>(in_input_array[2]);
+			const float scroll_y = std::min(1.0f, std::max(0.0f, std::abs(scroll_pos)));
+			const int32 overhang = std::max(0, render_request_size.GetY() - geometry_size.GetY());
+			const float low = static_cast<float>(overhang) * scroll_y;
+			output.Set(
+				low,
+				low + static_cast<float>(geometry_size.GetY()),
+				static_cast<float>(render_request_size.GetY()),
+				0.0f
+				);
+			}, owner_y
+			);
+		DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(scrollbar_range_read_y, "node to scroll data convertor y"));
+
+		DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometrySize), scrollbar_range_read_y);
+		DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TRenderRequestSize), scrollbar_range_read_y);
+		DscDag::LinkIndexNodes(2, scrollbar_write_y, scrollbar_range_read_y);
+
+		auto construction_helper_y = DscUi::MakeComponentScrollbarY(
+				DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+                DscUi::UiCoord(8, 0.0f),
+				scrollbar_write_y,
+				scrollbar_range_read_y
+			//).SetClearColour(
+            //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+            ).SetInputData(
+				nullptr,
+     //           [scrollbar_write_y]
+     //           (DscDag::NodeToken in_node, const DscCommon::VectorFloat2& in_node_rel_click) {
+					//const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
+					//	DscDag::DagNodeGroup::GetNodeTokenEnum(in_node, DscUi::TUiNodeGroup::TScreenSpace)
+					//	);
+					//const float length = screen_space._screen_space.GetW() - screen_space._screen_space.GetY();
+					//const float ratio = (0.0f != length) ? DscCommon::Math::Clamp(in_node_rel_click.GetY() / length, 0.0f, 1.0f) : 0.0f;
+					//DscDag::SetValueType(scrollbar_write_y, ratio);
+     //               return;
+     //           },
+                [scrollbar_write_y]
+                (DscDag::NodeToken in_node, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2& in_node_rel_click) {
+					const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
+						DscDag::DagNodeGroup::GetNodeTokenEnum(in_node, DscUi::TUiNodeGroup::TScreenSpace)
+						);
+					const float length = screen_space._screen_space.GetW() - screen_space._screen_space.GetY();
+					const float ratio = (0.0f != length) ? DscCommon::Math::Clamp(in_node_rel_click.GetY() / length, 0.0f, 1.0f) : 0.0f;
+					DscDag::SetValueType(scrollbar_write_y, ratio);
+                    return;
+                },
+                true,
+                true
+            );
+	{
+        auto component_resource_node_group = MakeComponentResourceGroup(
+            in_dag_collection,
+            construction_helper_y,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TTimeDelta),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiScale),
+            in_parent,
+            result_y
+        );
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TUiComponentResources, component_resource_node_group);
+    }
+
+    //TUiComponentType
+    {
+        auto ui_component_type = in_dag_collection.CreateValueOnValueChange(TUiComponentType::TScrollBar, owner_x);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_component_type, "ui component type x"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TUiComponentType, ui_component_type);
+    }
+    {
+        auto ui_component_type = in_dag_collection.CreateValueOnValueChange(TUiComponentType::TScrollBar, owner_y);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(ui_component_type, "ui component type y"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TUiComponentType, ui_component_type);
+    }
+
+    //TUiPanelShaderConstantBuffer
+    {
+        auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
+        auto node = in_dag_collection.CreateValueNone(panel_shader_constant_buffer, owner_x);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "ui panel shader constant buffer x"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TUiPanelShaderConstantBuffer, node);
+    }
+    {
+        auto panel_shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
+        auto node = in_dag_collection.CreateValueNone(panel_shader_constant_buffer, owner_y);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "ui panel shader constant buffer y"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TUiPanelShaderConstantBuffer, node);
+    }
+
+	//TGeometrySize
+	{
+		DscDag::NodeToken geometry_size = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([]
+		(DscCommon::VectorInt2& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+			const DscCommon::VectorInt2& parent_geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+			const int32 scrollbar_thickness = DscDag::GetValueType<int32>(in_input_array[1]);
+			const bool y_visible = DscDag::GetValueType<bool>(in_input_array[2]);
+			output.Set(
+				parent_geometry_size.GetX() - (y_visible ? scrollbar_thickness : 0),
+				scrollbar_thickness
+				);
+			},
+			owner_x);
+		DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(geometry_size, "scrollbar size x"));
+		DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometrySize), geometry_size);
+		DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TScrollBarThickness), geometry_size);
+		DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TVisible), geometry_size);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TGeometrySize, geometry_size);
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TRenderRequestSize, geometry_size);
+	}
+	{
+		DscDag::NodeToken geometry_size = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([]
+		(DscCommon::VectorInt2& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+			const DscCommon::VectorInt2& parent_geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+			const int32 scrollbar_thickness = DscDag::GetValueType<int32>(in_input_array[1]);
+			const bool x_visible = DscDag::GetValueType<bool>(in_input_array[2]);
+			output.Set(
+				scrollbar_thickness,
+				parent_geometry_size.GetY() - (x_visible ? scrollbar_thickness : 0)
+				);
+			},
+			owner_y);
+		DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(geometry_size, "scrollbar size y"));
+		DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometrySize), geometry_size);
+		DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TScrollBarThickness), geometry_size);
+		DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TVisible), geometry_size);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TGeometrySize, geometry_size);
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TRenderRequestSize, geometry_size);
+	}
+
+	//TGeometryOffset
+	{
+		DscDag::NodeToken geometry_offset = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([]
+		(DscCommon::VectorInt2& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+			const DscCommon::VectorInt2& parent_geometry_offset = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+			const DscCommon::VectorInt2& parent_geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+			const int32 scrollbar_thickness = DscDag::GetValueType<int32>(in_input_array[2]);
+			output.Set(
+				parent_geometry_offset.GetX(),
+				parent_geometry_offset.GetY() + parent_geometry_size.GetY() - scrollbar_thickness
+				);
+			},
+			owner_x);
+		DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(geometry_offset, "geometry_offset x"));
+		DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometryOffset), geometry_offset);
+		DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometrySize), geometry_offset);
+		DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TScrollBarThickness), geometry_offset);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TGeometryOffset, geometry_offset);
+	}
+	{
+		DscDag::NodeToken geometry_offset = in_dag_collection.CreateCalculate<DscCommon::VectorInt2>([]
+		(DscCommon::VectorInt2& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+			const DscCommon::VectorInt2& parent_geometry_offset = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+			const DscCommon::VectorInt2& parent_geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[1]);
+			const int32 scrollbar_thickness = DscDag::GetValueType<int32>(in_input_array[2]);
+			output.Set(
+				parent_geometry_offset.GetX() + parent_geometry_size.GetX() - scrollbar_thickness,
+				parent_geometry_offset.GetY()
+				);
+			},
+			owner_y);
+		DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(geometry_offset, "geometry_offset y"));
+		DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometryOffset), geometry_offset);
+		DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(in_node_to_scroll, TUiNodeGroup::TGeometrySize), geometry_offset);
+		DscDag::LinkIndexNodes(2, DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TScrollBarThickness), geometry_offset);
+
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TGeometryOffset, geometry_offset);
+	}
+
+	//TScrollPos
+    {
+        auto node = in_dag_collection.CreateValueNone(DscCommon::VectorFloat2::s_zero, owner_x);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "scroll pos x"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TScrollPos, node);
+    }
+    {
+        auto node = in_dag_collection.CreateValueNone(DscCommon::VectorFloat2::s_zero, owner_y);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "scroll pos y"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TScrollPos, node);
+    }
+
+	//TScreenSpaceSize, // from top left as 0,0, what is our on screen geometry footprint. for example, this is in mouse space, so if mouse is at [500,400] we want to know if it is inside our screen space to detect rollover
+    {
+        auto node = MakeNode::MakeScreenSpace(
+            in_dag_collection,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TScreenSpace),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TRenderRequestSize),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TGeometrySize),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TGeometryOffset),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TRenderRequestSize),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TScrollPos),
+            owner_x
+        );
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TScreenSpace, node);
+    }
+    {
+        auto node = MakeNode::MakeScreenSpace(
+            in_dag_collection,
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TScreenSpace),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TRenderRequestSize),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TGeometrySize),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TGeometryOffset),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TRenderRequestSize),
+            DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TScrollPos),
+            owner_y
+        );
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TScreenSpace, node);
+    }
+
+	//TAvaliableSize
+	{
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TAvaliableSize, 
+			DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TAvaliableSize)
+			);
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TAvaliableSize, 
+			DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TAvaliableSize)
+			);
+	}
+
+	//draw
+	{
+		DscDag::NodeToken base_node = nullptr;
+		auto draw_node = MakeDrawStack(
+			construction_helper_x, //TUiDrawType
+			in_draw_system,
+			in_dag_collection,
+			_scrollbar_effect_array,
+			in_root_node_group,
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TRenderRequestSize),
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TVisible),
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TArrayChildUiNodeGroup),
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_x, TUiNodeGroup::TUiComponentResources),
+			in_parent,
+			base_node
+		);
+		DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TDrawNode, draw_node);
+		DscDag::DagNodeGroup::SetNodeTokenEnum(result_x, TUiNodeGroup::TDrawBaseNode, base_node);
+
+		DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiNodeGroup>(result_x));
+
+		// add result node to parent child array
+		{
+			auto parent_child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TArrayChildUiNodeGroup);
+			DSC_ASSERT(nullptr != parent_child_array_node, "parent must have a child array");
+			DscDag::NodeArrayPushBack(parent_child_array_node, result_x);
+		}
+
+		// add draw node to parent draw node
+        auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
+        DscDag::LinkNodes(draw_node, parent_draw_base);
+	}
+	{
+		DscDag::NodeToken base_node = nullptr;
+		auto draw_node = MakeDrawStack(
+			construction_helper_y, //TUiDrawType
+			in_draw_system,
+			in_dag_collection,
+			_scrollbar_effect_array,
+			in_root_node_group,
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TRenderRequestSize),
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TVisible),
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TArrayChildUiNodeGroup),
+			DscDag::DagNodeGroup::GetNodeTokenEnum(result_y, TUiNodeGroup::TUiComponentResources),
+			in_parent,
+			base_node
+		);
+		DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TDrawNode, draw_node);
+		DscDag::DagNodeGroup::SetNodeTokenEnum(result_y, TUiNodeGroup::TDrawBaseNode, base_node);
+
+		DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiNodeGroup>(result_y));
+
+		// add result node to parent child array
+		{
+			auto parent_child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TArrayChildUiNodeGroup);
+			DSC_ASSERT(nullptr != parent_child_array_node, "parent must have a child array");
+			DscDag::NodeArrayPushBack(parent_child_array_node, result_y);
+		}
+
+		// add draw node to parent draw node
+        auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
+        DscDag::LinkNodes(draw_node, parent_draw_base);
+	}
+
+	return;
+}
+
+

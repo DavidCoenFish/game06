@@ -116,9 +116,6 @@ namespace DscUi
 		UiManager& operator=(const UiManager&) = delete;
 		UiManager(const UiManager&) = delete;
 
-		UiManager(DscRender::DrawSystem& in_draw_system, DscCommon::FileSystem& in_file_system, DscDag::DagCollection& in_dag_collection);
-		~UiManager();
-
 		struct TEffectConstructionHelper
 		{
 			TUiEffectType _effect_type = TUiEffectType::TCount;
@@ -128,6 +125,14 @@ namespace DscUi
 			DscCommon::VectorFloat4 _effect_param_rollover = {};
 			DscCommon::VectorFloat4 _effect_param_tint_rollover = {};
 		};
+
+		UiManager(
+			DscRender::DrawSystem& in_draw_system, 
+			DscCommon::FileSystem& in_file_system, 
+			DscDag::DagCollection& in_dag_collection,
+			const std::vector<TEffectConstructionHelper>& in_scrollbar_effect_array = std::vector<TEffectConstructionHelper>()
+			);
+		~UiManager();
 
 		DscDag::NodeToken MakeRootNode(
 			const ComponentConstructionHelper& in_construction_helper,
@@ -183,10 +188,6 @@ namespace DscUi
 		);
 
 	private:
-		//void UpdateRootViewportSize(
-		//	DscDag::NodeToken in_root_node_group
-		//	);
-
 		// so, if MakeDrawStack creates a UiRenderTaget, how does that get back into the parent, TUiNodeGroup::TUiRenderTarget
 		DscDag::NodeToken MakeDrawStack(
 			const ComponentConstructionHelper& in_construction_helper,
@@ -219,11 +220,21 @@ namespace DscUi
 			DscDag::NodeToken in_component_resource_group
 		);
 
+		void AddScrollbar(
+			DscRender::DrawSystem& in_draw_system,
+			DscDag::DagCollection& in_dag_collection,
+			DscDag::NodeToken in_root_node_group,
+			DscDag::NodeToken in_parent,
+			DscDag::NodeToken in_node_to_scroll,
+			DscDag::NodeToken in_pixel_traversal_node
+			);
+
 	private:
 		/// dag resource hooks into the render system "callbacks" as to know when the device is restored
 		std::unique_ptr<DscDagRender::DagResource> _dag_resource = {};
 		std::unique_ptr<DscRenderResource::RenderTargetPool> _render_target_pool = {};
 		std::unique_ptr<CelticKnot> _celtic_knot = {};
+		std::vector<TEffectConstructionHelper> _scrollbar_effect_array = {};
 
 		std::shared_ptr<DscRenderResource::Shader> _debug_grid_shader = {};
 		std::shared_ptr<DscRenderResource::Shader> _ui_panel_shader = {};

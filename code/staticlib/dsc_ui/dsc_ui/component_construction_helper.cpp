@@ -405,7 +405,8 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             input_state_flag
         );
 
-        if (nullptr != in_construction_helper._input_click_callback)
+        if ((nullptr != in_construction_helper._input_click_callback) ||
+			(nullptr != in_construction_helper._input_drag_callback))
         {
             auto input_data = in_dag_collection.CreateValueNone(
                 DscUi::TUiComponentInputData({ 

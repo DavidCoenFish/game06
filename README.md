@@ -30,3 +30,7 @@ hint<br>
 setting SolutionBuildProject in .\code\dsc.bff (or under) effects what the visual studio solution is set to build by default, and in visual studio, setting the startup project controlles what is run
 it is very easy to have visual studio set to run something that is not being built. have yet to find a setting in bff to enable every project to build.
 
+<br>
+<br>
+this is not production ready code, the ui system is very prototype, using lost of dynamic casts and way too many allocation, as well as excessive gpu resources (render targets).
+additionally the inheritance of uirootnode from uinode, and the poor cross mingling of draw nodes and the ui nodes is not ideal

@@ -297,6 +297,31 @@ namespace DscUi
 			_item_index = in_item_index;
 			return *this;
 		}
+
+		ComponentConstructionHelper& SetScroll(
+			const bool in_enable
+		)
+		{
+			_has_scroll = in_enable;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetManualScrollX(
+			const bool in_enable
+		)
+		{
+			_has_manual_scroll_x = in_enable;
+			return *this;
+		}
+
+		ComponentConstructionHelper& SetManualScrollY(
+			const bool in_enable
+		)
+		{
+			_has_manual_scroll_y = in_enable;
+			return *this;
+		}
+
 	};
 
 	// is passing tick and in_self overkill for the crossfade, should this be moved out~ but want the crossfade active child node

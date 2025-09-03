@@ -281,6 +281,8 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             DscUi::MakeComponentStack(
                 DscUi::TUiFlow::TVertical,
                 DscUi::UiCoord(8, 0.0f)
+			).SetManualScrollY(
+				true
             ).SetClearColour(
                 DscCommon::VectorFloat4(1.0f, 0.0f, 0.0f, 1.0f)
             ).SetChildSlot(
@@ -298,7 +300,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "stack")
         );
-
+#if 0
 		auto scroll_owner = dynamic_cast<DscDag::IDagOwner*>(stack_selector_node_group);
 		DscDag::NodeToken scrollbar_write_y = _resources->_dag_collection->CreateValueOnValueChange<float>(
 			0.5f,
@@ -378,9 +380,9 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             _resources->_ui_root_node_group,
             _resources->_ui_root_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
-            DSC_DEBUG_ONLY(DSC_COMMA "stack")
+            DSC_DEBUG_ONLY(DSC_COMMA "scrollbar test")
         );
-
+#endif
         for (int32 index = 0; index < 20; ++index)
         {
             AddListItem(
