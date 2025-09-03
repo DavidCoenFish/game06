@@ -93,6 +93,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
     DscRender::DrawSystem& in_draw_system,
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
+	DscDag::NodeToken in_visible,
     DscDag::NodeToken in_ui_scale,
     DscDag::NodeToken in_effect_strength,
     DscDag::NodeToken in_effect_param,
@@ -112,74 +113,79 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
         DSC_ASSERT(nullptr != frame, "invalid state");
         const auto& ui_render_target = DscDag::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);
         DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-        const auto& shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-        DSC_ASSERT(nullptr != shader_buffer, "invalid state");
-        const float ui_scale = DscDag::GetValueType<float>(in_input_array[3]);
-        const float effect_strength = (nullptr != in_input_array[4]) ? DscDag::GetValueType<float>(in_input_array[4]) : 1.0f;
-        if (0.0f == effect_strength)
-        {
-            out_value = nullptr;
-            if ((0 < in_input_texture_count) && (nullptr != in_input_array[7]))
-            {
-                out_value = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
-            }
-            return;
-        }
+		const bool visible = DscDag::GetValueType<bool>(in_input_array[2]);
+		ui_render_target->SetEnabled(visible);
+		if (true == visible)
+		{
+			const auto& shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[3]);
+			DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+			const float ui_scale = DscDag::GetValueType<float>(in_input_array[4]);
+			const float effect_strength = (nullptr != in_input_array[5]) ? DscDag::GetValueType<float>(in_input_array[5]) : 1.0f;
+			if (0.0f == effect_strength)
+			{
+				out_value = nullptr;
+				if ((0 < in_input_texture_count) && (nullptr != in_input_array[8]))
+				{
+					out_value = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[8]);
+				}
+				return;
+			}
 
-        const DscCommon::VectorFloat4& effect_param = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
-        const DscCommon::VectorFloat4& effect_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[6]);
+			const DscCommon::VectorFloat4& effect_param = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[6]);
+			const DscCommon::VectorFloat4& effect_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[7]);
 
-        const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
+			const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
 
-        auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
-        buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
-        buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
-        buffer._width_height[2] = effect_strength;
-        buffer._effect_param[0] = effect_param[0] * ui_scale;
-        buffer._effect_param[1] = effect_param[1] * ui_scale;
-        buffer._effect_param[2] = effect_param[2] * ui_scale;
-        buffer._effect_param[3] = effect_param[3] * ui_scale;
-        buffer._effect_tint[0] = effect_tint[0];
-        buffer._effect_tint[1] = effect_tint[1];
-        buffer._effect_tint[2] = effect_tint[2];
-        buffer._effect_tint[3] = effect_tint[3];
+			auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
+			buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
+			buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
+			buffer._width_height[2] = effect_strength;
+			buffer._effect_param[0] = effect_param[0] * ui_scale;
+			buffer._effect_param[1] = effect_param[1] * ui_scale;
+			buffer._effect_param[2] = effect_param[2] * ui_scale;
+			buffer._effect_param[3] = effect_param[3] * ui_scale;
+			buffer._effect_tint[0] = effect_tint[0];
+			buffer._effect_tint[1] = effect_tint[1];
+			buffer._effect_tint[2] = effect_tint[2];
+			buffer._effect_tint[3] = effect_tint[3];
 
-        std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
-        DSC_ASSERT(nullptr != shader, "invalid state");
+			std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
+			DSC_ASSERT(nullptr != shader, "invalid state");
 
-        if (0 < in_input_texture_count)
-        {
-            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
-            //ui_render_target->SetEnabled(input_texture->GetEnabled());
-            const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
-            buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
-            buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
-            const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
-            buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
-            buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
-            shader->SetShaderResourceViewHandle(0, nullptr);
-            shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
-        }
-        if (1 < in_input_texture_count) //&& (true == ui_render_target->GetEnabled()))
-        {
-            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[8]);
-            //ui_render_target->SetEnabled(input_texture->GetEnabled());
-            const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
-            buffer._texture_param_1[0] = static_cast<float>(input_texture_viewport_size.GetX());
-            buffer._texture_param_1[1] = static_cast<float>(input_texture_viewport_size.GetY());
-            const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
-            buffer._texture_param_1[2] = static_cast<float>(input_texture_size.GetX());
-            buffer._texture_param_1[3] = static_cast<float>(input_texture_size.GetY());
-            shader->SetShaderResourceViewHandle(1, nullptr);
-            shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
-        }
+			if (0 < in_input_texture_count)
+			{
+				DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[8]);
+				//ui_render_target->SetEnabled(input_texture->GetEnabled());
+				const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
+				buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
+				buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
+				const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
+				buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
+				buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
+				shader->SetShaderResourceViewHandle(0, nullptr);
+				shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
+			}
+			if (1 < in_input_texture_count) //&& (true == ui_render_target->GetEnabled()))
+			{
+				DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[9]);
+				//ui_render_target->SetEnabled(input_texture->GetEnabled());
+				const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
+				buffer._texture_param_1[0] = static_cast<float>(input_texture_viewport_size.GetX());
+				buffer._texture_param_1[1] = static_cast<float>(input_texture_viewport_size.GetY());
+				const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
+				buffer._texture_param_1[2] = static_cast<float>(input_texture_size.GetX());
+				buffer._texture_param_1[3] = static_cast<float>(input_texture_size.GetY());
+				shader->SetShaderResourceViewHandle(1, nullptr);
+				shader->SetShaderResourceViewHandle(1, input_texture->GetTexture());
+			}
 
-        if (true == ui_render_target->ActivateRenderTarget(*frame))
-        {
-            frame->SetShader(shader, shader_buffer);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
-        }
+			if (true == ui_render_target->ActivateRenderTarget(*frame))
+			{
+				frame->SetShader(shader, shader_buffer);
+				frame->Draw(weak_geometry.lock());
+				frame->SetRenderTarget(nullptr);
+			}
+		}
 
         out_value = ui_render_target.get();
     },
@@ -192,15 +198,16 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
 
     DscDag::LinkIndexNodes(0, in_frame_node, result_node);
     DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
-    DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
-    DscDag::LinkIndexNodes(3, in_ui_scale, result_node);
-    DscDag::LinkIndexNodes(4, in_effect_strength, result_node);
-    DscDag::LinkIndexNodes(5, in_effect_param, result_node);
-    DscDag::LinkIndexNodes(6, in_effect_tint, result_node);
+    DscDag::LinkIndexNodes(2, in_visible, result_node);
+    DscDag::LinkIndexNodes(3, shader_buffer_node, result_node);
+    DscDag::LinkIndexNodes(4, in_ui_scale, result_node);
+    DscDag::LinkIndexNodes(5, in_effect_strength, result_node);
+    DscDag::LinkIndexNodes(6, in_effect_param, result_node);
+    DscDag::LinkIndexNodes(7, in_effect_tint, result_node);
     for (int32 index = 0; index < in_input_texture_count; ++index)
     {
         DSC_ASSERT(index < static_cast<int32>(in_array_input_stack.size()), "invalid state");
-        DscDag::LinkIndexNodes(7 + index, in_array_input_stack[in_array_input_stack.size() - in_input_texture_count +  index], result_node);
+        DscDag::LinkIndexNodes(8 + index, in_array_input_stack[in_array_input_stack.size() - in_input_texture_count +  index], result_node);
     }
 
     return result_node;
@@ -219,6 +226,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectBurnBlotDrawNode(
     DscDag::NodeToken in_frame_node,
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_ui_render_target_node_b,
+	DscDag::NodeToken in_visible,
     DscDag::NodeToken in_effect_param,
     DscDag::NodeToken in_effect_tint,
     const std::vector<DscDag::NodeToken>& in_array_input_stack,
@@ -234,73 +242,81 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectBurnBlotDrawNode(
     DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader, state](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) mutable {
         DscRenderResource::Frame* const frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
         DSC_ASSERT(nullptr != frame, "invalid state");
-        const auto& ui_render_target_a = DscDag::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);
+		const bool visible = DscDag::GetValueType<bool>(in_input_array[1]);
+        const auto& ui_render_target_a = DscDag::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[2]);
         DSC_ASSERT(nullptr != ui_render_target_a, "invalid state");
-        const auto& ui_render_target_b = DscDag::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[2]);
+        const auto& ui_render_target_b = DscDag::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[3]);
         DSC_ASSERT(nullptr != ui_render_target_b, "invalid state");
-        const auto& shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[3]);
-        DSC_ASSERT(nullptr != shader_buffer, "invalid state");
-        const DscCommon::VectorFloat4& effect_param = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
-        const DscCommon::VectorFloat4& effect_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
 
-        const int32 other_index = state._index;// will be used as blot input
-        state._index ^= 1;// will be used as shader output
-        DscUi::UiRenderTarget* blot[2];
-        blot[0] = ui_render_target_b.get(); 
-        blot[1] = ui_render_target_a.get(); 
+		ui_render_target_a->SetEnabled(visible);
+		ui_render_target_b->SetEnabled(visible);
+		DscUi::UiRenderTarget* blot[2];
+		blot[0] = ui_render_target_b.get(); 
+		blot[1] = ui_render_target_a.get(); 
 
-        const DscCommon::VectorInt2 viewport_size = blot[state._index]->GetViewportSize();
+		if (true == visible)
+		{
+			const auto& shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[4]);
+			DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+			const DscCommon::VectorFloat4& effect_param = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
+			const DscCommon::VectorFloat4& effect_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[6]);
 
-        auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
-        buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
-        buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
-        // x. rolled over [0 ... 1] (1 == rolled over), y. time delta [0 ...], zw. mouse pos relative to shader in pixels, uv coords bottom left is 0,0
-        buffer._effect_param[0] = effect_param[0];
-        buffer._effect_param[1] = effect_param[1];
-        buffer._effect_param[2] = effect_param[2];
-        buffer._effect_param[3] = effect_param[3];
-        buffer._effect_tint[0] = effect_tint[0];
-        buffer._effect_tint[1] = effect_tint[1];
-        buffer._effect_tint[2] = effect_tint[2];
-        buffer._effect_tint[3] = effect_tint[3];
+			const int32 other_index = state._index;// will be used as blot input
+			state._index ^= 1;// will be used as shader output
 
-        std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
-        DSC_ASSERT(nullptr != shader, "invalid state");
+			const DscCommon::VectorInt2 viewport_size = blot[state._index]->GetViewportSize();
 
-        // texture zero, the previous draw step
-        {
-            DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
-            //ui_render_target->SetEnabled(input_texture->GetEnabled());
-            const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
-            buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
-            buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
-            const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
-            buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
-            buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
-            shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
-        }
+			auto& buffer = shader_buffer->GetConstant<DscUi::TEffectConstantBuffer>(0);
+			buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
+			buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
+			// x. rolled over [0 ... 1] (1 == rolled over), y. time delta [0 ...], zw. mouse pos relative to shader in pixels, uv coords bottom left is 0,0
+			buffer._effect_param[0] = effect_param[0];
+			buffer._effect_param[1] = effect_param[1];
+			buffer._effect_param[2] = effect_param[2];
+			buffer._effect_param[3] = effect_param[3];
+			buffer._effect_tint[0] = effect_tint[0];
+			buffer._effect_tint[1] = effect_tint[1];
+			buffer._effect_tint[2] = effect_tint[2];
+			buffer._effect_tint[3] = effect_tint[3];
 
-        // texture one, the previous blot texture
-        {
-            DscUi::UiRenderTarget* const input_texture_b = blot[other_index];
-            //DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
-            const DscCommon::VectorInt2 input_texture_viewport_size = input_texture_b->GetViewportSize();
-            buffer._texture_param_1[0] = static_cast<float>(input_texture_viewport_size.GetX());
-            buffer._texture_param_1[1] = static_cast<float>(input_texture_viewport_size.GetY());
-            const DscCommon::VectorInt2 input_texture_size = input_texture_b->GetTextureSize();
-            buffer._texture_param_1[2] = static_cast<float>(input_texture_size.GetX());
-            buffer._texture_param_1[3] = static_cast<float>(input_texture_size.GetY());
-            auto texture = input_texture_b->GetTexture();
-            DSC_ASSERT(nullptr != texture, "invalid state");
-            shader->SetShaderResourceViewHandle(1, texture);
-        }
+			std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
+			DSC_ASSERT(nullptr != shader, "invalid state");
 
-        if (true == blot[state._index]->ActivateRenderTarget(*frame))
-        {
-            frame->SetShader(shader, shader_buffer);
-            frame->Draw(weak_geometry.lock());
-            frame->SetRenderTarget(nullptr);
-        }
+			// texture zero, the previous draw step
+			{
+				DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[7]);
+				//ui_render_target->SetEnabled(input_texture->GetEnabled());
+				const DscCommon::VectorInt2 input_texture_viewport_size = input_texture->GetViewportSize();
+				buffer._texture_param_0[0] = static_cast<float>(input_texture_viewport_size.GetX());
+				buffer._texture_param_0[1] = static_cast<float>(input_texture_viewport_size.GetY());
+				const DscCommon::VectorInt2 input_texture_size = input_texture->GetTextureSize();
+				buffer._texture_param_0[2] = static_cast<float>(input_texture_size.GetX());
+				buffer._texture_param_0[3] = static_cast<float>(input_texture_size.GetY());
+				shader->SetShaderResourceViewHandle(0, input_texture->GetTexture());
+			}
+
+			// texture one, the previous blot texture
+			{
+				DscUi::UiRenderTarget* const input_texture_b = blot[other_index];
+				//DscUi::UiRenderTarget* const input_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
+				const DscCommon::VectorInt2 input_texture_viewport_size = input_texture_b->GetViewportSize();
+				buffer._texture_param_1[0] = static_cast<float>(input_texture_viewport_size.GetX());
+				buffer._texture_param_1[1] = static_cast<float>(input_texture_viewport_size.GetY());
+				const DscCommon::VectorInt2 input_texture_size = input_texture_b->GetTextureSize();
+				buffer._texture_param_1[2] = static_cast<float>(input_texture_size.GetX());
+				buffer._texture_param_1[3] = static_cast<float>(input_texture_size.GetY());
+				auto texture = input_texture_b->GetTexture();
+				DSC_ASSERT(nullptr != texture, "invalid state");
+				shader->SetShaderResourceViewHandle(1, texture);
+			}
+
+			if (true == blot[state._index]->ActivateRenderTarget(*frame))
+			{
+				frame->SetShader(shader, shader_buffer);
+				frame->Draw(weak_geometry.lock());
+				frame->SetRenderTarget(nullptr);
+			}
+		}
 
         out_value = blot[state._index];
     },
@@ -315,14 +331,15 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectBurnBlotDrawNode(
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(shader_buffer_node, "shader constant"));
 
     DscDag::LinkIndexNodes(0, in_frame_node, result_node);
-    DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
-    DscDag::LinkIndexNodes(2, in_ui_render_target_node_b, result_node);
-    DscDag::LinkIndexNodes(3, shader_buffer_node, result_node);
-    DscDag::LinkIndexNodes(4, in_effect_param, result_node);
-    DscDag::LinkIndexNodes(5, in_effect_tint, result_node);
+    DscDag::LinkIndexNodes(1, in_visible, result_node);
+    DscDag::LinkIndexNodes(2, in_ui_render_target_node, result_node);
+    DscDag::LinkIndexNodes(3, in_ui_render_target_node_b, result_node);
+    DscDag::LinkIndexNodes(4, shader_buffer_node, result_node);
+    DscDag::LinkIndexNodes(5, in_effect_param, result_node);
+    DscDag::LinkIndexNodes(6, in_effect_tint, result_node);
 
     DSC_ASSERT(0 < in_array_input_stack.size(), "invalid state");
-    DscDag::LinkIndexNodes(6, in_array_input_stack[in_array_input_stack.size() - 1], result_node);
+    DscDag::LinkIndexNodes(7, in_array_input_stack[in_array_input_stack.size() - 1], result_node);
 
     return result_node;
 }
