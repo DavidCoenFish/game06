@@ -209,7 +209,8 @@ DscDag::NodeToken DscUi::CelticKnot::MakeDrawNode(
     DscRenderResource::RenderTargetPool& in_render_target_pool,
 	DscDag::NodeToken in_frame_node,
 	DscDag::NodeToken in_ui_render_target_node,
-    DscDag::NodeToken in_component_resource_group
+    DscDag::NodeToken in_component_resource_group,
+	DscDag::NodeToken in_visible
 	)
 {
     DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(in_component_resource_group);
@@ -366,48 +367,53 @@ DscDag::NodeToken DscUi::CelticKnot::MakeDrawNode(
 			DSC_ASSERT(nullptr != frame, "invalid state");
 			auto ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
 			DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-			auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-			const int32 celtic_knot_size = DscDag::GetValueType<int32>(in_input_array[3]);
-
-            const DscCommon::VectorFloat4& celtic_knot_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
-
-            std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
-			DSC_ASSERT(nullptr != shader, "invalid state");
-
-			// data texture
-			DscUi::UiRenderTarget* const data_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[5]);
-			shader->SetShaderResourceViewHandle(0, data_texture->GetTexture());
-
-			// knot source texture
-			DscUi::UiRenderTarget* const knot_souce_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
-			shader->SetShaderResourceViewHandle(1, knot_souce_texture->GetTexture());
-
-			auto& buffer = shader_buffer->GetConstant<TFillKnotConstantBuffer>(0);
-
-            // width, height of our render target, then the size of the knot
-            const auto viewport_size = ui_render_target->GetViewportSize();
-            buffer._texture_size_knot_size[0] = static_cast<float>(viewport_size.GetX());
-            buffer._texture_size_knot_size[1] = static_cast<float>(viewport_size.GetY());
-            buffer._texture_size_knot_size[2] = static_cast<float>(celtic_knot_size);
-            buffer._texture_size_knot_size[3] = static_cast<float>(knot_souce_texture->GetTextureSize().GetX());
-
-            // width, height of the data texture, then a pixel delta x, delta y to get the knot centered on the render target
-            const auto data_size = data_texture->GetTextureSize();
-            buffer._data_size[0] = static_cast<float>(data_size.GetX());
-            buffer._data_size[1] = static_cast<float>(data_size.GetY());
-            buffer._data_size[2] = static_cast<float>((((viewport_size.GetX() / celtic_knot_size) * celtic_knot_size) - viewport_size.GetX()) / 2);
-            buffer._data_size[3] = static_cast<float>((((viewport_size.GetY() / celtic_knot_size) * celtic_knot_size) - viewport_size.GetY()) / 2);
-
-            buffer._knot_tint[0] = celtic_knot_tint.GetX();
-            buffer._knot_tint[1] = celtic_knot_tint.GetY();
-            buffer._knot_tint[2] = celtic_knot_tint.GetZ();
-            buffer._knot_tint[3] = celtic_knot_tint.GetW();
-
-			if (true == ui_render_target->ActivateRenderTarget(*frame))
+			const bool visible = DscDag::GetValueType<bool>(in_input_array[7]);
+			ui_render_target->SetEnabled(visible);
+			if (true == visible)
 			{
-				frame->SetShader(weak_shader.lock(), shader_buffer);
-				frame->Draw(weak_geometry.lock());
-				frame->SetRenderTarget(nullptr);
+				auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+				const int32 celtic_knot_size = DscDag::GetValueType<int32>(in_input_array[3]);
+
+				const DscCommon::VectorFloat4& celtic_knot_tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
+
+				std::shared_ptr<DscRenderResource::Shader> shader = weak_shader.lock();
+				DSC_ASSERT(nullptr != shader, "invalid state");
+
+				// data texture
+				DscUi::UiRenderTarget* const data_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[5]);
+				shader->SetShaderResourceViewHandle(0, data_texture->GetTexture());
+
+				// knot source texture
+				DscUi::UiRenderTarget* const knot_souce_texture = DscDag::GetValueType<DscUi::UiRenderTarget*>(in_input_array[6]);
+				shader->SetShaderResourceViewHandle(1, knot_souce_texture->GetTexture());
+
+				auto& buffer = shader_buffer->GetConstant<TFillKnotConstantBuffer>(0);
+
+				// width, height of our render target, then the size of the knot
+				const auto viewport_size = ui_render_target->GetViewportSize();
+				buffer._texture_size_knot_size[0] = static_cast<float>(viewport_size.GetX());
+				buffer._texture_size_knot_size[1] = static_cast<float>(viewport_size.GetY());
+				buffer._texture_size_knot_size[2] = static_cast<float>(celtic_knot_size);
+				buffer._texture_size_knot_size[3] = static_cast<float>(knot_souce_texture->GetTextureSize().GetX());
+
+				// width, height of the data texture, then a pixel delta x, delta y to get the knot centered on the render target
+				const auto data_size = data_texture->GetTextureSize();
+				buffer._data_size[0] = static_cast<float>(data_size.GetX());
+				buffer._data_size[1] = static_cast<float>(data_size.GetY());
+				buffer._data_size[2] = static_cast<float>((((viewport_size.GetX() / celtic_knot_size) * celtic_knot_size) - viewport_size.GetX()) / 2);
+				buffer._data_size[3] = static_cast<float>((((viewport_size.GetY() / celtic_knot_size) * celtic_knot_size) - viewport_size.GetY()) / 2);
+
+				buffer._knot_tint[0] = celtic_knot_tint.GetX();
+				buffer._knot_tint[1] = celtic_knot_tint.GetY();
+				buffer._knot_tint[2] = celtic_knot_tint.GetZ();
+				buffer._knot_tint[3] = celtic_knot_tint.GetW();
+
+				if (true == ui_render_target->ActivateRenderTarget(*frame))
+				{
+					frame->SetShader(weak_shader.lock(), shader_buffer);
+					frame->Draw(weak_geometry.lock());
+					frame->SetRenderTarget(nullptr);
+				}
 			}
 
 			out_value = ui_render_target.get();
@@ -430,6 +436,8 @@ DscDag::NodeToken DscUi::CelticKnot::MakeDrawNode(
         DscDag::LinkIndexNodes(4, celtic_knot_tint, result_node);
 		DscDag::LinkIndexNodes(5, data_texture_node, result_node);
 		DscDag::LinkIndexNodes(6, celtic_knot_source_texture_node, result_node);
+		DscDag::LinkIndexNodes(7, in_visible, result_node);
+
 	}
 
 	return result_node;

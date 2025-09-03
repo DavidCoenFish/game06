@@ -133,7 +133,8 @@ namespace DscUi
 			const ComponentConstructionHelper& in_construction_helper,
 			DscRender::DrawSystem& in_draw_system,
 			DscDag::DagCollection& in_dag_collection,
-			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>()
+			const std::vector<TEffectConstructionHelper>& in_effect_array = std::vector<TEffectConstructionHelper>(),
+			const UiCoord& in_scrollbar_thickness = UiCoord(16, 0.0f)
 		);
 
 		// what about when we want a child to be at an index? set child of "application layer set"? put optional index in construction helper
@@ -194,6 +195,7 @@ namespace DscUi
 			const std::vector<TEffectConstructionHelper>& in_effect_array,
 			DscDag::NodeToken in_root_node_group,
 			DscDag::NodeToken in_render_request_size,
+			DscDag::NodeToken in_visible,
 			DscDag::NodeToken in_child_array_node_or_null,
 			DscDag::NodeToken in_component_resource_group,
 			DscDag::NodeToken in_parent,
@@ -206,6 +208,7 @@ namespace DscUi
 			DscDag::DagCollection& in_dag_collection,
 			std::vector<DscDag::NodeToken>& in_array_input_stack,
 			DscDag::NodeToken in_frame_node,
+			DscDag::NodeToken in_visible,
 			DscDag::NodeToken in_ui_render_target_node,
 			DscDag::NodeToken in_ui_render_target_node_b,
 			DscDag::NodeToken in_ui_scale,

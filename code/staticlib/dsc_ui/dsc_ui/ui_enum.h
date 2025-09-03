@@ -176,8 +176,8 @@ namespace DscUi
 	// this is ment to be the minimal set of values for the UiManager to handle layout
 	enum class TUiNodeGroup : uint8
 	{
-		TDrawNode, // returns a std::shared_ptr<RenderTargetTexture> _render_target_texture (some draw functions need texture size? or no) could this return a shared shader resource (texture)?
-		TDrawBaseNode, // TDrawNode may be the ui component or an effect, if we want to add a dependency, it needs to be to the base of the draw chain
+		TDrawNode, // returns a RenderTargetTexture* of the last thing drawn by the ui node (ie, could be a effect, or the results of the node draw)
+		TDrawBaseNode, // TDrawNode may be the ui component or an effect, if we want to add a dependency, it needs to be to the base of the draw chain. ie, children draw nodes add themselves as inputs to the base draw
 		TUiComponentType,
 		TUiComponentResources, // somewhere to access the text run or other resources kept for the component, an array of nodes? node group? hold the effect param?
 		TArrayChildUiNodeGroup, // so, there is an issue with this, handing around a COPY of a UiNodeGroup is a slight risk of stale data if reference is held elsewhere, use with care
@@ -193,6 +193,8 @@ namespace DscUi
 		// for everything else, put into the TUiComponentResources UiComponentResourceNodeGroup
 		TUiPanelTint, // for crossfade, start with a VectorFloat4, but may neet to change to a TUiPanelShaderConstantBufferPS?
 
+		TVisible, // for scroll bar, possibly an externally supplied node of if we are visible or not. in ui panel draw, skip children with disabled ui render targets...
+
 		TCount
 	};
 
@@ -206,6 +208,7 @@ namespace DscUi
 		TFrame, // no dirty on set
 		TTimeDelta, // dirty if not zero
 		TInputState, // hold state of what node had click down started, 
+		TScrollBarThickness, // the width for vertical scroll bar, or height for vertical, ui coord using TRenderTargetViewportSize and ui scale
 
 		TCount
 	};
@@ -262,6 +265,10 @@ namespace DscUi
 		TManualScrollX,
 		THasManualScrollY,
 		TManualScrollY,
+
+		// pass these down directly with scroll bar creation
+		//TRenderBiggerThanGeometrySizeX,
+		//TRenderBiggerThanGeometrySizeY,
 
 		//TScrollBarShaderConstantBuffer, // this could just be an input node to the draw calculate node
 		TScrollBarKnotTint,

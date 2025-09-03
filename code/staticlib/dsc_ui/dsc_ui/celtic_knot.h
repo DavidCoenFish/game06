@@ -51,7 +51,8 @@ namespace DscUi
 		    DscRenderResource::RenderTargetPool& in_render_target_pool,
 			DscDag::NodeToken in_frame_node,
 			DscDag::NodeToken in_ui_render_target_node,
-		    DscDag::NodeToken in_component_resource_group
+		    DscDag::NodeToken in_component_resource_group,
+		    DscDag::NodeToken in_visible
 			);
 
 	private:

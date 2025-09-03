@@ -158,6 +158,11 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 		static DscDag::DagNodeGroupMetaData s_meta_data = { true, typeid(DscCommon::VectorFloat4) };
 		return s_meta_data;
 	}
+	case DscUi::TUiNodeGroup::TVisible:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(bool) };
+		return s_meta_data;
+	}
 	}
 	static DscDag::DagNodeGroupMetaData s_dummy = { false, typeid(nullptr) };
 	return s_dummy;
@@ -205,6 +210,11 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const DscUi:
 	case DscUi::TUiRootNodeGroup::TInputState:
 	{
 		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(DscUi::UiInputState) };
+		return s_meta_data;
+	}
+	case DscUi::TUiRootNodeGroup::TScrollBarThickness:
+	{
+		static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(int32) };
 		return s_meta_data;
 	}
 	}

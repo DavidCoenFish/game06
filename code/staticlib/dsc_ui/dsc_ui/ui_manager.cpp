@@ -892,7 +892,8 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
     const ComponentConstructionHelper& in_construction_helper,
     DscRender::DrawSystem& in_draw_system,
     DscDag::DagCollection& in_dag_collection,
-    const std::vector<TEffectConstructionHelper>& in_effect_array
+    const std::vector<TEffectConstructionHelper>& in_effect_array,
+	const UiCoord& in_scrollbar_thickness
 )
 {
     DscDag::NodeToken result = in_dag_collection.CreateGroupEnum<DscUi::TUiRootNodeGroup, DscUi::TUiNodeGroup>(nullptr, true);
@@ -928,6 +929,23 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(render_target_size, "render target size root"));
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize, render_target_size);
     }
+
+	//TScrollBarThickness
+	{
+		auto scollbar_thickness_node = in_dag_collection.CreateCalculate<int32>([in_scrollbar_thickness]
+			(int32& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+				const DscCommon::VectorInt2& viewport_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
+				const float ui_scale = DscDag::GetValueType<float>(in_input_array[1]);
+
+				out_value = in_scrollbar_thickness.Evaluate(viewport_size.GetX(), viewport_size.GetY(), ui_scale);
+			}, 
+			owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(scollbar_thickness_node, "scollbar_thickness_node"));
+        DscDag::LinkIndexNodes(0, DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize), scollbar_thickness_node);
+        DscDag::LinkIndexNodes(1, DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TUiScale), scollbar_thickness_node);
+
+	    DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiRootNodeGroup::TScrollBarThickness, scollbar_thickness_node);
+	}
 
     {
         auto shader_constant_buffer = _ui_panel_shader->MakeShaderConstantBuffer(&in_draw_system);
@@ -983,6 +1001,13 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TScrollPos, node);
     }
 
+	// TVisible
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange(true, owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "visible"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TVisible, node);
+    }
+
     auto component_resource_node_group = DscUi::MakeComponentResourceGroup(
         in_dag_collection,
         in_construction_helper,
@@ -1001,6 +1026,7 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
         in_effect_array,
         result,
         DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TRenderTargetViewportSize),
+        DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TVisible),
         DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TArrayChildUiNodeGroup),
         component_resource_node_group,
         nullptr,
@@ -1142,11 +1168,16 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TRenderRequestSize, node);
     }
 
+	bool add_scroll_bar_x = false;
+	bool add_scroll_bar_y = false;
     //TScrollPos, // where is the geometry size quad is on the render target texture
     {
         auto resource_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
-        if ((nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX)) &&
-            (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollY)) &&
+		add_scroll_bar_x = (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX));
+		add_scroll_bar_y = (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::THasManualScrollX));
+
+        if (add_scroll_bar_x &&
+            add_scroll_bar_y &&
             (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::TManualScrollX)) &&
             (nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(resource_group, TUiComponentResourceNodeGroup::TManualScrollY)))
         {
@@ -1189,6 +1220,13 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TScreenSpace, node);
     }
 
+	// TVisible
+    {
+        auto node = in_dag_collection.CreateValueOnValueChange(true, owner);
+        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(node, "visible"));
+        DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TVisible, node);
+    }
+
     DscDag::NodeToken base_node = nullptr;
     auto draw_node = MakeDrawStack(
         in_construction_helper, //TUiDrawType
@@ -1197,6 +1235,7 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
         in_effect_array,
         in_root_node_group,
         DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TRenderRequestSize),
+        DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TVisible),
         DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TArrayChildUiNodeGroup),
         DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources),
         in_parent,
@@ -1207,7 +1246,7 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
 
     DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiNodeGroup>(result));
 
-    // add the crossfade node to the base node draw to ensure that if it changes, draw is triggered (not 100% sure this is still correct logic), disable for now
+    // add the crossfade node to the base node draw to ensure that if it changes, draw is triggered
     {
         auto component_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
         DscDag::NodeToken crossfade_node = DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeNode);
@@ -1399,34 +1438,37 @@ void DscUi::UiManager::DrawUiTextureToCurrentRenderTarget(
     const DscCommon::VectorFloat4& in_tint_colour
 )
 {
-    const auto& shader_constant_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(
-        DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiNodeGroup::TUiPanelShaderConstantBuffer)
-        );
-    {
-        auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferVS>(0);
-        buffer._pos_size[0] = -1.0f;
-        buffer._pos_size[1] = 1.0f;
-        buffer._pos_size[2] = 2.0f;
-        buffer._pos_size[3] = 2.0f;
+	if (true == in_ui_texture->GetEnabled())
+	{
+		const auto& shader_constant_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(
+			DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiNodeGroup::TUiPanelShaderConstantBuffer)
+			);
+		{
+			auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferVS>(0);
+			buffer._pos_size[0] = -1.0f;
+			buffer._pos_size[1] = 1.0f;
+			buffer._pos_size[2] = 2.0f;
+			buffer._pos_size[3] = 2.0f;
 
-        buffer._uv_size[0] = 0.0f;
-        buffer._uv_size[1] = 0.0f;
-        const auto render_target_size = in_ui_texture->GetTextureSize();
-        const auto texture_size = in_ui_texture->GetViewportSize();
-        buffer._uv_size[2] = static_cast<float>(texture_size.GetX()) / static_cast<float>(render_target_size.GetX());
-        buffer._uv_size[3] = static_cast<float>(texture_size.GetY()) / static_cast<float>(render_target_size.GetY());
-    }
-    {
-        auto& buffer_tint = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
-        buffer_tint._tint_colour[0] = in_tint_colour.GetX();
-        buffer_tint._tint_colour[1] = in_tint_colour.GetY();
-        buffer_tint._tint_colour[2] = in_tint_colour.GetZ();
-        buffer_tint._tint_colour[3] = in_tint_colour.GetW();
-    }
+			buffer._uv_size[0] = 0.0f;
+			buffer._uv_size[1] = 0.0f;
+			const auto render_target_size = in_ui_texture->GetTextureSize();
+			const auto texture_size = in_ui_texture->GetViewportSize();
+			buffer._uv_size[2] = static_cast<float>(texture_size.GetX()) / static_cast<float>(render_target_size.GetX());
+			buffer._uv_size[3] = static_cast<float>(texture_size.GetY()) / static_cast<float>(render_target_size.GetY());
+		}
+		{
+			auto& buffer_tint = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
+			buffer_tint._tint_colour[0] = in_tint_colour.GetX();
+			buffer_tint._tint_colour[1] = in_tint_colour.GetY();
+			buffer_tint._tint_colour[2] = in_tint_colour.GetZ();
+			buffer_tint._tint_colour[3] = in_tint_colour.GetW();
+		}
 
-    _ui_panel_shader->SetShaderResourceViewHandle(0, in_ui_texture->GetTexture());
-    in_frame.SetShader(_ui_panel_shader, shader_constant_buffer);
-    in_frame.Draw(_ui_panel_geometry);
+		_ui_panel_shader->SetShaderResourceViewHandle(0, in_ui_texture->GetTexture());
+		in_frame.SetShader(_ui_panel_shader, shader_constant_buffer);
+		in_frame.Draw(_ui_panel_geometry);
+	}
 
     return;
 }
@@ -1438,6 +1480,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
     const std::vector<TEffectConstructionHelper>& in_effect_array,
     DscDag::NodeToken in_root_node_group,
     DscDag::NodeToken in_render_request_size_node,
+	DscDag::NodeToken in_visible,
     DscDag::NodeToken in_child_array_node_or_null,
     DscDag::NodeToken in_component_resource_group,
     DscDag::NodeToken in_parent,
@@ -1470,7 +1513,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
             in_dag_collection,
             array_draw_nodes,
             DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TFrame),
-            ui_render_target_node,
+			in_visible,
+			ui_render_target_node,
             nullptr,
             DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiScale),
             nullptr,
@@ -1554,7 +1598,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawStack(
                 in_dag_collection,
                 array_draw_nodes, 
                 DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TFrame),
-                ui_render_target_node,
+				in_visible,
+				ui_render_target_node,
                 ui_render_target_node_b,
                 DscDag::DagNodeGroup::GetNodeTokenEnum(in_root_node_group, TUiRootNodeGroup::TUiScale),
                 effect_strength,
@@ -1578,6 +1623,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     DscDag::DagCollection& in_dag_collection,
     std::vector<DscDag::NodeToken>& in_array_input_stack,
     DscDag::NodeToken in_frame_node,
+	DscDag::NodeToken in_visible,
     DscDag::NodeToken in_ui_render_target_node,
     DscDag::NodeToken in_ui_render_target_node_b,
     DscDag::NodeToken in_ui_scale,
@@ -1609,27 +1655,32 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
     {
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _debug_grid_shader;
-        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader]
+			(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                 auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
                 DSC_ASSERT(nullptr != frame, "invalid state");
                 auto ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
                 DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-                auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-                DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+				const bool visible = DscDag::GetValueType<bool>(in_input_array[3]);
+				ui_render_target->SetEnabled(visible);
+				if (true == visible)
+				{
+					auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+					DSC_ASSERT(nullptr != shader_buffer, "invalid state");
 
-                const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
+					const DscCommon::VectorInt2 viewport_size = ui_render_target->GetViewportSize();
 
-                auto& buffer = shader_buffer->GetConstant<TDebugGridConstantBuffer>(0);
-                buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
-                buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
+					auto& buffer = shader_buffer->GetConstant<TDebugGridConstantBuffer>(0);
+					buffer._width_height[0] = static_cast<float>(viewport_size.GetX());
+					buffer._width_height[1] = static_cast<float>(viewport_size.GetY());
 
-                if (true == ui_render_target->ActivateRenderTarget(*frame))
-                {
-                    frame->SetShader(weak_shader.lock(), shader_buffer);
-                    frame->Draw(weak_geometry.lock());
-                    frame->SetRenderTarget(nullptr);
-                }
-
+					if (true == ui_render_target->ActivateRenderTarget(*frame))
+					{
+						frame->SetShader(weak_shader.lock(), shader_buffer);
+						frame->Draw(weak_geometry.lock());
+						frame->SetRenderTarget(nullptr);
+					}
+				}
                 out_value = ui_render_target.get();
             },
             owner);
@@ -1645,6 +1696,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
+        DscDag::LinkIndexNodes(3, in_visible, result_node);
     }
     break;
     case TUiDrawType::TFill:
@@ -1656,22 +1708,27 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != frame, "invalid state");
             auto ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-            auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-            DSC_ASSERT(nullptr != shader_buffer, "invalid state");
-            const DscCommon::VectorFloat4& fill_colour = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[3]);
+			const bool visible = DscDag::GetValueType<bool>(in_input_array[4]);
+			ui_render_target->SetEnabled(visible);
+			if (true == visible)
+			{
+				auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+				DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+				const DscCommon::VectorFloat4& fill_colour = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[3]);
 
-            auto& buffer = shader_buffer->GetConstant<TFillConstantBuffer>(0);
-            buffer._colour[0] = fill_colour.GetX();
-            buffer._colour[1] = fill_colour.GetY();
-            buffer._colour[2] = fill_colour.GetZ();
-            buffer._colour[3] = fill_colour.GetW();
+				auto& buffer = shader_buffer->GetConstant<TFillConstantBuffer>(0);
+				buffer._colour[0] = fill_colour.GetX();
+				buffer._colour[1] = fill_colour.GetY();
+				buffer._colour[2] = fill_colour.GetZ();
+				buffer._colour[3] = fill_colour.GetW();
 
-            if (true == ui_render_target->ActivateRenderTarget(*frame))
-            {
-                frame->SetShader(weak_shader.lock(), shader_buffer);
-                frame->Draw(weak_geometry.lock());
-                frame->SetRenderTarget(nullptr);
-            }
+				if (true == ui_render_target->ActivateRenderTarget(*frame))
+				{
+					frame->SetShader(weak_shader.lock(), shader_buffer);
+					frame->Draw(weak_geometry.lock());
+					frame->SetRenderTarget(nullptr);
+				}
+			}
 
             out_value = ui_render_target.get();
         },
@@ -1690,6 +1747,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
         DSC_ASSERT(nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TFillColour), "invalid state");
         DscDag::LinkIndexNodes(3, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TFillColour), result_node);
+        DscDag::LinkIndexNodes(4, in_visible, result_node);
     }
     break;
     case TUiDrawType::TGradientFill:
@@ -1701,18 +1759,23 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != frame, "invalid state");
             auto ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-            auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-            DSC_ASSERT(nullptr != shader_buffer, "invalid state");
+			const bool visible = DscDag::GetValueType<bool>(in_input_array[4]);
+			ui_render_target->SetEnabled(visible);
+			if (true == visible)
+			{
+				auto shader_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
+				DSC_ASSERT(nullptr != shader_buffer, "invalid state");
 
-            const TGradientFillConstantBuffer& gradient_fill = DscDag::GetValueType<TGradientFillConstantBuffer>(in_input_array[3]);
-            shader_buffer->GetConstant<TGradientFillConstantBuffer>(0) = gradient_fill;
+				const TGradientFillConstantBuffer& gradient_fill = DscDag::GetValueType<TGradientFillConstantBuffer>(in_input_array[3]);
+				shader_buffer->GetConstant<TGradientFillConstantBuffer>(0) = gradient_fill;
 
-            if (true == ui_render_target->ActivateRenderTarget(*frame))
-            {
-                frame->SetShader(weak_shader.lock(), shader_buffer);
-                frame->Draw(weak_geometry.lock());
-                frame->SetRenderTarget(nullptr);
-            }
+				if (true == ui_render_target->ActivateRenderTarget(*frame))
+				{
+					frame->SetShader(weak_shader.lock(), shader_buffer);
+					frame->Draw(weak_geometry.lock());
+					frame->SetRenderTarget(nullptr);
+				}
+			}
 
             out_value = ui_render_target.get();
         },
@@ -1731,6 +1794,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
         DSC_ASSERT(nullptr != DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TGradientFill), "invalid state");
         DscDag::LinkIndexNodes(3, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TGradientFill), result_node);
+        DscDag::LinkIndexNodes(4, in_visible, result_node);
     }
     break;
 	case TUiDrawType::TCelticKnotFill:
@@ -1742,7 +1806,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 			*_render_target_pool,
             in_frame_node,
             in_ui_render_target_node,
-			in_component_resource_group
+			in_component_resource_group,
+			in_visible
 			);
 	}
 	break;
@@ -1755,16 +1820,21 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != frame, "invalid state");
             auto ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-            auto shader_resource = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderResource>>(in_input_array[2]);
+			const bool visible = DscDag::GetValueType<bool>(in_input_array[3]);
+			ui_render_target->SetEnabled(visible);
+			if (true == visible)
+			{
+				auto shader_resource = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderResource>>(in_input_array[2]);
 
-            if (true == ui_render_target->ActivateRenderTarget(*frame))
-            {
-                auto shader = weak_shader.lock();
-                shader->SetShaderResourceViewHandle(0, shader_resource->GetHeapWrapperItem());
-                frame->SetShader(shader);
-                frame->Draw(weak_geometry.lock());
-                frame->SetRenderTarget(nullptr);
-            }
+				if (true == ui_render_target->ActivateRenderTarget(*frame))
+				{
+					auto shader = weak_shader.lock();
+					shader->SetShaderResourceViewHandle(0, shader_resource->GetHeapWrapperItem());
+					frame->SetShader(shader);
+					frame->Draw(weak_geometry.lock());
+					frame->SetRenderTarget(nullptr);
+				}
+			}
 
             out_value = ui_render_target.get();
         },
@@ -1777,6 +1847,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DscDag::LinkIndexNodes(2, texture_node, result_node);
+        DscDag::LinkIndexNodes(3, in_visible, result_node);
     }
     break;
     case TUiDrawType::TUiPanel:
@@ -1788,71 +1859,75 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
             DSC_ASSERT(nullptr != frame, "invalid state");
             const auto& ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
             DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-            const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[2]);
+			const bool visible = DscDag::GetValueType<bool>(in_input_array[3]);
+			ui_render_target->SetEnabled(visible);
+			if (true == visible)
+			{
+				const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(in_input_array[2]);
 
-            //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "UiPanelDraw viewport x:%d y:%d\n", ui_render_target->GetViewportSize().GetX(), ui_render_target->GetViewportSize().GetY() );
+				//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "UiPanelDraw viewport x:%d y:%d\n", ui_render_target->GetViewportSize().GetX(), ui_render_target->GetViewportSize().GetY() );
 
-            if (true == ui_render_target->ActivateRenderTarget(*frame))
-            {
-                auto shader = weak_shader.lock();
-                auto geometry = weak_geometry.lock();
-                const DscCommon::VectorInt2 parent_render_size = ui_render_target->GetViewportSize();
+				if (true == ui_render_target->ActivateRenderTarget(*frame))
+				{
+					auto shader = weak_shader.lock();
+					auto geometry = weak_geometry.lock();
+					const DscCommon::VectorInt2 parent_render_size = ui_render_target->GetViewportSize();
 
-                for (const auto& child : child_array)
-                {
-                    DscUi::UiRenderTarget* child_render_target = DscDag::GetValueType<DscUi::UiRenderTarget*>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TDrawNode));
-                    DSC_ASSERT(nullptr != child_render_target, "invalid state");
-                    auto child_texture = child_render_target->GetTexture();
-                    if (nullptr == child_texture)
-                    {
-                        continue;
-                    }
+					for (const auto& child : child_array)
+					{
+						DscUi::UiRenderTarget* child_render_target = DscDag::GetValueType<DscUi::UiRenderTarget*>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TDrawNode));
+						DSC_ASSERT(nullptr != child_render_target, "invalid state");
+						auto child_texture = child_render_target->GetTexture();
+						if (nullptr == child_texture) // can be false if child enable is false
+						{
+							continue;
+						}
 
-                    const auto& shader_constant_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TUiPanelShaderConstantBuffer));
+						const auto& shader_constant_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TUiPanelShaderConstantBuffer));
 
-                    auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferVS>(0);
-                    const DscCommon::VectorInt2& geometry_offset = DscDag::GetValueType<DscCommon::VectorInt2>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TGeometryOffset));
-                    const DscCommon::VectorInt2& geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TGeometrySize));
-                    const DscCommon::VectorFloat2& scroll_value = DscDag::GetValueType<DscCommon::VectorFloat2>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TScrollPos));
-                    const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
-                    const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
+						auto& buffer = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferVS>(0);
+						const DscCommon::VectorInt2& geometry_offset = DscDag::GetValueType<DscCommon::VectorInt2>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TGeometryOffset));
+						const DscCommon::VectorInt2& geometry_size = DscDag::GetValueType<DscCommon::VectorInt2>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TGeometrySize));
+						const DscCommon::VectorFloat2& scroll_value = DscDag::GetValueType<DscCommon::VectorFloat2>(DscDag::DagNodeGroup::GetNodeTokenEnum(child, TUiNodeGroup::TScrollPos));
+						const DscCommon::VectorInt2 render_viewport_size = child_render_target->GetViewportSize();
+						const DscCommon::VectorInt2 render_texture_size = child_render_target->GetTextureSize();
 
-                    CalculatePanelConstantBuffer(
-                        buffer,
-                        parent_render_size,
-                        geometry_offset,
-                        geometry_size,
-                        scroll_value,
-                        render_viewport_size,
-                        render_texture_size
-                        );
+						CalculatePanelConstantBuffer(
+							buffer,
+							parent_render_size,
+							geometry_offset,
+							geometry_size,
+							scroll_value,
+							render_viewport_size,
+							render_texture_size
+							);
 
-                    auto& buffer_tint = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
-                    DscDag::NodeToken tint_token_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child, DscUi::TUiNodeGroup::TUiPanelTint);
-                    if (nullptr != tint_token_node)
-                    {
-                        const DscCommon::VectorFloat4& tint_colour = DscDag::GetValueType<DscCommon::VectorFloat4>(tint_token_node);
-                        buffer_tint._tint_colour[0] = tint_colour.GetX();
-                        buffer_tint._tint_colour[1] = tint_colour.GetY();
-                        buffer_tint._tint_colour[2] = tint_colour.GetZ();
-                        buffer_tint._tint_colour[3] = tint_colour.GetW();
-                    }
-                    else
-                    {
-                        buffer_tint._tint_colour[0] = 1.0f;
-                        buffer_tint._tint_colour[1] = 1.0f;
-                        buffer_tint._tint_colour[2] = 1.0f;
-                        buffer_tint._tint_colour[3] = 1.0f;
-                    }
+						auto& buffer_tint = shader_constant_buffer->GetConstant<TUiPanelShaderConstantBufferPS>(1);
+						DscDag::NodeToken tint_token_node = DscDag::DagNodeGroup::GetNodeTokenEnum(child, DscUi::TUiNodeGroup::TUiPanelTint);
+						if (nullptr != tint_token_node)
+						{
+							const DscCommon::VectorFloat4& tint_colour = DscDag::GetValueType<DscCommon::VectorFloat4>(tint_token_node);
+							buffer_tint._tint_colour[0] = tint_colour.GetX();
+							buffer_tint._tint_colour[1] = tint_colour.GetY();
+							buffer_tint._tint_colour[2] = tint_colour.GetZ();
+							buffer_tint._tint_colour[3] = tint_colour.GetW();
+						}
+						else
+						{
+							buffer_tint._tint_colour[0] = 1.0f;
+							buffer_tint._tint_colour[1] = 1.0f;
+							buffer_tint._tint_colour[2] = 1.0f;
+							buffer_tint._tint_colour[3] = 1.0f;
+						}
 
-                    shader->SetShaderResourceViewHandle(0, child_texture);
-                    frame->SetShader(shader, shader_constant_buffer);
-                    frame->Draw(geometry);
-                }
+						shader->SetShaderResourceViewHandle(0, child_texture);
+						frame->SetShader(shader, shader_constant_buffer);
+						frame->Draw(geometry);
+					}
 
-                frame->SetRenderTarget(nullptr);
-            }
-
+					frame->SetRenderTarget(nullptr);
+				}
+			}
             out_value = ui_render_target.get();
         },
             owner);
@@ -1865,6 +1940,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
         DSC_ASSERT(nullptr != in_child_array_node_or_null, "invalid state");
         DscDag::LinkIndexNodes(2, in_child_array_node_or_null, result_node);
+        DscDag::LinkIndexNodes(3, in_visible, result_node);
 
         // so, if a child's scroll value changes, we need to know to mark ourself dirty (or TUiPanelTint, TGeometryOffset, TGeometrySize ...)
         // easiest way i can think of is to just set the entire child array as a draw input, but we do actually have that as input, in_child_array_node_or_null
@@ -1916,66 +1992,72 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
                 DscRenderResource::Frame& frame = *DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
                 const auto& ui_render_target = DscDag::GetValueType<std::shared_ptr<UiRenderTarget>>(in_input_array[1]);
                 DSC_ASSERT(nullptr != ui_render_target, "invalid state");
-                const auto& shader_constant_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[2]);
-                const DscUi::TUiComponentScrollbarData& scroll_data = DscDag::GetValueType<DscUi::TUiComponentScrollbarData>(in_input_array[3]);
-				const DscCommon::VectorFloat4& tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[4]);
 
-                const DscCommon::VectorInt2 render_viewport_size = ui_render_target->GetViewportSize();
+				const bool visible = DscDag::GetValueType<bool>(in_input_array[2]);
+				ui_render_target->SetEnabled(visible);
 
-                auto& buffer = shader_constant_buffer->GetConstant<TScrollBarConstantBuffer>(0);
-				buffer._tint[0] = tint[0];
-				buffer._tint[1] = tint[1];
-				buffer._tint[2] = tint[2];
-				buffer._tint[3] = tint[3];
-				buffer._pixel_width_height[0] = static_cast<float>(render_viewport_size.GetX());
-				buffer._pixel_width_height[1] = static_cast<float>(render_viewport_size.GetY());
-				buffer._pixel_low_x_y_high_x_y[0] = 0.0f;
-				buffer._pixel_low_x_y_high_x_y[1] = 0.0f;
-				buffer._pixel_low_x_y_high_x_y[2] = static_cast<float>(render_viewport_size.GetX());
-				buffer._pixel_low_x_y_high_x_y[3] = static_cast<float>(render_viewport_size.GetY());
-				if (0 != (scroll_data._scrollbar_axis_flag & TUiScrollbarAxis::THorizontal))
+				// if we need to draw the scroll bar
+				if (true == visible)
 				{
-					DSC_ASSERT(nullptr != in_input_array[5], "invalid state");
-					const DscCommon::VectorFloat4& range_x = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
-					buffer._pixel_low_x_y_high_x_y[0] = range_x[0] / range_x[2] * static_cast<float>(render_viewport_size.GetX());
-					buffer._pixel_low_x_y_high_x_y[2] = range_x[1] / range_x[2] * static_cast<float>(render_viewport_size.GetX());
-				}
-				if (0 != (scroll_data._scrollbar_axis_flag & TUiScrollbarAxis::TVertical))
-				{
-					DSC_ASSERT(nullptr != in_input_array[6], "invalid state");
-					const DscCommon::VectorFloat4& range_y = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[6]);
-					buffer._pixel_low_x_y_high_x_y[1] = range_y[0] / range_y[2] * static_cast<float>(render_viewport_size.GetY());
-					buffer._pixel_low_x_y_high_x_y[3] = range_y[1] / range_y[2] * static_cast<float>(render_viewport_size.GetY());
-				}
-
-				if (nullptr != in_input_array[7])
-				{
-					const float rollover_accumulate = DscDag::GetValueType<float>(in_input_array[7]);
-					const float rollover_accumulate_clamp = DscCommon::Math::Clamp(rollover_accumulate, 0.0f, 1.0f);
-					const float ratio = 1.0f - ((rollover_accumulate_clamp * 0.6f) + 0.4f);
-					//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "rollover_accumulate:%f ratio:%f\n", rollover_accumulate, ratio);
+					const auto& shader_constant_buffer = DscDag::GetValueType<std::shared_ptr<DscRenderResource::ShaderConstantBuffer>>(in_input_array[3]);
+					const DscUi::TUiComponentScrollbarData& scroll_data = DscDag::GetValueType<DscUi::TUiComponentScrollbarData>(in_input_array[4]);
+					const DscCommon::VectorFloat4& tint = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[5]);
+					const DscCommon::VectorInt2 render_viewport_size = ui_render_target->GetViewportSize();
+					auto& buffer = shader_constant_buffer->GetConstant<TScrollBarConstantBuffer>(0);
+					buffer._tint[0] = tint[0];
+					buffer._tint[1] = tint[1];
+					buffer._tint[2] = tint[2];
+					buffer._tint[3] = tint[3];
+					buffer._pixel_width_height[0] = static_cast<float>(render_viewport_size.GetX());
+					buffer._pixel_width_height[1] = static_cast<float>(render_viewport_size.GetY());
+					buffer._pixel_low_x_y_high_x_y[0] = 0.0f;
+					buffer._pixel_low_x_y_high_x_y[1] = 0.0f;
+					buffer._pixel_low_x_y_high_x_y[2] = static_cast<float>(render_viewport_size.GetX());
+					buffer._pixel_low_x_y_high_x_y[3] = static_cast<float>(render_viewport_size.GetY());
 					if (0 != (scroll_data._scrollbar_axis_flag & TUiScrollbarAxis::THorizontal))
 					{
-						buffer._pixel_low_x_y_high_x_y[1] = ((1.0f - ratio) * buffer._pixel_low_x_y_high_x_y[1]) + (ratio * buffer._pixel_low_x_y_high_x_y[3]);
+						DSC_ASSERT(nullptr != in_input_array[6], "invalid state");
+						const DscCommon::VectorFloat4& range_x = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[6]);
+						buffer._pixel_low_x_y_high_x_y[0] = range_x[0] / range_x[2] * static_cast<float>(render_viewport_size.GetX());
+						buffer._pixel_low_x_y_high_x_y[2] = range_x[1] / range_x[2] * static_cast<float>(render_viewport_size.GetX());
 					}
 					if (0 != (scroll_data._scrollbar_axis_flag & TUiScrollbarAxis::TVertical))
 					{
-						buffer._pixel_low_x_y_high_x_y[0] = ((1.0f - ratio) * buffer._pixel_low_x_y_high_x_y[0]) + (ratio * buffer._pixel_low_x_y_high_x_y[2]);
+						DSC_ASSERT(nullptr != in_input_array[7], "invalid state");
+						const DscCommon::VectorFloat4& range_y = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[7]);
+						buffer._pixel_low_x_y_high_x_y[1] = range_y[0] / range_y[2] * static_cast<float>(render_viewport_size.GetY());
+						buffer._pixel_low_x_y_high_x_y[3] = range_y[1] / range_y[2] * static_cast<float>(render_viewport_size.GetY());
 					}
-					//const float tint_ratio = rollover_accumulate_clamp * 0.5f + 0.5f;
-					//buffer._tint[0] *= tint_ratio;
-					//buffer._tint[1] *= tint_ratio;
-					//buffer._tint[2] *= tint_ratio;
-					//buffer._tint[3] *= tint_ratio;
-				}
 
-				if (true == ui_render_target->ActivateRenderTarget(frame))
-				{
-					auto shader = weak_shader.lock();
-					auto geometry = weak_geometry.lock();
-					frame.SetShader(shader, shader_constant_buffer);
-					frame.Draw(geometry);
-					frame.SetRenderTarget(nullptr);
+					if (nullptr != in_input_array[8])
+					{
+						const float rollover_accumulate = DscDag::GetValueType<float>(in_input_array[8]);
+						const float rollover_accumulate_clamp = DscCommon::Math::Clamp(rollover_accumulate, 0.0f, 1.0f);
+						const float ratio = 1.0f - ((rollover_accumulate_clamp * 0.6f) + 0.4f);
+						//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "rollover_accumulate:%f ratio:%f\n", rollover_accumulate, ratio);
+						if (0 != (scroll_data._scrollbar_axis_flag & TUiScrollbarAxis::THorizontal))
+						{
+							buffer._pixel_low_x_y_high_x_y[1] = ((1.0f - ratio) * buffer._pixel_low_x_y_high_x_y[1]) + (ratio * buffer._pixel_low_x_y_high_x_y[3]);
+						}
+						if (0 != (scroll_data._scrollbar_axis_flag & TUiScrollbarAxis::TVertical))
+						{
+							buffer._pixel_low_x_y_high_x_y[0] = ((1.0f - ratio) * buffer._pixel_low_x_y_high_x_y[0]) + (ratio * buffer._pixel_low_x_y_high_x_y[2]);
+						}
+						//const float tint_ratio = rollover_accumulate_clamp * 0.5f + 0.5f;
+						//buffer._tint[0] *= tint_ratio;
+						//buffer._tint[1] *= tint_ratio;
+						//buffer._tint[2] *= tint_ratio;
+						//buffer._tint[3] *= tint_ratio;
+					}
+
+					if (true == ui_render_target->ActivateRenderTarget(frame))
+					{
+						auto shader = weak_shader.lock();
+						auto geometry = weak_geometry.lock();
+						frame.SetShader(shader, shader_constant_buffer);
+						frame.Draw(geometry);
+						frame.SetRenderTarget(nullptr);
+					}
 				}
 
                 out_value = ui_render_target.get();
@@ -1992,12 +2074,13 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 
         DscDag::LinkIndexNodes(0, in_frame_node, result_node);
         DscDag::LinkIndexNodes(1, in_ui_render_target_node, result_node);
-        DscDag::LinkIndexNodes(2, shader_buffer_node, result_node);
-        DscDag::LinkIndexNodes(3, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarData), result_node);
-        DscDag::LinkIndexNodes(4, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarKnotTint), result_node);
-        DscDag::LinkIndexNodes(5, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarRangeReadX), result_node);
-        DscDag::LinkIndexNodes(6, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarRangeReadY), result_node);
-        DscDag::LinkIndexNodes(7, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TInputRolloverAccumulate), result_node);
+        DscDag::LinkIndexNodes(2, in_visible, result_node);
+        DscDag::LinkIndexNodes(3, shader_buffer_node, result_node);
+        DscDag::LinkIndexNodes(4, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarData), result_node);
+        DscDag::LinkIndexNodes(5, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarKnotTint), result_node);
+        DscDag::LinkIndexNodes(6, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarRangeReadX), result_node);
+        DscDag::LinkIndexNodes(7, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TScrollBarRangeReadY), result_node);
+        DscDag::LinkIndexNodes(8, DscDag::DagNodeGroup::GetNodeTokenEnum(in_component_resource_group, TUiComponentResourceNodeGroup::TInputRolloverAccumulate), result_node);
 	}
 	break;
     case TUiDrawType::TEffectCorner:
