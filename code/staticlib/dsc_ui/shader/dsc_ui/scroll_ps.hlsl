@@ -26,7 +26,7 @@ float CalculateCoverage(float2 in_uv)
 
 	float coverage = min(min(min(value_y_high, value_y_low), value_x_high), value_x_low);
 
-    return coverage;
+    return saturate(coverage);
 }
 
 Pixel main(Interpolant in_input)

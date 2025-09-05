@@ -91,7 +91,9 @@ possible improvements is to have the MakeRootNode return a [RootNodeGroup, UiNod
 namespace DscUi
 {
 	/*
-	so, 
+	so, have a struct to hold DagNodeGroups, of just put more in the node groups?
+	went with bloated node groupds, but that messed up the single chanel dirty of the node groups
+	ie, fetching layoutsize was updating the render, if the entire node group was updated
 	*/
 	//struct UiNode
 	//{

@@ -2374,23 +2374,12 @@ void DscUi::UiManager::AddScrollbar(
 		DscDag::LinkIndexNodes(2, scrollbar_write_x, scrollbar_range_read_x);
 
 		auto construction_helper_x = DscUi::MakeComponentScrollbarX(
-				DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+				DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.75f),
                 DscUi::UiCoord(8, 0.0f),
 				scrollbar_write_x,
 				scrollbar_range_read_x
-			//).SetClearColour(
-            //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
             ).SetInputData(
-                [scrollbar_write_x]
-                (DscDag::NodeToken in_node, const DscCommon::VectorFloat2& in_node_rel_click) {
-					const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
-						DscDag::DagNodeGroup::GetNodeTokenEnum(in_node, DscUi::TUiNodeGroup::TScreenSpace)
-						);
-					const float length = screen_space._screen_space.GetZ() - screen_space._screen_space.GetX();
-					const float ratio = (0.0f != length) ? DscCommon::Math::Clamp(in_node_rel_click.GetX() / length, 0.0f, 1.0f) : 0.0f;
-					DscDag::SetValueType(scrollbar_write_x, ratio);
-                    return;
-                },
+				nullptr,
                 [scrollbar_write_x]
                 (DscDag::NodeToken in_node, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2& in_node_rel_click) {
 					const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
@@ -2443,24 +2432,13 @@ void DscUi::UiManager::AddScrollbar(
 		DscDag::LinkIndexNodes(2, scrollbar_write_y, scrollbar_range_read_y);
 
 		auto construction_helper_y = DscUi::MakeComponentScrollbarY(
-				DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f),
+				DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.75f),
+				//DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.1f),
                 DscUi::UiCoord(8, 0.0f),
 				scrollbar_write_y,
 				scrollbar_range_read_y
-			//).SetClearColour(
-            //    DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
             ).SetInputData(
 				nullptr,
-     //           [scrollbar_write_y]
-     //           (DscDag::NodeToken in_node, const DscCommon::VectorFloat2& in_node_rel_click) {
-					//const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(
-					//	DscDag::DagNodeGroup::GetNodeTokenEnum(in_node, DscUi::TUiNodeGroup::TScreenSpace)
-					//	);
-					//const float length = screen_space._screen_space.GetW() - screen_space._screen_space.GetY();
-					//const float ratio = (0.0f != length) ? DscCommon::Math::Clamp(in_node_rel_click.GetY() / length, 0.0f, 1.0f) : 0.0f;
-					//DscDag::SetValueType(scrollbar_write_y, ratio);
-     //               return;
-     //           },
                 [scrollbar_write_y]
                 (DscDag::NodeToken in_node, const DscCommon::VectorFloat2&, const DscCommon::VectorFloat2& in_node_rel_click) {
 					const DscUi::ScreenSpace& screen_space = DscDag::GetValueType<DscUi::ScreenSpace>(

@@ -11,8 +11,10 @@ struct Pixel
 cbuffer ConstantBuffer : register(b0)
 {
     float4 _width_height;
+	// xy: pixel offset, z: radius (0.5 ... 6.7)
     float4 _effect_param;
     float4 _tint;
+	// xy: viewport size (what part of the texture was used) zw: entire texture size
     float4 _texture_param_0;
 };
 
@@ -77,7 +79,7 @@ Pixel main(Interpolant in_input)
     // premultiplied blend
     //result = source.RGB + (dest.RGB * (1 - source.A))
 
-    // we are replacing the existing pixel, but blending with the shad as appropriate
+    // we are replacing the existing pixel, but blending with the shadow as appropriate
     result._colour =
         float4((texel.rgb * (1.0 - shadow_colour.a)) + (shadow_colour.rgb * shadow_colour.a),
             texel.a

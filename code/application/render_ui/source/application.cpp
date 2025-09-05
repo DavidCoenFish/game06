@@ -264,7 +264,18 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
         _resources->_dag_collection = std::make_unique<DscDag::DagCollection>();
-        _resources->_ui_manager = std::make_unique<DscUi::UiManager>(*_draw_system, *_file_system, *(_resources->_dag_collection));
+        _resources->_ui_manager = std::make_unique<DscUi::UiManager>(
+			*_draw_system, 
+			*_file_system, 
+			*(_resources->_dag_collection),
+			std::vector<DscUi::UiManager::TEffectConstructionHelper>({
+				{
+					DscUi::TUiEffectType::TEffectInnerShadow,
+					DscCommon::VectorFloat4(0.0f, 0.0f, 4.0f, 0.0f),
+					DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 1.0f)
+				}
+				})
+			);
     }
 
     if (nullptr != _resources->_ui_manager)
