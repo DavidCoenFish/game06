@@ -49,9 +49,13 @@ DscDag::NodeToken DscUi::MakeNode::MakeUiRenderTargetNode(
     DscDag::NodeToken in_clear_colour,
     DscDag::NodeToken in_request_size_node,
     DscDag::IDagOwner* const in_owner
+	DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name)
 )
 {
-    DscDag::NodeToken node = in_dag_collection.CreateCalculate<std::shared_ptr<DscUi::UiRenderTarget>>([&in_render_target_pool, &in_draw_system](std::shared_ptr<DscUi::UiRenderTarget>& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+    DscDag::NodeToken node = in_dag_collection.CreateCalculate<std::shared_ptr<DscUi::UiRenderTarget>>([
+		&in_render_target_pool, &in_draw_system
+		DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)
+		](std::shared_ptr<DscUi::UiRenderTarget>& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             const DscCommon::VectorInt2 request_size = DscDag::GetValueType<DscCommon::VectorInt2>(in_input_array[0]);
             const DscCommon::VectorFloat4 clear_colour = DscDag::GetValueType<DscCommon::VectorFloat4>(in_input_array[1]);
 
@@ -69,6 +73,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeUiRenderTargetNode(
                 )
             );
 
+			DSC_DEBUG_ONLY(DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "%s\n", in_debug_name.c_str()));
             value->UpdateRenderTargetPool(
                 in_draw_system,
                 in_render_target_pool,
@@ -108,7 +113,13 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
 
     std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = in_geometry;
     std::weak_ptr<DscRenderResource::Shader> weak_shader = in_shader;
-    DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>([weak_geometry, weak_shader, in_input_texture_count](DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+    DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
+	[weak_geometry, weak_shader, in_input_texture_count DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+	(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+		#if defined(_DEBUG)
+		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate effect:%s\n", in_debug_name.c_str());
+		#endif// defined(_DEBUG)
+
         DscRenderResource::Frame* const frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
         DSC_ASSERT(nullptr != frame, "invalid state");
         const auto& ui_render_target = DscDag::GetValueType<std::shared_ptr<DscUi::UiRenderTarget>>(in_input_array[1]);

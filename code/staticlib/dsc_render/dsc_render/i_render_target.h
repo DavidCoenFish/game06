@@ -32,5 +32,7 @@ namespace DscRender
 		virtual const DscCommon::VectorInt2 GetSize() const = 0;
 		virtual const DscCommon::VectorInt2 GetViewportSize() const;
 		virtual const DscCommon::VectorFloat4 GetClearColour() const = 0;
+
+		DSC_DEBUG_ONLY( virtual void* GetDebugToken() { return nullptr; });
 	};
 }//namespace DscRender

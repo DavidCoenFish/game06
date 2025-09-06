@@ -1,10 +1,12 @@
 #include "frame.h"
-#include <dsc_render/draw_system.h>
-#include <dsc_render/i_render_target.h>
 #include "render_target_texture.h"
 #include "shader.h"
 #include "shader_constant_buffer.h"
 #include "geometry_generic.h"
+
+#include <dsc_common/log_system.h>
+#include <dsc_render/draw_system.h>
+#include <dsc_render/i_render_target.h>
 #include <dsc_render/resource_list.h>
 
 std::unique_ptr<DscRenderResource::Frame> DscRenderResource::Frame::CreateNewFrame(DscRender::DrawSystem& in_draw_system)
@@ -55,8 +57,19 @@ void DscRenderResource::Frame::SetRenderTarget(
 		return;
 	}
 
+	if ((in_render_target != nullptr) && 
+		(_render_target != nullptr))
+	{
+		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "new in_render_target:%p\n", in_render_target->GetDebugToken());
+
+		// cross fade was updating the child fade amount after the child had draw, moved caculate earlier as a parent dependency, but that is not a nice solution
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "not strictly an error, but do we have Ui nodes drawing during the draw of parent, missing render node update?\n");
+	}
+
 	if (_render_target)
 	{
+		// DebugToken can be null for things like the backbuffer
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "SetRenderTarget end:%p\n", _render_target->GetDebugToken());
 		_render_target->EndRender(_command_list);
 	}
 
@@ -66,6 +79,9 @@ void DscRenderResource::Frame::SetRenderTarget(
 		// backbuffer render resource is not a IResource, but RenderTargetTexture is, deal upstream
 		//_resource_list->AddResource(_render_target);
 		_render_target->StartRender(_command_list, in_allow_clear);
+
+		// DebugToken can be null for things like the backbuffer
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "SetRenderTarget start:%p\n", _render_target->GetDebugToken());
 	}
 
 	return;

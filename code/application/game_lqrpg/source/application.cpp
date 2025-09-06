@@ -272,6 +272,7 @@ const bool Application::Update()
                         ui_texture
                     );
                 }
+				frame->SetRenderTarget(nullptr);
 
                 if (_resources->_data_source_node_group)
                 {

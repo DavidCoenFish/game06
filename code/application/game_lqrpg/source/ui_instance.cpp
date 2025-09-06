@@ -63,6 +63,7 @@ void UiInstance::AddButton(
         DscUi::MakeComponentCanvas(
         ).SetInputData(
             in_data._on_click,
+			nullptr,
             true,
             true
         ).SetChildStackData(

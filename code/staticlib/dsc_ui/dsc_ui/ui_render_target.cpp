@@ -53,6 +53,8 @@ const bool DscUi::UiRenderTarget::ActivateRenderTarget(
 
 	if (nullptr != _render_target_pool_texture)
 	{
+		DSC_DEBUG_ONLY(_debug_activation_count += 1);
+
 		in_frame.SetRenderTargetTexture(_render_target_pool_texture->_render_target_texture, _allow_clear_on_set);
 		return true;
 	}

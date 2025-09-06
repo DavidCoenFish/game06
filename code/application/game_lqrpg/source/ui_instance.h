@@ -40,7 +40,7 @@ namespace UiInstance
     struct TButtonData
     {
         DscDag::NodeToken _button_text = {};
-        std::function<void(DscDag::NodeToken)> _on_click = {};
+        std::function<void(DscDag::NodeToken,const DscCommon::VectorFloat2 &)> _on_click = {};
     };
 
     DscDag::NodeToken MakeLocaleKey(

@@ -101,6 +101,8 @@ namespace DscRenderResource
 			const DXGI_FORMAT*& in_render_target_view_format
 		) const override;
 
+		DSC_DEBUG_ONLY( virtual void* GetDebugToken() override);
+
 	public:
 		std::vector < std::shared_ptr < Resource > > _target_resource_array;
 		std::vector < D3D12_CPU_DESCRIPTOR_HANDLE > _array_render_target_descriptors;

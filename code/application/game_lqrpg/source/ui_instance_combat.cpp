@@ -73,7 +73,7 @@ DscDag::NodeToken UiInstanceCombat::BuildDataSource(
     // back
     {
         auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "back");
-        auto function = [in_root_data_source_node](DscDag::NodeToken) {
+        auto function = [in_root_data_source_node](DscDag::NodeToken,const DscCommon::VectorFloat2&) {
             UiInstanceApp::DataSourceMainScreenStackPop(in_root_data_source_node);
         };
         UiInstance::TButtonData button_data({ text_node , function });

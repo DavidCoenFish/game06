@@ -111,7 +111,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         //Character
         {
             auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "character");
-            auto function = [in_root_data_source_node](DscDag::NodeToken) {
+            auto function = [in_root_data_source_node](DscDag::NodeToken,const DscCommon::VectorFloat2 &) {
                 UiInstanceApp::DataSourceMainScreenStackPush(in_root_data_source_node,
                     DscDag::DagNodeGroup::GetNodeTokenEnum(
                         in_root_data_source_node,
@@ -124,7 +124,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         //Combat
         {
             auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "combat");
-            auto function = [in_root_data_source_node](DscDag::NodeToken) {
+            auto function = [in_root_data_source_node](DscDag::NodeToken,const DscCommon::VectorFloat2 &) {
                 UiInstanceApp::DataSourceMainScreenStackPush(in_root_data_source_node,
                     DscDag::DagNodeGroup::GetNodeTokenEnum(
                         in_root_data_source_node,
@@ -137,7 +137,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         //Options
         {
             auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "options");
-            auto function = [in_root_data_source_node](DscDag::NodeToken) {
+            auto function = [in_root_data_source_node](DscDag::NodeToken,const DscCommon::VectorFloat2 &) {
                 UiInstanceApp::DataSourceDialogStackPush(in_root_data_source_node,
                     DscDag::DagNodeGroup::GetNodeTokenEnum(
                         in_root_data_source_node,
@@ -150,7 +150,7 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         // Exit
         {
             auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "exit");
-            auto function = [in_root_data_source_node](DscDag::NodeToken) {
+            auto function = [in_root_data_source_node](DscDag::NodeToken,const DscCommon::VectorFloat2 &) {
                 UiInstanceApp::DataSourceMainScreenStackClear(in_root_data_source_node);
             };
             button_data_array.push_back({ text_node , function });

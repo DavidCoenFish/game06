@@ -1,4 +1,6 @@
 #include "render_target_texture.h"
+
+#include <dsc_common/log_system.h>
 #include <dsc_render/heap_wrapper_item.h>
 #include <dsc_render/render_target_format_data.h>
 #include <dsc_render/dsc_render.h>
@@ -246,7 +248,7 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 			&iter->_clear_value,
 			IID_PPV_ARGS(iter->_render_target.ReleaseAndGetAddressOf())
 			));
-		//LOG_MESSAGE_RENDER("RenderTargetResource_%d [%dx%d]", _id, _size[0], _size[1]);
+		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "RenderTargetResource_%d %p [%dx%d]\n", _id, iter->_render_target.Get(), _size[0], _size[1]);
 		iter->_render_target->SetName((std::wstring(L"RenderTargetResource_") + std::to_wstring(_id)).c_str());
 
 		auto render_target_view_descriptor = iter->_render_target_view_descriptor->GetCPUHandle();
@@ -475,6 +477,19 @@ void DscRenderResource::RenderTargetTexture::GetFormatData(
 	in_render_target_view_format = (DXGI_FORMAT*)(_target_format_array.data());
 	return;
 }
+
+#if defined(_DEBUG)
+void* DscRenderResource::RenderTargetTexture::GetDebugToken()
+{
+	if (0 < _target_format_array.size())
+	{
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "RenderTargetResource_%d %p [%dx%d]\n", _id, iter->_render_target.Get(), _size[0], _size[1]);
+
+		return _target_resource_array[0]->_render_target.Get();
+	}
+	return nullptr;
+}
+#endif
 
 const DscCommon::VectorInt2 DscRenderResource::RenderTargetTexture::GetViewportSize() const
 {

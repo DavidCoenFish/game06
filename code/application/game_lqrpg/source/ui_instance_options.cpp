@@ -1,4 +1,6 @@
 #include "ui_instance_options.h"
+
+#include "application.h"
 #include "ui_instance.h"
 #include "ui_instance_app.h"
 #include "ui_instance_context.h"
@@ -71,7 +73,7 @@ DscDag::NodeToken UiInstanceOptions::BuildDataSource(
     // back
     {
         auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "back");
-        auto function = [in_root_data_source_node](DscDag::NodeToken) {
+        auto function = [in_root_data_source_node](DscDag::NodeToken, const DscCommon::VectorFloat2 &) {
             UiInstanceApp::DataSourceDialogStackPop(in_root_data_source_node);
         };
         UiInstance::TButtonData button_data({ text_node , function });
@@ -116,6 +118,7 @@ UiInstanceOptions::UiInstanceOptions(
 
     DscDag::NodeToken data_source = DscDag::GetValueType< DscDag::NodeToken>(in_context._data_source_node);
 
+	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceOptions ctor\n");
     _main_node_group = _ui_manager.AddChildNode(
         DscUi::MakeComponentCanvas(
         ).SetCrossfadeChildAmount(

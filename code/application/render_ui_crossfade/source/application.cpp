@@ -64,12 +64,10 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     }
 
     {
-        auto top_texture = _resources->_ui_manager->MakeUiRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
         _resources->_ui_root_node_group = _resources->_ui_manager->MakeRootNode(
             DscUi::MakeComponentCanvas().SetClearColour(DscCommon::VectorFloat4::s_zero),
             *_draw_system,
-            *_resources->_dag_collection,
-            top_texture
+            *_resources->_dag_collection
         );
 
         _resources->_ui_manager->AddChildNode(
@@ -85,17 +83,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "child one")
         );
-        DscDag::IDagOwner* const owner = dynamic_cast<DscDag::IDagOwner*>(_resources->_ui_root_node_group);
-        _resources->_crossfade_active_child = _resources->_dag_collection->CreateValueOnValueChange<DscDag::NodeToken>(
-            (DscDag::NodeToken)nullptr,
-            owner);
-        DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(_resources->_crossfade_active_child, "active crossfade child node"));
 
         // want a cross fade node, with two children that we can toggle activation on
         // how do we nominate the active child of the cross fade, have a Selected child 
-        DscDag::NodeToken ui_crossfade_node_group = _resources->_ui_manager->AddChildNode(
+        _resources->_ui_crossfade_node_group = _resources->_ui_manager->AddChildNode(
             DscUi::MakeComponentCrossfade(
-                _resources->_crossfade_active_child
+               nullptr
             ).SetChildSlot(
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
                 DscUi::VectorUiCoord2(DscUi::UiCoord(0, 0.5f), DscUi::UiCoord(0, 0.5f)),
@@ -121,7 +114,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            ui_crossfade_node_group,
+            _resources->_ui_crossfade_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "crossfade child a")
         );
@@ -136,15 +129,17 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             *_draw_system,
             *_resources->_dag_collection,
             _resources->_ui_root_node_group,
-            ui_crossfade_node_group,
+            _resources->_ui_crossfade_node_group,
             std::vector<DscUi::UiManager::TEffectConstructionHelper>()
             DSC_DEBUG_ONLY(DSC_COMMA "crossfade child b")
         );
 
-        DscDag::SetValueType<DscDag::NodeToken>(
-            _resources->_crossfade_active_child,
-            DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_child_a, DscUi::TUiNodeGroup::TDrawNode)
-            );
+        auto parent_resource_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
+        auto cross_fade_active_node = parent_resource_node ? DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_node, DscUi::TUiComponentResourceNodeGroup::TCrossfadeActiveChild) : nullptr;
+        if (nullptr != cross_fade_active_node)
+        {
+            DscDag::SetValueType(cross_fade_active_node, _resources->_ui_crossfade_child_a);
+        }
     }
 
     return;
@@ -189,19 +184,24 @@ const bool Application::Update()
             if (2.0f < _resources->_time_accumulate)
             {
                 _resources->_time_accumulate = 0.0f;
-                DscDag::NodeToken draw_a = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_child_a, DscUi::TUiNodeGroup::TDrawNode);
-                DscDag::NodeToken draw_b = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_child_b, DscUi::TUiNodeGroup::TDrawNode);
 
                 DscDag::NodeToken active_child = nullptr;
-                if (draw_a == DscDag::GetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child))
+				auto parent_resource_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_resources->_ui_crossfade_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
+				auto cross_fade_active_node = parent_resource_node ? DscDag::DagNodeGroup::GetNodeTokenEnum(parent_resource_node, DscUi::TUiComponentResourceNodeGroup::TCrossfadeActiveChild) : nullptr;
+				if (nullptr != cross_fade_active_node)
+				{
+					active_child = DscDag::GetValueType<DscDag::NodeToken>(cross_fade_active_node);
+				}
+
+                if (_resources->_ui_crossfade_child_a == active_child)
                 {
-                    active_child = draw_b;
+                    active_child = _resources->_ui_crossfade_child_b;
                 }
                 else
                 {
-                    active_child = draw_a;
+                    active_child = _resources->_ui_crossfade_child_a;
                 }
-                DscDag::SetValueType<DscDag::NodeToken>(_resources->_crossfade_active_child, active_child);
+                DscDag::SetValueType<DscDag::NodeToken>(cross_fade_active_node, active_child);
             }
         }
 
@@ -224,21 +224,31 @@ const bool Application::Update()
                 );
         }
 
+        DscUi::UiRenderTarget* ui_texture = nullptr;
         if (_resources->_ui_manager)
         {
             _resources->_ui_manager->Update(
                 _resources->_ui_root_node_group,
                 time_delta,
                 input_param,
-                _draw_system->GetRenderTargetBackBuffer()
+                _draw_system->GetRenderTargetBackBuffer()->GetViewportSize()
             );
 
-            _resources->_ui_manager->Draw(
+            ui_texture = _resources->_ui_manager->Draw(
                 _resources->_ui_root_node_group,
                 *_resources->_dag_collection,
+                *frame
+            );
+        }
+
+        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
+
+        if (nullptr != ui_texture)
+        {
+            _resources->_ui_manager->DrawUiTextureToCurrentRenderTarget(
                 *frame,
-                true,
-                _draw_system->GetRenderTargetBackBuffer()
+                _resources->_ui_root_node_group,
+                ui_texture
             );
         }
 

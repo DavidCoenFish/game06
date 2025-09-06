@@ -71,5 +71,6 @@ namespace DscUi
 		bool _enabled = false;
 		std::shared_ptr<DscRenderResource::RenderTargetPool::RenderTargetPoolTexture> _render_target_pool_texture = {};
 
+		DSC_DEBUG_ONLY(int32 _debug_activation_count = 0);
 	};
 }

@@ -73,6 +73,7 @@ namespace DscUi
             DscDag::NodeToken in_clear_colour,
             DscDag::NodeToken in_request_size_node,
             DscDag::IDagOwner* const in_owner
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
         );
 
         DscDag::NodeToken MakeEffectDrawNode(

@@ -203,6 +203,7 @@ namespace DscUi
 			DscDag::NodeToken in_component_resource_group,
 			DscDag::NodeToken in_parent,
 			DscDag::NodeToken& out_draw_base_node
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
 		);
 
 		DscDag::NodeToken MakeDrawNode(
@@ -220,6 +221,7 @@ namespace DscUi
 			DscDag::NodeToken in_effect_tint_or_null,
 			DscDag::NodeToken in_child_array_node_or_null,
 			DscDag::NodeToken in_component_resource_group
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string & in_debug_name = "")
 		);
 
 		void AddScrollbar(

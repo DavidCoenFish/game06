@@ -159,14 +159,16 @@ void DscOnscreenVersion::OnscreenVersion::Update(
         in_frame.SetRenderTarget(_render_target_texture.get());
         in_frame.SetShader(shader);
         in_frame.Draw(geometry);
+		in_frame.SetRenderTarget(nullptr);
     }
 
-    // draw out render target texture to the backbuffer
+    // draw our render target texture to the backbuffer
     {
         auto geometry_version = _screen_quad->GetGeometry(in_draw_system, in_frame.GetCommandList());
         in_frame.SetRenderTarget(in_draw_system.GetRenderTargetBackBuffer(), in_allow_clear_backbuffer);
         in_frame.SetShader(_screen_quad_shader);
         in_frame.Draw(geometry_version);
+		in_frame.SetRenderTarget(nullptr);
     }
 
     return;
