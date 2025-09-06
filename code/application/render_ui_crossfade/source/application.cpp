@@ -241,15 +241,15 @@ const bool Application::Update()
             );
         }
 
-        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
-
         if (nullptr != ui_texture)
         {
+	        frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer());
             _resources->_ui_manager->DrawUiTextureToCurrentRenderTarget(
                 *frame,
                 _resources->_ui_root_node_group,
                 ui_texture
             );
+			frame->SetRenderTarget(nullptr);
         }
 
         if (_resources->_onscreen_version)

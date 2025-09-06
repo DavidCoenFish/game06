@@ -1024,7 +1024,7 @@ DscDag::NodeToken DscUi::UiManager::MakeRootNode(
         DscDag::DagNodeGroup::SetNodeTokenEnum(result, TUiNodeGroup::TVisible, node);
     }
 
-    auto component_resource_node_group = DscUi::MakeComponentResourceGroup(
+    auto component_resource_node_group = MakeComponentResourceGroup(
         in_dag_collection,
         in_construction_helper,
         DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiRootNodeGroup::TTimeDelta),
@@ -1073,7 +1073,7 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
     DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
-	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Add child node:%s\n", in_debug_name.c_str());
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Add child node:%s\n", in_debug_name.c_str());
 
     DscDag::NodeToken result = in_dag_collection.CreateGroupEnum<DscUi::TUiNodeGroup>(nullptr, true);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(result, in_debug_name));
@@ -1267,23 +1267,25 @@ DscDag::NodeToken DscUi::UiManager::AddChildNode(
 
     DSC_DEBUG_ONLY(DscDag::DagNodeGroup::DebugValidate<TUiNodeGroup>(result));
 
+	//No, change how this works, parent should no be telling child it's visiblity, as that can mess up render order, 
+	//crossfade amount calculated after child is drawn, and so gets draw again inside parent draw is bad
     // add the crossfade node to the base node draw to ensure that if it changes, draw is triggered
-    {
-        auto component_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
-        DscDag::NodeToken crossfade_node = DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeNode);
-        if (nullptr != crossfade_node)
-        {
-            //DscDag::LinkNodes(crossfade_node, base_node);
+   // {
+   //     auto component_resource_node_group = DscDag::DagNodeGroup::GetNodeTokenEnum(result, TUiNodeGroup::TUiComponentResources);
+   //     DscDag::NodeToken crossfade_node = DscDag::DagNodeGroup::GetNodeTokenEnum(component_resource_node_group, TUiComponentResourceNodeGroup::TCrossfadeNode);
+   //     if (nullptr != crossfade_node)
+   //     {
+   //         //DscDag::LinkNodes(crossfade_node, base_node);
 
-			// actually, link it to the parent in an attempt to have the Nodefade amount of the children update BEFORE 
-			// the children draw...
-			auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
-			if (nullptr != parent_draw_base)
-			{
-				DscDag::LinkNodes(crossfade_node, parent_draw_base);
-			}
-        }
-    }
+			//// actually, link it to the parent in an attempt to have the Nodefade amount of the children update BEFORE 
+			//// the children draw...
+			//auto parent_draw_base = DscDag::DagNodeGroup::GetNodeTokenEnum(in_parent, TUiNodeGroup::TDrawBaseNode);
+			//if (nullptr != parent_draw_base)
+			//{
+			//	DscDag::LinkNodes(crossfade_node, parent_draw_base);
+			//}
+   //     }
+   // }
 
     // add result node to parent child array
     {
@@ -1460,9 +1462,9 @@ DscUi::UiRenderTarget* const DscUi::UiManager::Draw(
     DscRenderResource::Frame& in_frame
 )
 {
-	#if defined(_DEBUG)
-	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "UiManager::Draw\n\n");
-	#endif// defined(_DEBUG)
+	//#if defined(_DEBUG)
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "UiManager::Draw\n\n");
+	//#endif// defined(_DEBUG)
 
     if (nullptr != in_root_node_group)
     {
@@ -1687,6 +1689,8 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 	DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name)
 )
 {
+	DSC_DEBUG_ONLY(DSC_UNUSED(in_debug_name));
+
     DscDag::IDagOwner* owner = dynamic_cast<DscDag::IDagOwner*>(in_component_resource_group);
     DSC_ASSERT(nullptr != owner, "invalid state");
 
@@ -1709,12 +1713,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _debug_grid_shader;
         result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
-			[weak_geometry, weak_shader  DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+			[weak_geometry, weak_shader]//  DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
 			(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
 
-				#if defined(_DEBUG)
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate debug grid:%s\n", in_debug_name.c_str());
-				#endif// defined(_DEBUG)
+				//#if defined(_DEBUG)
+				//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate debug grid:%s\n", in_debug_name.c_str());
+				//#endif// defined(_DEBUG)
 
                 auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
                 DSC_ASSERT(nullptr != frame, "invalid state");
@@ -1763,12 +1767,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _fill_shader;
         result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
-			[weak_geometry, weak_shader DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+			[weak_geometry, weak_shader]// DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
 			(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
 
-			#if defined(_DEBUG)
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate fill:%s\n", in_debug_name.c_str());
-			#endif// defined(_DEBUG)
+			//#if defined(_DEBUG)
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate fill:%s\n", in_debug_name.c_str());
+			//#endif// defined(_DEBUG)
 
             auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");
@@ -1821,12 +1825,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _gradient_fill_shader;
         result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
-			[weak_geometry, weak_shader  DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+			[weak_geometry, weak_shader]//  DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
 			(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
 
-			#if defined(_DEBUG)
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate gradient fill:%s\n", in_debug_name.c_str());
-			#endif// defined(_DEBUG)
+			//#if defined(_DEBUG)
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate gradient fill:%s\n", in_debug_name.c_str());
+			//#endif// defined(_DEBUG)
 
             auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");
@@ -1889,12 +1893,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _full_quad_pos_uv;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _image_shader;
         result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
-			[weak_geometry, weak_shader DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+			[weak_geometry, weak_shader]// DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
 			(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
 
-			#if defined(_DEBUG)
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate image:%s\n", in_debug_name.c_str());
-			#endif// defined(_DEBUG)
+			//#if defined(_DEBUG)
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate image:%s\n", in_debug_name.c_str());
+			//#endif// defined(_DEBUG)
 
             auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");
@@ -1935,12 +1939,12 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
         std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = _ui_panel_geometry;
         std::weak_ptr<DscRenderResource::Shader> weak_shader = _ui_panel_shader;
         result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
-			[weak_geometry, weak_shader DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+			[weak_geometry, weak_shader]// DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
 			(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
 
-			#if defined(_DEBUG)
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate panel:%s\n", in_debug_name.c_str());
-			#endif// defined(_DEBUG)
+			//#if defined(_DEBUG)
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate panel:%s\n", in_debug_name.c_str());
+			//#endif// defined(_DEBUG)
 
             auto frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
             DSC_ASSERT(nullptr != frame, "invalid state");

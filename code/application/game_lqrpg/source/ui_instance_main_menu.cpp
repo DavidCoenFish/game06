@@ -1,4 +1,6 @@
 #include "ui_instance_main_menu.h"
+
+#include "application.h"
 #include "ui_instance.h"
 #include "ui_instance_app.h"
 #include "ui_instance_context.h"
@@ -151,7 +153,10 @@ DscDag::NodeToken UiInstanceMainMenu::BuildDataSource(
         {
             auto text_node = UiInstance::MakeLocaleKey(in_dag_collection, dag_owner, in_root_data_source_node, "exit");
             auto function = [in_root_data_source_node](DscDag::NodeToken,const DscCommon::VectorFloat2 &) {
+
+				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "Exit\n");
                 UiInstanceApp::DataSourceMainScreenStackClear(in_root_data_source_node);
+
             };
             button_data_array.push_back({ text_node , function });
         }

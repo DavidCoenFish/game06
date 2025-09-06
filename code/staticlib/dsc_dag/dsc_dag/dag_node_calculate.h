@@ -50,9 +50,9 @@ namespace DscDag
 				return;
 			}
 
-			#if defined(_DEBUG)
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "Calculate MarkDirty:%s\n", DebugGetNodeName().c_str());
-			#endif// defined(_DEBUG)
+			//#if defined(_DEBUG)
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "Calculate MarkDirty:%s\n", DebugGetNodeName().c_str());
+			//#endif// defined(_DEBUG)
 
 			_dirty = true;
 			for (auto& item : _output)

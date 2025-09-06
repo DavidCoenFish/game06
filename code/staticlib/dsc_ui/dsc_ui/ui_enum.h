@@ -305,7 +305,7 @@ namespace DscUi
 		TCrossfadeActiveChild, // use the DagNodeGroup<TUiNodeGroup> node to identify which child UiNodeGroup to fade up to full visiblity
 		TCrossfadeChildAmount, // for the child of the cross fade, the amount of fade (alpha)
 		//TCrossfadeCondition, // true if the fade is active
-		TCrossfadeNode, // the crossfade node that needs to be set as an input to the crossfade base draw
+		//TCrossfadeNode, // the crossfade node that needs to be set as an input to the crossfade base draw
 
 		TCelticKnotSize,
 		TCelticKnotTint,

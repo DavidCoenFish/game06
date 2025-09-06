@@ -114,11 +114,11 @@ DscDag::NodeToken DscUi::MakeNode::MakeEffectDrawNode(
     std::weak_ptr<DscRenderResource::GeometryGeneric> weak_geometry = in_geometry;
     std::weak_ptr<DscRenderResource::Shader> weak_shader = in_shader;
     DscDag::NodeToken result_node = in_dag_collection.CreateCalculate<DscUi::UiRenderTarget*>(
-	[weak_geometry, weak_shader, in_input_texture_count DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
+	[weak_geometry, weak_shader, in_input_texture_count]// DSC_DEBUG_ONLY(DSC_COMMA in_debug_name)]
 	(DscUi::UiRenderTarget*& out_value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
-		#if defined(_DEBUG)
-		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate effect:%s\n", in_debug_name.c_str());
-		#endif// defined(_DEBUG)
+		//#if defined(_DEBUG)
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "Draw node calculate effect:%s\n", in_debug_name.c_str());
+		//#endif// defined(_DEBUG)
 
         DscRenderResource::Frame* const frame = DscDag::GetValueType<DscRenderResource::Frame*>(in_input_array[0]);
         DSC_ASSERT(nullptr != frame, "invalid state");

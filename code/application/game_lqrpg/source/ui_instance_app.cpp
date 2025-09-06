@@ -1,4 +1,6 @@
 #include "ui_instance_app.h"
+
+#include "application.h"
 #include "ui_instance_context.h"
 #include <dsc_common/enum_soft_bind.h>
 #include <dsc_common/file_system.h>
@@ -32,6 +34,7 @@ namespace
                 {
                     delete_node_array.push_back(child);
                 }
+				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UpdateCrossFadeChildren:%f\n", cross_fade_amount);
             }
 
             for (const auto& delete_node : delete_node_array)
@@ -249,7 +252,6 @@ DscDag::NodeToken UiInstanceApp::BuildDataSource(
 
     return result;
 }
-
 
 void UiInstanceApp::DataSourceMainScreenStackPush(DscDag::NodeToken in_data_source, DscDag::NodeToken in_main_screen)
 {
@@ -523,6 +525,9 @@ const bool UiInstanceApp::HasContent()
     {
         DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
         const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
+
+		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceApp::HasContent:%d\n", child_array.size());
+
         if (0 != child_array.size())
         {
             return true;
