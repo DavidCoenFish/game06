@@ -435,6 +435,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
 UiInstanceMainMenu::~UiInstanceMainMenu()
 {
+	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceMainMenu dtor\n");
     // tell the parent node that we are no longer the active crossfade node, null protected but also asuming parent might be crossfade
     {
         auto parent_resource_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_parent_node_group, DscUi::TUiNodeGroup::TUiComponentResources);
