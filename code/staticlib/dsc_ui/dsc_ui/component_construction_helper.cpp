@@ -15,7 +15,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
     DscDag::IDagOwner* const top_owner = dynamic_cast<DscDag::IDagOwner*>(in_owner);
     DSC_ASSERT(nullptr != top_owner, "invalid state");
 
-    DscDag::NodeToken component_resource_group = in_dag_collection.CreateGroupEnum<DscUi::TUiComponentResourceNodeGroup>(top_owner);
+    DscDag::NodeToken component_resource_group = in_dag_collection.CreateGroupEnum<DscUi::TUiComponentResourceNodeGroup>(top_owner, true);
     DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(component_resource_group, "component_resource_group"));
     DscDag::IDagOwner* const owner = dynamic_cast<DscDag::IDagOwner*>(component_resource_group);
     DSC_ASSERT(nullptr != owner, "invalid state");
@@ -35,8 +35,6 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
 
     if (true == in_construction_helper._has_scroll)
     {
-        //DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "has_scroll: true\n");
-
         auto has_manual_scroll_x = in_dag_collection.CreateValueOnValueChange(
             in_construction_helper._has_manual_scroll_x,
             owner
@@ -471,10 +469,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
 	            const float time_delta = DscDag::GetValueType<float>(in_input_array[1]);
 				const bool active = (in_owner == crossfade_active_child);
                 value += (active ? time_delta : -time_delta);
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "value:%f time_delta:%f\n", value, time_delta);
                 value = std::clamp(value, 0.0f, 1.0f);
-
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "active:%d time_delta:%f value:%f\n", active, time_delta, value);
             },
             owner);
         DscDag::LinkIndexNodes(0, crossfade_active_child_node, crossfade_amount_calculate);
@@ -503,8 +498,6 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
                 {
                     out_value = (0.0f != cross_fade_amount);
                 }
-
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "crossfade condition:%d cross_fade_amount:%f\n", out_value, cross_fade_amount);
             },
             owner);
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(crossfade_condition, "crossfade condition"));
@@ -513,7 +506,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         DscDag::LinkIndexNodes(1, crossfade_amount, crossfade_condition);
 
 		// make a condition node to hook up "cross fade amount calculate" to "cross fade amount" when "crossfade condition" is true
-        in_dag_collection.CreateCondition<float, bool>(
+        auto condition_node = in_dag_collection.CreateCondition<float, bool>(
             crossfade_condition,
             crossfade_amount_calculate,
             nullptr,

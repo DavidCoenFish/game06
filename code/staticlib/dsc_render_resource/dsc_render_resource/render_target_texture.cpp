@@ -248,7 +248,7 @@ void DscRenderResource::RenderTargetTexture::DeviceRestored(
 			&iter->_clear_value,
 			IID_PPV_ARGS(iter->_render_target.ReleaseAndGetAddressOf())
 			));
-		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "RenderTargetResource_%d %p [%dx%d]\n", _id, iter->_render_target.Get(), _size[0], _size[1]);
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "RenderTargetResource_%d %p [%dx%d]\n", _id, iter->_render_target.Get(), _size[0], _size[1]);
 		iter->_render_target->SetName((std::wstring(L"RenderTargetResource_") + std::to_wstring(_id)).c_str());
 
 		auto render_target_view_descriptor = iter->_render_target_view_descriptor->GetCPUHandle();

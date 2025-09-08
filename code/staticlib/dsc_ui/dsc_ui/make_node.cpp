@@ -73,7 +73,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeUiRenderTargetNode(
                 )
             );
 
-			DSC_DEBUG_ONLY(DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "%s\n", in_debug_name.c_str()));
+			//DSC_DEBUG_ONLY(DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_UI, "%s\n", in_debug_name.c_str()));
             value->UpdateRenderTargetPool(
                 in_draw_system,
                 in_render_target_pool,

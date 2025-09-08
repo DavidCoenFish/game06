@@ -249,7 +249,7 @@ const bool Application::Update()
             {
                 ui_instance->Update();
 
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "time_delta:%f\n", time_delta);
+				//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "time_delta:%f\n", time_delta);
 
                 _resources->_ui_manager->Update(
                     ui_instance->GetDagUiGroupNode(),

@@ -118,7 +118,7 @@ UiInstanceOptions::UiInstanceOptions(
 
     DscDag::NodeToken data_source = DscDag::GetValueType< DscDag::NodeToken>(in_context._data_source_node);
 
-	DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceOptions ctor\n");
+	//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceOptions ctor\n");
     _main_node_group = _ui_manager.AddChildNode(
         DscUi::MakeComponentCanvas(
         ).SetCrossfadeChildAmount(

@@ -51,9 +51,9 @@ namespace DscDag
 	private:
 		virtual void MarkDirty() override
 		{
-#if defined(_DEBUG)
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "Condition MarkDirty:%s _dirty:%d\n", DebugGetNodeName().c_str(), _dirty);
-#endif //#if defined(_DEBUG)
+//#if defined(_DEBUG)
+//				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "Condition MarkDirty:%s _dirty:%d\n", DebugGetNodeName().c_str(), _dirty);
+//#endif //#if defined(_DEBUG)
 
 			if (false == _dirty)
 			{
@@ -70,9 +70,9 @@ namespace DscDag
 		}
 		virtual void Update() override
 		{
-#if defined(_DEBUG)
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "Condition Update:%s _dirty:%d\n", DebugGetNodeName().c_str(), _dirty);
-#endif //#if defined(_DEBUG)
+//#if defined(_DEBUG)
+//				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG, "Condition Update:%s _dirty:%d\n", DebugGetNodeName().c_str(), _dirty);
+//#endif //#if defined(_DEBUG)
 
 			if (true == _dirty)
 			{

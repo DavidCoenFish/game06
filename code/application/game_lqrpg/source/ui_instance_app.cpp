@@ -34,7 +34,7 @@ namespace
                 {
                     delete_node_array.push_back(child);
                 }
-				DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UpdateCrossFadeChildren:%f\n", cross_fade_amount);
+				//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UpdateCrossFadeChildren:%f\n", cross_fade_amount);
             }
 
             for (const auto& delete_node : delete_node_array)
@@ -526,7 +526,7 @@ const bool UiInstanceApp::HasContent()
         DscDag::NodeToken child_array_node = DscDag::DagNodeGroup::GetNodeTokenEnum(_main_screen_cross_fade, DscUi::TUiNodeGroup::TArrayChildUiNodeGroup);
         const std::vector<DscDag::NodeToken>& child_array = DscDag::GetValueNodeArray(child_array_node);
 
-		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceApp::HasContent:%d\n", child_array.size());
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "UiInstanceApp::HasContent:%d\n", child_array.size());
 
         if (0 != child_array.size())
         {
