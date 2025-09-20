@@ -1,0 +1,7 @@
+https://kodekloud.com/blog/how-to-push-git-tags-to-remote/
+
+git tag v0.1
+git describe --long
+
+C:\development\game06>git describe --long
+v0.1-9-g670725b
