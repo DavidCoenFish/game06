@@ -1,158 +1,74 @@
-#include "dag_node_node.h"
-#include <dsc_common\debug_print.h>
+#include "dag_2_dirty_component.h"
 
-DscDag::DagNodeNode::DagNodeNode(NodeToken in_node_or_null)
-	: _node(in_node_or_null)
+
+DscDag2::Dag2DirtyComponent::Dag2DirtyComponent()
 {
-	//nop
+	//NOP
 }
 
-DscDag::NodeToken DscDag::DagNodeNode::GetValue() const
+// on dtor, we unlink all our outputs
+DscDag2::Dag2DirtyComponent::~Dag2DirtyComponent()
 {
-	return _node;
-}
-
-void DscDag::DagNodeNode::SetValue(NodeToken in_node_or_null)
-{
-	if (_node == in_node_or_null)
+	for (auto& iter : _output_set)
 	{
-		return;
+		DSC_ASSERT(nullptr != iter, "invalid state");
+		Unlink(*this, *iter);
 	}
-	if (nullptr != _node)
-	{
-		_node->RemoveOutput(this);
-	}
-	if (nullptr != in_node_or_null)
-	{
-		in_node_or_null->AddOutput(this);
-	}
-
-	_node = in_node_or_null;
-
 	return;
 }
 
-void DscDag::DagNodeNode::MarkDirty()
+void DscDag2::Dag2DirtyComponent::Link(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output)
 {
-	if (true == _dirty)
+	auto found_input = in_input._output_set.find(&in_output);
+	auto found_output = in_output._input_set.find(&in_input);
+	if ((found_input != in_input._output_set.end()) ||
+		(found_output != in_output._input_set.end()))
 	{
+		DSC_LOG_WARNING(LOG_TOPIC_DSC_DAG_2, "attempt to multiplically link Dag2DirtyComponent");
 		return;
 	}
 
-	_dirty = true;
-	for (auto& item : _output)
+	in_input._output_set.insert(&in_output);
+	in_output._input_set.insert(&in_input);
+	return;
+}
+
+void DscDag2::Dag2DirtyComponent::Unlink(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output)
+{
+	auto found_input = in_input._output_set.find(&in_output);
+	DSC_ASSERT(found_input != in_input._output_set.end());
+	in_input._output_set.erase(found_input);
+
+	auto found_output = in_output._input_set.find(&in_input);
+	DSC_ASSERT(found_output != in_output._input_set.end());
+	in_output._input_set.erase(found_output);
+
+	return;
+}
+
+// if we are not dirty, then set ourselves as dirty and tell output to mark themselves as dirty
+void DscDag2::Dag2DirtyComponent::MarkDirtyFlag()
+{
+	if (true == _dirty_flag)
 	{
-		item->MarkDirty();
+		return;
+	}
+
+	_dirty_flag = true;
+	for (auto& iter : _output_set)
+	{
+		iter->MarkDirtyFlag();
 	}
 
 	return;
 }
 
-void DscDag::DagNodeNode::Update()
+// if we are dirty, remove the 
+void DscDag2::Dag2DirtyComponent::ClearDirtyFlag()
 {
-	if (true == _dirty)
+	if (true == _dirty_flag)
 	{
-		_dirty = false;
-		if (nullptr != _node)
-		{
-			_node->Update();
-		}
+		_dirty_flag = false;
 	}
 	return;
 }
-
-void DscDag::DagNodeNode::AddOutput(NodeToken in_node)
-{
-	DSC_ASSERT(nullptr != in_node, "invalid param");
-	if (nullptr != in_node)
-	{
-		in_node->MarkDirty();
-	}
-	_output.insert(in_node);
-}
-
-void DscDag::DagNodeNode::RemoveOutput(NodeToken in_node)
-{
-	DSC_ASSERT(nullptr != in_node, "invalid param");
-	if (nullptr != in_node)
-	{
-		in_node->MarkDirty();
-	}
-	_output.erase(in_node);
-}
-
-const bool DscDag::DagNodeNode::GetHasNoLinks() const
-{
-	if (0 != _output.size())
-	{
-		return false;
-	}
-	//if (nullptr != _node)
-	//{
-	//	return false;
-	//}
-	return true;
-}
-
-void DscDag::DagNodeNode::UnlinkInputs()
-{
-	if (nullptr != _node)
-	{
-		//_node->UnlinkInputs();
-		_node->RemoveOutput(this);
-	}
-
-	return;
-}
-
-#if defined(_DEBUG)
-const std::type_info& DscDag::DagNodeNode::DebugGetTypeInfo() const
-{
-	return typeid(NodeToken);
-}
-
-const std::string DscDag::DagNodeNode::DebugPrintRecurseInputs(const int32 in_depth) const
-{
-	std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
-
-	result += "Node:\"";
-	result += DebugGetNodeName();
-	result += "\" dirty:" + std::to_string(_dirty);
-	result += "\n";
-
-	if (nullptr != _node)
-	{
-		result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
-		result += "input:\n";
-		result += _node->DebugPrintRecurseInputs(in_depth + 2);
-	}
-
-	return result;
-}
-
-const std::string DscDag::DagNodeNode::DebugPrintRecurseOutputs(const int32 in_depth) const
-{
-	std::string result = DscCommon::DebugPrint::TabDepth(in_depth);
-
-	result += "Node:\"";
-	result += DebugGetNodeName();
-	result += "\" dirty:" + std::to_string(_dirty);
-	result += "\n";
-
-	if (0 < _output.size())
-	{
-		result += DscCommon::DebugPrint::TabDepth(in_depth + 1);
-		result += "output:\n";
-		for (NodeToken item : _output)
-		{
-			if (nullptr != item)
-			{
-				result += item->DebugPrintRecurseOutputs(in_depth + 2);
-			}
-		}
-	}
-
-	return result;
-}
-#endif //#if defined(_DEBUG)
-

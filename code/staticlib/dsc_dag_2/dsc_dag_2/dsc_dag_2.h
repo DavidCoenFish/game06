@@ -1,6 +1,16 @@
 #pragma once
 
-#define LOG_TOPIC_DSC_DAG "DSC_DAG"
+#define LOG_TOPIC_DSC_DAG_2 "DSC_DAG_2"
+
+namespace DscDag2
+{
+	enum class EMarkValueDirtyLogic
+	{
+		TNone,
+		TValueChange,
+		TNotZero // if you set a value and it is not zero, make dependents dirty
+	};
+}
 
 // allow the IDE to get definitions, otherwise the include paths are defined in the BFF script outside awarness of the IDE
 // added DSC_BFF_BUILD to fastbuild defines
@@ -8,18 +18,10 @@
 
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 
-#include "accessor.h"
-#include "dag_collection.h"
-#include "dag_node_calculate.h"
-#include "dag_node_condition.h"
-#include "dag_node_group.h"
-#include "dag_node_node.h"
-#include "dag_node_node_array.h"
-#include "dag_node_value.h"
-#include "debug_print.h"
-#include "i_dag_node.h"
-#include "i_dag_owner.h"
-#include "link.h"
+#include "dag_2_calculate_component.h"
+#include "dag_2_dirty_component.h"
+#include "dag_2_node.h"
+
 
 #endif //#ifndef DSC_BFF_BUILD
 

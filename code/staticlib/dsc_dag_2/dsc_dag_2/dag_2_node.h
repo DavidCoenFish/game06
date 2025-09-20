@@ -1,39 +1,39 @@
 #pragma once
-#include "dsc_dag.h"
-#include "i_dag_node.h"
+#include "dsc_dag_2.h"
+#include "dag_2_dirty_component.h"
 
-namespace DscDag
+namespace DscDag2
 {
-	class IDagNode;
-	typedef IDagNode* NodeToken;
+	class Dag2calculateComponent;
 
-	/// we hold a node token
-	class DagNodeNode : public IDagNode
+	template <typename IN_TYPE>
+	class Dag2Node //: public IDag2Update
 	{
 	public:
-		DagNodeNode(NodeToken in_node_or_null);
-
-		NodeToken GetValue() const;
-		void SetValue(NodeToken in_node_or_null);
+		Dag2Node(
+			const IN_TYPE& in_value,
+			const EMarkValueDirtyLogic in_dirty_logic//,
+			//std::unique_ptr<Dag2CalculateComponent>&& in_calculate_component
+			);
+		
+		//void SetValue(const IN_TYPE in_value);
+		void SetValueRef(const IN_TYPE& in_value);
+		IN_TYPE& GetValueNonConstRef(const bool in_mark_dirty);
+		const IN_TYPE GetValue() const
+		{
+			return _value;
+		}
+		const IN_TYPE& GetValueRef() const
+		{
+			return _value;
+		}
 
 	private:
-		virtual void MarkDirty() override;
-		virtual void Update() override;
-		virtual void AddOutput(NodeToken in_node) override;
-		virtual void RemoveOutput(NodeToken in_node) override;
-		virtual const bool GetHasNoLinks() const override;
-		virtual void UnlinkInputs() override;
+		// enum
+		EMarkValueDirtyLogic _dirty_logic = EMarkValueDirtyLogic::TNone;
+		Dag2DirtyComponent _dirty_component = {};
+		IN_TYPE _value;
+		//std::unique_ptr<Dag2CalculateComponent> _calculate_component = {};
+	};
+}
 
-#if defined(_DEBUG)
-		virtual const std::type_info& DebugGetTypeInfo() const override;
-		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const override;
-		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const override;
-#endif //#if defined(_DEBUG)
-
-	private:
-		NodeToken _node = {};
-		std::set<NodeToken> _output = {};
-		bool _dirty = false;
-
-	}; // DagGroup
-} //DscDag

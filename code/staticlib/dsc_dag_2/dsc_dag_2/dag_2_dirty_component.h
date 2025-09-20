@@ -1,39 +1,56 @@
 #pragma once
-#include "dsc_dag.h"
-#include "i_dag_node.h"
+#include "dsc_dag_2.h"
+#include <dsc_common\dsc_common.h>
 
-namespace DscDag
+/*
+don't have the concept of condtional sets in the dirty component
+alt. have a set of the conditional nodes that need to be checked each step
+
+other than adding debug name, pretty sure nothing else should be added to this class
+*/
+namespace DscDag2
 {
-	class IDagNode;
-	typedef IDagNode* NodeToken;
+	class Dag2calculateComponent;
 
-	/// we hold a node token
-	class DagNodeNode : public IDagNode
+	class Dag2DirtyComponent
 	{
 	public:
-		DagNodeNode(NodeToken in_node_or_null);
+		// disable copy
+		Dag2DirtyComponent(const Dag2DirtyComponent&) = delete;
+		Dag2DirtyComponent& operator=(const Dag2DirtyComponent&) = delete;
 
-		NodeToken GetValue() const;
-		void SetValue(NodeToken in_node_or_null);
+			//std::set<Dag2DirtyComponent*>* in_conditional_set_or_nullptr = nullptr,
+			//Dag2calculateComponent* in_calculate_component_or_nullptr = nullptr
+		Dag2DirtyComponent();
+		// on dtor, we unlink all our outputs
+		~Dag2DirtyComponent();
+
+		static void Link(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output);
+		static void Unlink(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output);
+
+		// if we are not dirty, then set ourselves as dirty and tell output to mark themselves as dirty
+		void MarkDirtyFlag();
+		// if we are dirty, remove the 
+		void ClearDirtyFlag();
+
+		const bool GetDirtyFlag() const 
+		{
+			return _dirty_flag;
+		}
 
 	private:
-		virtual void MarkDirty() override;
-		virtual void Update() override;
-		virtual void AddOutput(NodeToken in_node) override;
-		virtual void RemoveOutput(NodeToken in_node) override;
-		virtual const bool GetHasNoLinks() const override;
-		virtual void UnlinkInputs() override;
+		bool _dirty_flag = false;
 
-#if defined(_DEBUG)
-		virtual const std::type_info& DebugGetTypeInfo() const override;
-		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const override;
-		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const override;
-#endif //#if defined(_DEBUG)
+		// Multiple double linked
+		// the nodes that we use as input to our dirty state
+		std::set<Dag2DirtyComponent*> _input_set = {};
+		// the nodes that use us as input, our output 
+		std::set<Dag2DirtyComponent*> _output_set = {};
 
-	private:
-		NodeToken _node = {};
-		std::set<NodeToken> _output = {};
-		bool _dirty = false;
-
-	}; // DagGroup
-} //DscDag
+		// where should this live, on dirty, want conditional components to be added to a set to be calculated
+		// does clearing the dirty invoke the calculate components update? 
+		// just keep track of the conditional nodes and update them each tick
+		//std::set<Dag2DirtyComponent*>* _condition_set = {};
+		//Dag2calculateComponent* _calculate_component = nullptr;
+	}
+}

@@ -1,39 +1,19 @@
 #pragma once
-#include "dsc_dag.h"
-#include "i_dag_node.h"
+#include "dsc_dag_2.h"
 
-namespace DscDag
+namespace DscDag2
 {
-	class IDagNode;
-	typedef IDagNode* NodeToken;
-
-	/// we hold a node token
-	class DagNodeNode : public IDagNode
-	{
+	//
+	template<typename... IN_TYPES>
+	class Dag2CalculateComponent {
 	public:
-		DagNodeNode(NodeToken in_node_or_null);
+		// Constructor to accept arguments of the specified types
+		Dag2CalculateComponent(IN_TYPES... args) {
+			// You can process the arguments here
+			// For example, store them in a tuple or a vector of variant
+			// or perform operations based on their types.
+			// This example just prints the number of arguments.
+			std::cout << "Number of arguments: " << sizeof...(args) << std::endl;
+		}
 
-		NodeToken GetValue() const;
-		void SetValue(NodeToken in_node_or_null);
-
-	private:
-		virtual void MarkDirty() override;
-		virtual void Update() override;
-		virtual void AddOutput(NodeToken in_node) override;
-		virtual void RemoveOutput(NodeToken in_node) override;
-		virtual const bool GetHasNoLinks() const override;
-		virtual void UnlinkInputs() override;
-
-#if defined(_DEBUG)
-		virtual const std::type_info& DebugGetTypeInfo() const override;
-		virtual const std::string DebugPrintRecurseInputs(const int32 in_depth = 0) const override;
-		virtual const std::string DebugPrintRecurseOutputs(const int32 in_depth = 0) const override;
-#endif //#if defined(_DEBUG)
-
-	private:
-		NodeToken _node = {};
-		std::set<NodeToken> _output = {};
-		bool _dirty = false;
-
-	}; // DagGroup
-} //DscDag
+}
