@@ -19,6 +19,7 @@
     .CommonVcproject = ^CommonVcproject
     .LibraryBaseNameDependency = {
         "dsc_common", 
+        "dsc_dag_2",
         "dsc_dag",
         "dsc_data"
         }
@@ -29,5 +30,5 @@ DscVsprojectConsoleExe("unit_test" .Param)
 
 .SolutionProjects + "unit_test_project"
 .SolutionItemsApplicationProject + "unit_test_project"
-//.SolutionBuildProject = "unit_test_project"
+.SolutionBuildProject = "unit_test_project"
 

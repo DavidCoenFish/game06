@@ -7,6 +7,7 @@
 #include "test\dsc_common_log_system.h"
 #include "test\dsc_common_math_angle.h"
 #include "test\dsc_common_utf8.h"
+#include "test\dsc_dag_2.h"
 #include "test\dsc_dag_container.h"
 #include "test\dsc_dag_group.h"
 #include "test\dsc_data.h"
@@ -23,6 +24,7 @@ int32 main(int32, char*, char*)
 	TestUtil::AddTest(std::function<bool(void)>(DscCommonLogSystem));
 	TestUtil::AddTest(std::function<bool(void)>(DscCommonMathAngle));
 	TestUtil::AddTest(std::function<bool(void)>(DscCommonUtf8));
+	TestUtil::AddTest(std::function<bool(void)>(DscDag2Test));
 	TestUtil::AddTest(std::function<bool(void)>(DscDagContainer));
 	TestUtil::AddTest(std::function<bool(void)>(DscDagGroup));
 	TestUtil::AddTest(std::function<bool(void)>(TestDscData));

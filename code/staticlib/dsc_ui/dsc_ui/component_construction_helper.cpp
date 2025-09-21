@@ -514,6 +514,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
             nullptr,
             owner);
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(condition_node, "crossfade condition node"));
+		DSC_UNUSED(condition_node);
 
 		// make a ui panel tint calculate
         auto ui_panel_tint_calculate = in_dag_collection.CreateCalculate<DscCommon::VectorFloat4>([](DscCommon::VectorFloat4& value, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {

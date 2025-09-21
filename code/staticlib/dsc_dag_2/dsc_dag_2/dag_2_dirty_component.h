@@ -52,5 +52,5 @@ namespace DscDag2
 		// just keep track of the conditional nodes and update them each tick
 		//std::set<Dag2DirtyComponent*>* _condition_set = {};
 		//Dag2calculateComponent* _calculate_component = nullptr;
-	}
+	};
 }

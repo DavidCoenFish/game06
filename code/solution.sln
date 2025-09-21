@@ -255,6 +255,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{4109
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notes", "notes", "{9BF93803-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
+		notes\git.txt = notes\git.txt
 		notes\notes.txt = notes\notes.txt
 		notes\ui.txt = notes\ui.txt
 		notes\vcpkg.txt = notes\vcpkg.txt
@@ -366,11 +367,7 @@ Global
 		{F2637670-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{F2637670-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{F6424901-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
-		{F6424901-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
-		{F6424901-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Deploy.0 = Debug|x64
 		{F6424901-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
-		{F6424901-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
-		{F6424901-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Deploy.0 = Release|x64
 		{B56D4BCB-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{B56D4BCB-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{45130EE1-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
@@ -400,7 +397,11 @@ Global
 		{929FF9FA-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{929FF9FA-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
+		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Deploy.0 = Debug|x64
 		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
+		{5B0ECA77-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Deploy.0 = Release|x64
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{84F84FC5-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{DC1202D0-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
