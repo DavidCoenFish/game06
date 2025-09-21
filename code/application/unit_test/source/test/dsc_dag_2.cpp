@@ -9,12 +9,11 @@ const bool TestSanity()
 {
 	bool ok = true;
 
-	DscDag2::DscNode<int32> dag_node_0 = {};
-	dag_node_0.S
+	DscDag2::Dag2Node<int32> dag_node_0(0, &DscDag2::CallbackOnValueChange<int32>::Function);
 
-	ok = TEST_UTIL_EQUAL(ok, 3, DscDag::GetValueType<int32>(n2));
-	DscDag::SetValueType(n0, 3);
-	ok = TEST_UTIL_EQUAL(ok, 5, DscDag::GetValueType<int32>(n2));
+	ok = TEST_UTIL_EQUAL(ok, 0, dag_node_0.GetValue());
+	dag_node_0.SetValue(7);
+	ok = TEST_UTIL_EQUAL(ok, 7, dag_node_0.GetValue());
 
 	return ok;
 }

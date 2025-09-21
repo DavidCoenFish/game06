@@ -16,6 +16,56 @@ namespace DscDag2
 	};
 
 	template <typename IN_TYPE>
+	struct CallbackOnSetValue {
+		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		{
+			if (in_new_value != in_old_value)
+			{
+				in_new_value == in_old_value;
+			}
+			return true;
+		}
+	};
+
+	template <typename IN_TYPE>
+	struct CallbackNever {
+		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		{
+			if (in_new_value != in_old_value)
+			{
+				in_new_value == in_old_value;
+			}
+			return false;
+		}
+	};
+
+	template <typename IN_TYPE>
+	struct CallbackOnValueChange {
+		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		{
+			bool result = false;
+			if (in_new_value != in_old_value)
+			{
+				in_new_value == in_old_value;
+				result = true;
+			}
+			return result;
+		}
+	};
+
+	template <typename IN_TYPE>
+	struct CallbackNotZero {
+		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		{
+			if (in_new_value != in_old_value)
+			{
+				in_new_value == in_old_value;
+			}
+			return (0 != in_new_value);
+		}
+	};
+
+	template <typename IN_TYPE>
 	class Dag2Node : public IDag2NodeBase //: public IDag2Update
 	{
 	public:

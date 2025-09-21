@@ -1,5 +1,5 @@
 #include "dag_2_dirty_component.h"
-
+#include <dsc_common\log_system.h>
 
 DscDag2::Dag2DirtyComponent::Dag2DirtyComponent()
 {
