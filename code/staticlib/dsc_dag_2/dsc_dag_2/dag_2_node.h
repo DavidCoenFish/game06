@@ -17,11 +17,11 @@ namespace DscDag2
 
 	template <typename IN_TYPE>
 	struct CallbackOnSetValue {
-		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		static const bool Function(IN_TYPE& in_new_value, const IN_TYPE& in_old_value)
 		{
 			if (in_new_value != in_old_value)
 			{
-				in_new_value == in_old_value;
+				in_new_value = in_old_value;
 			}
 			return true;
 		}
@@ -29,11 +29,11 @@ namespace DscDag2
 
 	template <typename IN_TYPE>
 	struct CallbackNever {
-		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		static const bool Function(IN_TYPE& in_new_value, const IN_TYPE& in_old_value)
 		{
 			if (in_new_value != in_old_value)
 			{
-				in_new_value == in_old_value;
+				in_new_value = in_old_value;
 			}
 			return false;
 		}
@@ -41,12 +41,12 @@ namespace DscDag2
 
 	template <typename IN_TYPE>
 	struct CallbackOnValueChange {
-		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		static const bool Function(IN_TYPE& in_new_value, const IN_TYPE& in_old_value)
 		{
 			bool result = false;
 			if (in_new_value != in_old_value)
 			{
-				in_new_value == in_old_value;
+				in_new_value = in_old_value;
 				result = true;
 			}
 			return result;
@@ -55,11 +55,11 @@ namespace DscDag2
 
 	template <typename IN_TYPE>
 	struct CallbackNotZero {
-		static const bool Function(const IN_TYPE& in_old_value, IN_TYPE& in_new_value)
+		static const bool Function(IN_TYPE& in_new_value, const IN_TYPE& in_old_value)
 		{
 			if (in_new_value != in_old_value)
 			{
-				in_new_value == in_old_value;
+				in_new_value = in_old_value;
 			}
 			return (0 != in_new_value);
 		}
@@ -69,9 +69,13 @@ namespace DscDag2
 	class Dag2Node : public IDag2NodeBase //: public IDag2Update
 	{
 	public:
+		Dag2Node() = delete;
+		Dag2Node& operator=(const Dag2Node&) = delete;
+		Dag2Node(const Dag2Node&) = delete;
+
 		typedef const bool (*TValueAssignCallback)(
-			const IN_TYPE& in_old_value,
-			IN_TYPE& in_new_value
+			IN_TYPE& in_new_value,
+			const IN_TYPE& in_old_value
 			);
 
 		Dag2Node(
@@ -95,7 +99,7 @@ namespace DscDag2
 			bool mark_dirty = false;
 			if (nullptr != _value_assign_callback)
 			{
-				(*_value_assign_callback)(_value, in_value, mark_dirty);
+				mark_dirty = (*_value_assign_callback)(_value, in_value);
 			}
 
 			if (true == mark_dirty)
@@ -117,13 +121,13 @@ namespace DscDag2
 			return _value;
 		}
 
-		const IN_TYPE GetValue() const
+		const IN_TYPE GetValue()
 		{
 			Update();
 			return _value;
 		}
 
-		const IN_TYPE& GetValueRef() const
+		const IN_TYPE& GetValueRef()
 		{
 			Update();
 			return _value;

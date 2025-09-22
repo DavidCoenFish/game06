@@ -36,12 +36,16 @@ void DscDag2::Dag2DirtyComponent::Link(Dag2DirtyComponent& in_input, Dag2DirtyCo
 void DscDag2::Dag2DirtyComponent::Unlink(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output)
 {
 	auto found_input = in_input._output_set.find(&in_output);
-	DSC_ASSERT(found_input != in_input._output_set.end());
-	in_input._output_set.erase(found_input);
+	if (found_input != in_input._output_set.end())
+	{
+		in_input._output_set.erase(found_input);
+	}
 
 	auto found_output = in_output._input_set.find(&in_input);
-	DSC_ASSERT(found_output != in_output._input_set.end());
-	in_output._input_set.erase(found_output);
+	if (found_output != in_output._input_set.end())
+	{
+		in_output._input_set.erase(found_output);
+	}
 
 	return;
 }
