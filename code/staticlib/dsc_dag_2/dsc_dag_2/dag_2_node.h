@@ -81,12 +81,10 @@ namespace DscDag2
 
 		Dag2Node(
 			const IN_TYPE& in_value,
-			const TValueAssignCallback in_value_assign_callback,
-			std::unique_ptr<IDag2CalculateComponent<IN_TYPE>>&& in_calculate_component = std::unique_ptr<IDag2CalculateComponent<IN_TYPE>>()
+			const TValueAssignCallback in_value_assign_callback
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 			)
-			: _calculate_component(std::move(in_calculate_component))
-			, _value_assign_callback(in_value_assign_callback)
+			: _value_assign_callback(in_value_assign_callback)
 			, _value(in_value)
 			DSC_DEBUG_ONLY(DSC_COMMA _debug_name(in_debug_name))
 		{
@@ -94,6 +92,17 @@ namespace DscDag2
 			return;
 		}
 		
+		Dag2Node(
+			std::unique_ptr<IDag2CalculateComponent<IN_TYPE>>&& in_calculate_component = std::unique_ptr<IDag2CalculateComponent<IN_TYPE>>()
+			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
+			)
+			: _calculate_component(std::move(in_calculate_component))
+			DSC_DEBUG_ONLY(DSC_COMMA _debug_name(in_debug_name))
+		{
+			DSC_ASSERT(nullptr != _calculate_component, "invalid state");
+			return;
+		}
+
 		void SetValue(const IN_TYPE& in_value)
 		{
 			DSC_ASSERT(nullptr == _calculate_component, "should not call set value on a calculate node");

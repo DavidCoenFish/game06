@@ -59,12 +59,13 @@ namespace DscDag2
 		typedef std::tuple<IN_TYPE_LIST...> TypeList;
 		typename typedef std::tuple_element<0, TypeList>::type Type00; 
 		typename typedef std::tuple_element<1, TypeList>::type Type01; 
-		typename typedef std::tuple_element<2, TypeList>::type Type02; 
-		typename typedef std::tuple_element<3, TypeList>::type Type03; 
+		//typename typedef std::tuple_element<2, TypeList>::type Type02; 
+		//typename typedef std::tuple_element<3, TypeList>::type Type03; 
 
+		//typedef std::array<IDag2NodeBase*, sizeof(IN_TYPE_LIST)...> TArrayInput;
+		typedef std::array<IDag2NodeBase*, sizeof...(IN_TYPE_LIST)> TArrayInput;
 
-		typedef std::array<IDag2NodeBase*, sizeof(IN_TYPE_LIST)...> TArrayInput;
-		typedef std::function<void(IN_RESULT_TYPE&, IN_TYPE_LIST*...)> TCalculateFunction;
+		typedef std::function<void(IN_RESULT_TYPE&, const IN_TYPE_LIST* const...)> TCalculateFunction;
 		//typedef std::function<void(IN_RESULT_TYPE&, const TArrayInput& in_input)> TCalculateFunction;
 
 		// Constructor to accept arguments of the specified types
@@ -80,8 +81,6 @@ namespace DscDag2
 			static_assert(std::is_same_v<
 				std::tuple_element<in_index, TypeList>::type,
 				IN_TYPE>, "Wrong type at index");
-		//void SetInput(const int32 in_index, IDag2NodeBase* const in_node_or_nullptr)
-		//{
 			_input_array[in_index] = in_node_or_nullptr;
 			return;
 		}
@@ -89,37 +88,37 @@ namespace DscDag2
 	private:
 		void Update(IN_RESULT_TYPE& in_out_result)
 		{
-			int size = sizeof...(IN_TYPE_LIST);
-			// to to transform 
-			switch(size)
-			{
-			default:
-			case 0:
-				_calculate_function(in_out_result);
-				break;
-			case 1:
-				{
-					const Type00* value0 = nullptr;
-					if (nullptr != _input_array[0])
-					{
-						Dag2Node<Type00>* pNode = (Dag2Node<Type00>*)(_input_array[0]);
-						value0 = &(pNode->GetValueRef());
-					}
-					_calculate_function(in_out_result, value0);
-				}
-				break;
-			case 1:
+			//int size = sizeof...(IN_TYPE_LIST);
+			//// to to transform 
+			//switch(size)
+			//{
+			//default:
+			//case 0:
+			//	_calculate_function(in_out_result);
+			//	break;
+			//case 1:
+			//	{
+			//		const Type00* value0 = nullptr;
+			//		if (nullptr != _input_array[0])
+			//		{
+			//			Dag2Node<Type00>* pNode = (Dag2Node<Type00>*)(_input_array[0]);
+			//			value0 = &(pNode->GetValueRef());
+			//		}
+			//		_calculate_function(in_out_result, value0);
+			//	}
+			//	break;
+			//case 2:
 				{
 					const Type00* value0 = (nullptr != _input_array[0]) ? &((Dag2Node<Type00>*)_input_array[0])->GetValueRef() : nullptr;  
 					const Type01* value1 = (nullptr != _input_array[1]) ? &((Dag2Node<Type01>*)_input_array[1])->GetValueRef() : nullptr;  
 					_calculate_function(in_out_result, value0, value1);
 				}
-				break;
-			}
+				//break;
+			//}
 		}
 
 	private:
-		std::array<IDag2NodeBase*, sizeof(IN_TYPE_LIST)...> _input_array = {};
+		TArrayInput _input_array = {};
 		TCalculateFunction _calculate_function = {};
 	};
 }
