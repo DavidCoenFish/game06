@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_dag_2.h"
 #include "dag_2_dirty_component.h"
+#include "i_dag_2_calculate_component.h"
 #include <dsc_common\dsc_common.h>
 
 namespace DscDag2
@@ -81,7 +82,7 @@ namespace DscDag2
 		Dag2Node(
 			const IN_TYPE& in_value,
 			const TValueAssignCallback in_value_assign_callback,
-			std::unique_ptr<IDag2CalculateComponentBase<IN_TYPE>>&& in_calculate_component = std::unique_ptr<IDag2CalculateComponentBase<IN_TYPE>>()
+			std::unique_ptr<IDag2CalculateComponent<IN_TYPE>>&& in_calculate_component = std::unique_ptr<IDag2CalculateComponent<IN_TYPE>>()
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 			)
 			: _calculate_component(std::move(in_calculate_component))
@@ -150,7 +151,7 @@ namespace DscDag2
 		}
 
 	private:
-		std::unique_ptr<IDag2CalculateComponentBase<IN_TYPE>> _calculate_component = {};
+		std::unique_ptr<IDag2CalculateComponent<IN_TYPE>> _calculate_component = {};
 		TValueAssignCallback _value_assign_callback = nullptr;
 		Dag2DirtyComponent _dirty_component = {};
 		IN_TYPE _value;

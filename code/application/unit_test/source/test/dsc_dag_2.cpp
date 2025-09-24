@@ -11,8 +11,8 @@ const bool TestValue()
 
 	DscDag2::Dag2Node<int32> dag_node_0(
 		0, 
-		&DscDag2::CallbackOnValueChange<int32>::Function,
-		std::unique_ptr<DscDag2::IDag2CalculateComponentBase<int32>>()
+		&DscDag2::CallbackOnValueChange<int32>::Function//,
+		//std::unique_ptr<DscDag2::IDag2CalculateComponent<int32>>()
 		);
 
 	ok = TEST_UTIL_EQUAL(ok, 0, dag_node_0.GetValue());

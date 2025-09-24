@@ -1,5 +1,7 @@
 #pragma once
 #include "dsc_dag_2.h"
+#include "i_dag_2_calculate_component.h"
+#include "dag_2_node.h"
 #include <dsc_common\dsc_common.h>
 
 /*
@@ -50,21 +52,8 @@ namespace DscDag2
 {
 	class IDag2NodeBase;
 
-	template <typename IN_RESULT_TYPE>
-	class IDag2CalculateComponentBase
-	{
-	public:
-		~IDag2CalculateComponentBase(){};
-		virtual void Update(IN_RESULT_TYPE& in_out_result) = 0;
-	};
-
-	//template<typename... IN_TYPE_LIST>
-	//struct TypeList {};
-
-	//template<template<typename> class IN_TYPE_LIST_CLASS>
-	//template<typename IN_RESULT_TYPE, typename TypeList>
 	template<typename IN_RESULT_TYPE, typename ... IN_TYPE_LIST>
-	class Dag2CalculateComponent : public IDag2CalculateComponentBase<IN_RESULT_TYPE>
+	class Dag2CalculateComponent : public IDag2CalculateComponent<IN_RESULT_TYPE>
 	{
 	public:
 		typedef std::tuple<IN_TYPE_LIST...> TypeList;
@@ -85,14 +74,14 @@ namespace DscDag2
 			DSC_ASSERT(nullptr != _calculate_function, "invalid state");
 		}
 
-		//template <typename IN_TYPE>
-		//void SetInput(const int32 in_index, Dag2Node<IN_TYPE>* const in_node_or_nullptr)
-		//{
-		//	static_assert(std::is_same_v<
-		//		std::tuple_element<in_index, TypeList>::type,
-		//		IN_TYPE>, "Wrong type at index");
-		void SetInput(const int32 in_index, IDag2NodeBase* const in_node_or_nullptr)
+		template <typename IN_TYPE>
+		void SetInput(const int32 in_index, Dag2Node<IN_TYPE>* const in_node_or_nullptr)
 		{
+			static_assert(std::is_same_v<
+				std::tuple_element<in_index, TypeList>::type,
+				IN_TYPE>, "Wrong type at index");
+		//void SetInput(const int32 in_index, IDag2NodeBase* const in_node_or_nullptr)
+		//{
 			_input_array[in_index] = in_node_or_nullptr;
 			return;
 		}

@@ -21,6 +21,7 @@ namespace DscDag2
 #include "dag_2_calculate_component.h"
 #include "dag_2_dirty_component.h"
 #include "dag_2_node.h"
+#include "i_dag_2_calculate_component.h"
 
 
 #endif //#ifndef DSC_BFF_BUILD
