@@ -69,7 +69,7 @@ namespace DscDag2
 		//break circular dependency with Dag2CalculateComponent for linking nodes, either exposing Dag2DirtyComponent, IDag2CalculateComponent or friend
 		friend struct Link;
 
-		Node() = delete;
+		//Node() = delete;
 		Node& operator=(const Node&) = delete;
 		Node(const Node&) = delete;
 
@@ -80,27 +80,19 @@ namespace DscDag2
 
 		Node(
 			const IN_TYPE& in_value,
-			const TValueAssignCallback in_value_assign_callback
-			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
-			)
-			: _value_assign_callback(in_value_assign_callback)
-			, _value(in_value)
-			DSC_DEBUG_ONLY(DSC_COMMA _debug_name(in_debug_name))
-		{
-			DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG_2, "Node value ctor:%p\n", this);
-			DSC_ASSERT(nullptr != _value_assign_callback, "invalid state");
-			return;
-		}
-		
-		Node(
+			const TValueAssignCallback in_value_assign_callback = nullptr,
 			std::unique_ptr<ICalculateComponent<IN_TYPE>>&& in_calculate_component = std::unique_ptr<ICalculateComponent<IN_TYPE>>()
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 			)
 			: _calculate_component(std::move(in_calculate_component))
+			, _value_assign_callback(in_value_assign_callback)
+			, _value(in_value)
 			DSC_DEBUG_ONLY(DSC_COMMA _debug_name(in_debug_name))
 		{
-			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG_2, "Node calculate ctor:%p\n", this);
-			DSC_ASSERT(nullptr != _calculate_component, "invalid state");
+			//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_DAG_2, "Node ctor:%p\n", this);
+			DSC_ASSERT(
+				(nullptr != _calculate_component) != (nullptr != _value_assign_callback)
+				, "one or the other must be set");
 			return;
 		}
 
@@ -171,11 +163,16 @@ namespace DscDag2
 			return;
 		}
 
+	protected:
+		//DirtyComponent& GetDirtyComponent() const { return _dirty_component; }
+
 	private:
 		std::unique_ptr<ICalculateComponent<IN_TYPE>> _calculate_component = {};
 		TValueAssignCallback _value_assign_callback = nullptr;
+	protected:
 		DirtyComponent _dirty_component = {};
 		IN_TYPE _value;
+	private:
 		DSC_DEBUG_ONLY(std::string _debug_name = {});
 	};
 }

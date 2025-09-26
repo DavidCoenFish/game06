@@ -93,38 +93,128 @@ namespace DscDag2
 #endif //if defined(_DEBUG)
 
 	private:
-		typename typedef std::tuple_element<0, TypeList>::type Type00; 
-		typename typedef std::tuple_element<1, TypeList>::type Type01; 
-
 		void Update(IN_RESULT_TYPE& in_out_result)
 		{
-			//int size = sizeof...(IN_TYPE_LIST);
-			//// to to transform 
-			//switch(size)
-			//{
-			//default:
-			//case 0:
-			//	_calculate_function(in_out_result);
-			//	break;
-			//case 1:
-			//	{
-			//		const Type00* value0 = nullptr;
-			//		if (nullptr != _input_array[0])
-			//		{
-			//			Dag2Node<Type00>* pNode = (Dag2Node<Type00>*)(_input_array[0]);
-			//			value0 = &(pNode->GetValueRef());
-			//		}
-			//		_calculate_function(in_out_result, value0);
-			//	}
-			//	break;
-			//case 2:
-				{
-					const Type00* value0 = (nullptr != _input_array[0]) ? &((Node<Type00>*)_input_array[0])->GetValueRef() : nullptr;  
-					const Type01* value1 = (nullptr != _input_array[1]) ? &((Node<Type01>*)_input_array[1])->GetValueRef() : nullptr;  
-					_calculate_function(in_out_result, value0, value1);
-				}
-				//break;
-			//}
+			UpdateImpl<sizeof...(IN_TYPE_LIST)>(in_out_result);
+			return;
+		}
+
+		template<int32 IN_TYPE_LIST_SIZE>
+		void UpdateImpl(IN_RESULT_TYPE& in_out_result);
+
+		template<>
+		void UpdateImpl<1>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0);
+		}
+
+		template<>
+		void UpdateImpl<2>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1);
+		}
+
+		template<>
+		void UpdateImpl<3>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2);
+		}
+
+		template<>
+		void UpdateImpl<4>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3);
+		}
+
+		template<>
+		void UpdateImpl<5>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			const std::tuple_element<4, TypeList>::type* value4 = (nullptr != _input_array[4]) ? &((Node<std::tuple_element<4, TypeList>::type>*)_input_array[4])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3, value4);
+		}
+
+		template<>
+		void UpdateImpl<6>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			const std::tuple_element<4, TypeList>::type* value4 = (nullptr != _input_array[4]) ? &((Node<std::tuple_element<4, TypeList>::type>*)_input_array[4])->GetValueRef() : nullptr;  
+			const std::tuple_element<5, TypeList>::type* value5 = (nullptr != _input_array[5]) ? &((Node<std::tuple_element<5, TypeList>::type>*)_input_array[5])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3, value4, value5);
+		}
+
+		template<>
+		void UpdateImpl<7>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			const std::tuple_element<4, TypeList>::type* value4 = (nullptr != _input_array[4]) ? &((Node<std::tuple_element<4, TypeList>::type>*)_input_array[4])->GetValueRef() : nullptr;  
+			const std::tuple_element<5, TypeList>::type* value5 = (nullptr != _input_array[5]) ? &((Node<std::tuple_element<5, TypeList>::type>*)_input_array[5])->GetValueRef() : nullptr;  
+			const std::tuple_element<6, TypeList>::type* value6 = (nullptr != _input_array[6]) ? &((Node<std::tuple_element<6, TypeList>::type>*)_input_array[6])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3, value4, value5, value6);
+		}
+
+		template<>
+		void UpdateImpl<8>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			const std::tuple_element<4, TypeList>::type* value4 = (nullptr != _input_array[4]) ? &((Node<std::tuple_element<4, TypeList>::type>*)_input_array[4])->GetValueRef() : nullptr;  
+			const std::tuple_element<5, TypeList>::type* value5 = (nullptr != _input_array[5]) ? &((Node<std::tuple_element<5, TypeList>::type>*)_input_array[5])->GetValueRef() : nullptr;  
+			const std::tuple_element<6, TypeList>::type* value6 = (nullptr != _input_array[6]) ? &((Node<std::tuple_element<6, TypeList>::type>*)_input_array[6])->GetValueRef() : nullptr;  
+			const std::tuple_element<7, TypeList>::type* value7 = (nullptr != _input_array[7]) ? &((Node<std::tuple_element<7, TypeList>::type>*)_input_array[7])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3, value4, value5, value6, value7);
+		}
+
+		template<>
+		void UpdateImpl<9>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			const std::tuple_element<4, TypeList>::type* value4 = (nullptr != _input_array[4]) ? &((Node<std::tuple_element<4, TypeList>::type>*)_input_array[4])->GetValueRef() : nullptr;  
+			const std::tuple_element<5, TypeList>::type* value5 = (nullptr != _input_array[5]) ? &((Node<std::tuple_element<5, TypeList>::type>*)_input_array[5])->GetValueRef() : nullptr;  
+			const std::tuple_element<6, TypeList>::type* value6 = (nullptr != _input_array[6]) ? &((Node<std::tuple_element<6, TypeList>::type>*)_input_array[6])->GetValueRef() : nullptr;  
+			const std::tuple_element<7, TypeList>::type* value7 = (nullptr != _input_array[7]) ? &((Node<std::tuple_element<7, TypeList>::type>*)_input_array[7])->GetValueRef() : nullptr;  
+			const std::tuple_element<8, TypeList>::type* value8 = (nullptr != _input_array[8]) ? &((Node<std::tuple_element<8, TypeList>::type>*)_input_array[8])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3, value4, value5, value6, value7, value8);
+		}
+
+		template<>
+		void UpdateImpl<10>(IN_RESULT_TYPE& in_out_result)
+		{
+			const std::tuple_element<0, TypeList>::type* value0 = (nullptr != _input_array[0]) ? &((Node<std::tuple_element<0, TypeList>::type>*)_input_array[0])->GetValueRef() : nullptr;  
+			const std::tuple_element<1, TypeList>::type* value1 = (nullptr != _input_array[1]) ? &((Node<std::tuple_element<1, TypeList>::type>*)_input_array[1])->GetValueRef() : nullptr;  
+			const std::tuple_element<2, TypeList>::type* value2 = (nullptr != _input_array[2]) ? &((Node<std::tuple_element<2, TypeList>::type>*)_input_array[2])->GetValueRef() : nullptr;  
+			const std::tuple_element<3, TypeList>::type* value3 = (nullptr != _input_array[3]) ? &((Node<std::tuple_element<3, TypeList>::type>*)_input_array[3])->GetValueRef() : nullptr;  
+			const std::tuple_element<4, TypeList>::type* value4 = (nullptr != _input_array[4]) ? &((Node<std::tuple_element<4, TypeList>::type>*)_input_array[4])->GetValueRef() : nullptr;  
+			const std::tuple_element<5, TypeList>::type* value5 = (nullptr != _input_array[5]) ? &((Node<std::tuple_element<5, TypeList>::type>*)_input_array[5])->GetValueRef() : nullptr;  
+			const std::tuple_element<6, TypeList>::type* value6 = (nullptr != _input_array[6]) ? &((Node<std::tuple_element<6, TypeList>::type>*)_input_array[6])->GetValueRef() : nullptr;  
+			const std::tuple_element<7, TypeList>::type* value7 = (nullptr != _input_array[7]) ? &((Node<std::tuple_element<7, TypeList>::type>*)_input_array[7])->GetValueRef() : nullptr;  
+			const std::tuple_element<8, TypeList>::type* value8 = (nullptr != _input_array[8]) ? &((Node<std::tuple_element<8, TypeList>::type>*)_input_array[8])->GetValueRef() : nullptr;  
+			const std::tuple_element<9, TypeList>::type* value9 = (nullptr != _input_array[9]) ? &((Node<std::tuple_element<9, TypeList>::type>*)_input_array[9])->GetValueRef() : nullptr;  
+			_calculate_function(in_out_result, value0, value1, value2, value3, value4, value5, value6, value7, value8, value9);
 		}
 
 	private:
