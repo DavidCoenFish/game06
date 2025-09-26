@@ -18,11 +18,12 @@ namespace DscDag2
 
 #include "..\..\dsc_common\dsc_common\dsc_common.h"
 
-#include "dag_2_calculate_component.h"
-#include "dag_2_dirty_component.h"
-#include "dag_2_node.h"
-#include "i_dag_2_calculate_component.h"
-
+#include "calculate_component.h"
+#include "dirty_component.h"
+#include "node.h"
+#include "i_calculate_component.h"
+#include "i_node.h"
+#include "link.h"
 
 #endif //#ifndef DSC_BFF_BUILD
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_dag_2.h"
 #include <dsc_common\dsc_common.h>
+#include <dsc_common\log_system.h>
 
 /*
 don't have the concept of condtional sets in the dirty component
@@ -10,23 +11,21 @@ other than adding debug name, pretty sure nothing else should be added to this c
 */
 namespace DscDag2
 {
-	class Dag2calculateComponent;
-
-	class Dag2DirtyComponent
+	class DirtyComponent
 	{
 	public:
 		// disable copy
-		Dag2DirtyComponent(const Dag2DirtyComponent&) = delete;
-		Dag2DirtyComponent& operator=(const Dag2DirtyComponent&) = delete;
+		DirtyComponent(const DirtyComponent&) = delete;
+		DirtyComponent& operator=(const DirtyComponent&) = delete;
 
 			//std::set<Dag2DirtyComponent*>* in_conditional_set_or_nullptr = nullptr,
 			//Dag2calculateComponent* in_calculate_component_or_nullptr = nullptr
-		Dag2DirtyComponent();
+		DirtyComponent();
 		// on dtor, we unlink all our outputs
-		~Dag2DirtyComponent();
+		~DirtyComponent();
 
-		static void Link(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output);
-		static void Unlink(Dag2DirtyComponent& in_input, Dag2DirtyComponent& in_output);
+		static void Link(DirtyComponent& in_input, DirtyComponent& in_output);
+		static void Unlink(DirtyComponent& in_input, DirtyComponent& in_output);
 
 		// if we are not dirty, then set ourselves as dirty and tell output to mark themselves as dirty
 		void MarkDirtyFlag();
@@ -41,11 +40,11 @@ namespace DscDag2
 	private:
 		bool _dirty_flag = false;
 
-		// Multiple double linked
+		// Multiple double linked, makes it easier to delete node without needing to presuerve order of singlely linked
 		// the nodes that we use as input to our dirty state
-		std::set<Dag2DirtyComponent*> _input_set = {};
+		std::set<DirtyComponent*> _input_set = {};
 		// the nodes that use us as input, our output 
-		std::set<Dag2DirtyComponent*> _output_set = {};
+		std::set<DirtyComponent*> _output_set = {};
 
 		// where should this live, on dirty, want conditional components to be added to a set to be calculated
 		// does clearing the dirty invoke the calculate components update? 
