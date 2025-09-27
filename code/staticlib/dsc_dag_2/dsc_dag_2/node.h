@@ -81,7 +81,7 @@ namespace DscDag2
 		Node(
 			const IN_TYPE& in_value,
 			const TValueAssignCallback in_value_assign_callback = nullptr,
-			std::unique_ptr<ICalculateComponent<IN_TYPE>>&& in_calculate_component = std::unique_ptr<ICalculateComponent<IN_TYPE>>()
+			std::unique_ptr<ICalculateComponent<IN_TYPE>>&& in_calculate_component = nullptr //std::unique_ptr<ICalculateComponent<IN_TYPE>>()
 			DSC_DEBUG_ONLY(DSC_COMMA const std::string& in_debug_name = "")
 			)
 			: _calculate_component(std::move(in_calculate_component))

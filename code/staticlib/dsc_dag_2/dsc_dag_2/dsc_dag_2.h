@@ -20,10 +20,12 @@ namespace DscDag2
 
 #include "calculate_component.h"
 #include "dirty_component.h"
-#include "node.h"
 #include "i_calculate_component.h"
 #include "i_node.h"
 #include "link.h"
+#include "node.h"
+#include "node_array_node.h"
+#include "node_owner.h"
 
 #endif //#ifndef DSC_BFF_BUILD
 

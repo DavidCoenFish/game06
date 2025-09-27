@@ -83,6 +83,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parent", "parent", "{3D8E60
 		..\backup_copy_e_drive.cmd = ..\backup_copy_e_drive.cmd
 		..\cmd_here.cmd = ..\cmd_here.cmd
 		..\commit.cmd = ..\commit.cmd
+		..\generate_project.cmd = ..\generate_project.cmd
 		..\launch_visual_studio_code.cmd = ..\launch_visual_studio_code.cmd
 		..\notes.txt = ..\notes.txt
 		..\publish_show_n_tell.cmd = ..\publish_show_n_tell.cmd

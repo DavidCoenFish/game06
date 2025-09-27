@@ -38,6 +38,7 @@
             "../backup_copy_e_drive.cmd",
             "../cmd_here.cmd",
             "../commit.cmd",
+            "../generate_project.cmd",
             "../launch_visual_studio_code.cmd",
             "../notes.txt",
             "../publish_show_n_tell.cmd",
