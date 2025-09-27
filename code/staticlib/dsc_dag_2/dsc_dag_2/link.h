@@ -47,6 +47,8 @@ namespace DscDag2
 						in_node._dirty_component
 					);
 				}
+				//INode& base_node = in_node;
+				//base_node.
 			}
 		}
 	};

@@ -95,6 +95,9 @@ namespace DscDag2
 	private:
 		void Update(IN_RESULT_TYPE& in_out_result)
 		{
+			// ensure each input has had update called
+			//for (const auto& iter : 
+
 			UpdateImpl<sizeof...(IN_TYPE_LIST)>(in_out_result);
 			return;
 		}

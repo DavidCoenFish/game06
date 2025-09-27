@@ -62,7 +62,7 @@ const bool TestNodeArrayNode()
 
 	DscDag2::Node<int32> dag_node_0(0, &DscDag2::CallbackOnValueChange<int32>::Function);
 	DscDag2::Node<int32> dag_node_1(0, &DscDag2::CallbackOnValueChange<int32>::Function);
-	DscDag2::NodeArrayNode<int32> dag_node_array;
+	DscDag2::NodeArrayNode<int32> dag_node_array(DSC_DEBUG_ONLY("node array"));
 	dag_node_array.Push(dag_node_0);
 	dag_node_array.Push(dag_node_1);
 
@@ -76,7 +76,7 @@ const bool TestNodeArrayNode()
 				return;
 			}
 		));
-/*
+
 	DscDag2::Link::SetInput<
 		std::vector<DscDag2::Node<int32>*>, 
 		0, 
@@ -94,7 +94,7 @@ const bool TestNodeArrayNode()
 	dag_node_0.SetValue(2);
 	dag_node_calc.GetValue();
 	ok = TEST_UTIL_EQUAL(ok, 2, calc_count);
-*/
+
 	return ok;
 }
 

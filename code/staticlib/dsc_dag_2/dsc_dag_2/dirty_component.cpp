@@ -50,6 +50,9 @@ void DscDag2::DirtyComponent::Link(DirtyComponent& in_input, DirtyComponent& in_
 
 	in_input._output_set.insert(&in_output);
 	in_output._input_set.insert(&in_input);
+
+	in_output.MarkDirtyFlag();
+
 	return;
 }
 
@@ -68,6 +71,8 @@ void DscDag2::DirtyComponent::Unlink(DirtyComponent& in_input, DirtyComponent& i
 	{
 		in_output._input_set.erase(found_output);
 	}
+
+	in_output.MarkDirtyFlag();
 
 	return;
 }

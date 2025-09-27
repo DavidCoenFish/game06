@@ -150,21 +150,20 @@ namespace DscDag2
 
 		void Update()
 		{
-			if (nullptr == _calculate_component)
-			{
-				return;
-			}
 			if (true == _dirty_component.GetDirtyFlag())
 			{
 				_dirty_component.ClearDirtyFlag();
-				// this is a lazy update when node is marked dirty, we possibly could do something fancy with result of calculate marking dirty again, but not the current architecture
-				_calculate_component->Update(_value);
+				if (nullptr != _calculate_component)
+				{
+					// this is a lazy update when node is marked dirty, we possibly could do something fancy with result of calculate marking dirty again, but not the current architecture
+					_calculate_component->Update(_value);
+				}
 			}
 			return;
 		}
 
 	protected:
-		//DirtyComponent& GetDirtyComponent() const { return _dirty_component; }
+		DirtyComponent& GetDirtyComponent() override { return _dirty_component; }
 
 	private:
 		std::unique_ptr<ICalculateComponent<IN_TYPE>> _calculate_component = {};

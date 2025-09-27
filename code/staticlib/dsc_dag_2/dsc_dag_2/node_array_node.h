@@ -21,7 +21,7 @@ namespace DscDag2
 		explicit NodeArrayNode(
 			DSC_DEBUG_ONLY(const std::string& in_debug_name = "")
 			)
-		: Node(
+		: Node<std::vector<Node<IN_TYPE>*>>(
 			TNodeArray(),
 			&CallbackNever<TNodeArray>::Function,
 			std::unique_ptr<ICalculateComponent<TNodeArray>>()
@@ -88,14 +88,14 @@ namespace DscDag2
 			this->_dirty_component.MarkDirtyFlag();
 		}
 	private:
-		void AddLink(Node<IN_TYPE>& in_node)
+		void AddLink(INode& in_node)
 		{
-			DirtyComponent::Link(in_node, *this);
+			DirtyComponent::Link(in_node.GetDirtyComponent(), this->_dirty_component);
 			return;
 		}
-		void RemoveLink(Node<IN_TYPE>& in_node)
+		void RemoveLink(INode& in_node)
 		{
-			DirtyComponent::Unlink(in_node, *this);
+			DirtyComponent::Unlink(in_node.GetDirtyComponent(), this->_dirty_component);
 			return;
 		}
 	};
