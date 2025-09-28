@@ -11,7 +11,7 @@
     ^SolutionItemArray + .temp
 }
 
-.Param = [
+.LibraryParam = [
     .RootPath = ^_WORKING_DIR_
     .RelativePath = ^_CURRENT_BFF_DIR_
     .ConfigurationArray = ^ConfigurationArray
@@ -19,16 +19,15 @@
     .CommonVcproject = ^CommonVcproject
     .LibraryBaseNameDependency = {
         "dsc_common", 
-        "dsc_dag_2",
-        "dsc_dag",
-        "dsc_data"
+        "dsc_render", 
+        "dsc_render_resource", 
+        "dsc_dag_2", 
+        "dsc_text",
+        "dsc_locale",
         }
-    .DataCopyPath = {"$RootPath$/../data/sample_json"}
-    .DoDataCopy = true
 ]
-DscVsprojectConsoleExe("unit_test" .Param)
+DscVsprojectStaticLib("dsc_ui_2" .LibraryParam)
 
-.SolutionProjects + "unit_test_project"
-.SolutionItemsApplicationProject + "unit_test_project"
-//.SolutionBuildProject = "unit_test_project"
-
+.SolutionProjects + "dsc_ui_2_project"
+.SolutionItemsStaticLibProject + "dsc_ui_2_project"
+//.SolutionBuildProject = "dsc_ui_2_project"

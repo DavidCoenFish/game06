@@ -1,0 +1,38 @@
+#pragma once
+#include "dsc_ui_2.h"
+
+namespace DscUi2
+{
+	class Coord
+	{
+	public:
+		enum class TMethod
+		{
+			TPrimaryPoroportinal = 0, //default, ((in_parent_primary * _ratio) + _pixels)
+			TSecondaryPoroportinal, // ((in_parent_secondary * _ratio) + _pixels)
+			TMin, //((std::min(in_parent_primary, in_parent_secondary)* _ratio) + _pixels)
+			TMax, //((std::max(in_parent_primary, in_parent_secondary)* _ratio) + _pixels)
+		};
+		Coord() {}
+
+		explicit Coord(
+			const int32 in_pixels,
+			const float in_ratio,
+			const TMethod in_method = TMethod::TPrimaryPoroportinal
+		);
+
+		const bool operator==(const Coord& in_rhs) const;
+		const bool operator!=(const Coord& in_rhs) const;
+		Coord& operator=(const Coord& in_rhs);
+
+		/// if this is a horizontal ui cord, then the primary input is the parents horizontal value, and vertical the scondary
+		/// if this is a vertical ui cord, then the primary input is the parents vertical value, and horizontal the scondary
+		/// todo: this may want to return a float, as we move towards to animated positions?
+		const int32 Evaluate(const int32 in_parent_primary, const int32 in_parent_secondary, const float in_ui_scale = 1.0f) const;
+
+	private:
+		int32 _pixels = 0;
+		float _ratio = 0.0f;
+		TMethod _method = {};
+	};
+}

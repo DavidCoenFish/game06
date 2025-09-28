@@ -22,6 +22,7 @@
 #include "render_text\dsc.bff"
 #include "render_texture\dsc.bff"
 #include "render_triangle\dsc.bff"
+#include "render_ui_2\dsc.bff"
 #include "render_ui\dsc.bff"
 #include "render_ui_button\dsc.bff"
 #include "render_ui_canvas\dsc.bff"
