@@ -19,21 +19,18 @@
     .CommonVcproject = ^CommonVcproject 
     .LibraryBaseNameDependency = {
         "dsc_common", 
-        "dsc_dag_2", 
-        "dsc_data", 
         "dsc_locale",
         "dsc_onscreen_version", 
         "dsc_render", 
-        "dsc_render_resource", 
-        "dsc_render_resource_png", 
+        "dsc_render_resource",
         "dsc_text", 
-        "dsc_ui_2",
+        "dsc_ui",
         "dsc_version", 
-        "dsc_windows"
+        "dsc_windows",
         }
     .LinkerAdditionalDependency = {
         "user32.lib", 
-        "Shcore.lib",
+        "Shcore.lib", 
         "D3d12.lib", 
         "DXGI.lib", 
         "dxguid.lib", 
@@ -45,7 +42,7 @@
 
     .AdditionalStaticLibPaths = {
         "$RootPath$/sdk/freetype_x64-windows/lib",
-        "$RootPath$/sdk/harfbuzz_x64-windows/lib"
+        "$RootPath$/sdk/harfbuzz_x64-windows/lib",
         "$RootPath$/sdk/libpng_x64-windows/lib",
         }
     .AdditionalIncludePaths = {}
@@ -66,8 +63,9 @@
     .DoRootCopy = true
 ]
 
-DscVsprojectWindowExe("render_ui_2" .WindowExeParam)
+DscVsprojectWindowExe("a00_spring_sphere" .WindowExeParam)
 
-.SolutionProjects + "render_ui_2_project"
-.SolutionItemsApplicationProject + "render_ui_2_project"
-//.SolutionBuildProject = "render_ui_2_project"
+.SolutionProjects + "a00_spring_sphere_project"
+.SolutionItemsApplicationProject + "a00_spring_sphere_project"
+.SolutionBuildProject = "a00_spring_sphere_project"
+

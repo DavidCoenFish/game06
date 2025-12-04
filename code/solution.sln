@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "a00_spring_sphere", "application\a00_spring_sphere\a00_spring_sphere.vcxproj", "{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "console_html_to_json", "application\console_html_to_json\console_html_to_json.vcxproj", "{119D96F5-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "console_premultiply_png", "application\console_premultiply_png\console_premultiply_png.vcxproj", "{68D802E7-6C94-4F93-BC2A-7F5284B7D434}"
@@ -143,6 +145,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{A9795628-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
 		application\dsc.bff = application\dsc.bff
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "a00_spring_sphere", "a00_spring_sphere", "{95575CC3-6C94-4F93-BC2A-7F5284B7D434}"
+	ProjectSection(SolutionItems) = preProject
+		application\a00_spring_sphere\dsc.bff = application\a00_spring_sphere\dsc.bff
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "console_html_to_json", "console_html_to_json", "{1374607C-6C94-4F93-BC2A-7F5284B7D434}"
@@ -375,6 +382,12 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Deploy.0 = Debug|x64
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Deploy.0 = Release|x64
 		{119D96F5-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{119D96F5-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{68D802E7-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
@@ -398,11 +411,7 @@ Global
 		{71320AF4-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{71320AF4-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{044EE5B6-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
-		{044EE5B6-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Build.0 = Debug|x64
-		{044EE5B6-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.Deploy.0 = Debug|x64
 		{044EE5B6-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
-		{044EE5B6-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Build.0 = Release|x64
-		{044EE5B6-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.Deploy.0 = Release|x64
 		{363046A7-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{363046A7-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{0C55D7B2-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
@@ -458,6 +467,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{DBC2652E-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{119D96F5-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{68D802E7-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
 		{F2637670-6C94-4F93-BC2A-7F5284B7D434} = {A45BDDC1-6C94-4F93-BC2A-7F5284B7D434}
@@ -504,6 +514,7 @@ Global
 		{F774B024-6C94-4F93-BC2A-7F5284B7D434} = {DFE42817-6C94-4F93-BC2A-7F5284B7D434}
 		{1EAABDE6-6C94-4F93-BC2A-7F5284B7D434} = {3D8E604F-6C94-4F93-BC2A-7F5284B7D434}
 		{A9795628-6C94-4F93-BC2A-7F5284B7D434} = {CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}
+		{95575CC3-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{1374607C-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{F58DD578-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
 		{5ED5FB3C-6C94-4F93-BC2A-7F5284B7D434} = {A9795628-6C94-4F93-BC2A-7F5284B7D434}
