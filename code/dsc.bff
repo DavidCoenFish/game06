@@ -21,6 +21,7 @@
     .temp =  [
         .Path           = "solution_items/notes"
         .Items = { 
+            "notes/compute_shaders.txt",
             "notes/git.txt", 
             "notes/ui.txt", 
             "notes/notes.txt",
@@ -66,6 +67,7 @@
             "../design/rpg_succubus_survival_00.txt",
             "../design/rts_mold_00.txt",
             "../design/sandbox_jank_00.txt",
+            "../design/sandbox_simian_00.txt",
             }
     ]
     ^SolutionItemArray + .temp;

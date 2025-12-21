@@ -38,6 +38,42 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
     }
+
+    // compute shader         std::unique_ptr<DscRenderResource::Shader> _compute_shader_advance_spring_system;
+    if ((nullptr != _file_system) && (nullptr != _draw_system))
+    {
+        std::vector<uint8> compute_shader_data;
+        if (false == _file_system->LoadFile(compute_shader_data, DscCommon::FileSystem::JoinPath("shader", "advance_spring_system_cs.cso")))
+        {
+            DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load compute shader\n");
+        }
+
+        std::vector < DXGI_FORMAT > render_target_format;
+        render_target_format.push_back(DXGI_FORMAT_B8G8R8A8_UNORM);
+        DscRenderResource::ShaderPipelineStateData shader_pipeline_state_data(
+            input_element_desc_array,
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            DXGI_FORMAT_UNKNOWN,
+            // DXGI_FORMAT_D32_FLOAT,
+            render_target_format,
+            CD3DX12_BLEND_DESC(D3D12_DEFAULT),
+            CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            CD3DX12_DEPTH_STENCIL_DESC()// CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)
+            );
+
+        _compute_shader_advance_spring_system = std::make_shared<DscRenderResource::Shader>(
+                _draw_system.get(),
+                shader_pipeline_state_data,
+                std::vector<uint8_t>(),
+                std::vector<uint8_t>(),
+                std::vector<uint8_t>(),
+                std::vector<std::shared_ptr<ShaderResourceInfo>>(),
+                std::vector<std::shared_ptr<ConstantBufferInfo>>(),
+                compute_shader_data,
+                std::vector<std::shared_ptr<UnorderedAccessInfo>>()
+                );
+
+    }
 }
 
 Application::~Application()

@@ -63,6 +63,20 @@ private:
 
         std::unique_ptr<DscText::TextManager> _text_manager;
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
+
+        std::shared_ptr<DscRenderResource::Shader> _advance_spring_shader;
+        struct TSpringData
+        {
+            int32 SelfIndex;
+            int32 LinkIndex[12];
+            float LinkWeight[12]; //or use a special index for 
+        };
+        // 3 pos textures, [prev pos 2, pre pos, texture to write new pos to]
+
+        // draw the given pos texture as point cloud the provided colour
+        std::shared_ptr<DscRenderResource::Shader> _present_spring_shader;
+        // geometry data is the pos index
+        std::shared_ptr<DscRenderResource::GeometryGeneric> _present_spring_geometry;
     };
     std::unique_ptr<Resources> _resources;
 

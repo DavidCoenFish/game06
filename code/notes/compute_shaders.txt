@@ -1,0 +1,120 @@
+https://www.codinglabs.net/tutorial_compute_shaders_filters.aspx
+https://logins.github.io/graphics/2020/10/31/D3D12ComputeShaders.html
+
+C:\development\chica\webgl\source\test\spring
+C:\development\chica\webgl\source\test\spring\assets.js
+
+
+
+const sVertexShaderSource = `
+attribute vec4 a_positionWeight;
+attribute vec2 a_uv;
+
+varying vec3 v_position;
+
+uniform sampler2D u_samplerVelocity;
+uniform sampler2D u_samplerPositionOld;
+
+uniform vec3 u_modelPos;
+uniform vec3 u_modelAt;
+uniform vec3 u_modelUp;
+uniform vec3 u_modelRight;
+uniform vec4 u_modelScaleDensitySpringconstantSpringdampen;
+
+uniform float u_timeDelta;
+
+vec3 getAtomPosition(){
+	float x = a_positionWeight.x + (mod(a_positionWeight.y, 2.0) * 0.5) - (mod(a_positionWeight.z, 2.0) * 0.5);
+	float y = (a_positionWeight.y * 0.86602540378443864676372317075294) + (mod(a_positionWeight.z, 2.0) * 0.28867513459481288225457439025098);
+	float z = 	a_positionWeight.z * 0.81649658092772603273242802490196;
+	float modelScale = u_modelScaleDensitySpringconstantSpringdampen.x;
+	vec3 pos = u_modelPos + (((u_modelRight * x) + (u_modelUp * y) + (u_modelAt * z)) * modelScale);
+	return pos;
+}
+
+void main() {
+	vec3 atomPosition = getAtomPosition();
+
+	vec3 velocity = texture2D(u_samplerVelocity, a_uv).xyz;
+	vec3 positionOld = texture2D(u_samplerPositionOld, a_uv).xyz;
+
+	vec3 newPosition = positionOld + (velocity * u_timeDelta);
+	v_position = mix(atomPosition, newPosition, a_positionWeight.w);
+
+	gl_Position = vec4((a_uv.x - 0.5) * 2.0, (a_uv.y - 0.5) * 2.0, 0.0, 1.0);
+	gl_PointSize = 1.0;
+}
+`;
+
+const sFragmentShaderSource = `
+precision mediump float;
+varying vec3 v_position;
+void main() {
+	gl_FragColor = vec4(v_position, 1.0);
+}
+`;
+
+
+vec3 sprintDisplacementFromTarget(vec3 in_positionA, vec3 in_positionB, float in_springLength, vec3 in_coincidentNormal){
+	float currentLength = distance(in_positionB, in_positionA);
+	if (abs(currentLength) < 0.001){
+		return (in_coincidentNormal * in_springLength);
+	}
+	vec3 aToBNorm = (in_positionB - in_positionA) / currentLength;
+	vec3 distanceTospringTarget = in_positionA - (in_positionB - (aToBNorm * in_springLength));
+	return distanceTospringTarget;
+}
+
+vec3 calculateAccelerationFromLink(float in_mass, vec3 in_positionA, vec3 in_velocityA, vec3 in_linkUvw, vec3 in_coincidentNormal){
+	vec3 positionB = texture2D(u_samplerPosition, in_linkUvw.xy).xyz;
+	vec3 velocityB = texture2D(u_samplerVelocity, in_linkUvw.xy).xyz;
+
+	float springLength = u_modelScaleDensitySpringconstantSpringdampen.x;
+	vec3 sprintDisplacement = sprintDisplacementFromTarget(in_positionA, positionB, springLength, in_coincidentNormal);
+
+	float springConstant = u_modelScaleDensitySpringconstantSpringdampen.z;
+	vec3 springForce = -springConstant * sprintDisplacement;
+
+	float springDampen = u_modelScaleDensitySpringconstantSpringdampen.w;
+	vec3 deformationResistForce = (velocityB - in_velocityA) * springDampen;
+	vec3 acceleration = (springForce + deformationResistForce) * (0.5 / in_mass);
+
+	return acceleration;
+}
+
+
+void main() {
+	float modelScale = u_modelScaleDensitySpringconstantSpringdampen.x;
+	float atomRadius = 0.61237243569579452454932101867647 * modelScale;
+	float volume = 4.188790205 * atomRadius * atomRadius * atomRadius; //V=(4/3)PiR^3
+	float modelDensity = u_modelScaleDensitySpringconstantSpringdampen.y;
+	float atomMass = volume * modelDensity;
+
+	vec3 acceleration = vec3(-9.80665, 0.0, 0.0);
+	vec3 position = texture2D(u_samplerPosition, a_uv).xyz;
+	vec3 velocity = texture2D(u_samplerVelocity, a_uv).xyz;
+
+	vec3 coincidentUp = vec3(0.0, 0.0, 1.0);
+	vec3 coincidentDown = vec3(0.0, 0.0, 1.0);
+
+	acceleration += a_linkUvw0.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw0, coincidentUp);
+	acceleration += a_linkUvw1.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw1, coincidentUp);
+	acceleration += a_linkUvw2.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw2, coincidentUp);
+	acceleration += a_linkUvw3.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw3, coincidentUp);
+	acceleration += a_linkUvw4.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw4, coincidentUp);
+	acceleration += a_linkUvw5.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw5, coincidentUp);
+	acceleration += a_linkUvw6.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw6, coincidentDown);
+	acceleration += a_linkUvw7.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw7, coincidentDown);
+	acceleration += a_linkUvw8.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw8, coincidentDown);
+	acceleration += a_linkUvw9.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw9, coincidentDown);
+	acceleration += a_linkUvw10.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw10, coincidentDown);
+	acceleration += a_linkUvw11.z * calculateAccelerationFromLink(atomMass, position, velocity, a_linkUvw11, coincidentDown);
+
+	//use weight as bias between old and new pos, but also dampen velocity
+	vec3 newVelocity = (velocity + (acceleration * u_timeDelta)) * a_positionWeight.w;
+
+	gl_Position = vec4((a_uv.x - 0.5) * 2.0, (a_uv.y - 0.5) * 2.0, 0.0, 1.0);
+	gl_PointSize = 1.0;
+	v_velocity = newVelocity;
+}
+`;

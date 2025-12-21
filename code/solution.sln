@@ -109,6 +109,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "design", "design", "{B3B483
 		..\design\rpg_succubus_survival_00.txt = ..\design\rpg_succubus_survival_00.txt
 		..\design\rts_mold_00.txt = ..\design\rts_mold_00.txt
 		..\design\sandbox_jank_00.txt = ..\design\sandbox_jank_00.txt
+		..\design\sandbox_simian_00.txt = ..\design\sandbox_simian_00.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "drafts", "drafts", "{DFE42817-6C94-4F93-BC2A-7F5284B7D434}"
@@ -272,6 +273,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{4109
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notes", "notes", "{9BF93803-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
+		notes\compute_shaders.txt = notes\compute_shaders.txt
 		notes\git.txt = notes\git.txt
 		notes\notes.txt = notes\notes.txt
 		notes\ui.txt = notes\ui.txt
