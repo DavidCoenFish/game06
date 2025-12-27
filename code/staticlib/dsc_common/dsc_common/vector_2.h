@@ -109,6 +109,13 @@ namespace DscCommon
 	private:
 		IN_TYPE _data[Index::Count] = {};
 	};
+
+	template <typename IN_TYPE>
+	const IN_TYPE Dot(const DscCommon::Vector2<IN_TYPE>& in_lhs, const DscCommon::Vector2<IN_TYPE>& in_rhs)
+	{
+		return (in_lhs[0] * in_rhs[0]) +
+			(in_lhs[1] * in_rhs[1]);
+	}
 } //namespace DscCommon
 
 //template <typename IN_TYPE>
@@ -135,3 +142,41 @@ namespace DscCommon
 //{
 //	return !operator==(in_rhs, in_lhs);
 //}
+
+
+template <typename IN_TYPE>
+const DscCommon::Vector2<IN_TYPE> operator + (const DscCommon::Vector2<IN_TYPE>& in_lhs, const DscCommon::Vector2<IN_TYPE>& in_rhs)
+{
+	return DscCommon::Vector2<IN_TYPE>(
+		in_lhs[0] + in_rhs[0],
+		in_lhs[1] + in_rhs[1]
+		);
+}
+
+template <typename IN_TYPE>
+const DscCommon::Vector2<IN_TYPE> operator - (const DscCommon::Vector2<IN_TYPE>& in_lhs, const DscCommon::Vector2<IN_TYPE>& in_rhs)
+{
+	return DscCommon::Vector2<IN_TYPE>(
+		in_lhs[0] - in_rhs[0],
+		in_lhs[1] - in_rhs[1]
+		);
+}
+
+template <typename IN_TYPE>
+const DscCommon::Vector2<IN_TYPE> operator * (const DscCommon::Vector2<IN_TYPE>& in_lhs, const IN_TYPE in_rhs)
+{
+	return DscCommon::Vector2<IN_TYPE>(
+		in_lhs[0] * in_rhs,
+		in_lhs[1] * in_rhs
+		);
+}
+
+template <typename IN_TYPE>
+const DscCommon::Vector2<IN_TYPE> operator / (const DscCommon::Vector2<IN_TYPE>& in_lhs, const IN_TYPE in_rhs)
+{
+	return DscCommon::Vector2<IN_TYPE>(
+		in_lhs[0] / in_rhs,
+		in_lhs[1] / in_rhs
+		);
+}
+

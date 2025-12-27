@@ -128,7 +128,8 @@ DscRenderResource::ShaderResourceInfo::ShaderResourceInfo(
 
 void DscRenderResource::ShaderResourceInfo::Activate(
 	ID3D12GraphicsCommandList* const in_command_list,
-	const int in_root_param_index
+	const int in_root_param_index,
+	const bool in_compute_shader
 	)
 {
 	if (_shader_resource_view_handle)
@@ -138,10 +139,21 @@ void DscRenderResource::ShaderResourceInfo::Activate(
 			1,
 			&heap
 			);
-		in_command_list->SetGraphicsRootDescriptorTable(
-			in_root_param_index,
-			_shader_resource_view_handle->GetGPUHandle()
+
+		if (true == in_compute_shader)
+		{
+			in_command_list->SetComputeRootDescriptorTable(
+				in_root_param_index,
+				_shader_resource_view_handle->GetGPUHandle()
 			);
+		}
+		else
+		{
+			in_command_list->SetGraphicsRootDescriptorTable(
+				in_root_param_index,
+				_shader_resource_view_handle->GetGPUHandle()
+			);
+		}
 	}
 	return;
 }

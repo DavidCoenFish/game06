@@ -12,7 +12,9 @@ namespace DscRender
 
 namespace DscRenderResource
 {
-	/* was ShaderTexture */
+	/* was ShaderTexture
+		todo: make this only upload dirty ared of data
+	*/
 	class ShaderResourcePartialUpload : public DscRender::IResource
 	{
 	public:

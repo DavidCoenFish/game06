@@ -1,0 +1,93 @@
+//function DscVsprojectStaticLib( .ProjectName .Param )
+// to get visiblity of globals, we are not using functions, and just including this script as needed
+// also means we need to manually add ref to script in root dsc.bff solution items array
+
+.RootPath = ""
+.RelativePath = ""
+.ConfigurationArray = {}
+.VisualStudioSettings = []
+.CommonVcproject = []
+.LibraryBaseNameDependency = {}
+.AdditionalIncludePaths = {}
+.BuildShaderVS = false
+.BuildShaderPS = false
+.FunctionAllTargets = {}
+.ExtraProjectFiles = {}
+
+Using (.Param)
+
+ForEach( .ConfigIter in .ConfigurationArray )
+{
+    Using( .ConfigIter )
+
+    .CompilerOptions    + ' /D "_LIB"'
+                        + ' /Fd"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/$ProjectName$.pdb"'
+
+    Library( "$ProjectName$_$Config$_$Platform$" )
+    {
+        .LibrarianOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.lib"
+        .CompilerInputPath = "$RelativePath$/"
+        .CompilerInputPattern = {"*.cpp", "*.c", "*.cc", }
+        .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
+        .CompilerOptions + ' /I"$RootPath$\$RelativePath$"'
+        .CompilerOptions + ' /I"$RootPath$\$RelativePath$\Source"'
+        ForEach( .LibraryName in .LibraryBaseNameDependency )
+        {
+            ^CompilerOptions + ' /I"$RootPath$\staticlib\$LibraryName$"'
+        }
+        ForEach( .Path in .AdditionalIncludePaths )
+        {
+            ^CompilerOptions + ' /I"$Path$"'
+        }
+    }
+
+    ^FunctionAllTargets + "$ProjectName$_$Config$_$Platform$"
+
+    RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
+    {
+        .RemovePaths = { 
+            "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/", 
+            "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/", 
+            }
+    }
+}
+
+VCXProject( "$ProjectName$_project" )
+{
+    .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
+    .ProjectConfigs = .ConfigurationArray
+    .ProjectInputPaths = "$RelativePath$\"
+    .ProjectBasePath = '$RelativePath$\'
+    .ProjectFiles = { "$RelativePath$\dsc.bff" }
+
+    ForEach( .ProjectFile in ^ExtraProjectFiles )
+    {
+        .ProjectFiles + .ProjectFile
+        Print(.ProjectFiles)
+    }
+
+    Using (.CommonVcproject)
+
+    .Output = "^$(ProjectName).lib"
+    .OutputDirectory            = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/output"
+    .IntermediateDirectory 	    = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/intermediate"
+    .BuildLogFile               = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/build_^$(SolutionName).log"
+
+    .ProjectAllowedFileExtensions 	= {
+                                '*.cpp', '*.hpp', '*.cxx', '*.hxx', '*.c',   '*.h',  '*.cc',   '*.hh',
+                                '*.cp',  '*.hp',  '*.cs',  '*.inl', '*.bff', '*.rc', '*.resx', '*.m',  '*.mm',
+                                '*.cu',
+                                '*.asm', '*.s',
+                                '*.natvis', '*.editorconfig',
+                                '.hlsl', '.hlsli',
+                                '.txt'
+                            }
+
+    .PlatformToolset = ""
+    {
+        Using( .VisualStudioSettings )	
+        ^PlatformToolset = .VS_PlatformToolset
+    }
+}
+
+^AllTargets + .FunctionAllTargets

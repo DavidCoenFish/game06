@@ -21,8 +21,12 @@
 // append solution items
 {
     .temp =  [
-        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
-        .Items = { "$_CURRENT_BFF_DIR_$\windows.bff", "$_CURRENT_BFF_DIR_$\windows10sdk.bff"}
+        .Path = "$_CURRENT_BFF_DIR_$"
+        .Items = { 
+            "$_CURRENT_BFF_DIR_$\windows.bff",
+            // add ALL the branching files, not just the included ones
+            "$_CURRENT_BFF_DIR_$\windows10sdk.bff",
+            }
     ]
     ^SolutionItemArray + .temp
 }

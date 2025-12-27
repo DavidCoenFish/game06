@@ -27,7 +27,8 @@ namespace DscRenderResource
 		void DeviceRestored(ID3D12Device* const in_device);
 		void Activate(
 			ID3D12GraphicsCommandList* const in_command_list,
-			const int in_root_param_index
+			const int in_root_param_index,
+			const bool in_compute_shader
 		);
 
 		const D3D12_SHADER_VISIBILITY GetVisiblity() const

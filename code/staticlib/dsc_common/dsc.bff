@@ -2,25 +2,24 @@
 //Print(._CURRENT_BFF_DIR_)
 //Print(._WORKING_DIR_)
 
-// append solution items
 {
-    .temp =  [
-        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
-        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+    ]
+
+    .ProjectName = "dsc_common"
+    #include "..\..\fbuild\dsc_vsproject_static_lib.bff"
+}
+
+{
+    .temp = [
+        .Path           = "staticlib"
+        .Projects       = "dsc_common_project"
     ]
     ^SolutionItemArray + .temp
 }
-
-.LibraryParam = [
-    .RootPath = ^_WORKING_DIR_
-    .RelativePath = ^_CURRENT_BFF_DIR_
-    .ConfigurationArray = ^ConfigurationArray
-    .VisualStudioSettings = ^VisualStudioSettings
-    .CommonVcproject = ^CommonVcproject
-]
-DscVsprojectStaticLib("dsc_common" .LibraryParam)
-
-.SolutionProjects + "dsc_common_project"
-.SolutionItemsStaticLibProject + "dsc_common_project"
-//.SolutionBuildProject = "dsc_common_project"
 

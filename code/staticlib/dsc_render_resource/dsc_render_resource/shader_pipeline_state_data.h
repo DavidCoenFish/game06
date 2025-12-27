@@ -9,6 +9,7 @@ namespace DscRenderResource
 	struct ShaderPipelineStateData
 	{
 	public:
+		static const D3D12_BLEND_DESC FactoryBlendDesc();
 		static const D3D12_BLEND_DESC FactoryBlendDescAlphaPremultiplied();
 		static ShaderPipelineStateData FactoryComputeShader();
 		explicit ShaderPipelineStateData(

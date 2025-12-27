@@ -24,7 +24,8 @@ namespace DscRenderResource
 
 		void SetActive(
 			ID3D12GraphicsCommandList* const in_command_list,
-			int& in_out_root_paramter_index
+			int& in_out_root_paramter_index,
+			const bool in_compute_shader
 		);
 
 		void SetConstantBufferData(

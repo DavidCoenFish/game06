@@ -96,6 +96,9 @@
     <CustomBuild Include="dsc_common\vector_2.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_3.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
     <CustomBuild Include="dsc_common\vector_4.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
@@ -103,6 +106,12 @@
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\vector_float2.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_float3.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_float3.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\vector_float4.cpp">
@@ -115,6 +124,12 @@
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\vector_int2.h">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_int3.cpp">
+      <Filter>dsc_common</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dsc_common\vector_int3.h">
       <Filter>dsc_common</Filter>
     </CustomBuild>
     <CustomBuild Include="dsc_common\vector_int4.cpp">

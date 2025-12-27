@@ -1,0 +1,47 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+{
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+        .LibraryBaseNameDependency = {}
+
+        .LinkerAdditionalDependency = {
+            "pugixml.lib",
+            }
+        .AdditionalStaticLibPaths = {
+            "$RootPath$/sdk/pugixml_x64-windows/lib",
+            }
+        .AdditionalIncludePaths = {
+            "$RootPath$/sdk/nlohmann-json_x64-windows/include",
+            "$RootPath$/sdk/pugixml_x64-windows/include",
+            }
+
+        .RootCopyPath = {
+            "$RootPath$/sdk/pugixml_x64-windows/bin",
+            }
+        .DoRootCopy = true
+
+        .DataCopyPath = {
+            "$RootPath$/../data/sample_html_to_json"
+            }
+        .DoDataCopy = true
+
+    ]
+
+    .ProjectName = "console_html_to_json"
+    #include "..\..\..\fbuild\dsc_vsproject_console_exe.bff"
+}
+
+{
+    .temp =  [
+             .Path           = "application\tools"
+            .Projects       = { "console_html_to_json_project" }
+    ]
+    ^SolutionItemArray + .temp
+}

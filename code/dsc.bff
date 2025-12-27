@@ -5,31 +5,7 @@
 //#define DEBUG_SDK
 
 .SolutionItemArray = {}
-{
-    .temp =  [
-        .Path           = "solution_items"
-        .Items = { 
-            "dsc.cmd", 
-            "dsc.bff", 
-            "solution.cmd",
-            "todo.txt" 
-            }
-    ]
-    ^SolutionItemArray + .temp
-}
-{
-    .temp =  [
-        .Path           = "solution_items/notes"
-        .Items = { 
-            "notes/compute_shaders.txt",
-            "notes/git.txt", 
-            "notes/ui.txt", 
-            "notes/notes.txt",
-            "notes/vcpkg.txt",
-            }
-    ]
-    ^SolutionItemArray + .temp
-}
+
 {
     .temp = [
         .Path           = "parent"
@@ -37,14 +13,15 @@
             "../.gitignore",
             "../backup_copy_d_drive.cmd",
             "../backup_copy_e_drive.cmd",
+            "../build_all.cmd",
             "../cmd_here.cmd",
             "../commit.cmd",
-            "../generate_project.cmd",
-            "../launch_visual_studio_code.cmd",
-            "../notes.txt",
+            "../generate_solution.cmd",
+            "../open_solution.cmd",
+            "../open_visual_studio_code.cmd",
             "../publish_show_n_tell.cmd",
             "../README.md",
-            "../Reset.cmd",
+            "../reset.cmd",
             "../sync.cmd"
             }
     ]
@@ -91,15 +68,6 @@
     ]
     ^SolutionItemArray + .temp;
 }
-{
-    .temp = [
-        .Path           = "parent/utils"
-        .Items = { 
-            "../utils/make_folder_for_today.cmd",
-            }
-    ]
-    ^SolutionItemArray + .temp;
-}
 
 {
     .temp = [
@@ -111,11 +79,54 @@
     ^SolutionItemArray + .temp;
 }
 
-.SolutionItemsSdkProject = {}
+{
+    .temp = [
+        .Path           = "parent/utils"
+        .Items = { 
+            "../utils/make_folder_for_today.cmd",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+
+{
+    .temp =  [
+        .Path           = "solution_items"
+        .Items = { 
+            "todo.txt" 
+            }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+{
+    .temp =  [
+        .Path           = "solution_items/notes"
+        .Items = { 
+            "notes/compute_shaders.txt",
+            "notes/git.txt", 
+            "notes/ui.txt", 
+            "notes/notes.txt",
+            "notes/vcpkg.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+{
+    .temp = [
+        .Path           = "fbuild"
+        .Items = { 
+            "/fbuild/dsc_vsproject_console_exe.bff",
+            "/fbuild/dsc_vsproject_static_lib.bff",
+            "/fbuild/dsc_vsproject_window_exe.bff",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+
 .SolutionItemsStaticLibProject = {}
-.SolutionItemsApplicationProject = {}
-.SolutionProjects = {}
-.SolutionBuildProject = ""
+.AllTargets = {}
 
 // sdk folder populated by
 //vcpkg install harfbuzz
@@ -123,6 +134,8 @@
 #include "fbuild\dsc.bff"
 #include "staticlib\dsc.bff"
 #include "application\dsc.bff"
+
+.SolutionBuildProject = "a00_compute_spring_project"
 
 VSSolution("solution")
 {
@@ -144,17 +157,11 @@ VSSolution("solution")
         ]
         ^SolutionFolders + .temp
     }
-
-    {
-        .temp = [
-            .Path           = "application"
-            .Projects       = .SolutionItemsApplicationProject
-        ]
-        ^SolutionFolders + .temp
-    }
 }
+
+.AllTargets + "solution"
 
 Alias("all")
 {
-	.Targets = {"solution"}
+	.Targets = ^AllTargets
 }

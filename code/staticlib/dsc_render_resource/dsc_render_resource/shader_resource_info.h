@@ -32,7 +32,7 @@ namespace DscRenderResource
 		);
 		static std::shared_ptr<ShaderResourceInfo> FactoryNoSampler(
 			const std::shared_ptr < DscRender::HeapWrapperItem >& in_shader_resource_view_handle,
-			const D3D12_SHADER_VISIBILITY in_visiblity
+			const D3D12_SHADER_VISIBILITY in_visiblity = D3D12_SHADER_VISIBILITY_ALL
 		);
 
 		explicit ShaderResourceInfo(
@@ -42,7 +42,8 @@ namespace DscRenderResource
 		);
 		void Activate(
 			ID3D12GraphicsCommandList* const in_command_list,
-			const int in_root_param_index
+			const int in_root_param_index,
+			const bool in_compute_shader
 		);
 		// Void ActivateSampler(
 		// ID3D12GraphicsCommandList* const pCommandList,

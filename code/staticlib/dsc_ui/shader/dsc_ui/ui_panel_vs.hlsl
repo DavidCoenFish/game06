@@ -8,7 +8,7 @@ struct Vertex
     //float2 _uv : TEXCOORD0;
 };
 
-cbuffer ConstantBuffer : register(b0)
+cbuffer MyConstantBuffer : register(b0)
 {
     float4 _pos_size;
     float4 _uv_size;

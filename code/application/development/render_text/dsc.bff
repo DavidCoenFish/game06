@@ -1,0 +1,94 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+{
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings 
+        .CommonVcproject = ^CommonVcproject 
+        .LibraryBaseNameDependency = {
+            "dsc_common", 
+            "dsc_version", 
+            "dsc_windows", 
+            "dsc_render", 
+            "dsc_render_resource", 
+            "dsc_text", 
+            "dsc_locale",
+            "dsc_png",
+            }
+        .LinkerAdditionalDependency = {
+            "user32.lib", 
+            "Shcore.lib",
+            "D3d12.lib", 
+            "DXGI.lib", 
+            "dxguid.lib", 
+            "Gdi32.lib",
+    #if DEBUG_SDK
+            "freetyped.lib",
+            "libpng16d.lib",
+    #else
+            "freetype.lib", 
+            "libpng16.lib",
+    #endif
+            "harfbuzz.lib",
+            }
+
+        .AdditionalStaticLibPaths = {
+    #if DEBUG_SDK
+            "$RootPath$/sdk/freetype_x64-windows/debug/lib",
+            "$RootPath$/sdk/harfbuzz_x64-windows/debug/lib",
+            "$RootPath$/sdk/libpng_x64-windows/debug/lib",
+    #else
+            "$RootPath$/sdk/freetype_x64-windows/lib",
+            "$RootPath$/sdk/harfbuzz_x64-windows/lib",
+            "$RootPath$/sdk/libpng_x64-windows/lib",
+    #endif
+            }
+        .AdditionalIncludePaths = {
+            "$RootPath$/sdk/freetype_x64-windows/include",
+            "$RootPath$/sdk/harfbuzz_x64-windows/include",
+            }
+
+        .DataCopyPath = {
+            "$RootPath$/../data/font",
+            "$RootPath$/../data/sample_png",
+            }
+        .DoDataCopy = true
+
+        .RootCopyPath = {
+    #if DEBUG_SDK
+            "$RootPath$/sdk/brotli_x64-windows/debug/bin",
+            "$RootPath$/sdk/bzip2_x64-windows/debug/bin",
+            "$RootPath$/sdk/freetype_x64-windows/debug/bin",
+            "$RootPath$/sdk/libpng_x64-windows/debug/bin",
+            "$RootPath$/sdk/zlib_x64-windows/debug/bin",
+            "$RootPath$/sdk/harfbuzz_x64-windows/debug/bin"
+    #else
+            "$RootPath$/sdk/brotli_x64-windows/bin",
+            "$RootPath$/sdk/bzip2_x64-windows/bin",
+            "$RootPath$/sdk/freetype_x64-windows/bin",
+            "$RootPath$/sdk/libpng_x64-windows/bin",
+            "$RootPath$/sdk/zlib_x64-windows/bin",
+            "$RootPath$/sdk/harfbuzz_x64-windows/bin"
+    #endif
+            }
+        .DoRootCopy = true
+    ]
+
+    .ProjectName = "render_text"
+    #include "..\..\..\fbuild\dsc_vsproject_window_exe.bff"
+    //DscVsprojectWindowExe("render_text" .Param)
+}
+
+{
+    .temp =  [
+             .Path           = "application\development"
+            .Projects       = { "render_text_project" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+//.SolutionBuildProject = "render_text_project"

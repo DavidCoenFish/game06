@@ -43,13 +43,18 @@
     <CustomBuild Include="dsc_common\utf8.cpp" />
     <CustomBuild Include="dsc_common\utf8.h" />
     <CustomBuild Include="dsc_common\vector_2.h" />
+    <CustomBuild Include="dsc_common\vector_3.h" />
     <CustomBuild Include="dsc_common\vector_4.h" />
     <CustomBuild Include="dsc_common\vector_float2.cpp" />
     <CustomBuild Include="dsc_common\vector_float2.h" />
+    <CustomBuild Include="dsc_common\vector_float3.cpp" />
+    <CustomBuild Include="dsc_common\vector_float3.h" />
     <CustomBuild Include="dsc_common\vector_float4.cpp" />
     <CustomBuild Include="dsc_common\vector_float4.h" />
     <CustomBuild Include="dsc_common\vector_int2.cpp" />
     <CustomBuild Include="dsc_common\vector_int2.h" />
+    <CustomBuild Include="dsc_common\vector_int3.cpp" />
+    <CustomBuild Include="dsc_common\vector_int3.h" />
     <CustomBuild Include="dsc_common\vector_int4.cpp" />
     <CustomBuild Include="dsc_common\vector_int4.h" />
   </ItemGroup>
@@ -85,25 +90,25 @@
     <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -wrapper</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform) -wrapper</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectName).lib</NMakeOutput>
-    <IntDir>C:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/intermediate</IntDir>
-    <OutDir>C:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/output</OutDir>
+    <IntDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/intermediate</IntDir>
+    <OutDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/output</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <NMakeBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache $(ProjectName)_$(Configuration)_$(Platform) -wrapper</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -monitor -cache -clean $(ProjectName)_$(Configuration)_$(Platform) -wrapper</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>cd $(SolutionDir) &amp; ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_$(ProjectName)_$(Configuration)_$(Platform) -wrapper</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectName).lib</NMakeOutput>
-    <IntDir>C:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/intermediate</IntDir>
-    <OutDir>C:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/output</OutDir>
+    <IntDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/intermediate</IntDir>
+    <OutDir>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/output</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <BuildLog>
-    <Path>C:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
+    <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <BuildLog>
-    <Path>C:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
+    <Path>G:\development\game06\code/../build/$(ProjectName)/$(Platform)/$(Configuration)/build_$(SolutionName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

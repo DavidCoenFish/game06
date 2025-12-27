@@ -1,0 +1,32 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+{
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings 
+        .CommonVcproject = ^CommonVcproject 
+        .LibraryBaseNameDependency = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource"}
+        .LinkerAdditionalDependency = {
+            "user32.lib", 
+            "Shcore.lib", 
+            "D3d12.lib", 
+            "DXGI.lib", 
+            "dxguid.lib", 
+            "Gdi32.lib"}
+        ]
+
+    .ProjectName = "render_celtic_knot"
+    #include "..\..\..\fbuild\dsc_vsproject_window_exe.bff"
+}
+
+{
+    .temp =  [
+             .Path           = "application\development"
+            .Projects       = { "render_celtic_knot_project" }
+    ]
+    ^SolutionItemArray + .temp
+}

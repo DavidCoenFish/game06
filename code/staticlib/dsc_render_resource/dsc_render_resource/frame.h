@@ -18,6 +18,7 @@ namespace DscRenderResource
 	class RenderTargetTexture;
 	class Shader;
 	class ShaderConstantBuffer;
+	class UnorderedAccess;
 
 	class Frame
 	{
@@ -66,12 +67,16 @@ namespace DscRenderResource
 			const std::shared_ptr<GeometryGeneric>& in_geometry
 		);
 
-		/// Trigger compute shader, thread_group_count as the number of steps for each thread to do
-		//void Dispatch(
-		//	uint32_t in_thread_group_count_x,
-		//	uint32_t in_thread_group_count_y = 1,
-		//	uint32_t in_thread_group_count_z = 1
-		//);
+		// Trigger compute shader, thread_group_count as the number of steps for each thread to do
+		void Dispatch(
+			uint32_t in_thread_group_count_x,
+			uint32_t in_thread_group_count_y = 1,
+			uint32_t in_thread_group_count_z = 1
+		);
+
+		//void ClearUAV(
+		//	const std::shared_ptr<UnorderedAccess>& in_unordered_access
+		//	);
 
 		/// Transition a given resource
 		void ResourceBarrier(

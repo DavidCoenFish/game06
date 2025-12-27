@@ -1,0 +1,37 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+{
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+        .LibraryBaseNameDependency = {
+            "dsc_common", 
+            "dsc_dag_2",
+            "dsc_dag",
+            "dsc_data"
+            }
+        .DataCopyPath = {"$RootPath$/../data/sample_json"}
+        .DoDataCopy = true
+    ]
+
+    .ProjectName = "unit_test"
+    #include "..\..\..\fbuild\dsc_vsproject_console_exe.bff"
+}
+//DscVsprojectConsoleExe("unit_test" .Param)
+
+//.SolutionProjects + "unit_test_project"
+//.SolutionBuildProject = "unit_test_project"
+
+{
+    .temp =  [
+             .Path           = "application\tests"
+            .Projects       = { "unit_test_project" }
+    ]
+    ^SolutionItemArray + .temp
+}
+

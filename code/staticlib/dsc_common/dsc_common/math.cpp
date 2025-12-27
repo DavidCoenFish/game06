@@ -92,3 +92,14 @@ const float DscCommon::Math::EaseInEaseOut(const float in_x)
 	return result;
 }
 
+// fmod(-5, 3) gives -2, and we want 1, so we have PosFMod
+const float DscCommon::Math::PosFMod(const float x, const float y)
+{
+	float result = fmod(x, y);
+	if (result < 0.0f)
+	{
+		result += y;
+	}
+	return result;
+}
+

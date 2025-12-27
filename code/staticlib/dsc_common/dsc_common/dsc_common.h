@@ -135,10 +135,13 @@ typedef unsigned __int64 uint64;
 #include "timer.h"
 #include "utf8.h"
 #include "vector_2.h"
+#include "vector_3.h"
 #include "vector_4.h"
 #include "vector_float2.h"
+#include "vector_float3.h"
 #include "vector_float4.h"
 #include "vector_int2.h"
+#include "vector_int3.h"
 #include "vector_int4.h"
 
 #endif //#ifndef DSC_BFF_BUILD

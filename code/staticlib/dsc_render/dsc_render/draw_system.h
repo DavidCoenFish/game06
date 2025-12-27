@@ -88,6 +88,7 @@ namespace DscRender
 		IRenderTarget* GetRenderTargetBackBuffer();
 
 		std::shared_ptr<HeapWrapperItem> MakeHeapWrapperCbvSrvUav(const int in_length = 1);
+		//std::shared_ptr<HeapWrapperItem> MakeHeapWrapperCbvSrvUavNone(const int in_length = 1);
 		std::shared_ptr<HeapWrapperItem> MakeHeapWrapperSampler(const int in_length = 1);
 		std::shared_ptr<HeapWrapperItem> MakeHeapWrapperRenderTargetView(const int in_length = 1);
 		std::shared_ptr<HeapWrapperItem> MakeHeapWrapperDepthStencilView(const int in_length = 1);
@@ -110,6 +111,8 @@ namespace DscRender
 		std::list<IResource*> _list_resource;
 
 		std::shared_ptr<HeapWrapper> _heap_wrapper_cbv_srv_uav;
+		// UAV clear needed a heap descriptor WITHOUT shader visiblity
+		//std::shared_ptr<HeapWrapper> _heap_wrapper_cbv_srv_uav_none;
 		std::shared_ptr<HeapWrapper> _heap_wrapper_sampler;
 		std::shared_ptr<HeapWrapper> _heap_wrapper_render_target_view;
 		std::shared_ptr<HeapWrapper> _heap_wrapper_depth_stencil_view;

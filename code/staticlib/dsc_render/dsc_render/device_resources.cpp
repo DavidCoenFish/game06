@@ -244,6 +244,18 @@ DscRender::DeviceResources::DeviceResources(
 	{
 		DSC_LOG_INFO(LOG_TOPIC_DSC_RENDER, "Shader Model 6.5 is not supported\n");
 	}
+
+	//D3D12_FEATURE_DATA_FORMAT_SUPPORT data_format_support = {};
+	//data_format_support.Format = DXGI_FORMAT_R32_FLOAT;
+	//if (FAILED(_device->CheckFeatureSupport(
+	//	D3D12_FEATURE_FORMAT_SUPPORT,
+	//	&data_format_support,
+	//	sizeof(data_format_support)
+	//)) || (0 == (data_format_support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD)))
+	//{
+	//	DSC_LOG_INFO(LOG_TOPIC_DSC_RENDER, "Load UAV TYPED RGBA Float not supported\n");
+	//}
+
 	D3D12_FEATURE_DATA_D3D12_OPTIONS7 feature_options7 = {};
 	if (FAILED(_device->CheckFeatureSupport(
 		D3D12_FEATURE_D3D12_OPTIONS7,

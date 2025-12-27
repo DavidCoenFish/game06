@@ -381,7 +381,8 @@ void DscRenderResource::Shader::SetActive(
 	{
 		in_shader_constant_buffer->SetActive(
 			in_command_list,
-			root_paramter_index
+			root_paramter_index,
+			_pipeline_state_data._compute_shader
 			);
 	}
 
@@ -390,7 +391,8 @@ void DscRenderResource::Shader::SetActive(
 	{
 		iter->Activate(
 			in_command_list,
-			root_paramter_index
+			root_paramter_index,
+			_pipeline_state_data._compute_shader
 			);
 		root_paramter_index += 1;
 	}
@@ -399,7 +401,8 @@ void DscRenderResource::Shader::SetActive(
 	{
 		iter->Activate(
 			in_command_list,
-			root_paramter_index
+			root_paramter_index,
+			_pipeline_state_data._compute_shader
 			);
 		root_paramter_index += 1;
 	}

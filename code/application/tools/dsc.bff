@@ -1,0 +1,16 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+// append solution items
+{
+    .temp =  [
+        .Path = "$_CURRENT_BFF_DIR_$"
+        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+//pull in child scripts
+#include "console_html_to_json\dsc.bff"
+#include "console_premultiply_png\dsc.bff"

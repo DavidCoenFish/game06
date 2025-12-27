@@ -50,12 +50,18 @@ DscRender::DrawSystem::DrawSystem(
 	, _target_format_data(in_target_format_data)
 	, _target_depth_data(in_target_depth_data)
 {
-	_heap_wrapper_cbv_srv_uav = std::make_shared < HeapWrapper > (
+	_heap_wrapper_cbv_srv_uav = std::make_shared < HeapWrapper >(
 		this,
 		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
 		true,
 		in_num_descriptors
 		);
+	//_heap_wrapper_cbv_srv_uav_none = std::make_shared < HeapWrapper >(
+	//	this,
+	//	D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+	//	false,
+	//	in_num_descriptors
+	//	);
 	_heap_wrapper_sampler = std::make_shared < HeapWrapper > (
 		this,
 		D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER,
@@ -271,6 +277,15 @@ std::shared_ptr < DscRender::HeapWrapperItem > DscRender::DrawSystem::MakeHeapWr
 		in_length
 		);
 }
+
+//std::shared_ptr<DscRender::HeapWrapperItem> DscRender::DrawSystem::MakeHeapWrapperCbvSrvUavNone(const int in_length)
+//{
+//	return HeapWrapperItem::Factory(
+//		_device_resources ? _device_resources->GetD3dDevice() : nullptr,
+//		_heap_wrapper_cbv_srv_uav_none,
+//		in_length
+//	);
+//}
 
 std::shared_ptr < DscRender::HeapWrapperItem > DscRender::DrawSystem::MakeHeapWrapperSampler(const int in_length)
 {

@@ -43,7 +43,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DscRender::HeapWrapper::GetCPUHandleFrame(
 
 D3D12_GPU_DESCRIPTOR_HANDLE DscRender::HeapWrapper::GetGPUHandle(const int in_index)
 {
-	assert(_desc.Flags&D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	//assert(_desc.Flags&D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	const int page_index = in_index / _desc.NumDescriptors;
 	if ((0 <= page_index) && (page_index < (int) _array_page.size()))
 	{

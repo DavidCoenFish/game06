@@ -2,7 +2,7 @@
 // append solution items
 {
     .temp =  [
-        .Path = "solution_items/$_CURRENT_BFF_DIR_$"
+        .Path = "$_CURRENT_BFF_DIR_$"
         .Items = { "$_CURRENT_BFF_DIR_$/dsc.bff" }
     ]
     ^SolutionItemArray + .temp
@@ -24,6 +24,9 @@
     .CompilerOptions = ""
     .Linker = ""
     .LinkerOptions = ""
+    .EffectCompilerToolArgumentsVS = '/nologo /E"main" /T vs_6_0 /Fo "%2"'
+    .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_6_0 /Fo "%2"'
+    .EffectCompilerToolArgumentsCS = '/nologo /E"main" /T cs_6_0 /Fo "%2"'
     {
         Using( .VisualStudioSettings )	
         Using( .ToolChain_VS_Windows_X64 )
@@ -43,12 +46,13 @@
 ]
 {
     Using(.Windows10_SDK_X64)
-    Compiler( 'fxc' )
+    Compiler( "dxc" )
     {
       .Executable = .EffectCompilerTool
       .CompilerFamily = "custom"
     }
 }
+//Print(.Windows10_SDK_X64)
 
 // debug x64
 {
@@ -65,8 +69,9 @@
                             + ' /JMC'
                             + ' /D "DSC_LOG"'
                             + ' /D "DSC_DEBUG"'
-        .EffectCompilerToolArgumentsVS = '/nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
-        .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" /Od /Zi "%1"'
+        .EffectCompilerToolArgumentsVS + ' -Qembed_debug /Od /Zi "%1"'
+        .EffectCompilerToolArgumentsPS + ' -Qembed_debug /Od /Zi "%1"'
+        .EffectCompilerToolArgumentsCS + ' -Qembed_debug /Od /Zi "%1"'
     ]
     ^ConfigurationArray + .Config
 }
@@ -90,8 +95,9 @@
          .LinkerOptions     + ' /OPT:REF'
                             + ' /OPT:ICF'
                             + ' /LTCG:incremental'
-        .EffectCompilerToolArgumentsVS = '/nologo /E"main" /T vs_4_0_level_9_3 /Fo "%2" "%1"'
-        .EffectCompilerToolArgumentsPS = '/nologo /E"main" /T ps_4_0_level_9_3 /Fo "%2" "%1"'
+        .EffectCompilerToolArgumentsVS + ' "%1"'
+        .EffectCompilerToolArgumentsPS + ' "%1"'
+        .EffectCompilerToolArgumentsCS + ' "%1"'
     ]
     ^ConfigurationArray + .Config
 }
@@ -110,364 +116,3 @@
         .ProjectCleanCommand        = "cd ^$(SolutionDir) & ..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -ide clean_^$(ProjectName)_^$(Configuration)_^$(Platform) -wrapper"
 #endif
 ]
-
-function DscVsprojectStaticLib( .ProjectName .Param)
-{
-    .RootPath = ""
-    .RelativePath = ""
-    .ConfigurationArray = []
-    .VisualStudioSettings = []
-    .CommonVcproject = {}
-    .LibraryBaseNameDependency = {}
-    .AdditionalIncludePaths = {}
-    .BuildShaderVS = false
-    .BuildShaderPS = false
-
-    Using (.Param)
-
-    ForEach( .ConfigIter in .ConfigurationArray )
-    {
-        Using( .ConfigIter )
-
-        .CompilerOptions    + ' /D "_LIB"'
-                            + ' /Fd"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/$ProjectName$.pdb"'
-
-        Library( "$ProjectName$_$Config$_$Platform$" )
-        {
-            .LibrarianOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.lib"
-            .CompilerInputPath = "$RelativePath$/"
-            .CompilerInputPattern = {"*.cpp", "*.c", "*.cc", }
-            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
-            .CompilerOptions + ' /I"$RootPath$\$RelativePath$"'
-            .CompilerOptions + ' /I"$RootPath$\$RelativePath$\Source"'
-            ForEach( .LibraryName in .LibraryBaseNameDependency )
-            {
-                ^CompilerOptions + ' /I"$RootPath$\staticlib\$LibraryName$"'
-            }
-            ForEach( .Path in .AdditionalIncludePaths )
-            {
-                ^CompilerOptions + ' /I"$Path$"'
-            }
-        }
-
-        RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
-        {
-            .RemovePaths = { 
-                "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/", 
-                "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/", 
-                }
-        }
-    }
-
-    VCXProject( "$ProjectName$_project" )
-    {
-        .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
-        .ProjectConfigs = .ConfigurationArray
-        .ProjectInputPaths = "$RelativePath$/"
-        .ProjectBasePath = '$RelativePath$/'
-        .ProjectFiles = "$RelativePath$/dsc.bff"
-
-        Using (.CommonVcproject)
-
-        .Output = "^$(ProjectName).lib"
-        .OutputDirectory            = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/output"
-        .IntermediateDirectory 	    = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/intermediate"
-        .BuildLogFile               = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/build_^$(SolutionName).log"
-
-        .ProjectAllowedFileExtensions 	= {
-                                  '*.cpp', '*.hpp', '*.cxx', '*.hxx', '*.c',   '*.h',  '*.cc',   '*.hh',
-                                  '*.cp',  '*.hp',  '*.cs',  '*.inl', '*.bff', '*.rc', '*.resx', '*.m',  '*.mm',
-                                  '*.cu',
-                                  '*.asm', '*.s',
-                                  '*.natvis', '*.editorconfig',
-                                  '.hlsl', '.hlsli'
-                              }
-
-        .PlatformToolset = ""
-        {
-            Using( .VisualStudioSettings )	
-            ^PlatformToolset = .VS_PlatformToolset
-        }
-    }
-}
-
-function DscVsprojectWindowExe( .ProjectName .Param )
-{
-    .RootPath = ""
-    .RelativePath = ""
-    .ConfigurationArray = []
-    .VisualStudioSettings = []
-    .CommonVcproject = {}
-    .LibraryBaseNameDependency = {}
-    .LinkerAdditionalDependency = {}
-    .AdditionalStaticLibPaths = {}
-    .AdditionalIncludePaths = {}
-    .DataCopyPath = {}
-    .DoDataCopy = false
-    .RootCopyPath = {}
-    .DoRootCopy = false
-
-    Using (.Param)
-
-    ForEach( .ConfigIter in .ConfigurationArray )
-    {
-        Using( .ConfigIter )
-
-        .CompilerOptions    + ' /D "_WINDOWS"'
-                            + ' /Fd"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/$ProjectName$.pdb"'
-
-        ObjectList ("obj_$ProjectName$_$Config$_$Platform$")
-        {
-            .CompilerInputPath = "$RelativePath$/"
-            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
-            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source"'
-            ForEach( .LibraryName in .LibraryBaseNameDependency )
-            {
-                ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
-            }
-            ForEach( .Path in .AdditionalIncludePaths )
-            {
-                ^CompilerOptions + ' /I"$Path$"'
-            }
-        }
-
-        .LinkerOptions + ' /PDB:"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/$ProjectName$.pdb"'
-                       + ' /SUBSYSTEM:WINDOWS'
-        ForEach( .lib in .LinkerAdditionalDependency )
-        {
-            ^LinkerOptions + ' "$lib$"'
-        }
-
-        .ShaderCompilerPath = {"$RelativePath$/shader"}
-        .ProjectTargets = {}
-        ForEach( .LibraryName in .LibraryBaseNameDependency )
-        {
-            ^ShaderCompilerPath + "$RootPath$/staticlib/$LibraryName$/shader"
-        }
-
-        .ProjectTargets = {}
-        ObjectList("vs_$ProjectName$_$Config$_$Platform$")
-        {
-            .Compiler = "fxc"
-            .CompilerOptions = .EffectCompilerToolArgumentsVS
-            .CompilerOutputExtension = ".cso"
-            .CompilerInputPath = ^ShaderCompilerPath
-            .CompilerInputPattern = "*_vs.hlsl"
-            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/shader"
-        }
-        .ProjectTargets + "vs_$ProjectName$_$Config$_$Platform$"
-
-        ObjectList("ps_$ProjectName$_$Config$_$Platform$")
-        {
-            .Compiler = "fxc"
-            .CompilerOptions = .EffectCompilerToolArgumentsPS
-            .CompilerOutputExtension = ".cso"
-            .CompilerInputPath = ^ShaderCompilerPath
-            .CompilerInputPattern = "*_ps.hlsl"
-            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/shader"
-        }
-        .ProjectTargets + "ps_$ProjectName$_$Config$_$Platform$"
-
-        Executable( "exe_$ProjectName$_$Config$_$Platform$" )
-        {
-            .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"
-            .Libraries = {"obj_$ProjectName$_$Config$_$Platform$"}
-            ForEach( .LibraryName in .LibraryBaseNameDependency )
-            {
-                .Temp = {"$LibraryName$_$Config$_$Platform$"}
-                ^Libraries + .Temp
-            }
-            .LinkerOptions = ^LinkerOptions
-            ForEach( .StaicLibPath in .AdditionalStaticLibPaths )
-            {
-                ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$"'
-            }
-        }
-        .ProjectTargets + "exe_$ProjectName$_$Config$_$Platform$"
-
-        If (.DoDataCopy)
-        {
-            CopyDir( "copy_$ProjectName$_$Config$_$Platform$" )
-            {
-                .SourcePaths = .DataCopyPath
-                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/data"
-            }
-            ^ProjectTargets + "copy_$ProjectName$_$Config$_$Platform$"
-        }
-
-        If (.DoRootCopy)
-        {
-            CopyDir( "copy_root_$ProjectName$_$Config$_$Platform$" )
-            {
-                .SourcePaths = .RootCopyPath
-                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output"
-            }
-            ^ProjectTargets + "copy_root_$ProjectName$_$Config$_$Platform$"
-        }
-
-        Alias( "$ProjectName$_$Config$_$Platform$" )
-        {
-          .Targets = ^ProjectTargets 
-        }
-
-        RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
-        {
-            .RemovePaths = { 
-                "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/", 
-                "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/", 
-                }
-        }
-    }
-
-    VCXProject( "$ProjectName$_project" )
-    {
-        //Print("VCXProject $ProjectName$_project")
-        .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
-        .ProjectConfigs = .ConfigurationArray
-        .ProjectInputPaths  = "$RelativePath$/"
-        .ProjectBasePath = '$RelativePath$/'
-        .ProjectFiles = "$RelativePath$/dsc.bff"
-        .ProjectAllowedFileExtensions 	= {
-                                  '*.cpp', '*.hpp', '*.cxx', '*.hxx', '*.c',   '*.h',  '*.cc',   '*.hh',
-                                  '*.cp',  '*.hp',  '*.cs',  '*.inl', '*.bff', '*.rc', '*.resx', '*.m',  '*.mm',
-                                  '*.cu',
-                                  '*.asm', '*.s',
-                                  '*.natvis', '*.editorconfig',
-                                  '.hlsl', '.hlsli'
-                              }
-
-        Using (.CommonVcproject)
-
-        .Output = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/output/^$(ProjectName).exe"
-        .OutputDirectory            = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/output"
-        .IntermediateDirectory 	    = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/intermediate"
-        .BuildLogFile               = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/build_^$(SolutionName).log"
-
-        .PlatformToolset = ""
-        {
-            Using( .VisualStudioSettings )	
-            ^PlatformToolset = .VS_PlatformToolset
-        }
-    }
-}
-
-function DscVsprojectConsoleExe( .ProjectName .Param)
-{
-    .RootPath = ""
-    .RelativePath = ""
-    .ConfigurationArray = []
-    .VisualStudioSettings = []
-    .CommonVcproject = {}
-    .LibraryBaseNameDependency = {}
-    .AdditionalIncludePaths = {}
-    .LinkerAdditionalDependency = {}
-    .AdditionalStaticLibPaths = {}
-    .DataCopyPath = {}
-    .DoDataCopy = false
-    .RootCopyPath = {}
-    .DoRootCopy = false
-
-    Using (.Param)
-
-    ForEach( .ConfigIter in .ConfigurationArray )
-    {
-        Using( .ConfigIter )
-
-        .CompilerOptions    + ' /D "_CONSOLE"'
-                            + ' /Fd"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/$ProjectName$.pdb"'
-
-        ObjectList ("obj_$ProjectName$_$Config$_$Platform$")
-        {
-            .CompilerInputPath = "$RelativePath$/"
-            .CompilerOutputPath = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/"
-            .CompilerOptions + ' /I"$RootPath$/$RelativePath$/source"'
-            ForEach( .LibraryName in .LibraryBaseNameDependency )
-            {
-                ^CompilerOptions + ' /I"$RootPath$/staticlib/$LibraryName$"'
-            }
-            ForEach( .Path in .AdditionalIncludePaths )
-            {
-                ^CompilerOptions + ' /I"$Path$"'
-            }
-        }
-
-        .LinkerOptions + ' /PDB:"$RootPath$/../build/$ProjectName$/$Platform$/$Config$/$ProjectName$.pdb"'
-                       + ' /SUBSYSTEM:CONSOLE'
-        ForEach( .lib in .LinkerAdditionalDependency )
-        {
-            ^LinkerOptions + ' "$lib$"'
-        }
-        ForEach( .StaicLibPath in .AdditionalStaticLibPaths )
-        {
-            ^LinkerOptions + ' /LIBPATH:"$StaicLibPath$"'
-        }
-
-        .ProjectTargets = {}
-        Executable( "exe_$ProjectName$_$Config$_$Platform$" )
-        {
-            .LinkerOutput = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/$ProjectName$.exe"
-            .Libraries = {"obj_$ProjectName$_$Config$_$Platform$"}
-            ForEach( .LibraryName in .LibraryBaseNameDependency )
-            {
-                .Temp = {"$LibraryName$_$Config$_$Platform$"}
-                ^Libraries + .Temp
-            }
-            ^ProjectTargets + "exe_$ProjectName$_$Config$_$Platform$"
-        }
-
-        If (.DoDataCopy)
-        {
-            CopyDir( "copy_$ProjectName$_$Config$_$Platform$" )
-            {
-                .SourcePaths = .DataCopyPath
-                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/data"
-            }
-            ^ProjectTargets + "copy_$ProjectName$_$Config$_$Platform$"
-        }
-
-        If (.DoRootCopy)
-        {
-            CopyDir( "copy_root_$ProjectName$_$Config$_$Platform$" )
-            {
-                .SourcePaths = .RootCopyPath
-                .Dest = "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output"
-            }
-            ^ProjectTargets + "copy_root_$ProjectName$_$Config$_$Platform$"
-        }
-
-        Alias( "$ProjectName$_$Config$_$Platform$" )
-        {
-          .Targets = ^ProjectTargets 
-        }
-
-        RemoveDir( "clean_$ProjectName$_$Config$_$Platform$" )
-        {
-            .RemovePaths = { 
-                "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/output/", 
-                "$RootPath$/../build/$ProjectName$/$Platform$/$Config$/intermediate/", 
-                }
-        }
-    }
-
-    VCXProject( "$ProjectName$_project" )
-    {
-        .ProjectOutput = "$RelativePath$/$ProjectName$.vcxproj"
-        .ProjectConfigs = .ConfigurationArray
-        .ProjectInputPaths  = "$RelativePath$/"
-        .ProjectBasePath = '$RelativePath$/'
-        .ProjectFiles = "$RelativePath$/dsc.bff"
-
-        Using (.CommonVcproject)
-
-        .Output = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/output/^$(ProjectName).exe"
-        .OutputDirectory            = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/output"
-        .IntermediateDirectory 	    = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/intermediate"
-        .BuildLogFile               = "$RootPath$/../build/^$(ProjectName)/^$(Platform)/^$(Configuration)/build_^$(SolutionName).log"
-
-        .PlatformToolset = ""
-        {
-            Using( .VisualStudioSettings )	
-            ^PlatformToolset = .VS_PlatformToolset
-        }
-    }
-}

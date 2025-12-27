@@ -5,7 +5,7 @@ struct Pixel
     float4 _colour : SV_TARGET0;
 };
 
-cbuffer ConstantBuffer : register(b0)
+cbuffer MyConstantBuffer : register(b0)
 {
     // data size [x,y] for the celtic knot data map, then [z,w] of the render target size
     float4 _texture_size;

@@ -5,7 +5,7 @@ struct Pixel
     float4 _colour : SV_TARGET0;
 };
 
-cbuffer ConstantBuffer : register(b0)
+cbuffer MyConstantBuffer : register(b0)
 {
 	float4 _focus;
 	float4 _colour_0;

@@ -23,23 +23,15 @@ SET _minute=%_minute:~-2%
 SET _second=%_second:~-2%
 SET TIMESTAMP=%_yyyy%-%_mm%-%_dd%T%_hour%_%_minute%_%_second%
 
-::Set project
-
-::SET PROJECT_NAME=render_ui
-SET PROJECT_NAME=game_lqrpg
-SET PLATFORM=x64
-SET CONFIG=Release
+::Build projects
 
 :: invoke fastbuild to build the project, warning, env is slightly different than from being run in VS, possibly need to run vcvars64.bat?
 ::G:\bin\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
 :: WARNING, added "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64" to the env PATH else was having the linker not find the rc.exe
 ::C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe
 PUSHD code
-::https://www.fastbuild.org/docs/options.html
-::-clean
-::-verbose 
-::-showcmds
-..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -cache "%PROJECT_NAME%_%CONFIG%_%PLATFORM%"
+::%PROJECT_NAME%_%CONFIG%_%PLATFORM%
+..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -vs -cache "game_lqrpg_Release_x64"
 POPD
 
 echo %ERRORLEVEL%
@@ -49,8 +41,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 :: mirror the build project output dir to a show_n_tell dir, two folders above this script
-
-robocopy "build\%PROJECT_NAME%\%PLATFORM%\%CONFIG%\output" "..\..\shown_n_tell\%PROJECT_NAME%\%TIMESTAMP%" /MIR /s /ns /nc /nfl /ndl /np
+robocopy "build\game_lqrpg\x64\Release\output" "..\..\shown_n_tell\game_lqrpg\%TIMESTAMP%" /MIR /s /ns /nc /nfl /ndl /np
 
 ::echo %ERRORLEVEL%
 ::Any value equal to or greater than 8 indicates that there was at least one failure during the copy operation.

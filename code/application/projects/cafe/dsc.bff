@@ -1,0 +1,6 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+//pull in child scripts
+#include "a00_compute_spring\dsc.bff"

@@ -24,8 +24,14 @@ SET _hour=%_hour:~-2%
 SET _minute=%_minute:~-2%
 SET _second=%_second:~-2%
 
-SET TIMESTAMP=%_yyyy%-%_mm%-%_dd%T%_hour%%_minute%%_second%
-SET DESTINATION=D:\backup\%TIMESTAMP%_game06
+SET TIMESTAMPFOLDER=%_yyyy%-%_mm%-%_dd%T%_hour%%_minute%%_second%
+SET DESTINATION=D:\backup\%TIMESTAMPFOLDER%_game06
+
+:: start force timestamp increment. Do we update the version timestamp on backup to drive? normally no, but im currently in ofline mode and want the timestamp to increment
+SET TIMESTAMP=%_yyyy%-%_mm%-%_dd%T%_hour%:%_minute%:%_second%
+echo "%TIMESTAMP%"^>code\staticlib\dsc_version\dsc_version\timestamp.txt
+echo "%TIMESTAMP%">code\staticlib\dsc_version\dsc_version\timestamp.txt
+:: end force timestamp increment
 
 ::/L list and dont copy
 ::/NJH no job header

@@ -1,0 +1,31 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+{
+    .LibraryDependencyArray = {"dsc_common", "dsc_windows", "dsc_render", "dsc_render_resource" }
+    .LinkerAdditionalDependency = {"user32.lib", "Shcore.lib", "D3d12.lib", "DXGI.lib", "dxguid.lib", "Gdi32.lib"}
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings 
+        .CommonVcproject = ^CommonVcproject 
+        .LibraryBaseNameDependency = ^LibraryDependencyArray
+        .LinkerAdditionalDependency = ^LinkerAdditionalDependency
+    ]
+
+    .ProjectName = "render_triangle"
+    #include "..\..\..\fbuild\dsc_vsproject_window_exe.bff"
+    //DscVsprojectWindowExe("render_triangle" .Param)
+}
+
+{
+    .temp =  [
+             .Path           = "application\development"
+            .Projects       = { "render_triangle_project" }
+    ]
+    ^SolutionItemArray + .temp
+}
+
+//.SolutionBuildProject = "render_triangle_project"

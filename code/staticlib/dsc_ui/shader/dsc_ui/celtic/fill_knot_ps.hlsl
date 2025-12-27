@@ -13,7 +13,7 @@ SamplerState g_sampler_state_data : register(s0);
 Texture2D g_texture_knot : register(t1);
 SamplerState g_sampler_state_knot : register(s1);
 
-cbuffer ConstantBuffer : register(b0)
+cbuffer MyConstantBuffer : register(b0)
 {
     // width, height of our render target, then the size of the knot
     float4 _texture_size_knot_size;

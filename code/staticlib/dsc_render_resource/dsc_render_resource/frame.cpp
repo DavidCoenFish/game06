@@ -3,6 +3,7 @@
 #include "shader.h"
 #include "shader_constant_buffer.h"
 #include "geometry_generic.h"
+#include "unordered_access.h"
 
 #include <dsc_common/log_system.h>
 #include <dsc_render/draw_system.h>
@@ -60,7 +61,7 @@ void DscRenderResource::Frame::SetRenderTarget(
 	if ((in_render_target != nullptr) && 
 		(_render_target != nullptr))
 	{
-		DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "new in_render_target:%p\n", in_render_target->GetDebugToken());
+		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "new in_render_target:%p\n", in_render_target->GetDebugToken());
 
 		// cross fade was updating the child fade amount after the child had draw, moved caculate earlier as a parent dependency, but that is not a nice solution
 		//DSC_LOG_DIAGNOSTIC(LOG_TOPIC_DSC_RENDER, "not strictly an error, but do we have Ui nodes drawing during the draw of parent, missing render node update?\n");
@@ -132,17 +133,26 @@ void DscRenderResource::Frame::Draw(
 	return;
 }
 
-//void DscRenderResource::Frame::Dispatch(
-//	uint32_t in_thread_group_count_x,
-//	uint32_t in_thread_group_count_y,
-//	uint32_t in_thread_group_count_z
-//	)
+void DscRenderResource::Frame::Dispatch(
+	uint32_t in_thread_group_count_x,
+	uint32_t in_thread_group_count_y,
+	uint32_t in_thread_group_count_z
+	)
+{
+	_command_list->Dispatch(
+		in_thread_group_count_x,
+		in_thread_group_count_y,
+		in_thread_group_count_z
+		);
+	return;
+}
+
+//void DscRenderResource::Frame::ClearUAV(
+//	const std::shared_ptr<UnorderedAccess>& in_unordered_access
+//)
 //{
-//	_command_list->Dispatch(
-//		in_thread_group_count_x,
-//		in_thread_group_count_y,
-//		in_thread_group_count_z
-//		);
+//	in_unordered_access->Clear(_command_list);
+//	_resource_list->AddResource(in_unordered_access);
 //	return;
 //}
 

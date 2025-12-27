@@ -1,6 +1,7 @@
 #pragma once
 #include "dsc_common.h"
 
+#define DSC_2_PI 6.283185307179586476925286766559f
 #define DSC_PI 3.1415926535897932384626433832795f
 #define DSC_PI_DIV_180 0.01745329251994329576923690768489f
 #define DSC_180_DIV_PI 57.295779513082320876798154814105f
@@ -41,5 +42,8 @@ namespace Math
 
 	// 3x^2 - 2x^3
 	const float EaseInEaseOut(const float in_x);
+
+	// fmod(-5, 3) gives -2, and we want 1, so we have PosFMod
+	const float PosFMod(const float x, const float y);
 }
 }

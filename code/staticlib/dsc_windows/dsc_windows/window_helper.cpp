@@ -217,9 +217,9 @@ namespace
 		case WM_SYSKEYUP:
 			if (nullptr != application)
 			{
+				// Implements the classic ALT+ENTER fullscreen toggle
 				if ((in_wparam == VK_RETURN && (in_lparam & 0x60000000) == 0x20000000))
 				{
-					// Implements the classic ALT+ENTER fullscreen toggle
 					if (application->GetFullScreen())
 					{
 						application->SetFullScreen(false);
@@ -241,6 +241,11 @@ namespace
 						SetWindowPos(in_hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 						ShowWindow(in_hwnd, SW_SHOWMAXIMIZED);
 					}
+				}
+				// Implements the classic ALT+F4 exit
+				else if ((in_wparam == VK_F4 && (in_lparam & 0x60000000) == 0x20000000))
+				{
+					PostMessage(in_hwnd, WM_CLOSE, 0, 0);
 				}
 				else
 				{

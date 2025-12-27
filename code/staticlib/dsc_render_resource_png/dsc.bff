@@ -2,25 +2,23 @@
 //Print(._CURRENT_BFF_DIR_)
 //Print(._WORKING_DIR_)
 
-// append solution items
 {
-    .temp =  [
-        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
-        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+        .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_render_resource", "dsc_png"}
+    ]
+    .ProjectName = "dsc_render_resource_png"
+    #include "..\..\fbuild\dsc_vsproject_static_lib.bff"
+}
+
+{
+    .temp = [
+        .Path           = "staticlib"
+        .Projects       = "dsc_render_resource_png_project"
     ]
     ^SolutionItemArray + .temp
 }
-
-.LibraryParam = [
-    .RootPath = ^_WORKING_DIR_
-    .RelativePath = ^_CURRENT_BFF_DIR_
-    .ConfigurationArray = ^ConfigurationArray
-    .VisualStudioSettings = ^VisualStudioSettings
-    .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {"dsc_common", "dsc_render", "dsc_render_resource", "dsc_png"}
-]
-DscVsprojectStaticLib("dsc_render_resource_png" .LibraryParam)
-
-.SolutionProjects + "dsc_render_resource_png_project"
-.SolutionItemsStaticLibProject + "dsc_render_resource_png_project"
-//.SolutionBuildProject = "dsc_render_resource_png_project"

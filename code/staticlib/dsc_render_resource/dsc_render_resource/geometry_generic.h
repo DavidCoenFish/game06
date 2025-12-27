@@ -43,7 +43,7 @@ namespace DscRenderResource
 			const D3D_PRIMITIVE_TOPOLOGY in_primitive_topology,
 			const std::vector<D3D12_INPUT_ELEMENT_DESC>& in_input_element_desc_array,
 			const std::vector<uint8_t>& in_vertex_data_raw,
-			const int in_float_per_vertex
+			const int in_float_per_vertex // TODO: change to bytes per vertex stride, data may not even be float
 		);
 		void Draw(ID3D12GraphicsCommandList* const in_command_list);
 

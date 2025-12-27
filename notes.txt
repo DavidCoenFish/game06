@@ -1,1 +1,0 @@
-https://www.artima.com/articles/on-the-tension-between-object-oriented-and-generic-programming-in-c

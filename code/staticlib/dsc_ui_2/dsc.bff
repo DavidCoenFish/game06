@@ -2,32 +2,30 @@
 //Print(._CURRENT_BFF_DIR_)
 //Print(._WORKING_DIR_)
 
-// append solution items
 {
-    .temp =  [
-        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
-        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+        .LibraryBaseNameDependency = {
+            "dsc_common", 
+            "dsc_render", 
+            "dsc_render_resource", 
+            "dsc_dag_2", 
+            "dsc_text",
+            "dsc_locale",
+            }
+    ]
+    .ProjectName = "dsc_ui_2"
+    #include "..\..\fbuild\dsc_vsproject_static_lib.bff"
+}
+
+{
+    .temp = [
+        .Path           = "staticlib"
+        .Projects       = "dsc_ui_2_project"
     ]
     ^SolutionItemArray + .temp
 }
-
-.LibraryParam = [
-    .RootPath = ^_WORKING_DIR_
-    .RelativePath = ^_CURRENT_BFF_DIR_
-    .ConfigurationArray = ^ConfigurationArray
-    .VisualStudioSettings = ^VisualStudioSettings
-    .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {
-        "dsc_common", 
-        "dsc_render", 
-        "dsc_render_resource", 
-        "dsc_dag_2", 
-        "dsc_text",
-        "dsc_locale",
-        }
-]
-DscVsprojectStaticLib("dsc_ui_2" .LibraryParam)
-
-.SolutionProjects + "dsc_ui_2_project"
-.SolutionItemsStaticLibProject + "dsc_ui_2_project"
-//.SolutionBuildProject = "dsc_ui_2_project"

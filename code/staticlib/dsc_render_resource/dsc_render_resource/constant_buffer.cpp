@@ -68,7 +68,8 @@ void DscRenderResource::ConstantBuffer::DeviceRestored(ID3D12Device* const in_de
 void DscRenderResource::ConstantBuffer::Activate(
 	ID3D12GraphicsCommandList* const in_command_list,
 	// Void* const pData,
-	const int in_root_param_index
+	const int in_root_param_index,
+	const bool in_compute_shader
 	)
 {
 	ID3D12DescriptorHeap* descriptor_heaps[] =
@@ -79,10 +80,22 @@ void DscRenderResource::ConstantBuffer::Activate(
 		_countof(descriptor_heaps),
 		descriptor_heaps
 		);
-	in_command_list->SetGraphicsRootDescriptorTable(
-		in_root_param_index,
-		_heap_wrapper_item->GetGPUHandle()
+	if (true == in_compute_shader)
+	{
+		in_command_list->SetComputeRootDescriptorTable(
+			in_root_param_index,
+			_heap_wrapper_item->GetGPUHandle()
 		);
+	}
+	else
+	{
+		in_command_list->SetGraphicsRootDescriptorTable(
+			in_root_param_index,
+			_heap_wrapper_item->GetGPUHandle()
+			);
+	}
+
+
 	if (0 == _gpu_address)
 	{
 		return;

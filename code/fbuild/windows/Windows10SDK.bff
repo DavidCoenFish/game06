@@ -78,7 +78,10 @@
                                     + ' /LIBPATH:"$Windows10_SDKBasePath$/Lib/$Windows10_SDKVersion$/ucrt/x64"'
                                     + ' /MACHINE:X64'
 
-    .EffectCompilerTool             = '$Windows10_SDKBasePath$\bin\$Windows10_SDKVersion$\x86\fxc.exe'
+    // C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86
+    //.EffectCompilerTool             = '$Windows10_SDKBasePath$\bin\$Windows10_SDKVersion$\x86\fxc.exe'
+    .EffectCompilerTool             = '$Windows10_SDKBasePath$\bin\$Windows10_SDKVersion$\x86\dxc.exe'
+
 ]
 .Windows10_SDK_X64_ClangCl =
 [
@@ -112,5 +115,3 @@ Compiler( 'ResourceCompiler-Windows10' )
 // PATH environment variable
 //------------------------------------------------------------------------------
 .WINDOWS_SDK_2019_PATH          = '$Windows10_SDKBasePath$/bin/$Windows10_SDKVersion$/x64'
-
-//------------------------------------------------------------------------------

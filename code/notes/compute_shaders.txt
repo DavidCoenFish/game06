@@ -4,6 +4,12 @@ https://logins.github.io/graphics/2020/10/31/D3D12ComputeShaders.html
 C:\development\chica\webgl\source\test\spring
 C:\development\chica\webgl\source\test\spring\assets.js
 
+/Zi /E"main" /Od /Fo"G:\development\game05\build\application\x64\Debug\output\task\test_compute\compute_shader.cso" /cs"_5_0" /nologo 
+C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe /nologo /E"main" /T cs_5_0 /Fo "G:\development\game05\build\application\x64\Debug\output\task\test_compute\compute_shader.cso" /Od /Zi task\test_compute\compute_shader.hlsl
+
+
+C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\fxc.exe 
+/nologo /E"main" /T cs_5_0 /Fo "G:\development\game05\build\application\x64\Debug\output\task\test_compute\compute_shader.cso" /Od /Zi task\test_compute\compute_shader.hlsl
 
 
 const sVertexShaderSource = `

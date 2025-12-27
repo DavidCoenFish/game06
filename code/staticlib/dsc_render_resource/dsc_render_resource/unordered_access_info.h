@@ -30,7 +30,8 @@ namespace DscRenderResource
 
 		void Activate(
 			ID3D12GraphicsCommandList* const in_command_list,
-			const int in_root_param_index
+			const int in_root_param_index,
+			const bool in_compute_shader
 		);
 
 	private:

@@ -32,9 +32,11 @@ void DscRenderResource::UnorderedAccessInfo::SetUnorderedAccessViewHandle(const 
 
 void DscRenderResource::UnorderedAccessInfo::Activate(
 	ID3D12GraphicsCommandList* const in_command_list,
-	const int in_root_param_index
+	const int in_root_param_index,
+	const bool in_compute_shader
 	)
 {
+	// we don't know if we have a UAV or a SRV (as _unordered_access_view_handle) but the interface matters to the command list, ie, which type of root signiture is in use
 	if (_unordered_access_view_handle)
 	{
 		auto heap = _unordered_access_view_handle->GetHeap();
@@ -42,10 +44,20 @@ void DscRenderResource::UnorderedAccessInfo::Activate(
 			1,
 			&heap
 			);
-		in_command_list->SetComputeRootDescriptorTable(
-			in_root_param_index,
-			_unordered_access_view_handle->GetGPUHandle()
+		if (true == in_compute_shader)
+		{
+			in_command_list->SetComputeRootDescriptorTable(
+				in_root_param_index,
+				_unordered_access_view_handle->GetGPUHandle()
+				);
+		}
+		else
+		{
+			in_command_list->SetGraphicsRootDescriptorTable(
+				in_root_param_index,
+				_unordered_access_view_handle->GetGPUHandle()
 			);
+		}
 	}
 	return;
 }

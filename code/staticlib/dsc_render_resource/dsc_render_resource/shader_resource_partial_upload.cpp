@@ -68,7 +68,7 @@ void DscRenderResource::ShaderResourcePartialUpload::UploadDataIfDirty(
 	if (_dirty)
 	{
 		_dirty = false;
-		//TODO: actually fo a partial upload, rather than a full upload
+		//TODO: actually do a partial upload, rather than a full upload
 		_dirty_height_low = _desc.Height;
 		_dirty_height_high = 0;
 

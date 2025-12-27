@@ -19,7 +19,8 @@ DscRenderResource::ShaderConstantBuffer::~ShaderConstantBuffer()
 
 void DscRenderResource::ShaderConstantBuffer::SetActive(
 	ID3D12GraphicsCommandList* const in_command_list,
-	int& in_out_root_paramter_index
+	int& in_out_root_paramter_index,
+	const bool in_compute_shader
 	)
 {
 	// B0,b1,b2,...
@@ -27,7 +28,8 @@ void DscRenderResource::ShaderConstantBuffer::SetActive(
 	{
 		iter->Activate(
 			in_command_list,
-			in_out_root_paramter_index
+			in_out_root_paramter_index,
+			in_compute_shader
 			);
 		in_out_root_paramter_index += 1;
 	}

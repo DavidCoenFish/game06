@@ -1,5 +1,31 @@
+- a00 compute spring
+	dsc_camera
+	dsc_statistics
+	dsc_onscreen_statistics
+	dsc_render_component_grid
+	dsc_render_component_background
+- a01 compute cloth
+- a02 compute collision
+- a03 grow
+- a04 prototype cowtastic cafe character
+- a05 sandbox cowtastic cafe character
+- a06 recreate cowtastic minimal (without tutorial, online, only english)
+- a07 recreate cowtastic total
+- a08? character editor, new anim, texture
+
+simian grow
+- b00 world prototype (sphere & camera move in world convex hull)
+- b01 stick figure (in sphere in world, animation)
+- b02 jiggle figure
+- b02 grow figure (first item bikini, grow, loose item)
+- b03 banana (grow, use a weapon in world)
+- b04 minigame inflate banana
+- b05 minigame match recipy
+- b06 tutorial
+- b07 first playable (tutorial, inflate banana, move in world, combat, match recipy, earn bikini, grow)
+
 - ?ui
-	refactor UiRenderTarget to no use external render target, add helper to draw UiRenderTargett to backbuffer
+	refactor UiRenderTarget to no use external render target, add helper to draw UiRenderTarget to backbuffer
 	Option Dialog
 		drop down (local select)
 		slider (ui scale)
@@ -19,3 +45,7 @@ what is our target project, jank, 2d anime shirow anime draw, subuccus life, leg
 		- map
 	- combat
 	- local network play/ coop. one person hosts as dm? or let computer be dm?
+
+
+
+..\bin\fbuild.exe -config dsc.bff -dbfile ..\build\dsc.fdb -showtargets

@@ -2,33 +2,31 @@
 //Print(._CURRENT_BFF_DIR_)
 //Print(._WORKING_DIR_)
 
-// append solution items
 {
-    .temp =  [
-        .Path = "solution_items\$_CURRENT_BFF_DIR_$"
-        .Items = { "$_CURRENT_BFF_DIR_$\dsc.bff" }
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+        .LibraryBaseNameDependency = {
+            "dsc_common", 
+            "dsc_render", 
+            "dsc_render_resource", 
+            "dsc_version", 
+            "dsc_text",
+            "dsc_locale",
+            "dsc_ui",
+            }
+    ]
+    .ProjectName = "dsc_onscreen_version"
+    #include "..\..\fbuild\dsc_vsproject_static_lib.bff"
+}
+
+{
+    .temp = [
+        .Path           = "staticlib"
+        .Projects       = "dsc_onscreen_version_project"
     ]
     ^SolutionItemArray + .temp
 }
-
-.LibraryParam = [
-    .RootPath = ^_WORKING_DIR_
-    .RelativePath = ^_CURRENT_BFF_DIR_
-    .ConfigurationArray = ^ConfigurationArray
-    .VisualStudioSettings = ^VisualStudioSettings
-    .CommonVcproject = ^CommonVcproject
-    .LibraryBaseNameDependency = {
-        "dsc_common", 
-        "dsc_render", 
-        "dsc_render_resource", 
-        "dsc_version", 
-        "dsc_text",
-        "dsc_locale",
-        "dsc_ui",
-        }
-]
-DscVsprojectStaticLib("dsc_onscreen_version" .LibraryParam)
-
-.SolutionProjects + "dsc_onscreen_version_project"
-.SolutionItemsStaticLibProject + "dsc_onscreen_version_project"
-//.SolutionBuildProject = "dsc_onscreen_version_project"
