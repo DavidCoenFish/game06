@@ -13,5 +13,4 @@
 
 //pull in child scripts
 #include "console_test_harf_buzz\dsc.bff"
-#include "render_unit_test\dsc.bff"
 #include "unit_test\dsc.bff"

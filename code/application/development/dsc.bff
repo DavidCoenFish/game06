@@ -9,13 +9,8 @@
 #include "render_text\dsc.bff"
 #include "render_texture\dsc.bff"
 #include "render_triangle\dsc.bff"
-#include "render_ui_2\dsc.bff"
 #include "render_ui\dsc.bff"
-#include "render_ui_button\dsc.bff"
-#include "render_ui_canvas\dsc.bff"
 #include "render_ui_crossfade\dsc.bff"
-#include "render_ui_root_effect\dsc.bff"
-#include "render_ui_stack\dsc.bff"
 #include "render_version\dsc.bff"
 
 // append solution items
