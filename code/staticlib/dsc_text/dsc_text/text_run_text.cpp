@@ -33,20 +33,24 @@ void DscText::TextRunText::BuildPreVertexData(
 	const float in_ui_scale
 )
 {
+	const int32 scale_font_size = DscCommon::Math::ScaleInt(_font_size, in_ui_scale);
+	const int32 scale_line_minimum_height = DscCommon::Math::ScaleInt(_line_minimum_height, in_ui_scale);
+	const int32 scale_line_minimum_depth = DscCommon::Math::ScaleInt(_line_minimum_depth, in_ui_scale);
+	const int32 scale_new_line_gap_pixels = DscCommon::Math::ScaleInt(in_new_line_gap_pixels, in_ui_scale);
+	const int32 scale_base_line_offset = DscCommon::Math::ScaleInt(_base_line_offset, in_ui_scale);
 	_font->BuildPreVertexData(
 		in_out_pre_vertex_data,
 		in_out_cursor,
 		_string_utf8,
 		_locale_token,
-		DscCommon::Math::ScaleInt(_font_size, in_ui_scale),
+		scale_font_size,
 		in_width_limit_enabled,
 		in_width_limit,
 		_colour,
-		DscCommon::Math::ScaleInt(_line_minimum_height, in_ui_scale),
-		DscCommon::Math::ScaleInt(_line_minimum_depth, in_ui_scale),
-		DscCommon::Math::ScaleInt(in_new_line_gap_pixels, in_ui_scale),
-		DscCommon::Math::ScaleInt(_base_line_offset, in_ui_scale)
+		scale_line_minimum_height,
+		scale_line_minimum_depth,
+		scale_new_line_gap_pixels,
+		scale_base_line_offset
 	);
-
 }
 

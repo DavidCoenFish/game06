@@ -60,12 +60,6 @@ VCXProject( "$ProjectName$_project" )
     .ProjectBasePath = '$RelativePath$\'
     .ProjectFiles = { "$RelativePath$\dsc.bff" }
 
-    ForEach( .ProjectFile in ^ExtraProjectFiles )
-    {
-        .ProjectFiles + .ProjectFile
-        Print(.ProjectFiles)
-    }
-
     Using (.CommonVcproject)
 
     .Output = "^$(ProjectName).lib"

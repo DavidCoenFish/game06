@@ -58,8 +58,10 @@ typedef unsigned __int64 uint64;
 #include <cmath>
 #include <codecvt>
 #include <filesystem>
+//#include <format> C++20 or later
 #include <functional>
 #include <fstream>
+#include <iomanip> // std::put_time
 #include <iostream>
 #include <limits>
 #include <list>
@@ -69,6 +71,7 @@ typedef unsigned __int64 uint64;
 #include <mutex>
 #include <set>
 #include <string>
+#include <sstream>
 #include <variant>
 #include <vector>
 

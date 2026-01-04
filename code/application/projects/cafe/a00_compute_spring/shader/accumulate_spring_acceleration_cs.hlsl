@@ -1,3 +1,5 @@
+#include "spring_acceleration.hlsli"
+
 cbuffer ConstantBuffer0 : register(b0)
 {
     int _link_count;
@@ -22,15 +24,6 @@ struct AccelerationData
     int3 acceleration;
 };
 RWStructuredBuffer<AccelerationData> g_acceleration_data : register(u0);
-
-int3 ConvertFloat3ToInt3(float3 in_float3)
-{
-    return int3(
-        ((int)(in_float3.x * 16777216.0)), //2 ^ 24
-        ((int)(in_float3.y * 16777216.0)),
-        ((int)(in_float3.z * 16777216.0))
-        );
-}
 
 //F = -kx
 int3 CalculateSpringForce(float3 in_pos_a, float3 in_pos_b, float in_length)

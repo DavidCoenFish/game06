@@ -43,6 +43,24 @@ DscUi::ScreenQuad::ScreenQuad(
 	//nop
 }
 
+void DscUi::ScreenQuad::SetQuadSize(
+	const VectorUiCoord2& in_quad_size,
+	const VectorUiCoord2& in_quad_pivot,
+	const VectorUiCoord2& in_parent_attach
+)
+{
+	if ((_quad_size != in_quad_size) ||
+		(_quad_pivot != in_quad_pivot) ||
+		(_parent_attach != in_parent_attach))
+	{
+		_quad_size = in_quad_size;
+		_quad_pivot = in_quad_pivot;
+		_parent_attach = in_parent_attach;
+		_dirty = true;
+	}
+}
+
+
 void DscUi::ScreenQuad::SetParentSize(
 	const DscCommon::VectorInt2& in_parent_size
 )

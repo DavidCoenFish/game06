@@ -25,7 +25,7 @@ namespace DscRenderResource
 namespace DscText
 {
     class TextManager;
-    class TextRun;
+    class Text;
 }
 
 class Application : public DscWindows::IWindowApplication
@@ -54,7 +54,7 @@ private:
         Resources(const Resources&) = delete;
 
         std::unique_ptr<DscText::TextManager> _text_manager;
-        std::unique_ptr<DscText::TextRun> _text_run;
+        std::unique_ptr<DscText::Text> _text_run;
     };
     std::unique_ptr<Resources> _resources;
 

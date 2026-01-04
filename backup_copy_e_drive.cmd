@@ -1,9 +1,6 @@
 ::BackupCopyEDrive.cmd
-
 @ECHO OFF
 PUSHD %~dp0
-
-cls
 
 echo %~nx0 %~1 %~2
 

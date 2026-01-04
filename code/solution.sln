@@ -48,6 +48,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_data", "staticlib\dsc_d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_locale", "staticlib\dsc_locale\dsc_locale.vcxproj", "{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_onscreen_debug", "staticlib\dsc_onscreen_debug\dsc_onscreen_debug.vcxproj", "{C51EFA5B-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_onscreen_version", "staticlib\dsc_onscreen_version\dsc_onscreen_version.vcxproj", "{4E8FF1E7-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_png", "staticlib\dsc_png\dsc_png.vcxproj", "{3F637C94-6C94-4F93-BC2A-7F5284B7D434}"
@@ -57,6 +59,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_render_resource", "staticlib\dsc_render_resource\dsc_render_resource.vcxproj", "{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_render_resource_png", "staticlib\dsc_render_resource_png\dsc_render_resource_png.vcxproj", "{DC26275A-6C94-4F93-BC2A-7F5284B7D434}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_statistics", "staticlib\dsc_statistics\dsc_statistics.vcxproj", "{92C76D99-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsc_text", "staticlib\dsc_text\dsc_text.vcxproj", "{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}"
 EndProject
@@ -133,6 +137,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parent", "parent", "{3D8E60
 		..\publish_show_n_tell.cmd = ..\publish_show_n_tell.cmd
 		..\reset.cmd = ..\reset.cmd
 		..\sync.cmd = ..\sync.cmd
+		..\test_all.cmd = ..\test_all.cmd
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{D7B0BF07-6C94-4F93-BC2A-7F5284B7D434}"
@@ -176,6 +181,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{1EAABDE6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution_items", "solution_items", "{CBDF0CCA-6C94-4F93-BC2A-7F5284B7D434}"
 	ProjectSection(SolutionItems) = preProject
+		dsc.bff = dsc.bff
+		parent_items.bff = parent_items.bff
 		todo.txt = todo.txt
 	EndProjectSection
 EndProject
@@ -249,6 +256,8 @@ Global
 		{8521107B-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{C51EFA5B-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{C51EFA5B-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{4E8FF1E7-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{4E8FF1E7-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{3F637C94-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
@@ -259,6 +268,8 @@ Global
 		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{DC26275A-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{DC26275A-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
+		{92C76D99-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
+		{92C76D99-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
 		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434}.Release|x64.ActiveCfg = Release|x64
 		{0162C302-6C94-4F93-BC2A-7F5284B7D434}.Debug|x64.ActiveCfg = Debug|x64
@@ -297,11 +308,13 @@ Global
 		{6EACFF0D-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{8521107B-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{FB836DEC-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
+		{C51EFA5B-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{4E8FF1E7-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{3F637C94-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{C8FD9BC9-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{8E5DB12D-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{DC26275A-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
+		{92C76D99-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{EA12BD98-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{0162C302-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}
 		{EF038EDB-6C94-4F93-BC2A-7F5284B7D434} = {51B0D35D-6C94-4F93-BC2A-7F5284B7D434}

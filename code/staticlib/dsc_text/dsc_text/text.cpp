@@ -1,4 +1,4 @@
-#include "text_run.h"
+#include "text.h"
 
 #include "text_run_icon.h"
 #include "text_run_text.h"
@@ -10,7 +10,7 @@
 #include <dsc_render_resource\geometry_generic.h>
 
 
-std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
+std::unique_ptr<DscText::ITextRun> DscText::Text::MakeTextRunDataString(
 	const std::string& in_string_utf8,
 	const TextLocale* const in_locale_token,
 	GlyphCollectionText* const in_text_font,
@@ -33,7 +33,7 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataString(
 		);
 }
 
-std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataIcon(
+std::unique_ptr<DscText::ITextRun> DscText::Text::MakeTextRunDataIcon(
 	const int32 in_icon_id,
 	GlyphCollectionIcon* const in_icon_font,
 	const int32 in_colour_tint,
@@ -53,7 +53,7 @@ std::unique_ptr<DscText::ITextRun> DscText::TextRun::MakeTextRunDataIcon(
 }
 
 // Do we keep the defaults, and each run has the settings? or simplify so we just have global settings at top, and data for each run
-DscText::TextRun::TextRun(
+DscText::Text::Text(
 	std::vector<std::unique_ptr<ITextRun>>&& in_text_run_array,
 	const DscCommon::VectorInt2& in_container_size,
 	const bool in_width_limit_enabled,
@@ -61,7 +61,8 @@ DscText::TextRun::TextRun(
 	const THorizontalAlignment in_horizontal_line_alignment,
 	const TVerticalAlignment in_vertical_block_alignment,
 	const int32 in_line_gap_pixels,
-	const float in_ui_scale
+	const float in_ui_scale,
+	const DscCommon::VectorInt4& in_text_margin
 )
 : _text_run_array(std::move(in_text_run_array))
 , _container_size(in_container_size)
@@ -74,18 +75,19 @@ DscText::TextRun::TextRun(
 , _calculate_dirty(true)
 , _pre_vertex_data()
 , _text_bounds()
+, _text_margin(in_text_margin)
 , _geometry_dirty(true)
 , _geometry()
 {
 	//nop
 }
 
-DscText::TextRun::~TextRun()
+DscText::Text::~Text()
 {
 	//nop
 }
 
-const std::shared_ptr<DscRenderResource::GeometryGeneric>& DscText::TextRun::GetGeometry(
+const std::shared_ptr<DscRenderResource::GeometryGeneric>& DscText::Text::GetGeometry(
 	DscRender::DrawSystem* const in_draw_system,
 	DscRenderResource::Frame* const in_draw_system_frame
 	)
@@ -101,7 +103,8 @@ const std::shared_ptr<DscRenderResource::GeometryGeneric>& DscText::TextRun::Get
 			vertex_raw_data,
 			_container_size,
 			_horizontal_line_alignment,
-			_vertical_block_alignment
+			_vertical_block_alignment,
+			_text_margin
 		);
 
 		// the problem with resizing an existing geometry, is what if that geometry is still on a command list
@@ -137,7 +140,7 @@ const std::shared_ptr<DscRenderResource::GeometryGeneric>& DscText::TextRun::Get
 }
 
 // Get the natural size required by the text using current width limit if enabled
-DscCommon::VectorInt2 DscText::TextRun::GetTextBounds()
+DscCommon::VectorInt2 DscText::Text::GetTextBounds()
 {
 	if (true == _calculate_dirty)
 	{
@@ -159,10 +162,14 @@ DscCommon::VectorInt2 DscText::TextRun::GetTextBounds()
 		_text_bounds = _pre_vertex_data->GetBounds();
 	}
 
-	return _text_bounds;
+	DscCommon::VectorInt2 result = _text_bounds + DscCommon::VectorInt2(
+		_text_margin.GetLeft() + _text_margin.GetRight(),
+		_text_margin.GetTop() + _text_margin.GetBottom()
+		);
+	return result;
 }
 
-void DscText::TextRun::SetTextRunArray(
+void DscText::Text::SetTextRunArray(
 	std::vector<std::unique_ptr<ITextRun>>&& in_text_run_array
 )
 {
@@ -171,7 +178,7 @@ void DscText::TextRun::SetTextRunArray(
 	_geometry_dirty = true;
 }
 
-void DscText::TextRun::SetTextContainerSize(
+void DscText::Text::SetTextContainerSize(
 	const DscCommon::VectorInt2& in_container_size
 )
 {
@@ -182,12 +189,12 @@ void DscText::TextRun::SetTextContainerSize(
 	}
 }
 
-const bool DscText::TextRun::GetWidthLimitEnabled() const
+const bool DscText::Text::GetWidthLimitEnabled() const
 {
 	return _width_limit_enabled;
 }
 
-void DscText::TextRun::SetWidthLimit(
+void DscText::Text::SetWidthLimit(
 	const bool in_width_limit_enabled,
 	const int in_width_limit
 )
@@ -209,7 +216,7 @@ void DscText::TextRun::SetWidthLimit(
 	}
 }
 
-void DscText::TextRun::SetHorizontalLineAlignment(
+void DscText::Text::SetHorizontalLineAlignment(
 	const THorizontalAlignment in_horizontal_line_alignment
 )
 {
@@ -220,7 +227,7 @@ void DscText::TextRun::SetHorizontalLineAlignment(
 	}
 }
 
-void DscText::TextRun::SetVerticalBlockAlignment(
+void DscText::Text::SetVerticalBlockAlignment(
 	const TVerticalAlignment in_vertical_block_alignment
 )
 {
@@ -231,7 +238,7 @@ void DscText::TextRun::SetVerticalBlockAlignment(
 	}
 }
 
-void DscText::TextRun::SetLineGapPixels(
+void DscText::Text::SetLineGapPixels(
 	const int in_line_gap_pixels
 )
 {
@@ -243,7 +250,7 @@ void DscText::TextRun::SetLineGapPixels(
 	}
 }
 
-void DscText::TextRun::SetUIScale(
+void DscText::Text::SetUIScale(
 	const float in_ui_scale
 )
 {

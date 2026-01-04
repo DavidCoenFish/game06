@@ -12,7 +12,7 @@ namespace DscDag
 namespace DscText
 {
 	class TextManager;
-	class TextRun;
+	class Text;
 }
 
 namespace DscUi
@@ -108,7 +108,7 @@ namespace DscUi
 		TStack,
 		TText,
 		// Todo, merge TTextNode into TText
-		TTextNode, // alternative data path for TText, but from a DagNode returning a shared_ptr<TextRun>
+		TTextNode, // alternative data path for TText, but from a DagNode returning a shared_ptr<Text>
 
 		// there is no button component, components are for layout and draw style
 		//TButton, // has input, filter draw of children for input flag if they have a for_input_flag node
@@ -228,7 +228,7 @@ namespace DscUi
 {
 	struct TUiComponentTextData
 	{
-		std::shared_ptr<DscText::TextRun> _text_run = {};
+		std::shared_ptr<DscText::Text> _text_run = {};
 		DscText::TextManager* _text_manager = nullptr;
 	};
 	struct TUiComponentScrollbarData

@@ -48,7 +48,7 @@ namespace DscDagRender
 namespace DscText
 {
 	class TextManager;
-	class TextRun;
+	class Text;
 }
 
 namespace DscUi
@@ -85,7 +85,7 @@ namespace DscUi
 		std::shared_ptr<DscRenderResource::ShaderResource> _texture;
 
 		// we could use move semantics to have the text run as a unique_ptr, but kind of throwing around the ComponentConstructionHelper by copy
-		std::shared_ptr<DscText::TextRun> _text_run = {};
+		std::shared_ptr<DscText::Text> _text_run = {};
 		DscDag::NodeToken _text_run_node = nullptr;
 		DscText::TextManager* _text_manager = nullptr;
 
@@ -345,7 +345,7 @@ namespace DscUi
 	ComponentConstructionHelper MakeComponentImage(const std::shared_ptr<DscRenderResource::ShaderResource>& in_texture);
 	ComponentConstructionHelper MakeComponentCanvas();
 	ComponentConstructionHelper MakeComponentText(
-		const std::shared_ptr<DscText::TextRun>& in_text_run,
+		const std::shared_ptr<DscText::Text>& in_text_run,
 		DscText::TextManager* const in_text_manager, // so, either the text manager needs to be told to upload the glyph texture before draw and we can grab the text shader pointer, or our draw method needs a ref to the text manager
 		const bool in_has_scroll = true
 		);

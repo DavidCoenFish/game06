@@ -1,0 +1,24 @@
+#once
+//Print(._CURRENT_BFF_DIR_)
+//Print(._WORKING_DIR_)
+
+{
+    .Param = [
+        .RootPath = ^_WORKING_DIR_
+        .RelativePath = ^_CURRENT_BFF_DIR_
+        .ConfigurationArray = ^ConfigurationArray
+        .VisualStudioSettings = ^VisualStudioSettings
+        .CommonVcproject = ^CommonVcproject
+        .LibraryBaseNameDependency = {"dsc_common"}
+    ]
+    .ProjectName = "dsc_statistics"
+    #include "..\..\fbuild\dsc_vsproject_static_lib.bff"
+}
+
+{
+    .temp = [
+        .Path           = "staticlib"
+        .Projects       = "dsc_statistics_project"
+    ]
+    ^SolutionItemArray + .temp
+}

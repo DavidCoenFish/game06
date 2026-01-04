@@ -10,7 +10,7 @@
 #include <dsc_data/accessor.h>
 #include <dsc_render_resource_png/dsc_render_resource_png.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/i_text_run.h>
 #include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
@@ -32,7 +32,7 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         break;
     case UiInstanceMainMenu::TUiNodeGroupDataSource::TTitle:
     {
-        // do we spit out strings of TextRun
+        // do we spit out strings of Text
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(std::string) };
         return s_meta_data;
     }
@@ -270,9 +270,9 @@ UiInstanceMainMenu::UiInstanceMainMenu(
     {
         auto& text_manager = *in_context._text_manager;
         auto& file_system = *in_context._file_system;
-        auto text = in_context._dag_collection->CreateCalculate<std::shared_ptr<DscText::TextRun>>(
+        auto text = in_context._dag_collection->CreateCalculate<std::shared_ptr<DscText::Text>>(
                 [&text_manager, &file_system]
-                (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+                (std::shared_ptr<DscText::Text>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
                     const DscLocale::LocaleISO_639_1 locale = DscDag::GetValueType<DscLocale::LocaleISO_639_1>(in_input_array[0]);
                     const std::string& font_path = DscDag::GetValueType<std::string>(in_input_array[1]);
                     const std::string& message = DscDag::GetValueType<std::string>(in_input_array[2]);
@@ -281,7 +281,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
                     DscText::GlyphCollectionText* font = text_manager.LoadFont(file_system, font_path);
 
                     std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
-                    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                    text_run_array.push_back(DscText::Text::MakeTextRunDataString(
                         message,
                         pLocale,
                         font,
@@ -291,7 +291,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
                         //30
                     ));
 
-                    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+                    text_run_array.push_back(DscText::Text::MakeTextRunDataString(
                         "\xE2" "\x84" "\xA2",
                         pLocale,
                         font,
@@ -304,7 +304,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
                     DscCommon::VectorInt2 container_size = {};
                     const int32 current_width = 0;
-                    output = std::make_shared<DscText::TextRun>(
+                    output = std::make_shared<DscText::Text>(
                         std::move(text_run_array),
                         container_size,
                         true,
@@ -354,9 +354,9 @@ UiInstanceMainMenu::UiInstanceMainMenu(
     {
         auto& text_manager = *in_context._text_manager;
         auto& file_system = *in_context._file_system;
-        auto text = in_context._dag_collection->CreateCalculate<std::shared_ptr<DscText::TextRun>>(
+        auto text = in_context._dag_collection->CreateCalculate<std::shared_ptr<DscText::Text>>(
             [&text_manager, &file_system]
-        (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
+        (std::shared_ptr<DscText::Text>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             const DscLocale::LocaleISO_639_1 locale = DscDag::GetValueType<DscLocale::LocaleISO_639_1>(in_input_array[0]);
             const std::string& font_path = DscDag::GetValueType<std::string>(in_input_array[1]);
             const std::string& message = DscDag::GetValueType<std::string>(in_input_array[2]);
@@ -365,7 +365,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
             DscText::GlyphCollectionText* font = text_manager.LoadFont(file_system, font_path);
 
             std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
-            text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            text_run_array.push_back(DscText::Text::MakeTextRunDataString(
                 message,
                 pLocale,
                 font,
@@ -375,7 +375,7 @@ UiInstanceMainMenu::UiInstanceMainMenu(
 
             DscCommon::VectorInt2 container_size = {};
             const int32 current_width = 0;
-            output = std::make_shared<DscText::TextRun>(
+            output = std::make_shared<DscText::Text>(
                 std::move(text_run_array),
                 container_size,
                 true,

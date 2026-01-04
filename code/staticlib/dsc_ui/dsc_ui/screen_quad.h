@@ -32,6 +32,12 @@ namespace DscUi
 			const DscCommon::VectorInt2& in_parent_size
 		);
 
+		void SetQuadSize(
+			const VectorUiCoord2& in_quad_size,
+			const VectorUiCoord2& in_quad_pivot,
+			const VectorUiCoord2& in_parent_attach
+			);
+
 		void SetParentSize(
 			const DscCommon::VectorInt2& in_parent_size
 			);

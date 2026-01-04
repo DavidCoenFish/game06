@@ -9,7 +9,7 @@
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
 #include <dsc_png/dsc_png.h>
@@ -67,7 +67,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         const DscText::TextLocale* const pLocale = _resources->_text_manager->GetLocaleToken(DscLocale::LocaleISO_639_1::English);
 
         //https://r12a.github.io/app-conversion/
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataString(
             "Non fixed width layout.\nLigature " "\xC3" "\xA6" ".\n" "\xE4" "\xBD" "\xA0" "\xE5" "\xA5" "\xBD" "\xE4" "\xBA" "\xBA" " which may not be that special when it is done as unicode glyphs, but feels good.",
             pLocale,
             font,
@@ -76,33 +76,33 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             48,
             12
             ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataString(
             "red",
             pLocale,
             font,
             80,
             DscCommon::Math::ConvertColourToInt(255, 0, 0, 255)
         ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataString(
             "green",
             pLocale,
             font,
             64,
             DscCommon::Math::ConvertColourToInt(0, 255, 0, 255)
         ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataString(
             "blue.\n",
             pLocale,
             font,
             48,
             DscCommon::Math::ConvertColourToInt(0, 0, 255, 255)
         ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataIcon(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataIcon(
             icon_a,
             _resources->_text_manager->GetIconFont(),
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
         ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataString(
             " (and",
             pLocale,
             font,
@@ -111,12 +111,12 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
             48,
             12
         ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataIcon(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataIcon(
             icon_b,
             _resources->_text_manager->GetIconFont(),
             DscCommon::Math::ConvertColourToInt(255, 255, 255, 255)
         ));
-        text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+        text_run_array.push_back(DscText::Text::MakeTextRunDataString(
             ") and now icons.",
             pLocale,
             font,
@@ -127,7 +127,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         ));
 
         const int32 current_width = _draw_system->GetRenderTargetBackBuffer()->GetSize().GetX();
-        _resources->_text_run = std::make_unique<DscText::TextRun>(
+        _resources->_text_run = std::make_unique<DscText::Text>(
             std::move(text_run_array),
             container_size,
             true,

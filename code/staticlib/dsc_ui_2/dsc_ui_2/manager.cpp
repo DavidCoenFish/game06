@@ -19,7 +19,7 @@
 #include <dsc_render_resource\shader_resource.h>
 #include <dsc_render_resource\shader_resource_info.h>
 #include <dsc_text\text_manager.h>
-#include <dsc_text\text_run.h>
+#include <dsc_text\text.h>
 
 namespace
 {

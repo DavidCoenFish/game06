@@ -4,6 +4,13 @@
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/debug_print.h>
 
+namespace DscCommon
+{
+	template <typename IN_TYPE>
+	class Vector2;
+	typedef Vector2<int32> VectorInt2;
+}
+
 namespace DscRender
 {
 	class DrawSystem;
@@ -88,6 +95,12 @@ namespace DscRenderResource
 		//	const std::shared_ptr<GeometryGeneric>& in_shader,
 		//	const std::vector<uint8_t>& in_vertex_data_raw
 		//);
+
+		// slow and a little dangerous, if texture resource still in use for draw, resize is not healthy
+		void UpdateRenderTargetSize(
+			std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target,
+			const DscCommon::VectorInt2& in_size
+			);
 
 	private:
 		/// draw system reference

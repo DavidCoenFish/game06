@@ -13,7 +13,7 @@
 #include <dsc_render_resource/shader_pipeline_state_data.h>
 #include <dsc_render_resource/shader_resource_info.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
 #include <dsc_version/dsc_version.h>
@@ -37,7 +37,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
 
     const int32 text_colour = DscCommon::Math::ConvertColourToInt(192, 192, 192, 255);
 
-    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+    text_run_array.push_back(DscText::Text::MakeTextRunDataString(
         DscCommon::LogSystem::Printf("%s %s\n", DscVersion::GetConfiguration(), DscVersion::GetPlatform()),
         pLocale,
         font,
@@ -45,7 +45,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         text_colour
     ));
 
-    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+    text_run_array.push_back(DscText::Text::MakeTextRunDataString(
         DscCommon::LogSystem::Printf("%s\n", DscVersion::GetGitRevision()),
         pLocale,
         font,
@@ -53,7 +53,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
         text_colour
     ));
 
-    text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+    text_run_array.push_back(DscText::Text::MakeTextRunDataString(
         DscCommon::LogSystem::Printf("%s", DscVersion::GetTimestamp()),
         pLocale,
         font,
@@ -62,23 +62,23 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
     ));
 
 
-    _text_run = std::make_unique<DscText::TextRun>(
+    _text_run = std::make_unique<DscText::Text>(
         std::move(text_run_array),
         container_size,
         false,
         0,
         DscText::THorizontalAlignment::TRight,
         DscText::TVerticalAlignment::TMiddle,
-        8
+        8,
+        1.0f,
+        DscCommon::VectorInt4(8,8,8,8)
         );
 
     DscCommon::VectorInt2 text_size = _text_run->GetTextBounds();
-    DscCommon::VectorInt2 text_size_padded(text_size.GetX() + 16, text_size.GetY() + 16);
-    DscCommon::VectorInt2 text_size_half(text_size.GetX() + 8, text_size.GetY() + 12);
-    _text_run->SetTextContainerSize(text_size_half);
+    _text_run->SetTextContainerSize(text_size);
     // make a screen quad the size of the text, to the bottom right of the screen
     _screen_quad = std::make_unique<DscUi::ScreenQuad>(
-        DscUi::VectorUiCoord2(DscUi::UiCoord(text_size_padded.GetX(), 0.0f), DscUi::UiCoord(text_size_padded.GetY(), 0.0f)),
+        DscUi::VectorUiCoord2(DscUi::UiCoord(text_size.GetX(), 0.0f), DscUi::UiCoord(text_size.GetY(), 0.0f)),
         DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
         DscUi::VectorUiCoord2(DscUi::UiCoord(0, 1.0f), DscUi::UiCoord(0, 1.0f)),
         container_size
@@ -90,7 +90,7 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
             DscRender::RenderTargetFormatData(
                 DXGI_FORMAT_B8G8R8A8_UNORM,
                 true,
-                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.25f)
+                DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.5f)
             )
         );
 
@@ -98,13 +98,9 @@ DscOnscreenVersion::OnscreenVersion::OnscreenVersion(
             &in_draw_system,
             target_format_data_array,
             DscRender::RenderTargetDepthData(),
-            text_size_padded,
-            false,
-            true,
-            text_size_half
+            text_size
             );
     }
-
 
     std::vector<uint8> vertex_shader_data;
     if (false == in_file_system.LoadFile(vertex_shader_data, DscCommon::FileSystem::JoinPath("shader", "dsc_ui", "screen_quad_texture_vs.cso")))

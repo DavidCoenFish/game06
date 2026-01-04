@@ -8,8 +8,9 @@ which also pulled in some zip, png packages.<br>
 <br>
 Uses RapidJSON, which is licensed under the MIT License.<br>
 <br>
-// todo, replace NLohmann with RapidJSON<br>
+// todo, replace NLohmann with RapidJSON?<br>
 `vcpkg install nlohmann`<br> 
+`vcpkg install pugixml`<br> 
 <br>
 Uses of the font code2000.ttf  <https://www.code2001.com/index.htm><br>
 <br>

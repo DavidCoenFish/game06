@@ -48,7 +48,7 @@ namespace DscDagRender
 namespace DscText
 {
 	class TextManager;
-	class TextRun;
+	class Text;
 }
 
 /*

@@ -30,7 +30,7 @@
 #include <dsc_ui/ui_instance_factory.h>
 #include <dsc_locale/dsc_locale.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
 #include <dsc_windows/window_helper.h>
@@ -183,9 +183,9 @@ namespace
         );
 
 
-        auto text = in_dag_collection.CreateCalculate<std::shared_ptr<DscText::TextRun>>(
+        auto text = in_dag_collection.CreateCalculate<std::shared_ptr<DscText::Text>>(
             [&in_text_manager, &in_file_system, in_message]
-        (std::shared_ptr<DscText::TextRun>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>&) {
+        (std::shared_ptr<DscText::Text>& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>&) {
             const DscText::TextLocale* const pLocale = in_text_manager.GetLocaleToken(DscLocale::LocaleISO_639_1::English);
             DscText::GlyphCollectionText* font = in_text_manager.LoadFont(
                 in_file_system, 
@@ -195,7 +195,7 @@ namespace
             std::vector<std::unique_ptr<DscText::ITextRun>> text_run_array;
             DscCommon::VectorInt2 container_size = {};
 
-            text_run_array.push_back(DscText::TextRun::MakeTextRunDataString(
+            text_run_array.push_back(DscText::Text::MakeTextRunDataString(
                 in_message,
                 pLocale,
                 font,
@@ -207,7 +207,7 @@ namespace
             ));
 
             const int32 current_width = 0;
-            output = std::make_shared<DscText::TextRun>(
+            output = std::make_shared<DscText::Text>(
                 std::move(text_run_array),
                 container_size,
                 true,

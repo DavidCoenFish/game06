@@ -28,7 +28,7 @@
 #include "text_locale.h"
 #include "text_manager.h"
 #include "text_pre_vertex.h"
-#include "text_run.h"
+#include "text.h"
 #include "text_run_icon.h"
 #include "text_run_text.h"
 

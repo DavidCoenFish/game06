@@ -2,6 +2,7 @@
 #include "dsc_text.h"
 #include <dsc_common/dsc_common.h>
 #include <dsc_common/vector_int2.h>
+#include <dsc_common/vector_int4.h>
 #include <dsc_common/vector_float4.h>
 #include <dsc_text/i_text_run.h>
 #include <dsc_text/text_enum.h>
@@ -24,7 +25,12 @@ namespace DscText
 	class GlyphCollectionText;
 	class TextLocale;
 
-	class TextRun
+	/*
+	better names? "Text", "TextRunContainer"
+	own the text runs, render geometry, size info
+	*/
+
+	class Text
 	{
 	public:
 		static std::unique_ptr<ITextRun> MakeTextRunDataString(
@@ -46,12 +52,12 @@ namespace DscText
 			const int32 in_base_line_offset = 0
 		);
 
-		TextRun() = delete;
-		TextRun& operator=(const TextRun&) = delete;
-		TextRun(const TextRun&) = delete;
+		Text() = delete;
+		Text& operator=(const Text&) = delete;
+		Text(const Text&) = delete;
 
 		// Do we keep the defaults, and each run has the settings? or simplify so we just have global settings at top, and data for each run
-		TextRun(
+		Text(
 			std::vector<std::unique_ptr<ITextRun>>&& in_text_run_array,
 			const DscCommon::VectorInt2& in_container_size,
 			const bool in_width_limit_enabled = false,
@@ -59,10 +65,11 @@ namespace DscText
 			const THorizontalAlignment in_horizontal_line_alignment = THorizontalAlignment::TNone,
 			const TVerticalAlignment in_vertical_block_alignment = TVerticalAlignment::TTop,
 			const int32 in_lineGapPixels = 0,
-			const float in_ui_scale = 1.0f
-		);
+			const float in_ui_scale = 1.0f,
+			const DscCommon::VectorInt4& in_text_margin = DscCommon::VectorInt4::s_zero
+			);
 
-		~TextRun();
+		~Text();
 
 		// build geoemtry if needed
 		const std::shared_ptr<DscRenderResource::GeometryGeneric>& GetGeometry(
@@ -70,7 +77,7 @@ namespace DscText
 			DscRenderResource::Frame* const in_draw_system_frame
 			);
 
-		// Get the natural size required by the text using current width limit if enabled
+		// Get the natural size required by the text using current width limit if enabled, includes text margin
 		DscCommon::VectorInt2 GetTextBounds();
 
 		void SetTextRunArray(
@@ -111,6 +118,7 @@ namespace DscText
 		bool _calculate_dirty;
 		std::unique_ptr<TextPreVertex> _pre_vertex_data;
 		DscCommon::VectorInt2 _text_bounds;
+		DscCommon::VectorInt4 _text_margin;
 		bool _geometry_dirty;
 		std::shared_ptr<DscRenderResource::GeometryGeneric> _geometry;
 

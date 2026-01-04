@@ -29,7 +29,7 @@
 #include <dsc_render_resource\shader_resource.h>
 #include <dsc_render_resource\shader_resource_info.h>
 #include <dsc_text\text_manager.h>
-#include <dsc_text\text_run.h>
+#include <dsc_text\text.h>
 
 
 namespace
@@ -575,7 +575,7 @@ DscDag::NodeToken DscUi::MakeNode::MakeDesiredSize(
             const DscUi::TUiComponentTextData& text_data = DscDag::GetValueType<DscUi::TUiComponentTextData>(in_input_array[1]);
             const float ui_scale = DscDag::GetValueType<float>(in_input_array[2]);
 
-            DscText::TextRun* const text_run_raw = text_data._text_run.get();
+            DscText::Text* const text_run_raw = text_data._text_run.get();
             if (nullptr != text_run_raw)
             {
                 text_run_raw->SetWidthLimit(

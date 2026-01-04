@@ -1,0 +1,85 @@
+#once
+
+{
+    .temp = [
+        .Path           = "parent"
+        .Items = { 
+            "../.gitignore",
+            "../backup_copy_d_drive.cmd",
+            "../backup_copy_e_drive.cmd",
+            "../build_all.cmd",
+            "../cmd_here.cmd",
+            "../commit.cmd",
+            "../generate_solution.cmd",
+            "../open_solution.cmd",
+            "../open_visual_studio_code.cmd",
+            "../publish_show_n_tell.cmd",
+            "../README.md",
+            "../reset.cmd",
+            "../sync.cmd",
+            "../test_all.cmd"
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/data/sample_json"
+        .Items = { 
+            "../data/sample_json/sample_json/test.json",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/design"
+        .Items = { 
+            "../design/rpg_legendary_quest_00.txt",
+            "../design/rpg_succubus_survival_00.txt",
+            "../design/rts_mold_00.txt",
+            "../design/sandbox_jank_00.txt",
+            "../design/sandbox_simian_00.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/design/drafts/hunts_goblins"
+        .Items = { 
+            "../design/drafts/hunts_goblins/draft00.txt",
+            "../design/drafts/hunts_goblins/draft01.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+{
+    .temp = [
+        .Path           = "parent/design/drafts/trailer_bridge_archer"
+        .Items = { 
+            "../design/drafts/trailer_bridge_archer/draft00.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+
+{
+    .temp = [
+        .Path           = "parent/design/drafts/trailer_explorer_loop"
+        .Items = { 
+            "../design/drafts/trailer_explorer_loop/draft00.txt",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}
+
+{
+    .temp = [
+        .Path           = "parent/utils"
+        .Items = { 
+            "../utils/make_folder_for_today.cmd",
+            }
+    ]
+    ^SolutionItemArray + .temp;
+}

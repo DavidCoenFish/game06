@@ -1,7 +1,6 @@
 #include "application.h"
 
 #include <dsc_camera/camera.h>
-#include <dsc_common/dsc_common.h>
 #include <dsc_common/data_helper.h>
 #include <dsc_common/i_file_overlay.h>
 #include <dsc_common/file_system.h>
@@ -11,6 +10,7 @@
 #include <dsc_common/vector_int2.h>
 #include <dsc_common/vector_int3.h>
 #include <dsc_common/vector_float3.h>
+#include <dsc_onscreen_debug/onscreen_debug.h>
 #include <dsc_onscreen_version/onscreen_version.h>
 #include <dsc_render/draw_system.h>
 #include <dsc_render/i_render_target.h>
@@ -25,7 +25,13 @@
 #include <dsc_render_resource/shader_resource_info.h>
 #include <dsc_render_resource/unordered_access.h>
 #include <dsc_render_resource/unordered_access_info.h>
+#include <dsc_statistics/bookmark.h>
+#include <dsc_statistics/bookmarks_per_second.h>
+#include <dsc_statistics/value_int.h>
+#include <dsc_statistics/event_store.h>
+#include <dsc_statistics/i_event.h>
 #include <dsc_text/text_manager.h>
+#include <dsc_windows/window_helper.h>
 
 namespace
 {
@@ -127,7 +133,7 @@ namespace
 #endif
         return;
     }
-#endif
+#else
 
 #define DSC_SQRT_3_DIV_SIX 0.28867513459481288225457439025098f
 #define DSC_SQRT_2_3RD 0.81649658092772603273242802490196f
@@ -366,6 +372,7 @@ namespace
         }
 
     }
+#endif
 }
 
 Application::Resources::Resources() 
@@ -394,7 +401,7 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     );
 #else
     GenerateSphere(
-        10.0f,
+        5.0f,
         0.75f,
         pos_data,
         link_data,
@@ -415,16 +422,32 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     _apply_spring_acceleration_constant_buffer._time_step = 1.0f / (60.0f * 40.0f);
     _apply_spring_acceleration_constant_buffer._dampen = 0.995f;
 
+    _click_spring_acceleration_constant_buffer._pos_count = pos_count;
+
     _file_system = std::make_unique<DscCommon::FileSystem>();
-    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f));
+    _draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.5f, 0.5f, 0.5f, 0.0f));
+    //_draw_system = DscRender::DrawSystem::FactoryClearColour(in_hwnd, DscCommon::VectorFloat4(0.0f, 0.0f, 0.0f, 0.0f));
+    _event_store = std::make_unique<DscStatistics::EventStore>();
+    if (nullptr != _event_store)
+    {
+        _event_store->SetStoredEvents("FPS");
+        _event_store->SetStoredEvents("pos_count");
+        _event_store->SetStoredEvents("link_count");
+
+        _event_store->AddEventDerrived(
+            std::make_unique<DscStatistics::BookmarksPerSecond>("FPS"),
+            std::vector<std::string>({"frame"})
+            );
+    }
 
     _resources = std::make_unique<Resources>();
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
         _resources->_text_manager = std::make_unique<DscText::TextManager>(*_draw_system, *_file_system);
+        _resources->_onscreen_debug = std::make_unique<DscOnscreenDebug::OnscreenDebug>(*_draw_system, *_file_system, *(_resources->_text_manager));
         _resources->_onscreen_version = std::make_unique<DscOnscreenVersion::OnscreenVersion>(*_draw_system, *_file_system, *(_resources->_text_manager));
         _resources->_camera = std::make_unique<DscCamera::Camera>(
-            DscCommon::VectorFloat3(1.0f, 20.0f, 1.0f), //in_initial_pos,
+            DscCommon::VectorFloat3(0.0f, 20.0f, 0.0f), //in_initial_pos, // 1.0f, 20.0f, 1.0f
             DscCommon::VectorFloat3(0.0f, -1.0f, 0.0f), //in_initial_at,
             DscCommon::VectorFloat3(0.0f, 0.0f, 1.0f), //in_initial_up,
             30.0f, //in_far,
@@ -434,6 +457,11 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
     }
 
     DSC_LOG_DIAGNOSTIC(LOG_TOPIC_APPLICATION, "pos_count:%d, link_count:%d\n", pos_count, link_count);
+    if (nullptr != _event_store)
+    {
+        _event_store->AddEvent(std::make_unique<DscStatistics::ValueInt>("pos_count", pos_count));
+        _event_store->AddEvent(std::make_unique<DscStatistics::ValueInt>("link_count", link_count));
+    }
 
     //_pos_data
     {
@@ -745,6 +773,46 @@ Application::Application(const HWND in_hwnd, const bool in_fullScreen, const int
         _resources->_accumulate_spring_acceleration_constant_buffer = _resources->_accumulate_spring_acceleration_shader->MakeShaderConstantBuffer(_draw_system.get());
     }
 
+    //_click_spring_acceleration_shader
+    if ((nullptr != _file_system) && (nullptr != _draw_system))
+    {
+        std::vector<uint8> compute_shader_data;
+        if (false == _file_system->LoadFile(compute_shader_data, DscCommon::FileSystem::JoinPath("shader", "click_spring_acceleration_cs.cso")))
+        {
+            DSC_LOG_WARNING(LOG_TOPIC_APPLICATION, "failed to load compute shader\n");
+        }
+        DscRenderResource::ShaderPipelineStateData compute_pipeline_state_data = DscRenderResource::ShaderPipelineStateData::FactoryComputeShader();
+
+        std::vector< std::shared_ptr< DscRenderResource::ConstantBufferInfo > > array_shader_constants_info;
+        array_shader_constants_info.push_back(
+            DscRenderResource::ConstantBufferInfo::Factory(_click_spring_acceleration_constant_buffer)
+        );
+
+        std::vector< std::shared_ptr< DscRenderResource::ShaderResourceInfo > > array_shader_resource_info;
+        array_shader_resource_info.push_back(DscRenderResource::ShaderResourceInfo::FactoryNoSampler(
+            nullptr
+        ));
+
+        std::vector< std::shared_ptr< DscRenderResource::UnorderedAccessInfo > > array_unordered_access_info;
+        array_unordered_access_info.push_back(
+            DscRenderResource::UnorderedAccessInfo::Factory(
+                _resources->_acceleration_data->GetHeapWrapperItem()
+            ));
+
+        _resources->_click_spring_acceleration_shader = std::make_shared<DscRenderResource::Shader>(
+            _draw_system.get(),
+            compute_pipeline_state_data,
+            std::vector<uint8_t>(),
+            std::vector<uint8_t>(),
+            std::vector<uint8_t>(),
+            array_shader_resource_info,
+            array_shader_constants_info,
+            compute_shader_data,
+            array_unordered_access_info
+            );
+        _resources->_click_spring_acceleration_constant_buffer = _resources->_click_spring_acceleration_shader->MakeShaderConstantBuffer(_draw_system.get());
+    }
+
     // _apply_spring_acceleration_shader;
     if ((nullptr != _file_system) && (nullptr != _draw_system))
     {
@@ -809,9 +877,35 @@ const bool Application::Update()
 {
     BaseType::Update();
 
+    if (nullptr != _event_store)
+    {
+        _event_store->AddEvent(std::make_unique<DscStatistics::Bookmark>("frame", std::chrono::system_clock::now()));
+    }
+
+    // do we need to actually check focus of app
+    const bool window_focused = false == GetMinimized();
+
     if (_resources && _resources->_camera)
     {
-        _resources->_camera->Update(GetHwnd(), false == GetMinimized());
+        _resources->_camera->Update(GetHwnd(), window_focused);
+    }
+
+    bool click = false;
+    DscCommon::VectorInt2 click_pos;
+
+    //bool _prev_mouse_pos_valid = false;
+    //DscCommon::VectorInt2 _prev_mouse_pos;
+    {
+        bool left_button = false;
+        bool right_button = false;
+
+        // top left is 0,0 and +x is across the screen, +y is down the screen
+        const bool mouse_valid = DscWindows::GetMouseState(GetHwnd(), click_pos, left_button, right_button);
+
+        if (mouse_valid && right_button)
+        {
+            click = true;
+        }
     }
 
     if (_draw_system && (false == GetMinimized()))
@@ -848,8 +942,47 @@ const bool Application::Update()
             frame->SetShader(_resources->_accumulate_spring_acceleration_shader, _resources->_accumulate_spring_acceleration_constant_buffer);
             frame->Dispatch(8, 8);
 
+            if (click && _resources && _resources->_camera)
+            {
+                // Set T0 position
+                {
+                    DscRenderResource::UnorderedAccess* pos_data = _resources->_pos_data[GetPosDataIndexPrev()].get();
+                    frame->ResourceBarrier(pos_data, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+                    _resources->_click_spring_acceleration_shader->SetShaderResourceViewHandle(
+                        0, pos_data->GetShaderViewHeapWrapperItem()
+                    );
+                }
 
-            // apply sprint
+                // Set U0 acceleration
+                frame->ResourceBarrier(_resources->_acceleration_data.get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+                _resources->_click_spring_acceleration_shader->SetUnorderedAccessViewHandle(
+                    0, _resources->_acceleration_data->GetHeapWrapperItem()
+                );
+
+                // Set constant buffer b0
+                {
+                    const DscCamera::Camera::TConstantBuffer& camera_buffer = _resources->_camera->GetConstantBuffer();
+
+                    _click_spring_acceleration_constant_buffer._click_pos_weight[0] = camera_buffer._camera_pos_fov_horizontal[0];
+                    _click_spring_acceleration_constant_buffer._click_pos_weight[1] = camera_buffer._camera_pos_fov_horizontal[1];
+                    _click_spring_acceleration_constant_buffer._click_pos_weight[2] = camera_buffer._camera_pos_fov_horizontal[2];
+                    _click_spring_acceleration_constant_buffer._click_pos_weight[3] = 0.075f;
+
+                    _click_spring_acceleration_constant_buffer._click_norm_range[0] = 0.0f;
+                    _click_spring_acceleration_constant_buffer._click_norm_range[1] = -1.0f;
+                    _click_spring_acceleration_constant_buffer._click_norm_range[2] = 0.0f;
+                    _click_spring_acceleration_constant_buffer._click_norm_range[3] = 0.002f; // 0.034f; // 1.0 - cos(15deg)
+
+                    TClickSpringAccelerationConstantBuffer& buffer = _resources->_click_spring_acceleration_constant_buffer->GetConstant<TClickSpringAccelerationConstantBuffer>(0);
+                    buffer = _click_spring_acceleration_constant_buffer;
+                }
+
+                //   dispatch
+                frame->SetShader(_resources->_click_spring_acceleration_shader, _resources->_click_spring_acceleration_constant_buffer);
+                frame->Dispatch(8, 8);
+            }
+
+            // apply spring
             //   set T0 (pos prev prev)
             {
                 DscRenderResource::UnorderedAccess* pos_data = _resources->_pos_data[GetPosDataIndexPrevPrev()].get();
@@ -891,8 +1024,15 @@ const bool Application::Update()
         frame->SetRenderTarget(_draw_system->GetRenderTargetBackBuffer(), true);
 
         // display is tearing a bit funny, stepping through each frame, the last drawn is dominant, but letting it just run, things look green
-        // also now the compute advanced 40 times a frame, the tripple buffer lag is a lot less
+        // also now the compute advanced 40 times a frame, the tripple buffer lag is a lot less, so only draw the current pos data
         PresentPos(frame, GetPosDataIndex(), DscCommon::VectorFloat4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        UpdateDebugText();
+
+        if (_resources->_onscreen_debug)
+        {
+            _resources->_onscreen_debug->Update(*_draw_system, *frame, *_resources->_text_manager, false);
+        }
 
         if (_resources->_onscreen_version)
         {
@@ -980,4 +1120,22 @@ void Application::PresentPos(std::unique_ptr<DscRenderResource::Frame>& in_frame
     //   draw
     in_frame->SetShader(_resources->_present_pos_shader, _resources->_present_pos_constant_buffer[in_pos_data_index]);
     in_frame->Draw(_resources->_geometry);
+
+    return;
 }
+
+void Application::UpdateDebugText()
+{
+    if ((nullptr != _event_store) && (nullptr != _resources) && (nullptr != _resources->_onscreen_debug))
+    {
+        std::string debug_text;
+
+        _event_store->VisitEvents([&debug_text](const DscStatistics::IEvent& in_event) {
+            debug_text += in_event.GetDescription() + "\n";
+        });
+
+        _resources->_onscreen_debug->SetText(debug_text);
+    }
+    return;
+}
+

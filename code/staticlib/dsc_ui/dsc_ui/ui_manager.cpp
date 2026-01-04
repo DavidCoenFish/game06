@@ -30,7 +30,7 @@
 #include <dsc_render_resource\shader_resource.h>
 #include <dsc_render_resource\shader_resource_info.h>
 #include <dsc_text\text_manager.h>
-#include <dsc_text\text_run.h>
+#include <dsc_text\text.h>
 
 bool k_rollover = false;
 
@@ -2049,7 +2049,7 @@ DscDag::NodeToken DscUi::UiManager::MakeDrawNode(
 
                 if (true == ui_render_target->ActivateRenderTarget(frame))
                 {
-                    DscText::TextRun* text_run_raw = text_data._text_run.get();
+                    DscText::Text* text_run_raw = text_data._text_run.get();
                     if (nullptr != text_run_raw)
                     {
                         text_run_raw->SetTextContainerSize(ui_render_target->GetViewportSize());

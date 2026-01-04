@@ -80,7 +80,8 @@ namespace DscText
 			std::vector<uint8_t>& out_vertex_raw_data,
 			const DscCommon::VectorInt2& in_container_size,
 			const THorizontalAlignment in_horizontal_line_alignment,
-			const TVerticalAlignment in_vertical_line_alignment
+			const TVerticalAlignment in_vertical_line_alignment,
+			const DscCommon::VectorInt4& in_text_margin
 		);
 
 	private:

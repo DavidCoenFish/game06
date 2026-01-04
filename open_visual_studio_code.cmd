@@ -1,8 +1,8 @@
-::chdir %~dp0
-::start code .
-::exit 0
+::open_visual_studio_code.cmd
+@ECHO OFF
 
-chdir %~dp0
-start /B /D . code .
-::exit /b 0
-exit 0
+PUSHD %~dp0
+START /B /D . code .
+POPD
+
+EXIT /b 0

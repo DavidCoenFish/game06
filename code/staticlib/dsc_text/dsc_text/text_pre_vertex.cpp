@@ -185,10 +185,13 @@ void DscText::TextPreVertex::BuildVertexData(
 	std::vector<uint8_t>& out_vertex_raw_data,
 	const DscCommon::VectorInt2& in_container_size,
 	const THorizontalAlignment in_horizontal_line_alignment,
-	const TVerticalAlignment in_vertical_line_alignment
+	const TVerticalAlignment in_vertical_line_alignment,
+	const DscCommon::VectorInt4& in_text_margin
 )
 {
 	FinishLine(0);
+	// adjust vertical_delta for the vertical margin, not the _accumulate_line_height_offset
+	//_accumulate_line_height_offset = in_text_margin.GetTop();
 
 	const int line_count = static_cast<int>(_horizontal_bounds.size());
 	std::vector<int> horizontal_line_delta(line_count);
@@ -198,12 +201,14 @@ void DscText::TextPreVertex::BuildVertexData(
 		switch (in_horizontal_line_alignment)
 		{
 		default:
+			horizontal_line_delta[index] = in_text_margin.GetLeft();
 			break;
 		case THorizontalAlignment::TMiddle:
-			horizontal_line_delta[index] = ((in_container_size[0] - width) / 2) - _horizontal_bounds[index][0];
+			//horizontal_line_delta[index] = ((in_container_size[0] - width) / 2) - _horizontal_bounds[index][0];
+			horizontal_line_delta[index] = in_text_margin.GetLeft() + (((in_container_size[0] - width - in_text_margin.GetLeft() - in_text_margin.GetRight())) / 2);
 			break;
 		case THorizontalAlignment::TRight:
-			horizontal_line_delta[index] = (in_container_size[0] - _horizontal_bounds[index][1]);
+			horizontal_line_delta[index] = (in_container_size[0] - _horizontal_bounds[index][1] - in_text_margin.GetRight());
 			break;
 		}
 	}
@@ -214,13 +219,14 @@ void DscText::TextPreVertex::BuildVertexData(
 		switch (in_vertical_line_alignment)
 		{
 		default:
-			vertical_delta = in_container_size.GetY();
+			vertical_delta = in_container_size.GetY() - in_text_margin.GetTop();
 			break;
 		case TVerticalAlignment::TMiddle:
-			vertical_delta = ((in_container_size[1] - bounds_height) / 2) + bounds_height;
+			//vertical_delta = ((in_container_size[1] - bounds_height) / 2) + bounds_height;
+			vertical_delta = bounds_height + in_text_margin.GetBottom() + (((in_container_size[1] - bounds_height - in_text_margin.GetTop() - in_text_margin.GetBottom())) / 2);
 			break;
 		case TVerticalAlignment::TBottom:
-			vertical_delta = bounds_height;
+			vertical_delta = bounds_height + in_text_margin.GetBottom();
 			break;
 		}
 	}
@@ -317,7 +323,7 @@ void DscText::TextPreVertex::FinishLine(const int32 in_line_gap_pixels)
 	_vertical_bounds[1] = std::max(_vertical_bounds[1], _line_vertical_bounds[1]);
 
 	// we add current line depth AFTER moving the current text lower, so following lines of text are adjusted
-	// likewise the ling gap
+	// likewise the line gap
 	_accumulate_line_height_offset += _current_line_depth;
 	_accumulate_line_height_offset += in_line_gap_pixels;
 

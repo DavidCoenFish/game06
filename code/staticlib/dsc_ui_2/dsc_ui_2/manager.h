@@ -32,7 +32,7 @@ namespace DscRenderResource
 namespace DscText
 {
 	class TextManager;
-	class TextRun;
+	class Text;
 }
 
 namespace DscUi2

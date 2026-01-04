@@ -1,3 +1,4 @@
+::cnd_here.cmd
 @ECHO OFF
 PUSHD %~dp0
 

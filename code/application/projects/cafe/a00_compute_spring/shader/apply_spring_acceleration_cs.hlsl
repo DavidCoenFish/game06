@@ -1,3 +1,5 @@
+#include "spring_acceleration.hlsli"
+
 cbuffer ConstantBuffer0 : register(b0)
 {
     int _point_count;
@@ -19,15 +21,6 @@ struct AccelerationData
 StructuredBuffer<AccelerationData> g_acceleration_data : register(t2);
 
 RWStructuredBuffer<PositionData> g_pos_data : register(u0);
-
-float3 ConvertInt3ToFloat3(int3 in_int3)
-{
-    return float3(
-        ((float)(in_int3.x)) / 16777216.0, //2 ^ 24
-        ((float)(in_int3.y)) / 16777216.0,
-        ((float)(in_int3.z)) / 16777216.0
-        );
-}
 
 [numthreads(8, 8, 1)]
 void main(uint3 in_dispatch_thread_id : SV_DispatchThreadID, uint3 in_group_id : SV_GroupID)

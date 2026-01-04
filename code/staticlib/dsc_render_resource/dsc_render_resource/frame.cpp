@@ -179,6 +179,21 @@ void DscRenderResource::Frame::ResourceBarrier(
 //	return;
 //}
 
+void DscRenderResource::Frame::UpdateRenderTargetSize(
+	std::shared_ptr<DscRenderResource::RenderTargetTexture>& in_render_target,
+	const DscCommon::VectorInt2& in_size
+)
+{
+	in_render_target->Resize(
+		_command_list,
+		_draw_system.GetD3dDevice(),
+		in_size
+		);
+	_resource_list->AddResource(in_render_target);
+	return;
+}
+
+
 #if defined(_DEBUG)
 
 //template <>

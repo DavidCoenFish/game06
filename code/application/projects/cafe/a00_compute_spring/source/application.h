@@ -19,6 +19,11 @@ namespace DscCommon
     typedef Vector4<float> VectorFloat4;
 }
 
+namespace DscOnscreenDebug
+{
+    class OnscreenDebug;
+}
+
 namespace DscOnscreenVersion
 {
     class OnscreenVersion;
@@ -38,6 +43,11 @@ namespace DscRenderResource
     class ShaderResource;
     class ShaderConstantBuffer;
     class UnorderedAccess;
+}
+
+namespace DscStatistics
+{
+    class EventStore;
 }
 
 namespace DscText
@@ -67,11 +77,14 @@ private:
 
     void PresentPos(std::unique_ptr<DscRenderResource::Frame>& in_frame, const int32 in_pos_data_index, const DscCommon::VectorFloat4& in_colour);
 
+    void UpdateDebugText();
+
 private:
     typedef DscWindows::IWindowApplication BaseType;
 
     std::unique_ptr<DscCommon::FileSystem> _file_system;
     std::unique_ptr<DscRender::DrawSystem> _draw_system;
+    std::unique_ptr<DscStatistics::EventStore> _event_store;
 
     static constexpr int32 k_pos_data_count = 3;
     int32 _pos_data_index = 0;
@@ -84,6 +97,7 @@ private:
 
         std::unique_ptr<DscText::TextManager> _text_manager;
         std::unique_ptr<DscOnscreenVersion::OnscreenVersion> _onscreen_version = {};
+        std::unique_ptr<DscOnscreenDebug::OnscreenDebug> _onscreen_debug = {};
         std::unique_ptr<DscCamera::Camera> _camera = {};
 
         // unable to get StructBuffer acceleration to clear, so make a shader to do it
@@ -92,6 +106,9 @@ private:
 
         std::shared_ptr<DscRenderResource::Shader> _accumulate_spring_acceleration_shader;
         std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _accumulate_spring_acceleration_constant_buffer;
+
+        std::shared_ptr<DscRenderResource::Shader> _click_spring_acceleration_shader;
+        std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _click_spring_acceleration_constant_buffer;
 
         std::shared_ptr<DscRenderResource::Shader> _apply_spring_acceleration_shader;
         std::shared_ptr<DscRenderResource::ShaderConstantBuffer> _apply_spring_acceleration_constant_buffer;
@@ -127,6 +144,14 @@ private:
         float _spring_constant;
     };
     TAccumulateSpringAccelerationConstantBuffer _accumulate_spring_acceleration_constant_buffer = {};
+
+    struct TClickSpringAccelerationConstantBuffer
+    {
+        float _click_pos_weight[4];
+        float _click_norm_range[4];
+        int _pos_count;
+    };
+    TClickSpringAccelerationConstantBuffer _click_spring_acceleration_constant_buffer = {};
 
     struct TApplySpringAccelerationConstantBuffer
     {

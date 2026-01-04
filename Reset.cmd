@@ -1,7 +1,6 @@
+::reset.cmd
 @ECHO OFF
 PUSHD %~dp0
-
-CLS
 
 ECHO %time% %~nx0 %~1
 

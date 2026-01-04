@@ -9,7 +9,7 @@
 #include <dsc_data/dsc_data.h>
 #include <dsc_data/accessor.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/i_text_run.h>
 #include <dsc_ui/component_construction_helper.h>
 #include <dsc_ui/ui_manager.h>
@@ -31,7 +31,7 @@ const DscDag::DagNodeGroupMetaData& DscDag::GetDagNodeGroupMetaData(const UiInst
         break;
     case UiInstanceOptions::TUiNodeGroupDataSource::TBack:
     {
-        // do we spit out strings of TextRun
+        // do we spit out strings of Text
         static DscDag::DagNodeGroupMetaData s_meta_data = { false, typeid(UiInstance::TButtonData) };
         return s_meta_data;
     }

@@ -67,6 +67,23 @@ namespace DscCommon
 			return;
 		}
 
+		const TYPE GetLeft() const
+		{
+			return _data[Index::Left];
+		}
+		const TYPE GetTop() const
+		{
+			return _data[Index::Top];
+		}
+		const TYPE GetRight() const
+		{
+			return _data[Index::Right];
+		}
+		const TYPE GetBottom() const
+		{
+			return _data[Index::Bottom];
+		}
+
 		const bool operator==(const Vector4& in_rhs) const
 		{
 			for (int index = 0; index < Index::Count; ++index)
@@ -100,7 +117,11 @@ namespace DscCommon
 			Y,
 			Z,
 			W,
-			Count
+			Count,
+			Left = X,
+			Top = Y,
+			Right = Z,
+			Bottom = W
 		};
 
 	private:

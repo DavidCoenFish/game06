@@ -8,7 +8,7 @@
 #include <dsc_render/i_render_target.h>
 #include <dsc_render_resource/frame.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
 #include <dsc_onscreen_version/onscreen_version.h>

@@ -3,7 +3,12 @@
 {
     .temp =  [
         .Path = "$_CURRENT_BFF_DIR_$"
-        .Items = { "$_CURRENT_BFF_DIR_$/dsc.bff" }
+        .Items = { 
+            "$_CURRENT_BFF_DIR_$/dsc.bff",
+            "$_CURRENT_BFF_DIR_$/dsc_vsproject_console_exe.bff",
+            "$_CURRENT_BFF_DIR_$/dsc_vsproject_static_lib.bff",
+            "$_CURRENT_BFF_DIR_$/dsc_vsproject_window_exe.bff",
+            }
     ]
     ^SolutionItemArray + .temp
 }

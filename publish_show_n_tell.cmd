@@ -1,9 +1,9 @@
+::publish_shown_n_tell.cmd
+:: intent was to collect into a script the build and copy to a publish dir all the public facing builds
 @ECHO OFF
 PUSHD %~dp0
-CLS
-ECHO %time% %~nx0 %*
 
-::Get timestamp
+ECHO %time% %~nx0 %*
 
 FOR /F "skip=1 tokens=1-6" %%G IN ('WMIC Path Win32_LocalTime Get Day^,Hour^,Minute^,Month^,Second^,Year /Format:table') DO (
    IF "%%~L"=="" goto S_DONE

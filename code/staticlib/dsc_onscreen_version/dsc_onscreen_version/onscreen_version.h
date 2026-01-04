@@ -15,7 +15,7 @@ namespace DscUi
 namespace DscText
 {
 	class TextManager;
-	class TextRun;
+	class Text;
 }
 
 namespace DscRenderResource
@@ -61,7 +61,7 @@ namespace DscOnscreenVersion
 			const DscCommon::VectorInt2& in_size
 		);
 	private:
-		std::unique_ptr<DscText::TextRun> _text_run;
+		std::unique_ptr<DscText::Text> _text_run;
 		std::shared_ptr<DscRenderResource::RenderTargetTexture> _render_target_texture;
 		std::shared_ptr<DscUi::ScreenQuad> _screen_quad;
 		std::shared_ptr<DscRenderResource::Shader> _screen_quad_shader;

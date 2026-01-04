@@ -130,7 +130,7 @@ DscDag::NodeToken DscUi::MakeComponentResourceGroup(
         DscText::TextManager* text_manager = in_construction_helper._text_manager;
         auto text = in_dag_collection.CreateCalculate<DscUi::TUiComponentTextData>([text_manager](DscUi::TUiComponentTextData& output, std::set<DscDag::NodeToken>&, std::vector<DscDag::NodeToken>& in_input_array) {
             output._text_manager = text_manager;
-            output._text_run = DscDag::GetValueType<std::shared_ptr<DscText::TextRun>>(in_input_array[0]);
+            output._text_run = DscDag::GetValueType<std::shared_ptr<DscText::Text>>(in_input_array[0]);
         }, owner
         );
         DSC_DEBUG_ONLY(DscDag::DebugSetNodeName(text, "text node"));
@@ -782,7 +782,7 @@ DscUi::ComponentConstructionHelper DscUi::MakeComponentCanvas()
 }
 
 DscUi::ComponentConstructionHelper DscUi::MakeComponentText(
-    const std::shared_ptr<DscText::TextRun>& in_text_run,
+    const std::shared_ptr<DscText::Text>& in_text_run,
     DscText::TextManager* const in_text_manager,
     const bool in_has_scroll
 )

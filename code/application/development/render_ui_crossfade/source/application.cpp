@@ -26,7 +26,7 @@
 #include <dsc_locale/dsc_locale.h>
 #include <dsc_png/dsc_png.h>
 #include <dsc_text/text_manager.h>
-#include <dsc_text/text_run.h>
+#include <dsc_text/text.h>
 #include <dsc_text/text_run_text.h>
 #include <dsc_text/glyph_collection_text.h>
 #include <dsc_windows/window_helper.h>
